@@ -1,10 +1,20 @@
 package zuo_course_01base.No_3;
 
-public class HeapSort {
-    /**
-     * 1. 堆结构中最重要的两个操作：heapfy和heapInsert,其他操作都是由这两个操作变来的。
-     * */
+import java.util.PriorityQueue;
 
+/**
+ * 1. 堆结构中最重要的两个操作：heapfy和heapInsert,其他操作都是由这两个操作变来的。
+ * 2. 堆排序 远远没有 堆结构重要。
+ * 3. java种的堆结构就是PriorityQueue。空参时构造器创建的是小根堆。。。系统中的堆不推荐的使用
+ *  是删除中间的某个数，系统的PriorityQueue只能挨个遍历去判断每一个数需要需要改动位置，这种情
+ *  况下建议自己写代码实现功能
+ * */
+public class HeapSort {
+
+    /**
+     * heapInsert：在index插入一个数后，调整大根堆是正确的
+     *  思路：
+     * */
     public static void heapInsert(int[] arr,int index){
         /**
          *  do:某个数现在在index位置，是否需要向上移动。
@@ -20,15 +30,11 @@ public class HeapSort {
             parent = (index-1)/2;
         }
     }
-//  heapInsert的简洁版本
-//    public static void heapInsert01(int[] arr,int index){
-//        while(arr[index]>arr[(index-1)/2]){
-//            swap(arr,index,(index-1)/2);
-//            index = (index-1)/2;
-//        }
-//    }
 
-
+    /**
+     * heapfy————删除堆顶的元素，重新构建堆；根据一批数构建出大根堆
+     *  这里的例子是：删除大根堆的堆顶元素(即一批数的最大值)，重新构建堆
+     * */
     public static void heapfy(int[] arr,int index,int heapSize){
         /**
          * do:某个数在index位置，是否需要向下移动.
@@ -37,37 +43,26 @@ public class HeapSort {
          *
          *      是否需要向下移动就是问它的孩子节点有比它大的吗？？
          * */
-        int left = 2*index +1;          //当前位置的左孩子节点。有左孩子不一定有右孩子，有右孩子一定有左孩子
+        int left = 2*index +1;          //当前位置的左孩子节点。堆的结构保证了：有左孩子不一定有右孩子，有右孩子一定有左孩子
         while(left<heapSize){           //说明有孩子，则还可能有右孩子。
             /*
             * left+1<heapSize && arr[left]<arr[left+1]是一个技术语句。
             *       首先判断left+1是否越界了，如果越界了后面的的arr[left]<arr[left+1]就不会执行因此不会异常终止；
             * */
             int largest = left+1<heapSize && arr[left]<arr[left+1] ? left+1:left;       //返回左右孩子最大的那个节点的索引
-            largest = arr[largest]>arr[index]?largest:index;            //返回index节点和左右孩子最大的相比最大的，对应的索引
+            largest = arr[largest]>arr[index]?largest:index;            //返回index节点和左右孩子最大的相比最大的那个值，对应的索引
             if(largest==index){                                 //如果index节点比左右两个孩子节点都大，就不需要移动了。break;
                 break;
             }
-            swap(arr,largest,index);        //如果没有执行if说明，index比左右孩子的某个小，需要交换
-            index = largest;                //交换后需要更新index值
+            swap(arr,largest,index);        //如果没有执行if内，说明index比左右孩子的某个小，需要执行这里交换
+            index = largest;                //交换后需要更新index值。因为还要继续二叉树向下判断是不是有孩子节点的值比它index位置的大
             left = 2*index+1;               //根据更新后的index值更新left的值。
         }
     }
 
-//    public static void heapfy01(int[] arr,int index,int heapSize){
-//        int left = index*2+1;
-//        while(left<heapSize){
-//            int largest = left+1<heapSize && arr[left+1]>arr[left]?left+1:left;
-//            if(arr[index]<arr[largest]){
-//                swap(arr,index,largest);
-//                index = largest;
-//                left = 2*index+1;
-//            }
-//            else
-//                break;;
-//        }
-//    }
-
+    /**
+     * 堆排序的实现。空间复杂度O(1)，时间复杂度O(NlogN)
+     * */
     public static void heapSort(int[] arr){
         /**
          * 堆排序：等价于一个一个的给数，然后构建最大堆。也就是说插入一个一个的数，不断调整先前的最大堆。。

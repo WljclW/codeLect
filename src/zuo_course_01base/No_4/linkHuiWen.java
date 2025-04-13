@@ -3,7 +3,7 @@ package zuo_course_01base.No_4;
 import java.util.Stack;
 
 public class linkHuiWen {
-    //方法1
+    //方法1,所有的数据压栈
     public static Boolean m01(Node head){
         if(head == null || head.next ==null){
             return true;
@@ -22,7 +22,7 @@ public class linkHuiWen {
         return true;
     }
 
-    //方法2
+    //方法2：将中点后面的一半压栈
     public static Boolean m02(Node head){
         if(head == null || head.next == null){
             return true;
@@ -53,4 +53,9 @@ public class linkHuiWen {
         }
         return true;
     }
+
+    //方法3：空间复杂度O(1)
+//    public static Boolean m03(Node head){
+//
+//    }
 }
