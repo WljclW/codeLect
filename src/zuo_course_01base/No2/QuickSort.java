@@ -2,6 +2,10 @@ package zuo_course_01base.No2;
 
 import java.util.Arrays;
 
+/**
+ * 快速排序3.0，也就是常规说法的快速排序
+ *    思路：每一次随机选择一个数，将其他的数按照这个数分为三部分。
+ * */
 public class QuickSort {
     public static void main(String[] args) {
         int[] arr = {9, 2, 5, 6, 7, 4, 9, 10, 1};
@@ -25,8 +29,8 @@ public class QuickSort {
     }
 
     private static int[] partition(int[] arr, int l, int r) {
-        int less = l - 1; //小于基准值的数的右边界
-        int more = r; //大于基准值的数的左边界
+        int less = l - 1; //小于基准值的数的右边界(这个位置的数是包含在左边的)
+        int more = r; //大于基准值的数的左边界(这个位置的数是包含在右边的)
         while (l < more) { //l代表当下研究的数，
             if (arr[l] < arr[r]) { //当前值小于基准值
                 swap(arr, ++less, l++);
@@ -36,7 +40,7 @@ public class QuickSort {
                 l++;
             }
         }
-        swap(arr, more, r);
+        swap(arr, more, r); //将最后一个数和右边数组的 第一个数交换，即将分组的边界值放在了大于部分的第一个位置
         return new int[]{less + 1, more};
     }
 

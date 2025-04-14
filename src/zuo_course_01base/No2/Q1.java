@@ -9,9 +9,28 @@ import java.util.Arrays;
 public class Q1 {
     public static void main(String[] args) {
         int[] arr = {7, 2, 5, 6, 7, 4, 9, 10, 1};
-        solution(arr,6);
-        System.out.println(Arrays.toString(arr));
+//        solution(arr,6);
+//        System.out.println(Arrays.toString(arr));
+
+        so(arr,6);
+        System.out.println(Arrays.toString(arr));;
     }
+
+
+    /**
+     * 下面是另外的一种写法。。。区别在于在for循环条件更新了变量i，因此循环内部不用更新了
+     * */
+    public static void so(int[] arr,int flag){
+        int left = 0;
+        for(int i=0;i<arr.length;i++){
+            if(arr[i]<=flag){
+                swap(arr,i,left++);
+            }
+        }
+    }
+
+
+
 
     public static void solution(int[] arr,int flag){
         int cur = 0; //当前研究的是该索引处的数

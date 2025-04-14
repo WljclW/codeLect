@@ -1,7 +1,10 @@
 package zuo_course_01base.No01_sort;
 
+import java.util.Arrays;
+
 /**
  * 冒泡排序：思想是每次从0的位置开始比较，将大的数不断的向后传递，直到传递到倒数第n(n就是第n轮)和位置
+ *    换句话说：每一轮都是从0位置开始；第m轮会0位置开始将大的数像冒泡一样传递到倒数第m个数的位置
  * 详细的理解————
  *      第一轮：0~n-1范围。0位置和1位置比较，0位置的数大？大的话0位置的数和1位置的数交换；接着比较
  * 1位置和2位置，1位置的数大？大的话1位置的数和2位置的数交换；接着比较2位置和3位置，2位置的数大？大
@@ -15,11 +18,15 @@ package zuo_course_01base.No01_sort;
  * */
 public class MaoPao {
     public static void main(String[] args) {
-        int[] arr = {3, 1, 2, 4, 8, 5, 6, 7, 9, 0, 11, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+        int[] arr = GetRandom.getInts(20);
+
         maoPao(arr);
         for (int i : arr) {
             System.out.print(i + " ");
         }
+
+        maopao02(arr);
+        System.out.println(Arrays.toString(arr));
     }
 
     public static void maoPao(int[] arr){
@@ -34,6 +41,19 @@ public class MaoPao {
             }
         }
     }
+
+    public static void maopao02(int[] arr){
+        for (int i=arr.length-1;i>0;i--){
+            for(int j=0;j<i;j++){
+                if(arr[j]>arr[j+1]){
+                    swap(arr,j,j+1);
+                }
+            }
+        }
+    }
+
+
+
 //    public static void swap(int[] arr,int i,int j){
 //        int temp=arr[i];
 //        arr[i]=arr[j];

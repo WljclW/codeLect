@@ -34,7 +34,7 @@ public class feidigui_bianli {
     public void houxu(Node head){
         if (head == null) return;
         LinkedList<Node> stack1 = new LinkedList<>();
-        LinkedList<Node> stack2 = new LinkedList<>(); //相比前序多一个栈
+        LinkedList<Node> stack2 = new LinkedList<>(); //1.1相比前序多一个栈
         stack1.push(head);
         /*
         *   将所有的节点压入到栈stack1。顺序是根、左孩子、右孩子（注意顺序和先序
@@ -43,10 +43,10 @@ public class feidigui_bianli {
         while (!stack1.isEmpty()){
             Node cur = stack1.pop();
             stack2.push(cur); //弹出的节点压入到stack2中。
-            if (cur.left!=null) stack1.push(cur.left); //先压左孩子
+            if (cur.left!=null) stack1.push(cur.left); //先压左孩子，区别点1.2
             if (cur.right!=null) stack1.push(cur.right);
         }
-        /*依次弹出stack2的节点并访问*/
+        /*依次弹出stack2的节点并访问.区别点1.3*/
         while(!stack2.isEmpty()){
             System.out.println(stack2.pop().value);
         }

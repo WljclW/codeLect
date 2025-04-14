@@ -6,6 +6,9 @@ public class getMax {
         System.out.println(getMax(arr, 0, arr.length - 1));
     }
 
+    /**
+     * 利用递归方法拿到数组的最大值
+     * */
     public static int getMax(int[] arr, int l, int r) {
         if (l == r) { //递归到什么程度能直接拿到结果
             return arr[l];

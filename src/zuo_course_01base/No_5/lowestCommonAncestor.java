@@ -2,7 +2,7 @@ package zuo_course_01base.No_5;
 
 
 /**
- *      给出两个节点，返回它们最早相交的父节点。
+ *  给出两个节点，返回它们最早相交的父节点。
  * */
 public class lowestCommonAncestor {
     public static Node m02(Node head,Node n1,Node n2){
