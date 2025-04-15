@@ -1,5 +1,8 @@
 package zuo_course_01base.No_5;
 
+/**
+ * 这种二叉树的节点，多了一个指向父节点的指针
+ * */
 public class parNode {
     int value;
     parNode left;

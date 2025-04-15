@@ -33,7 +33,7 @@ public class isBST_taoLu_BTdigui {
 
         /**3. 对于当前节点，利用已有信息计算需要返回的信息。。实现黑盒的拆解，拆解的完整内容就是计
          * 算当前节点需要返回的信息*/
-        /**3.1 继续需要返回的min，max信息*/
+        /**3.1 计算需要返回的min，max信息。min就是左右的min和当前节点取min；max就是左右的max和当前节点取max*/
         int min = x.value;
         int max = x.value;
         if (leftData != null){  //如果leftData不为空，求左子树的最大值、最小值。。

@@ -9,8 +9,7 @@ import java.util.LinkedList;
 public class BT_XuLieHua {
     public static String serialByPre(Node head){
         /**
-         *      根据前序遍历来进行序列化
-         *
+         *  根据前序遍历来进行序列化
          * */
         if (head == null)
             return "#_";
@@ -21,12 +20,6 @@ public class BT_XuLieHua {
     }
 
     public static Node reconByPreString(String preStr){
-        /**
-         * 反序列化的方法：
-         *
-         *      形参preStr是序列化的结果
-         *
-         * */
         String[] values = preStr.split("_");
         LinkedList<String> deque = new LinkedList<>();
         for (int i=0;i!=values.length;i++){
@@ -39,7 +32,7 @@ public class BT_XuLieHua {
         String value = deque.poll();
         if (value.equals("#"))
             return null;
-        Node head = new Node(Integer.valueOf(value));
+        Node head = new Node(Integer.parseInt(value));
         head.left = reconPreOrder(deque);
         head.right = reconPreOrder(deque);
         return head;

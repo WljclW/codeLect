@@ -112,7 +112,7 @@ public class BinaryTreeUnrecurOrder {
 
 
     /**
-     * 一种更清晰的层序遍历。。。下面的代码还可以实现计算二叉树的宽度
+     * 一种更清晰的层序遍历(宽度优先遍历)。。。下面的代码还可以实现计算二叉树的宽度
      * */
     public static void widthOrder(Node head){
         if(head==null) return;

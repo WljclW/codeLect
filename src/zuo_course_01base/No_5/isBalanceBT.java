@@ -35,8 +35,8 @@ public class isBalanceBT {
         ReturnType leftData = process(x.left);
         ReturnType rightData = process(x.right);
 
-        /**3. 基于左右子树返回的结果，如何计算出当前节点应该返回的信息。。。即黑盒
-         * 逻辑的实现，最终实现闭环*/
+        /**3. 基于左右子树返回的结果 以及 已经有的其他数据，如何计算出当前节点应该返回的信息。。。即黑盒
+         * 逻辑的“拆解”，最终实现闭环*/
         /**3.1 根据已有信息，计算当前节点为根的子树的高度————即返回值的其中一个信息*/
         int height = Math.max(leftData.height,rightData.height)+1;  //高度就是左右子树高度的最大值+1,1表示x的高度。
         /**3.2 根据已有的信息，计算当前的节点是不是平衡的————这是返回值的第二个信息*/
