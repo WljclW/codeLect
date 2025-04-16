@@ -9,9 +9,15 @@ public class tanXin {
         个算法来计算你所能获取的最大利润。
       返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 0 。
     * */
-//    public int maxProfit(int[] prices) {
-//
-//    }
+    public int maxProfit(int[] prices) {
+        int minPrice = prices[0];
+        int maxpro = Integer.MIN_VALUE;
+        for(int i=1;i<prices.length;i++){
+            maxpro = Math.max(prices[i]-minPrice,maxpro);
+            minPrice = Math.min(minPrice,prices[i]);
+        }
+        return maxpro;
+    }
 
 
     /*
@@ -20,9 +26,16 @@ public class tanXin {
     * 该位置可以跳跃的最大长度。
         判断你是否能够到达最后一个下标，如果可以，返回 true ；否则，返回 false 。
     * */
-//    public boolean canJump(int[] nums) {
-//
-//    }
+    public boolean canJump(int[] nums) {
+        int cur = 0;
+        int bound = 0;
+        while(cur<=bound){ /*只要当前到达的位置没有越界*/
+            int now = nums[cur];
+            bound = Math.max(bound,cur+now);
+            if(bound>= nums.length) return true;
+        }
+        return false;
+    }
 
     /*45.
     * 给定一个长度为 n 的 0 索引整数数组 nums。初始位置为 nums[0]。
