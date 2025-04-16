@@ -12,11 +12,12 @@ public class tanXin {
     public int maxProfit(int[] prices) {
         int minPrice = prices[0];
         int maxpro = Integer.MIN_VALUE;
-        for(int i=1;i<prices.length;i++){
-            maxpro = Math.max(prices[i]-minPrice,maxpro);
-            minPrice = Math.min(minPrice,prices[i]);
+        for (int i = 1; i < prices.length; i++) {
+            maxpro = Math.max(prices[i] - minPrice, maxpro); /*遍历到每一个位置的决策*/
+            minPrice = Math.min(minPrice, prices[i]); /*每一个位置都需要更新最小值，对于未来的某个位置可以获得更多的位置*/
         }
-        return maxpro;
+//        return maxpro;
+        return maxpro < 0 ? 0 : maxpro;  //利润最小是0，大不了不买。。其实把maxpro初始值设置为0就可以了
     }
 
 
@@ -27,11 +28,13 @@ public class tanXin {
         判断你是否能够到达最后一个下标，如果可以，返回 true ；否则，返回 false 。
     * */
     public boolean canJump(int[] nums) {
-        int cur = 0;
-        int bound = 0;
+        if(nums.length==1) return true;
+        int cur = 0; //表示当前来到的索引
+        int bound = 0; //表示当前最远可以到达的边界
         while(cur<=bound){ /*只要当前到达的位置没有越界*/
             int now = nums[cur];
             bound = Math.max(bound,cur+now);
+            cur++;
             if(bound>= nums.length) return true;
         }
         return false;
