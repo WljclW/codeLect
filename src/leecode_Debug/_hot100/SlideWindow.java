@@ -41,6 +41,7 @@ public class SlideWindow {
         HashMap<Character, Integer> map = new HashMap<>();
         while(right<s.length()){
             char c = s.charAt(right);
+            /*什么都不管，碰到的字符都先放进去；然后利用while循环保证当前窗口合法*/
             map.put(c,map.getOrDefault(c,0)+1);
             while(map.get(c)>1){
                 char cur = s.charAt(left);

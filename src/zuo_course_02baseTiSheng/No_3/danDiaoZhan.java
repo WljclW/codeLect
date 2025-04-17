@@ -1,25 +1,28 @@
 package zuo_course_02baseTiSheng.No_3;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Stack;
 
 /**
- * 单调栈————应用：一列数中找到左右两边离它最近的且大于它的值。
- * 单调栈要求栈中的元素按照严格的单调顺序存放，如果某个元素进栈时发现打破了这种顺序，就要出栈，直到当前元素加入栈顶时不打破那种规定的
- *      顺序。
- * 只要出栈，就生成出栈元素所需要的信息。。出栈链表，则会生成出栈的链表中所有元素的信息。
+ * 单调栈————应用：一列数中找到左右两边离它最近的且大于（或者小于）它的值。
+ * 单调栈要求栈中的元素按照严格的单调顺序(注意：不能相等)存放，如果某个元素进栈时发现打破了这种顺序，就要出栈，直到当前元素加入
+ *      栈顶时不打破那种规定的顺序。
+ * 只要出栈，就生成”出栈元素“所需要的信息；如果出栈的是链表，则会生成“出栈的链表中所有元素”的信息。。比如拿“出栈的是元素”且“查找
+ *      左右第一个大于当前元素”来说：一旦某一个元素出栈，则信息确定如下：右边大于该元素的第一个元素就是 即将入栈的元素；左边第一
+ *      个大于该元素的元素就是它出栈后 新的栈顶元素
  * */
 public class danDiaoZhan {
 
     //假设数组中没有重复元素
     public static int[][] getNearLargeNoRepeat(int[] arr){
         Stack<Integer> dandiaostack = new Stack<>();
-        int[][] res = new int[arr.length][2];               //每一个元素对应两个值————左边离它最进且比它大的数的下标，右边一样
+        int[][] res = new int[arr.length][2];  //每一个元素对应两个值————左边离它最进且比它大的数的下标，右边一样
         for (int i=0;i< arr.length;i++){
-            /**
-             *      遍历数组中的元素————
-             *          如果当前元素大于栈顶的元素，就让栈顶的元素出栈，直到栈顶的元素大于当前要入栈的元素；
-             *          任何一个元素，一旦要出栈，在出栈的时候就会生成它的信息。
+            /*
+             *  遍历数组中的元素————
+             *     如果当前元素大于栈顶的元素，就让栈顶的元素出栈，直到栈顶的元素大于当前要入栈的元素；
+             *     任何一个元素，一旦要出栈，在出栈的时候就会生成它所需要的信息。
              * */
             while(!dandiaostack.isEmpty()&&arr[i]>arr[dandiaostack.peek()]){
                 Integer popIndex = dandiaostack.pop();
@@ -28,17 +31,17 @@ public class danDiaoZhan {
             }
             dandiaostack.push(i);       //当前数入栈
         }
-        /**
-         *      出了for循环表示所有的元素均已经过了一遍，如果此时单调栈不为空，则需对单调栈进行清算
+        /*
+         *  出了for循环表示所有的元素均已经过了一遍，如果此时单调栈不为空，则需对单调栈进行清算
          * */
         while(!dandiaostack.isEmpty()){
-            /**
+            /*
              * 虽然数组遍历完了，但是单调栈中还有元素，需要进行清算。
-             *      清算阶段中，弹出的所有元素右边均没有满足要求的数；左边满足要求的数就是栈中在它下面的数。
+             *    清算阶段中，弹出的所有元素右边均没有满足要求的数；左边满足要求的数就是栈中在它下面的数。
              * */
             Integer index = dandiaostack.pop();
-            res[index][1] = -1;                 //右边没有满足要求的数
-            res[index][0] = dandiaostack.isEmpty()?-1:dandiaostack.peek();      //左边满足要求是栈中被它压着的数，但是要判断它下面还有元素没。
+            res[index][1] = -1;      //右边没有满足要求的数
+            res[index][0] = dandiaostack.isEmpty()?-1:dandiaostack.peek();  //左边满足要求是栈中被它压着的数，但是要判断它下面还有元素没。
         }
         return res;
     }
@@ -96,40 +99,9 @@ public class danDiaoZhan {
 
 
 
-//    public static int[][] getNearLarge_FuXi(int[] arr){
-//        Stack<LinkedList<Integer>> dandiaoStack = new Stack<>();
-//        int[][] res = new int[arr.length][2];
-//        for (int i=0;i<arr.length;i++){
-//            while(!dandiaoStack.isEmpty() && arr[i] > arr[dandiaoStack.peek().get(0)]){
-//                LinkedList<Integer> popList = dandiaoStack.pop();
-//                for (int index:popList){
-//                    res[index][0] = i;
-//                    res[index][1] = dandiaoStack.isEmpty()?-1:dandiaoStack.peek().get(dandiaoStack.peek().size()-1);
-//                }
-//            }
-//            if (!dandiaoStack.isEmpty() && arr[i] == arr[dandiaoStack.peek().get(0)])
-//                dandiaoStack.peek().add(i);
-//            else{
-//                LinkedList<Integer> list = new LinkedList<>();
-//                list.add(i);
-//                dandiaoStack.push(list);
-//            }
-//        }
-//        while(!dandiaoStack.isEmpty()){
-//            LinkedList<Integer> popList = dandiaoStack.pop();
-//            for (int index:popList){
-//                res[index][0] = -1;
-//                res[index][1] = dandiaoStack.isEmpty()?-1:arr[dandiaoStack.peek().get(dandiaoStack.peek().size()-1)];
-//            }
-//        }
-//        return res;
-//    }
-
-
-
     public static void main(String[] args) {
         int[] arr={9,3,1,3,4,3,5,3,2,2};
         int[][] res = getNearLargeNoRepeat(arr);
-        System.out.println(res);
+        System.out.println(Arrays.deepToString(res));
     }
 }
