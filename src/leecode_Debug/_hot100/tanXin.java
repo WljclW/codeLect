@@ -102,15 +102,21 @@ public class tanXin {
 
     public List<Integer> partitionLabels0(String s) {
         LinkedList<Integer> res = new LinkedList<>();
-        int[] flags = new int[s.length()];
+        int[] flags = new int[26];
         for (int i=0;i<s.length();i++){
             flags[s.charAt(i)-'a'] = i;
         }
 
+        int start = 0;
         int cur = 0;
         int bound = flags[s.charAt(0)-'a'];
-        while(cur<bound){
+        while(cur<s.length()){
             bound = Math.max(bound,flags[s.charAt(cur)-'a']);
+            if(cur==bound){
+                res.add(bound-start+1);
+                start = bound;
+            }
+            cur++;
         }
 
 
@@ -121,5 +127,6 @@ public class tanXin {
     public static void main(String[] args) {
         tanXin curClass = new tanXin();
         System.out.println(curClass.partitionLabels("dsadssbtyb"));
+        System.out.println(curClass.partitionLabels0("dsadssbtyb"));
     }
 }

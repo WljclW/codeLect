@@ -4,7 +4,8 @@ import java.util.LinkedList;
 
 /**
  *  求滑动窗口内的最值。
- *      双端队列(首尾两端都可以进出节点)中进的是数在数组中的索引(存下标可以代表更多的信息)，而不是真实的数子本身
+ *      双端队列(首尾两端都可以进出节点)中进的是数在数组中的索引(存下标可以代表更多的信息。不仅知道了索引的信息，还知道
+ *  了数，无非就是根据索引取数组拿一次)
  * */
 public class SlidingWindow {
     public static class MaxWindow{

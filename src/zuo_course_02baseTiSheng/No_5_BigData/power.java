@@ -1,4 +1,4 @@
-package zuo_course_02baseTiSheng.No_5;
+package zuo_course_02baseTiSheng.No_5_BigData;
 
 public class power {
     //2的幂 只有一位是1

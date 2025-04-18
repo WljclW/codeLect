@@ -1,4 +1,4 @@
-package zuo_course_02baseTiSheng.No_6;
+package zuo_course_02baseTiSheng.No_6_recurTransDP;
 
 //与2的区别在于每一种面值的货币有无限并且求的是方案数。
 

@@ -1,4 +1,4 @@
-package zuo_course_02baseTiSheng.No_6;
+package zuo_course_02baseTiSheng.No_6_recurTransDP;
 
 /**
  *  N*M的区域  bob在x,y位置  走k步 没走出区域就生存下来 返回bob生存的概率

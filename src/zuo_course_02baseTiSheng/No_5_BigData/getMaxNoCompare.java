@@ -1,4 +1,4 @@
-package zuo_course_02baseTiSheng.No_5;
+package zuo_course_02baseTiSheng.No_5_BigData;
 
 public class getMaxNoCompare {
     public static int flip(int a){     //保证形参a不是0就是1.

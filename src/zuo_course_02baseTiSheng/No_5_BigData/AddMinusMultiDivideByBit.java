@@ -1,4 +1,4 @@
-package zuo_course_02baseTiSheng.No_5;
+package zuo_course_02baseTiSheng.No_5_BigData;
 
 public class AddMinusMultiDivideByBit {
     public static int add(int a,int b){

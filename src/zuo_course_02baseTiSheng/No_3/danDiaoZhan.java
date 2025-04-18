@@ -16,7 +16,7 @@ public class danDiaoZhan {
 
     //假设数组中没有重复元素
     public static int[][] getNearLargeNoRepeat(int[] arr){
-        Stack<Integer> dandiaostack = new Stack<>();
+        Stack<Integer> dandiaostack = new Stack<>(); //栈中存放的是具体的数————索引值
         int[][] res = new int[arr.length][2];  //每一个元素对应两个值————左边离它最进且比它大的数的下标，右边一样
         for (int i=0;i< arr.length;i++){
             /*
@@ -26,8 +26,8 @@ public class danDiaoZhan {
              * */
             while(!dandiaostack.isEmpty()&&arr[i]>arr[dandiaostack.peek()]){
                 Integer popIndex = dandiaostack.pop();
-                res[popIndex][1] = i;       //右边满足要求的即为当前要入栈的数
-                res[popIndex][0] = dandiaostack.isEmpty()?-1:dandiaostack.peek();       //左边满足要求的即为栈中在它下面的数
+                res[popIndex][1] = i;   //右边满足要求的即为当前要入栈的数
+                res[popIndex][0] = dandiaostack.isEmpty()?-1:dandiaostack.peek(); //左边满足要求的即为栈中在它下面的数
             }
             dandiaostack.push(i);       //当前数入栈
         }
@@ -56,8 +56,8 @@ public class danDiaoZhan {
          *          ②右边满足要求的数依然是谁让它出栈的，就是谁
          *          ③每次出栈时，生成栈顶的那个链表中所有元素的题目要求信息。
          * */
-        Stack<LinkedList<Integer>> dandiaostack = new Stack<>();        //需要用到的栈结构
-        int[][] res = new int[arr.length][2];               //res顺组存放每一个位置对应的左右两边最近且比它大的数
+        Stack<LinkedList<Integer>> dandiaostack = new Stack<>();    //栈中存放的是链表，因为相同的数可能有多个
+        int[][] res = new int[arr.length][2];        //res数组每一个位置存放对应的左右两边最近且比它大的数
         for (int i=0;i< arr.length;i++){            //遍历数组的每一个元素
             while(!dandiaostack.isEmpty() && arr[i] > arr[dandiaostack.peek().get(0)]){
                 /**
@@ -86,7 +86,7 @@ public class danDiaoZhan {
         }
         while(!dandiaostack.isEmpty()){
             /**
-             *      数组遍历完成但是单调栈非空，需要清算单调栈。
+             *   数组遍历完成但是单调栈非空，需要清算单调栈。
              * */
             LinkedList<Integer> list = dandiaostack.pop();
             for (int index:list){
@@ -100,7 +100,7 @@ public class danDiaoZhan {
 
 
     public static void main(String[] args) {
-        int[] arr={9,3,1,3,4,3,5,3,2,2};
+        int[] arr={9,3,1,4,5,7,2,8,6};
         int[][] res = getNearLargeNoRepeat(arr);
         System.out.println(Arrays.deepToString(res));
     }
