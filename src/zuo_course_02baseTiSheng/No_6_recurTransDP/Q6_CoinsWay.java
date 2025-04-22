@@ -1,13 +1,16 @@
 package zuo_course_02baseTiSheng.No_6_recurTransDP;
 
-//与2的区别在于每一种面值的货币有无限并且求的是方案数。
+//与2的区别在于每一种面值的货币有无限并且求的是方案数,并且硬币是没有重复面值的。
+
+import java.lang.reflect.InvocationHandler;
+import java.net.Proxy;
 
 public class Q6_CoinsWay {
     //初始版本：暴力递归
     public static int way(int[] arr, int aim){
-        return process(arr, 0, aim);}               //从0位置的货币就开始往后找
+        return process(arr, 0, aim);}   //从0位置的货币就开始往后找
 
-    private static int process(int[] arr, int index, int rest) {
+    private static int process(int[] arr, int index, int rest) { /*从index索引开始选择货币，凑出rest这么多钱*/
         if (index == arr.length)
             return rest==0?1:0;
         int ways = 0;
