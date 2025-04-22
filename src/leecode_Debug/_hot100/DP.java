@@ -19,6 +19,8 @@ public class DP {
 
     /**dp动态规划*/
     public int climbStairs1(int n) {
+        if (n==1) return 1;
+        if(n==2) return 2;
         int[] dp = new int[n + 1];
         dp[1] = 1;
         dp[2] = 2;
@@ -190,14 +192,20 @@ public class DP {
     * 给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续 子数组（该子数组中至
     * 少包含一个数字），并返回该子数组所对应的乘积。
     测试用例的答案是一个 32-位 整数。*/
+    /**  求的是最大值，但是不能仅仅记录之前子数组的最大值。比如"-2,3,-4"的最大值应该是24，如果
+     * 仅仅选取最大值则遍历到元素3的时候，会选择单独成一个子数组，这样是不对的。应该到任何一个
+     * 位置，都应该记录当前子数组的最大值、最小值*/
     public int maxProduct(int[] nums) {
         //dp数组的定义：以nums[i-1]结尾的最大子数组的乘积..每一个数可以和前面的数个数合成一个子数组 或者 自己成立一个子数组
-        int[] dp = new int[nums.length + 1];
-        dp[0] = 1;
-        int max = 1;
+        int[] dp1 = new int[nums.length + 1];
+        int[] dp2 = new int[nums.length + 1];
+        dp1[0] = 1;
+        dp2[0] = 1;
+        int max = Integer.MIN_VALUE;
         for(int i=1;i<=nums.length;i++){
-            dp[i] = Math.max(dp[i-1]*nums[i-1],nums[i-1]);
-            max = Math.max(max,dp[i]);
+            dp1[i] = Math.max(Math.max(dp2[i-1]*nums[i-1],nums[i-1]),dp1[i-1]*nums[i-1]);
+            dp2[i] = Math.min(Math.min(dp2[i-1]*nums[i-1],nums[i-1]),dp1[i-1]*nums[i-1]);
+            max = Math.max(max,dp1[i]);
         }
         return max;
     }

@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-/**763.*/
+/**45.763*/
 public class tanXin {
     /*121.
     * 给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
@@ -41,9 +41,10 @@ public class tanXin {
      * 2. "贪心"贪的是什么？？是当前走过的位置，决定了最远能到达多远*/
     public boolean canJump(int[] nums) {
         if(nums.length==1) return true;
-        int cur = 0; //表示当前来到的索引
+
+        int cur = 0; //表示当前研究到的索引
         int bound = 0; //表示当前最远可以到达的边界
-        while(cur<=bound){ /*只要当前到达的位置没有越界就循环逻辑*/
+        while(cur<=bound){ /*只要当前到达的位置 没有越界(没有超过当前情况下最远可以去的地方)就循环逻辑*/
             int now = nums[cur]; //表示当前的位置最多走几步
             bound = Math.max(bound,cur+now); //更新可以到达的最远边界
             cur++;
@@ -77,6 +78,7 @@ public class tanXin {
      *    1."flags数组"记录每个字母出现的最后的位置
      *    2.“依次遍历更新窗口内所有字符的最后位置变量，如果当前遍历到的位置能匹配上‘最后位置’说明就是一个合格的子串”
      * */
+    // 763的写法1
     public List<Integer> partitionLabels(String s) {
         ArrayList<Integer> res = new ArrayList<>(); //记录结果
 
@@ -99,7 +101,7 @@ public class tanXin {
     }
 
 
-
+    //763的写法2.
     public List<Integer> partitionLabels0(String s) {
         LinkedList<Integer> res = new LinkedList<>();
         int[] flags = new int[26];
@@ -107,19 +109,17 @@ public class tanXin {
             flags[s.charAt(i)-'a'] = i;
         }
 
-        int start = 0;
-        int cur = 0;
-        int bound = flags[s.charAt(0)-'a'];
+        int start = 0; /*表示当前一个划分的左边界*/
+        int cur = 0; /*初始化遍历的位置为当前位置*/
+        int bound = flags[s.charAt(0)-'a']; /*初始化边界为第一个字符的边界*/
         while(cur<s.length()){
             bound = Math.max(bound,flags[s.charAt(cur)-'a']);
-            if(cur==bound){
+            if(cur==bound){ //到最后一个字符的时候必然会进入到这个if(最后一段区间的边界必然就是s的长度)，因为if外面不用额外添加剩余区间了
                 res.add(bound-start+1);
                 start = bound;
             }
             cur++;
         }
-
-
         return res;
     }
 
