@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 
-public class normalArr {
+public class _04normalArr {
 
     public static void main(String[] args) {
         System.out.println(Runtime.getRuntime().availableProcessors());
 //        new normalArr().maxSubArray(new int[]{-2,1,-3,4,-1,2,1,-5,4});
-        new normalArr().merge(new int[][]{{1,4},{2,3}});
+        new _04normalArr().merge(new int[][]{{1,4},{2,3}});
     }
 
 

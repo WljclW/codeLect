@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**滑动窗口的实质还是双指针*/
-public class SlideWindow {
+public class _03SlideWindow {
     /*
     * 3.给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。无重复字符的最长子串
      * */

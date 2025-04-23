@@ -1,9 +1,13 @@
 package leecode_Debug._hot100;
 
 import java.lang.reflect.Array;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.LinkedList;
 
+
+/**84、*/
 public class stack {
 
     /*20.
@@ -13,6 +17,8 @@ public class stack {
     左括号必须用相同类型的右括号闭合。
     左括号必须以正确的顺序闭合。
     每个右括号都有一个对应的相同类型的左括号。*/
+    /**1. 如果用一个栈就需要结合其他的方法比如下面的anthor方法得到一个括号的右括号；如果用一
+     * 个hasnmap就方便了*/
     public boolean isValid(String s) {
         LinkedList<Character> stack = new LinkedList<>();
         for (char c:s.toCharArray()){
@@ -22,7 +28,9 @@ public class stack {
                 if(stack.isEmpty()){
                     return false;
                 }else{
-                    return another(stack.pop())==c;
+                    /*相等时需要继续下一个字符的校验*/
+                    if(another(stack.pop())==c) continue;
+                    else return false;
                 }
             }
         }
@@ -110,7 +118,7 @@ public class stack {
     public int[] dailyTemperatures(int[] temperatures) {
         int[] res = new int[temperatures.length];
         LinkedList<Integer> stack = new LinkedList<>();
-        stack.push(temperatures[0]);
+        stack.push(0);
         for (int i=1;i<temperatures.length;i++){
             /*
             整体上分为两种情况：
@@ -121,18 +129,36 @@ public class stack {
                 if(temperatures[i]<=temperatures[stack.peek()]){
                     stack.push(i);
                 }else{
-                    while(temperatures[i]>temperatures[stack.peek()]){
+                    while(!stack.isEmpty()&&temperatures[i]>temperatures[stack.peek()]){
+                        /*while循环里面有出栈操作，因此循环条件需要注意判断栈*/
                         Integer cur = stack.pop();
                         res[cur] = i-cur;
                     }
+                    /*除了while循环需要将当前元素入栈*/
+                    stack.push(i);
                 }
             }else{
                 stack.push(i);
             }
         }
-
         return res;
     }
+
+
+    /**求解每日温度问题更好的解*/
+    public int[] dailyTemperatures01(int[] temperatures) {
+        Deque<Integer> stack = new ArrayDeque<>();
+        int[] res = new int[temperatures.length];
+        for(int i=0;i<temperatures.length;i++){
+            while(!stack.isEmpty()&&temperatures[i]>temperatures[stack.peek()]){
+                int index = stack.poll();
+                res[index] = i-index;
+            }
+            stack.push(i);
+        }
+        return res;
+    }
+
 
 
     /*84.
@@ -210,6 +236,11 @@ public class stack {
                 stack.push(i);
             }
         }
+        while(!stack.isEmpty()){
+            Integer cur = stack.pop();
+            int L = stack.isEmpty()?-1: stack.peek();
+            max = Math.max(max,heights[cur]*(cur-L-1));
+        }
         return max;
     }
 
@@ -218,7 +249,8 @@ public class stack {
         stack thisClass = new stack();
 
         System.out.println(thisClass.largestRectangleArea(new int[]{2, 1, 5, 6, 2, 3}));
-        System.out.println(thisClass.largestRectangleArea1(new int[]{2, 1, 5, 6, 2, 3}));
+        System.out.println(thisClass.largestRectangleArea1(new int[]{2,4}));
 
+        System.out.println(thisClass.isValid("()[]{}"));
     }
 }

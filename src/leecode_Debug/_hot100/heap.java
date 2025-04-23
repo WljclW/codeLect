@@ -3,7 +3,12 @@ package leecode_Debug._hot100;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
+/**215、掌握最优的解法；347；295*/
 public class heap {
+    public static void main(String[] args) {
+        heap heap = new heap();
+    }
+
 
     /*215.
     * 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
@@ -14,11 +19,11 @@ public class heap {
         int res = 0;
         for (int i:nums){
             queue.offer(i);
-            if (queue.size()==k){
-                res = queue.poll();
-            }
         }
-        return res;
+        while (queue.size()>k){
+            queue.poll();
+        }
+        return queue.poll();
     }
 
 
@@ -48,7 +53,9 @@ public class heap {
         案将被接受。
      */
     /**
-     * [说明]：1.添加元素的时候挑一个堆入，入进去了再调整*/
+     * [说明]：
+     *    1.这种方式是错的：添加元素的时候挑一个堆入，入进去了再调整
+     *    2.小根堆保存了nums中较大的一半；大根堆保存了nums中较小的一半*/
     class MedianFinder {
 
         PriorityQueue<Integer> small;
@@ -60,12 +67,25 @@ public class heap {
             });
         }
 
+        /**添加时下面的逻辑是错误的。。这样的添加会导致最后两个堆中的数据没有必然的大小关系*/
+//        public void addNum(int num) {
+//            small.offer(num);
+//            while (small.size()- big.size()>1){
+//                big.offer(small.poll());
+//            }
+//        }
+        //正确的方法应该是下面的形式，原因？？
         public void addNum(int num) {
+            if(small.size()>big.size()){
                 small.offer(num);
-            while (small.size()- big.size()>1){
                 big.offer(small.poll());
+            }else{
+                big.offer(num);
+                small.offer(big.poll());
             }
         }
+
+
 
         public double findMedian() {
             int size = small.size() + big.size();

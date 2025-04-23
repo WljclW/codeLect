@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 //15，42
-public class DoublePoint {
+public class _02DoublePoint {
     /*
     * 283.给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
     * 【】：熟悉颜色分类，75。。。。
@@ -110,7 +110,7 @@ public class DoublePoint {
 
 
     public static void main(String[] args) {
-        List<List<Integer>> lists = new DoublePoint().threeSum(new int[]{-1, 0, 1, 2, -1, -4});
+        List<List<Integer>> lists = new _02DoublePoint().threeSum(new int[]{-1, 0, 1, 2, -1, -4});
     }
 }
 
