@@ -7,6 +7,7 @@ import java.util.LinkedList;
 public class normalArr {
 
     public static void main(String[] args) {
+        System.out.println(Runtime.getRuntime().availableProcessors());
 //        new normalArr().maxSubArray(new int[]{-2,1,-3,4,-1,2,1,-5,4});
         new normalArr().merge(new int[][]{{1,4},{2,3}});
     }
@@ -104,7 +105,7 @@ public class normalArr {
 
     /**其实可以在返回的数组基础上进行记录，从而避免其余空间的浪费。
      * 思路：
-     *     第一次正着遍历结果数组res,位置i存放它的前缀积，遍历到末尾位置。。。。然后接着反序遍历结果数组，
+     *     第一次正着遍历原始数组nums,res数组位置i存放它的前缀积，遍历到末尾位置。。。。然后接着反序遍历结果数组，
      *  利用局部变量来记录当前索引j的后缀乘积，这样的话倒着遍历的时候每到一个位置，“局部变量”*“结果集的当
      *  前位置值”就是该位置的结果*/
     public int[] productExceptSelf(int[] nums){
@@ -131,23 +132,23 @@ public class normalArr {
         请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
     * */
     public int firstMissingPositive(int[] nums) {
-        for (int i=0;i<nums.length;i++){
+        for (int i = 0; i < nums.length; i++) {
             /**while会不断的将i位置的元素放到正确的位置....
              * 【注意】
              *      1.虽然交换但是i位置不能变，因为换过来的数还需要继续判断，这就是
-             * 为什么这里是while循环。。
+             * 为什么这里是while循环。。(跟"颜色交换(荷兰国旗类似)"，交换后不能移动cur指针)
              *      2.与"小于 等于 大于"将数组的数分开有异曲同工，如果当前遍历的位置
              * 的数发现大于flag需要换到大于区域，因此需要继续判断这个"从大于区域换来
              * 的数"应该放到哪里————也就意味着swap之后不能变换当前研究的索引cur。
              *      3.一旦出while循环就表示：位置i位置的元素放到了正确的位置，并且所
              * 有换过来的元素也都放到了正确的位置*/
-            while (nums[i]>0&&nums[i]<=nums.length&&nums[nums[i]-1]!=nums[i]){
-                swap(nums,i,nums[i]-1);
+            while (nums[i] > 0 && nums[i] <= nums.length && nums[nums[i] - 1] != nums[i]) {
+                swap(nums, i, nums[i] - 1);
             }
         }
         //经过上面的步骤理论上i位置存放的就是数字i+1.比如0位置存放1，1位置存放2....
-        for (int i=0;i<nums.length;i++){
-            if(nums[i]!=i+1) return i+1;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != i + 1) return i + 1;
         }
 
         return 0;

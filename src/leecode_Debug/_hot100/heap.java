@@ -1,23 +1,37 @@
 package leecode_Debug._hot100;
 
+import java.util.HashMap;
+import java.util.PriorityQueue;
+
 public class heap {
 
     /*215.
     * 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
     请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
     你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。*/
-//    public int findKthLargest(int[] nums, int k) {
-//
-//    }
+    public int findKthLargest(int[] nums, int k) {
+        PriorityQueue<Integer> queue = new PriorityQueue<>();
+        int res = 0;
+        for (int i:nums){
+            queue.offer(i);
+            if (queue.size()==k){
+                res = queue.poll();
+            }
+        }
+        return res;
+    }
 
 
 
-    /*347.
+    /*347. //无思路
     *给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率
     * 前 k 高的元素。你可以按 任意顺序 返回答案。
     * */
 //    public int[] topKFrequent(int[] nums, int k) {
-//
+//        HashMap<Integer, Integer> map = new HashMap<>();
+//        for (int i:nums){
+//            map.put(i,map.getOrDefault(i,0)+1);
+//        }
 //    }
 
 
@@ -33,20 +47,35 @@ public class heap {
         double findMedian() 返回到目前为止所有元素的中位数。与实际答案相差 10-5 以内的答
         案将被接受。
      */
-//    class MedianFinder {
-//
-//        public MedianFinder() {
-//
-//        }
-//
-//        public void addNum(int num) {
-//
-//        }
-//
-//        public double findMedian() {
-//
-//        }
-//    }
+    /**
+     * [说明]：1.添加元素的时候挑一个堆入，入进去了再调整*/
+    class MedianFinder {
+
+        PriorityQueue<Integer> small;
+        PriorityQueue<Integer> big;
+        public MedianFinder() {
+            small = new PriorityQueue<>();
+            big = new PriorityQueue<>((a, b) -> {
+                return b - a;
+            });
+        }
+
+        public void addNum(int num) {
+                small.offer(num);
+            while (small.size()- big.size()>1){
+                big.offer(small.poll());
+            }
+        }
+
+        public double findMedian() {
+            int size = small.size() + big.size();
+            if(size%2==0){
+                return (big.peek()+small.peek())/2.0;
+            }else{
+                return small.peek();
+            }
+        }
+    }
 
 /**
  * Your MedianFinder object will be instantiated and called as such:
