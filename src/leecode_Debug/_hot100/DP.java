@@ -83,10 +83,12 @@ public class DP {
     给定一个代表每个房屋存放金额的非负整数数组，计算你 不触动警报装置的情况下 ，一
     夜之内能够偷窃到的最高金额。
     * */
+    /**【】1. 注意dp问题base case的解决
+     *    */
     public int rob(int[] nums) {
       int max = Integer.MIN_VALUE;
-      rob(nums,0,0,max);
-      return max;
+        returnType res = rob(nums, 0, 0, max);
+        return Math.max(res.curTotal,res.noCurTotal);
     }
 
     class returnType{
@@ -99,9 +101,17 @@ public class DP {
         }
     }
 
-    public int rob(int[] nums,int index,int curTotal,int max){
-
-        return -1;
+    public returnType rob(int[] nums,int index,int curTotal,int max){
+        if(index==nums.length-1){
+            return new returnType(nums[index],0);
+        }
+        if (index==nums.length-2){
+            return new returnType(Math.max(nums[index],nums[index+1]),nums[index+1]);
+        }
+        returnType next = rob(nums, index + 1, curTotal, max);
+        int param1 = curTotal + nums[index]+next.noCurTotal;
+        int param2 = curTotal + Math.max(next.curTotal,next.noCurTotal);
+        return new returnType(param1,param2);
     }
 
 
