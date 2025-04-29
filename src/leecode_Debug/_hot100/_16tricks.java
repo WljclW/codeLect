@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * 25.4.22
  * */
-public class tricks {
+public class _16tricks {
     /*136.
     * 给你一个 非空 整数数组 nums ，除了某个元素只出现一次以外，其余每个元素均
     * 出现两次。找出那个只出现了一次的元素。
@@ -82,11 +82,11 @@ public class tricks {
 
     public static void main(String[] args) {
         int[] arr = {0,0,0,2,0,2,2,0};
-        new tricks().sortColors(arr);
+        new _16tricks().sortColors(arr);
         System.out.println(Arrays.toString(arr));
 
         int[] par = {1, 2, 3, 2};
-        int duplicate = new tricks().findDuplicate(par);
+        int duplicate = new _16tricks().findDuplicate(par);
         System.out.println(duplicate);
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 /**暴力递归：更像是一个从所求 依次推到 已知的问题
  * 动态规划：更像是一个从已知的基础问题(base case) 依次推到 想要求解的问题*/
-public class DP {
+public class _14DP {
     /*
     * 70.假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
     每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
@@ -238,7 +238,7 @@ public class DP {
 
 
     public static void main(String[] args) {
-        DP dp = new DP();
+        _14DP dp = new _14DP();
         System.out.println(dp.numSquares(13));
     }
 

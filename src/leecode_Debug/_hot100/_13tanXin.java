@@ -1,13 +1,11 @@
 package leecode_Debug._hot100;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 /**45.763*/
-public class tanXin {
+public class _13tanXin {
     /*121.
     * 给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
         你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一
@@ -125,7 +123,7 @@ public class tanXin {
 
 
     public static void main(String[] args) {
-        tanXin curClass = new tanXin();
+        _13tanXin curClass = new _13tanXin();
         System.out.println(curClass.partitionLabels("dsadssbtyb"));
         System.out.println(curClass.partitionLabels0("dsadssbtyb"));
     }

@@ -1,12 +1,11 @@
 package leecode_Debug._hot100;
 
-import java.util.HashMap;
 import java.util.PriorityQueue;
 
 /**215、掌握最优的解法；347；295*/
-public class heap {
+public class _12heap {
     public static void main(String[] args) {
-        heap heap = new heap();
+        _12heap heap = new _12heap();
     }
 
 
