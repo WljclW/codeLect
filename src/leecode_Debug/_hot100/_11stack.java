@@ -1,6 +1,5 @@
 package leecode_Debug._hot100;
 
-import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -8,7 +7,7 @@ import java.util.LinkedList;
 
 
 /**84、*/
-public class stack {
+public class _11stack {
 
     /*20.
     * 给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是
@@ -246,7 +245,7 @@ public class stack {
 
 
     public static void main(String[] args) {
-        stack thisClass = new stack();
+        _11stack thisClass = new _11stack();
 
         System.out.println(thisClass.largestRectangleArea(new int[]{2, 1, 5, 6, 2, 3}));
         System.out.println(thisClass.largestRectangleArea1(new int[]{2,4}));
