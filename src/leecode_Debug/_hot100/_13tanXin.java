@@ -16,7 +16,11 @@ public class _13tanXin {
      *     1.“每次判断更新最小值”：原因是，假设当前的位置i是目前遍历到的位置也是最小值m，遍历i位置之前遇到的
      *  最小值是n。因此基于前面的假设有m<n。那么对于未来的任何一天，从m买入肯定有更大的利润，因为m和n是买入
      *  的价格，相当于成本
-     *     2.“贪心”贪的是什么？贪的是遇到的最小值。认为更小的成本对于同样的卖出价会有更高的利润*/
+     *     2.“贪心”贪的是什么？贪的是遇到的最小值。认为更小的成本对于同样的卖出价会有更高的利润。
+     *     3.综上每到一个位置先更新遇到的最小值。结果有两种可能：
+     *          3.1如果现在的值比当前标记的最小值minPrice 还小，就更新minPrice。并且当前位置获得的利润是0；
+     *          3.2如果现在的值比当前标记的最小值minPrice 大，就不更新minPrice。并且当前位置获得的利润=当前
+     *     索引的价格-minPrice*/
     public int maxProfit(int[] prices) {
         int minPrice = prices[0];
         int maxpro = Integer.MIN_VALUE;
@@ -46,7 +50,7 @@ public class _13tanXin {
             int now = nums[cur]; //表示当前的位置最多走几步
             bound = Math.max(bound,cur+now); //更新可以到达的最远边界
             cur++;
-            if(bound>= nums.length) return true;
+            if(bound>= nums.length-1) return true;  /**err：bound是索引，因此达到“nums.length-1”就可以*/
         }
         return false; //除了循环说明bound没有到数组末尾，但是不能再走了，因为cur已经超出能走的边界了
     }

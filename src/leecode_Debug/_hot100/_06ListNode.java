@@ -36,6 +36,18 @@ public class _06ListNode {
 //        return headA;
 //    }
 
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode p1 = headA,p2 = headB;
+        while(p1!=p2){
+            /*p1要是来到null，就指向HeadB;否则的话p1来到下一个；
+            * p2要是来到null，就指向HeadA;否则的话p2来到下一个*/
+            p1 = (p1==null)?headB:p1.next;
+            p2 = (p2==null)?headA:p2.next;
+        }
+        return p1;
+    }
+
+
 
     /*206.
     * 给你单链表的头节点 head ，请你反转链表，并返回反转后的链表。*/
@@ -47,7 +59,7 @@ public class _06ListNode {
         ListNode pre = null,cur = pre,next = head;
         while(next!=null){
             cur = next;
-            next = next.next; /*先将next指针更新,然后再该边cur的next域*/
+            next = next.next; /**err:先将next指针更新,然后再该边cur的next域*/
             cur.next = pre;
             pre = cur;
         }
@@ -279,8 +291,8 @@ public class _06ListNode {
             if (now.next!=null){
                 queue.add(now.next);
             }
-            cur.next = now;
-            cur = cur.next; //②需要更新cur指针
+            cur.next = now; //将优先级队列弹出的节点拼到cur后面
+            cur = cur.next; //然后更新cur指针
             now.next = null;
         }
         return demmy.next;

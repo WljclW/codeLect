@@ -19,6 +19,10 @@ public class All {
             }else
                 cur++;
         }
+        /*需要将后续的置零*/
+        while(left<nums.length){
+            nums[left++]=0;
+        }
     }
 
     public int maxArea(int[] height){ //11
@@ -28,7 +32,7 @@ public class All {
             int cur = Math.min(height[left],height[right])*(right-left);
             Max = Math.max(cur,Max);
             if (height[left]<height[right]) left++;
-            else right++;
+            else right--;
         }
         return Max;
     }
@@ -114,7 +118,7 @@ public class All {
             res[i] = res[i-1]*nums[i-1];
         }
         int post = nums[nums.length-1];
-        for (int i=nums.length-2;i>0;i--){
+        for (int i=nums.length-2;i>=0;i--){
             res[i] *= (post);
             post = post*nums[i];
 
@@ -158,10 +162,11 @@ public class All {
         判断你是否能够到达最后一个下标，如果可以，返回 true ；否则，返回 false 。
     * */
     public boolean canJump(int[] nums) {
+        if (nums.length==1) return true;
         int cur = 0,bound = 0;
         while(cur<=bound){
             bound = Math.max(cur+nums[cur],bound);
-            if (bound>=nums.length) return true;
+            if (bound>=nums.length-1) return true;
             cur++;
         }
         return false;
@@ -259,7 +264,7 @@ public class All {
 
 
 
-    /*287.
+    /**287.
     * 给定一个包含 n + 1 个整数的数组 nums ，其数字都在 [1, n] 范围内（包括 1
     * 和 n），可知至少存在一个重复的整数。
     假设 nums 只有 一个重复的整数 ，返回 这个重复的数 。
@@ -283,7 +288,7 @@ public class All {
 
 
 
-    /*20.
+    /**20.
     * 给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是
     * 否有效。
     有效字符串需满足：
@@ -315,7 +320,7 @@ public class All {
 
 
 
-    /*739.
+    /**739.
     给定一个整数数组 temperatures ，表示每天的温度，返回一个数组 answer ，其中 answer[i] 是指对于第
      i 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 0 来代替。
     * */
@@ -359,7 +364,8 @@ public class All {
         return p1;
     }
 
-    //206
+    /**206
+     */
     public ListNode reverseList(ListNode head) {
         ListNode pre=null,cur=head,next = head;
         while(cur!=null){
@@ -390,7 +396,7 @@ public class All {
         ListNode slow = head,fast = head;
         while (fast!=null&&fast.next!=null){
             slow = slow.next;
-            fast = fast.next;
+            fast = fast.next.next;
             if (slow==fast){
                 fast = head;
                 while(slow!=fast){
@@ -404,7 +410,7 @@ public class All {
     }
 
 
-    /*21.
+    /**21.
      * 将两个升序链表合并为一个新的 升序 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 */
     public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
         ListNode res = new ListNode(-1);
@@ -424,7 +430,7 @@ public class All {
     }
 
 
-    /*2.
+    /**2.
     * 给你两个 非空 的链表，表示两个非负的整数。它们每位数字都是按照 逆序 的方式存储的，并且每个节点只能存储 一位 数字。
     请你将两个数相加，并以相同形式返回一个表示和的链表。
     你可以假设除了数字 0 之外，这两个数都不会以 0 开头。*/
@@ -536,7 +542,7 @@ public class All {
 
 
 
-        /*63.
+        /*62.
     * 一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。
 
     机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标

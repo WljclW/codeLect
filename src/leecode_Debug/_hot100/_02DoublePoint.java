@@ -22,6 +22,7 @@ public class _02DoublePoint {
             }else
                 cur++;
         }
+        /*需要将left及后续的都置零*/
         for (int j=left;j< nums.length;j++){
             nums[j] = 0;
         }
@@ -42,7 +43,7 @@ public class _02DoublePoint {
             if(height[left]<height[right]){
                 left++;
             }else{
-                right--;
+                right--; //right指针需要减1.
             }
         }
         return result;

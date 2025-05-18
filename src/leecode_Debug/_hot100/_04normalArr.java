@@ -19,7 +19,7 @@ public class _04normalArr {
     *   素），返回其最大和。( 子数组是数组中的一个连续部分)
     * */
     /**到达任何一个数有两种选择：要麽和前面的数组成子数组；要麽自己单独成一个数组。
-     * 两种选择到底采用哪一个呢？取最大的那个。
+     * 两种选择到底采用哪一个呢？取最大的那个，作为当前位置最终决策的结果。
      * 那到底最大子数组和是多少呢？使用一个外面的变量来标记。*/
     public int maxSubArray(int[] nums) {
         if(nums.length==1) return nums[0];
@@ -116,7 +116,7 @@ public class _04normalArr {
         for (int i=1;i<nums.length;i++){
             res[i] = res[i-1]*nums[i-1];
         }
-        for (int j=nums.length-2;j>=0;j--){
+        for (int j=nums.length-2;j>=0;j--){ /*等于0的时候也需要计算。否则结果数组的第一个数是1*/
             q *= nums[j+1];
             res[j]*=q;
         }
