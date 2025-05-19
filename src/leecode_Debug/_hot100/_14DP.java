@@ -117,7 +117,16 @@ public class _14DP {
 
     //解法2：最简做法
     /**题目的本质：每到一个位置，根据当前位置前面的两个值来推断当前位置的结果*/
-
+    public int rob01(int[] nums) {
+        if (nums.length==1) return nums[0];
+        int first = nums[0],sec=Math.max(nums[0],nums[1]);
+        for (int i=2;i<nums.length;i++){
+            int cur = Math.max(nums[i]+first,sec);
+            first = sec;
+            sec = cur;
+        }
+        return sec;
+    }
 
 
 
