@@ -93,6 +93,7 @@ public class _13tanXin {
         /*循环遍历，求满足要求的子串*/
         int start = 0, end = flags[s.charAt(0) - 'a'];
         for (int i = 0; i < s.length(); i++) {
+            //每次到一个位置，先根据这个字符更新end的值。（end标记当前窗口内字符出现的右边界 这个信息）
             end = Math.max(flags[s.charAt(i) - 'a'], end);
             if (i == end) {
                 res.add(end - start + 1);

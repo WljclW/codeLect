@@ -30,6 +30,10 @@ public class _06ListNode {
 //        while(headA!=headB){
 //            headA = headA.next;
 //            headB = headB.next;
+    /**直接移动headA和headBhi错误的！！！
+     *    原因：比如这里指向headA空时（即第一个链表走到了末尾）如果重置为headB,此时的headB并不是第二个链
+     * 表的头节点。。。最终会导致两个指针走的路程不一样————而这个解法的关键在于两个指针的总路长是一致的，因
+     * 此最后返回headA或者headB都是可以的。*/
 //            headA = (headA==null)?hb:headA;
 //            headB = (headB==null)?ha:headB;
 //        }
@@ -59,7 +63,7 @@ public class _06ListNode {
         ListNode pre = null,cur = pre,next = head;
         while(next!=null){
             cur = next;
-            next = next.next; /**err:先将next指针更新,然后再该边cur的next域*/
+            next = next.next; /*先将next指针更新,然后再该边cur的next域*/
             cur.next = pre;
             pre = cur;
         }
@@ -174,7 +178,8 @@ public class _06ListNode {
 
     /*19.
     * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。*/
-    /**【注】1. 这个题重要的是在删除的时候slow指针指向要删除节点的前一个节点。
+    /**【解题关键】开始时slow指向虚拟头dummy节点；但是fast指向head并且fast先走n步
+     * 【注】1. 这个题重要的是在删除的时候slow指针指向要删除节点的前一个节点。
      *      2.一开始，要让fast指针先走N步*/
     /*自己的解法*/
     public ListNode removeNthFromEnd(ListNode head, int n) {
@@ -195,7 +200,7 @@ public class _06ListNode {
     }
 
 
-    /*官方解，官方解的通用性更好*/
+    /*【建议采样这种】官方解，官方解的通用性更好*/
     public ListNode removeNthFromEnd1(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head);
         /**官方解中慢指针开始时指向了head节点的前一个；快指针指向head节点*/

@@ -587,12 +587,6 @@ public class All {
     }
 
 
-
-
-
-
-
-
     //438
 //    public List<Integer> findAnagrams(String s, String p) {
 //        ArrayList<Integer> res = new ArrayList<>();

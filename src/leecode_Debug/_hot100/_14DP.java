@@ -85,6 +85,7 @@ public class _14DP {
     * */
     /**【】1. 注意dp问题base case的解决
      *    */
+    //解法1：按照dp套路创建返回值来做
     public int rob(int[] nums) {
       int max = Integer.MIN_VALUE;
         returnType res = rob(nums, 0, 0, max);
@@ -113,6 +114,10 @@ public class _14DP {
         int param2 = curTotal + Math.max(next.curTotal,next.noCurTotal);
         return new returnType(param1,param2);
     }
+
+    //解法2：最简做法
+    /**题目的本质：每到一个位置，根据当前位置前面的两个值来推断当前位置的结果*/
+
 
 
 
@@ -202,9 +207,10 @@ public class _14DP {
     * 给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续 子数组（该子数组中至
     * 少包含一个数字），并返回该子数组所对应的乘积。
     测试用例的答案是一个 32-位 整数。*/
-    /**  求的是最大值，但是不能仅仅记录之前子数组的最大值。比如"-2,3,-4"的最大值应该是24，如果
+    /**    求的是最大值，但是不能仅仅记录之前子数组的最大值。比如"-2,3,-4"的最大值应该是24，如果
      * 仅仅选取最大值则遍历到元素3的时候，会选择单独成一个子数组，这样是不对的。应该到任何一个
-     * 位置，都应该记录当前子数组的最大值、最小值*/
+     * 位置，都应该记录当前子数组的最大值、最小值...
+     *     然后到每一个位置的时候，需要决策出当前位置的最大目标值*/
     public int maxProduct(int[] nums) {
         //dp数组的定义：以nums[i-1]结尾的最大子数组的乘积..每一个数可以和前面的数个数合成一个子数组 或者 自己成立一个子数组
         int[] dp1 = new int[nums.length + 1];
@@ -243,8 +249,3 @@ public class _14DP {
     }
 
 }
-
-
-/**
- * 1. dp问题汇总
- * */
