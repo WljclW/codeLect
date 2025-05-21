@@ -42,8 +42,8 @@ public class All_02 {
     给定一个代表每个房屋存放金额的非负整数数组，计算你 不触动警报装置的情况下 ，一
     夜之内能够偷窃到的最高金额。
     * */
-    public int rob(int[] nums) {  //验证后补充解法2——leecode_Debug._hot100._14DP.rob(int[])
-        if (nums.length==0) return nums[0];
+    public int rob(int[] nums) { //验证后补充解法2——leecode_Debug._hot100._14DP.rob(int[])
+        if (nums.length==1) return nums[0];
         int first = nums[0],sec=Math.max(nums[0],nums[1]);
         for (int i=2;i<nums.length;i++){
             int cur = Math.max(nums[i]+first,sec);
@@ -73,7 +73,7 @@ public class All_02 {
 //    }
 
 
-    /*152.
+    /**152.
     * 给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续 子数组（该子数组中至
     * 少包含一个数字），并返回该子数组所对应的乘积。
     测试用例的答案是一个 32-位 整数。*/
@@ -84,8 +84,8 @@ public class All_02 {
         min[0]=1;
         max[0]=1;
         for (int i=1;i<=nums.length;i++){
-            min[i] = Math.min(Math.min(nums[i]*min[i-1],nums[i]*max[i-1]),nums[i]);
-            max[i] = Math.max(Math.max(nums[i]*min[i-1],nums[i]*max[i-1]),nums[i]);
+            min[i] = Math.min(Math.min(nums[i-1]*min[i-1],nums[i-1]*max[i-1]),nums[i-1]);
+            max[i] = Math.max(Math.max(nums[i-1]*min[i-1],nums[i-1]*max[i-1]),nums[i-1]);
             res = Math.max(max[i],res);
         }
         return res;
@@ -123,7 +123,7 @@ public class All_02 {
     }
 
 
-    /*54.
+    /**54.
      * 给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
      * */
     public List<Integer> spiralOrder(int[][] matrix) {
@@ -239,7 +239,7 @@ public class All_02 {
 //    }
 
 
-    /*101.给你一个二叉树的根节点 root ， 检查它是否轴对称。*/
+    /**101.给你一个二叉树的根节点 root ， 检查它是否轴对称。*/
     public boolean isSymmetric(TreeNode root) {
         if (root==null) return true;
         if (root.left==null&&root.right==null) return true;
@@ -264,6 +264,7 @@ public class All_02 {
     public List<List<Integer>> levelOrder(TreeNode root) {
         LinkedList<List<Integer>> res = new LinkedList<>();
         LinkedList<TreeNode> deque = new LinkedList<>();
+        if (root==null) return res;
         deque.offer(root);
         while (!deque.isEmpty()){
             int size = deque.size();
@@ -286,6 +287,7 @@ public class All_02 {
     public List<Integer> rightSideView(TreeNode root) {
         LinkedList<Integer> res = new LinkedList<>();
         LinkedList<TreeNode> deque = new LinkedList<>();
+        if (root==null) return res;
         deque.offer(root);
         while (!deque.isEmpty()){
             int size = deque.size();
@@ -324,9 +326,9 @@ public class All_02 {
 //        return res;
 //    }
 
-    //72.编辑距离
-    public int minDistance(String str1,String str2){
-        int m = str1.length(),n = str2.length();
+    /**72.编辑距离*/
+    public int minDistance(String word1,String word2){
+        int m = word1.length(),n = word2.length();
         int[][] dp = new int[m + 1][n + 1];
         for (int i=0;i<n;i++){
             dp[0][i] = i;
@@ -337,7 +339,7 @@ public class All_02 {
         for (int i=1;i<m;i++)
             for (int j=1;j<n;j++){
                 int tmp = 0;
-                if (str1.charAt(i)==str2.charAt(j)){
+                if (word1.charAt(i)==word2.charAt(j)){
                     tmp = dp[i-1][j-1];
                 }else{
                     tmp = dp[i-1][j-1] + 1;
@@ -367,16 +369,17 @@ public class All_02 {
     }
 
 
-    //128
+    /**128*/
     public int longestConsecutive(int[] nums) {
+        if (nums.length==0) return 0;
         HashSet<Integer> set = new HashSet<>();
         for (int i:nums){
             set.add(i);
         }
 
-        int res = -1;
+        int res = 1;
         for (int i=0;i<nums.length;i++){
-            if (!set.contains(nums[i])){
+            if (!set.contains(nums[i]-1)){
                 int j=0;
                 while(set.contains(nums[i]+j)) j++;
                 res = Math.max(res,j);
@@ -401,7 +404,7 @@ public class All_02 {
     }
 
     void dfs(char[][] grid,int i,int j,int m,int n){
-        if (i<0||i>=m||j<0||j>=n)
+        if (i<0||i>=m||j<0||j>=n||grid[i][j]=='0')
             return;
         if (grid[i][j]=='1') grid[i][j]='0';
         dfs(grid,i-1,j,m,n);
@@ -422,10 +425,10 @@ public class All_02 {
         }
         for (int i=0;i<m;i++){
             dp[i][0] = matrix[i][0]-'0';
-            max = Math.max(max,dp[0][i]);
+            max = Math.max(max,dp[i][0]);
         }
         for (int i=1;i<m;i++)
-            for (int j=0;j<n;j++){
+            for (int j=1;j<n;j++){
                 if (matrix[i][j]=='1'){
                     dp[i][j] = Math.min(Math.min(dp[i-1][j],dp[i][j-1]),dp[i-1][j-1])+1;
                     max = Math.max(dp[i][j],max);
@@ -436,7 +439,7 @@ public class All_02 {
 
 
 
-        /*1.
+    /*1.
     * 给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。
     你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。
     你可以按任意顺序返回答案。*/

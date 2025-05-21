@@ -35,13 +35,14 @@ public class _03SlideWindow {
     *   找呢？因此需要借助left指针
     * */
     public int lengthOfLongestSubstring(String s) {
-        int left = 0;
+        int left = 0; //窗口左边界
         int res = 0;
-        int right = 0;
+        int right = 0; //窗口右边界
         HashMap<Character, Integer> map = new HashMap<>();
         while(right<s.length()){
             char c = s.charAt(right);
-            /*什么都不管，碰到的字符都先放进去；然后利用while循环保证当前窗口合法*/
+            /*什么都不管，碰到的字符都先放进去；然后利用while循环保证当前窗口合法;
+            * 保证当前窗口合法的前提下更新res的值*/
             map.put(c,map.getOrDefault(c,0)+1);
             while(map.get(c)>1){
                 char cur = s.charAt(left);
@@ -52,6 +53,25 @@ public class _03SlideWindow {
         }
         return res;
     }
+
+    /*自己写的方法————更容易理解*/
+    public int lengthOfLongestSubstring01(String s) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        int left = 0,max = 0;
+        for (int i=0;i<s.length();i++){
+            char c = s.charAt(i);
+            map.put(c, map.getOrDefault(c, 0) + 1);
+            while(map.get(c)>1){
+                Integer leftVal = map.get(s.charAt(left));
+                map.put(s.charAt(left),leftVal-1);
+                left++;
+            }
+            max = Math.max(max,i-left+1);
+        }
+        return max;
+    }
+
+
 
 
     /*

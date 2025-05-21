@@ -2,6 +2,7 @@ package leecode_Debug._hot100;
 
 import leecode_Debug.BTree.TreeNode;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class _07binarytree {
@@ -15,9 +16,16 @@ public class _07binarytree {
     /*104
     * 给定一个二叉树 root ，返回其最大深度。
     二叉树的 最大深度 是指从根节点到最远叶子节点的最长路径上的节点数。*/
-//    public int maxDepth(TreeNode root) {
-//
-//    }
+    /**【】理解二叉树的深度优先遍历 和 广度优先遍历
+     * 深度优先遍历————递归
+     * 广度优先遍历————原型就是二叉树的层次遍历*/
+    public int maxDepth(TreeNode root) {
+        if (root == null)
+            return 0;
+        int left = maxDepth(root.left);
+        int right = maxDepth(root.right);
+        return Math.max(left, right) + 1;
+    }
 
 
     /*
@@ -44,9 +52,24 @@ public class _07binarytree {
 
 
     /*102.层序遍历*/
-//    public List<List<Integer>> levelOrder(TreeNode root) {
-//
-//    }
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        LinkedList<List<Integer>> res = new LinkedList<>();
+        LinkedList<TreeNode> deque = new LinkedList<>();
+        if (root==null) return res;
+        deque.offer(root);
+        while (!deque.isEmpty()){
+            int size = deque.size();
+            LinkedList<Integer> ele = new LinkedList<>();
+            for (int i=0;i<size;i++){
+                TreeNode poll = deque.poll();
+                ele.add(poll.val);
+                if (poll.left!=null) deque.offer(poll.left);
+                if (poll.right!=null) deque.offer(poll.right);
+            }
+            res.add(new LinkedList<Integer>(ele));
+        }
+        return res;
+    }
 
 
     /*108.升序数组转换为平衡二叉搜索树*/
@@ -78,9 +101,22 @@ public class _07binarytree {
     /*199.
     给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
     * */
-//    public List<Integer> rightSideView(TreeNode root) {
-//
-//    }
+    public List<Integer> rightSideView(TreeNode root) {
+        LinkedList<Integer> res = new LinkedList<>();
+        LinkedList<TreeNode> deque = new LinkedList<>();
+        if (root==null) return res;
+        deque.offer(root);
+        while (!deque.isEmpty()){
+            int size = deque.size();
+            for (int i=0;i<size;i++){
+                TreeNode cur = deque.poll();
+                if (cur.left!=null) deque.offer(cur.left);
+                if (cur.right!=null) deque.offer(cur.right);
+                if (i==size-1) res.add(cur.val); //层序遍历的基础上只把每一层最后一个元素添加进res
+            }
+        }
+        return res;
+    }
 
 
     /*114.
@@ -108,9 +144,20 @@ public class _07binarytree {
 
     /*236.二叉树最近公共祖先
     * */
-//    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-//
-//    }
+    /**
+     * 解析建议看K神：https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/solutions/240096/236-er-cha-shu-de-zui-jin-gong-gong-zu-xian-hou-xu/
+     * */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        //1. 终止条件：为null，或者等于p，或者等于q
+        if (root==null) return null;
+        if (root==p||root==q) return root;
+        //2. 假设拿到了左右子树的信息
+        TreeNode leftNode = lowestCommonAncestor(root.left, p, q);
+        TreeNode rightNode = lowestCommonAncestor(root.right, p, q);
+        //3. 根据拿到的信息决策出当前节点的返回值————形成闭环！！
+        if (leftNode!=null&&rightNode!=null) return root;
+        return (leftNode==null)?rightNode:leftNode;
+    }
 
 
     /*124

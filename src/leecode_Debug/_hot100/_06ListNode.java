@@ -56,7 +56,7 @@ public class _06ListNode {
     /*206.
     * 给你单链表的头节点 head ，请你反转链表，并返回反转后的链表。*/
     /**总的思路是递归 和 迭代；迭代的空间复杂度更低*/
-    /*方法1：cur和pre开始时指向head的前一个节点；next指向head节点。
+    /*方法1【建议使用】：cur和pre开始时指向head的前一个节点；next指向head节点。
     *       while的条件是next！=null，最后返回的是cur或者pre*/
     public ListNode reverseList(ListNode head) {
         if (head==null ||head.next==null) return head;
@@ -178,8 +178,8 @@ public class _06ListNode {
 
     /*19.
     * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。*/
-    /**【解题关键】开始时slow指向虚拟头dummy节点；但是fast指向head并且fast先走n步。。这样其实最后fast比slow是
-     *      多走了n+1步，fast指向null时，slow指向倒数第n+1个，直接slow.next = slow.next.next即可
+    /**【解题关键】开始时slow指向虚拟头dummy节点；
+     *            但是fast指向head 并且 fast先走n步
      * 【注】1. 这个题重要的是在删除的时候slow指针指向要删除节点的前一个节点。
      *      2. 一开始，要让fast指针先走N步*/
     /*自己的解法*/
@@ -220,7 +220,7 @@ public class _06ListNode {
     }
 
 
-    /*24.
+    /**24.
     * 给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下
     * 完成本题（即，只能进行节点交换）。*/
     /*非递归的形式；非递归形式看官方讲解*/
@@ -264,7 +264,8 @@ public class _06ListNode {
 
 
     /*138*/
-
+//    public Node copyRandomList(Node head) {
+//    }
 
     /*148.
     * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
@@ -353,5 +354,19 @@ public class _06ListNode {
         p0.next.next = cur; /*cur其实就是反转链表后的下一个节点*/
         p0.next = pre; //pre就是反转链表部分的最后一个节点
         return dummy.next;
+    }
+
+
+    /*138题会用到，随即链表的复制*/
+    class Node {
+        int val;
+        Node next;
+        Node random;
+
+        public Node(int val) {
+            this.val = val;
+            this.next = null;
+            this.random = null;
+        }
     }
 }

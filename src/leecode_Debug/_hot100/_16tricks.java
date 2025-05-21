@@ -92,6 +92,8 @@ public class _16tricks {
 
 
     /*31.下一个排列*/
+    public void nextPermutation(int[] nums) {
+    }
 
 
     public static void main(String[] args) {
