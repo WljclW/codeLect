@@ -1,5 +1,6 @@
 package leecode_Debug._hot100;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class _03subString {
@@ -50,7 +51,23 @@ public class _03subString {
     /*560.
     * 给你一个整数数组 nums 和一个整数 k ，请你统计并返回 该数组中和为 k 的子数组的个数 。
     子数组是数组中元素的连续非空序列。*/
-//    public int subarraySum(int[] nums, int k) {
-//
-//    }
+    /**
+     * 【解题关键】计算每一个位置的前缀和pre，放入map前判断是不是有pre-k。map中存放的是
+     *      每一个前缀和值 对应的数量
+     * */
+    public int subarraySum(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int pre = 0;
+        map.put(0,1);
+        int res = 0;
+        for (int num:nums){
+            //先更新前缀和，然后看前缀和pre-k的数量，有的话累加到res.（pre-k到当前位置的子数组和就是k）
+            pre += num;
+            if (map.containsKey(pre-k)){
+                res += map.get(num-k);
+            }
+            map.put(pre,map.getOrDefault(pre,0)+1);
+        }
+        return res;
+    }
 }

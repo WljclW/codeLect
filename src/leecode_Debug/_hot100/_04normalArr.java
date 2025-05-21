@@ -49,7 +49,7 @@ public class _04normalArr {
         Arrays.sort(intervals, new Comparator<int[]>() {
             @Override
             public int compare(int[] o1, int[] o2) {
-                if (o1[0] != o2[0]) return o1[0] - o2[0];
+                if (o1[0] != o2[0]) return o1[0] - o2[0]; /*参数1-参数2 表示升序(若是优先级队列则是小根堆)*/
                 else return o1[1] - o2[1];
             }
         });
@@ -62,15 +62,29 @@ public class _04normalArr {
                 res.add(cur);
             }
         }
-        return res.toArray(new int[res.size()][]);
+        return res.toArray(new int[res.size()][]); /**err：List转换为数组的方法*/
     }
 
 
     /*189.
     * 给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。
     * */
+    /**【解题关键】等价于三次翻转：先整体翻转；再分别翻转左右两部分*/
     public void rotate(int[] nums, int k) {
+        k %= nums.length; /**err：这里要对k取余，否则会报“IndexOutOfBoundException”*/
+        swapL_R(nums,0,nums.length-1);
+        swapL_R(nums,0,k-1);
+        swapL_R(nums,k,nums.length-1);
+    }
 
+    public void swapL_R(int[] nums,int l,int r){
+        while(l<r){
+            int tmp = nums[l];
+            nums[l] = nums[r];
+            nums[r] = tmp;
+            l++;
+            r--;
+        }
     }
 
 
@@ -142,6 +156,7 @@ public class _04normalArr {
              * 的数"应该放到哪里————也就意味着swap之后不能变换当前研究的索引cur。
              *      3.一旦出while循环就表示：位置i位置的元素放到了正确的位置，并且所
              * 有换过来的元素也都放到了正确的位置*/
+            /**err：三个条件缺一不可*/
             while (nums[i] > 0 && nums[i] <= nums.length && nums[nums[i] - 1] != nums[i]) {
                 swap(nums, i, nums[i] - 1);
             }
@@ -151,7 +166,7 @@ public class _04normalArr {
             if (nums[i] != i + 1) return i + 1;
         }
 
-        return 0;
+        return nums.length+1; /**err：到了这里说明数组中不缺，因此应该返回下一个数*/
     }
 
     public void swap(int[] nums,int i,int j){

@@ -43,13 +43,13 @@ public class _03SlideWindow {
             char c = s.charAt(right);
             /*什么都不管，碰到的字符都先放进去；然后利用while循环保证当前窗口合法;
             * 保证当前窗口合法的前提下更新res的值*/
-            map.put(c,map.getOrDefault(c,0)+1);
-            while(map.get(c)>1){
+            map.put(c,map.getOrDefault(c,0)+1); //①什么都不管，先入map
+            while(map.get(c)>1){ //②保证窗口合法
                 char cur = s.charAt(left);
                 map.put(cur,map.get(cur)-1);
                 left++;
             }
-            res = Math.max(res,right-left+1);
+            res = Math.max(res,right-left+1); //③保证窗口合法在更新结果
         }
         return res;
     }

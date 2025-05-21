@@ -43,7 +43,8 @@ public class _06ListNode {
     public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
         ListNode p1 = headA,p2 = headB;
         while(p1!=p2){
-            /*p1要是来到null，就指向HeadB;否则的话p1来到下一个；
+            /*【注】由于headA和headB涉及到重新赋值，因此需要用两个备份指针p1,p2来遍历
+            p1要是来到null，就指向HeadB;否则的话p1来到下一个；
             * p2要是来到null，就指向HeadA;否则的话p2来到下一个*/
             p1 = (p1==null)?headB:p1.next;
             p2 = (p2==null)?headA:p2.next;
@@ -56,7 +57,7 @@ public class _06ListNode {
     /*206.
     * 给你单链表的头节点 head ，请你反转链表，并返回反转后的链表。*/
     /**总的思路是递归 和 迭代；迭代的空间复杂度更低*/
-    /*方法1【建议使用】：cur和pre开始时指向head的前一个节点；next指向head节点。
+    /*方法1：cur和pre开始时指向head的前一个节点；next指向head节点。
     *       while的条件是next！=null，最后返回的是cur或者pre*/
     public ListNode reverseList(ListNode head) {
         if (head==null ||head.next==null) return head;
@@ -201,7 +202,11 @@ public class _06ListNode {
     }
 
 
-    /**【建议采样这种】官方解，官方解的通用性更好*/
+    /**【建议采样这种】官方解，官方解的通用性更好。。
+     *      这种写法下fast指针指向slow指针前面的第n+1个节点，因此当fast指针指向null
+     *  的时候，slow指针指向要删除节点的前一个节点。举个例子：
+     *      比如想删除倒数第二个节点，则fast指针指向null的时候，slow指针指向的是倒数
+     *  第3个节点，想象一下*/
     public ListNode removeNthFromEnd1(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head);
         /**官方解中慢指针开始时指向了head节点的前一个；快指针指向head节点*/

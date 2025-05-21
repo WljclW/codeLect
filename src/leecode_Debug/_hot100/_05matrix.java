@@ -39,7 +39,7 @@ public class _05matrix {
             for (int i = left; i <= right; i++) {
                 res.add(matrix[top][i]);
             }
-            if(++top>bottom) break;
+            if(++top>bottom) break; /**在下一行或者下一列打印时，先判断是不是还有能打印的*/
             for (int i = top; i <= bottom; i++) {
                 res.add(matrix[i][right]);
             }

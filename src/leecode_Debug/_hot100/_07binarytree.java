@@ -31,9 +31,21 @@ public class _07binarytree {
     /*
     * 226.给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
      * */
-//    public TreeNode invertTree(TreeNode root) {
-//
-//    }
+    public TreeNode invertTree(TreeNode root) {
+        if (root==null) return root;
+        if (root.left==null&&root.right==null) return root;
+        /**
+         * err：这里必须使用临时变量记录一下，不能这么写：
+         *      root.left = invertTree(root.right);
+         *      root.right = invertTree(root.left);
+         *    错误原因：在第一行代码之后，改变了原始的root.left！！
+         */
+        TreeNode L = invertTree(root.right);
+        TreeNode R = invertTree(root.left);
+        root.left = L;
+        root.right = R;
+        return root;
+    }
 
 
     /*101.给你一个二叉树的根节点 root ， 检查它是否轴对称。*/

@@ -12,7 +12,7 @@ public class _08tulun {
         int m = grid.length,n = grid[0].length;
         for (int i=0;i<m;i++)
             for (int j=0;j<n;j++){
-                if (grid[i][j]=='1'){
+                if (grid[i][j]=='1'){ //只需要研究为‘1’的位置
                     res++;
                     dfs(grid,i,j,m,n);
                 }
