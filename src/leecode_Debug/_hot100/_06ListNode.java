@@ -32,8 +32,8 @@ public class _06ListNode {
 //            headB = headB.next;
     /**直接移动headA和headBhi错误的！！！
      *    原因：比如这里指向headA空时（即第一个链表走到了末尾）如果重置为headB,此时的headB并不是第二个链
-     * 表的头节点。。。最终会导致两个指针走的路程不一样————而这个解法的关键在于两个指针的总路长是一致的，因
-     * 此最后返回headA或者headB都是可以的。*/
+     * 表的头节点，因为headB已经移动了。。。最终会导致两个指针走的路程不一样————而这个解法的关键在于两个指
+     * 针的总路长是一致的，因此最后返回headA或者headB都是可以的。*/
 //            headA = (headA==null)?hb:headA;
 //            headB = (headB==null)?ha:headB;
 //        }
@@ -159,13 +159,13 @@ public class _06ListNode {
     你可以假设除了数字 0 之外，这两个数都不会以 0 开头。*/
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         ListNode res = new ListNode(-1);
-        ListNode curLs = res;
+        ListNode curLs = res; /*需要将结果链表的指针复制一份。一个指针不动代表返回值；两一个指针移动指向当前位置*/
         int carry = 0, cur = 0;
-        while (l1 != null || l2 != null || carry != 0) {
+        while (l1 != null || l2 != null || carry != 0) { /**设置三个条件*/
             int l1Val = (l1 == null) ? 0 : l1.val;
             int l2Val = (l2 == null) ? 0 : l2.val;
             cur = l1Val + l2Val + carry; /*计算当前位置的总和值*/
-            carry = cur / 10; //进位信息
+            carry = cur / 10; //记录进位信息
             cur %= 10; //当前位置的数值
             curLs.next = new ListNode(cur); //给结果串 拼接数值为cur的节点
             curLs = curLs.next;
@@ -178,9 +178,10 @@ public class _06ListNode {
 
     /*19.
     * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。*/
-    /**【解题关键】开始时slow指向虚拟头dummy节点；但是fast指向head并且fast先走n步
+    /**【解题关键】开始时slow指向虚拟头dummy节点；但是fast指向head并且fast先走n步。。这样其实最后fast比slow是
+     *      多走了n+1步，fast指向null时，slow指向倒数第n+1个，直接slow.next = slow.next.next即可
      * 【注】1. 这个题重要的是在删除的时候slow指针指向要删除节点的前一个节点。
-     *      2.一开始，要让fast指针先走N步*/
+     *      2. 一开始，要让fast指针先走N步*/
     /*自己的解法*/
     public ListNode removeNthFromEnd(ListNode head, int n) {
         ListNode slow = head,fast = head;
@@ -200,7 +201,7 @@ public class _06ListNode {
     }
 
 
-    /*【建议采样这种】官方解，官方解的通用性更好*/
+    /**【建议采样这种】官方解，官方解的通用性更好*/
     public ListNode removeNthFromEnd1(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head);
         /**官方解中慢指针开始时指向了head节点的前一个；快指针指向head节点*/

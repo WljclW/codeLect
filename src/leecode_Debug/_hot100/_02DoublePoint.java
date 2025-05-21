@@ -22,7 +22,7 @@ public class _02DoublePoint {
             }else
                 cur++;
         }
-        /*需要将left及后续的都置零*/
+        /**err：需要将left及后续的都置零*/
         for (int j=left;j< nums.length;j++){
             nums[j] = 0;
         }

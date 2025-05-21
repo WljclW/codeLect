@@ -119,7 +119,8 @@ public class _11stack {
      *              如果没有相同元素，好说，直接入栈 或者 出栈生成信息；
      *              如果待添加有重复元素，则每一个位置需要放一个链表，存放所有元素值相等的index。大于小于栈顶都会操作（即当前
      *           元素添加进链表入栈 或者 栈顶的链表所有元素出栈），等于栈顶的时候，将当前元素添加到栈顶的哪个链表
-     *      2. 针对这个题，其实并不要求栈内的元素严格单调递增 或者 递减。等于栈顶index对应元素值的时候直接入栈就可以了*/
+     *      2. 【重要说明】
+     *          针对这个题，其实并不要求栈内的元素严格单调递增 或者 递减。等于栈顶index对应元素值的时候直接入栈就可以了*/
     public int[] dailyTemperatures(int[] temperatures) {
         int[] res = new int[temperatures.length];
         LinkedList<Integer> stack = new LinkedList<>();
@@ -173,7 +174,8 @@ public class _11stack {
     /**
      *    这个题也可以用一维数组来表示，完整的可能情况：枚举每一个位置，比如该位置的高度是m，从该位置向左右两边查找第一个
      * 小于m的位置，分别即为L和R，则该位置能绘制的最大矩形就是长*高————(R-L-1)*m.
-     * 1. 因此解的关键在于：找到每一个位置，左右距离最近的比当前位置的数小的索引；
+     * 1. 因此解的关键在于：找到每一个位置，左右距离最近的 并且比 当前位置的数 小的索引————基于这样的信息就能求出来以当前
+     *  位置的值height[i]位高最大能画出多大的矩形！！
      * 2. 方法分为两种：
      *       方法1：第一次遍历找到任何一个数左边最近 的小于值；第二次遍历找到任何一个数右边最近 的小于值；第三次遍历
      *    计算每一个位置能画出的最大矩形(长就是两个小于值位置的间隔，高就是heights数组这个位置的值)。
@@ -214,7 +216,7 @@ public class _11stack {
         return res;
     }
 
-
+    /**【推荐下面的做法】由于要找到左右两边最近且小于的数，因此只要当前的数大于栈顶对应的数就入栈*/
     public int largestRectangleArea1(int[] heights){
         int max = Integer.MIN_VALUE;
         LinkedList<Integer> stack = new LinkedList<>();
@@ -230,17 +232,18 @@ public class _11stack {
         *       栈肯定不是空，同时栈顶位置的值必然大于当前遍历到的位置。————即找到了栈顶位置右边最近的小于值就是当前遍历的元素
         * */
         for (int i=0;i<heights.length;i++){
-            if(stack.isEmpty() || heights[i]>=heights[stack.peek()]){
+            if(stack.isEmpty() || heights[i]>=heights[stack.peek()]){ /*如果当前的数不小于栈顶的数，入栈*/
                 stack.push(i);
             }else{
-                while(!stack.isEmpty()&&heights[i]<heights[stack.peek()]){
+                while(!stack.isEmpty()&&heights[i]<heights[stack.peek()]){ /*只要当前的数小于栈顶对应的数，则”栈顶元素“的信息就生成了*/
                     Integer peek = stack.pop();
                     int L = stack.isEmpty()?-1: stack.peek();
-                    max = Math.max(max,heights[peek]*(i -L-1));
+                    max = Math.max(max,heights[peek]*(i -L-1)); //i当前位置也是右边所求的数；L是弹出后新栈顶的数，也即左边所求的数
                 }
                 stack.push(i);
             }
         }
+        /*清空栈。依次弹出并生成对应的信息*/
         while(!stack.isEmpty()){
             Integer cur = stack.pop();
             int L = stack.isEmpty()?-1: stack.peek();

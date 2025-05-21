@@ -116,7 +116,7 @@ public class _13tanXin {
         int cur = 0; /*初始化遍历的位置为当前位置*/
         int bound = flags[s.charAt(0)-'a']; /*初始化边界为第一个字符的边界*/
         while(cur<s.length()){
-            bound = Math.max(bound,flags[s.charAt(cur)-'a']);
+            bound = Math.max(bound,flags[s.charAt(cur)-'a']/*表示当前这个字符最后出现的位置(索引，从0开始的)*/);
             if(cur==bound){ //到最后一个字符的时候必然会进入到这个if(最后一段区间的边界必然就是s的长度)，因为if外面不用额外添加剩余区间了
                 res.add(bound-start+1);
                 start = bound;

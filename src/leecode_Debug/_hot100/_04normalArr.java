@@ -56,9 +56,9 @@ public class _04normalArr {
         res.add(intervals[0]); /*关键步骤：先将区间加到结果集里面，然后再利用后续元素更新这个元素的结尾界限*/
         for (int i=1;i<intervals.length;i++){
             int[] cur = intervals[i];
-            if(res.getLast()[1]>=cur[0]){
+            if(res.getLast()[1]>=cur[0]){ //情况1：更新res中最后一个区间的右边界
                 res.getLast()[1] = Math.max(res.getLast()[1],cur[1]);
-            }else{
+            }else{ //需要在res中添加新区见
                 res.add(cur);
             }
         }
@@ -70,7 +70,7 @@ public class _04normalArr {
     * 给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。
     * */
     public void rotate(int[] nums, int k) {
-        k %= nums.length;
+
     }
 
 
