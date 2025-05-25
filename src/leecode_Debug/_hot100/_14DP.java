@@ -1,5 +1,7 @@
 package leecode_Debug._hot100;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -136,39 +138,9 @@ public class _14DP {
 
        完全平方数 是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数
        * 自乘的积。例如，1、4、9 和 16 都是完全平方数，而 3 和 11 不是。*/
-    public int numSquares(int n) {
-        int len = (int) Math.sqrt(n);
-        int[] table = new int[len + 1];
-        for(int i=1;i<=len;i++){
-            table[i] = i*i;
-        }
-        int max = Integer.MAX_VALUE;
-        numSquares(n,1,max,table);
-        return max;
-    }
-
-    public int numSquares(int n,int cur,int max,int[] table){
-        if(n==0) return 0;
-        if(cur==table.length) return -1;
-
-        int p1 = numSquares(n,cur+1,max,table);
-        int p2 = numSquares(n-table[cur],cur+1,max,table);
-
-        if(p1==-1&&p2==-1) return -1;
-        else{
-            if(p1==-1){
-                max = Math.min(p2+1,max);
-                return p2+1;
-            }else if(p2==-1){
-                max = Math.min(p1,max);
-                return p1;
-            }else {
-                int curVal = Math.min(p1, p2 + 1);
-                max = Math.min(curVal,max);
-                return curVal;
-            }
-        }
-    }
+//    public int numSquares(int n) {
+//
+//    }
 
 
 
@@ -198,9 +170,21 @@ public class _14DP {
     * 给你一个字符串 s 和一个字符串列表 wordDict 作为字典。如果可以利
     * 用字典中出现的一个或多个单词拼接出 s 则返回 true。
     注意：不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。*/
-//    public boolean wordBreak(String s, List<String> wordDict) {
-//
-//    }
+    public boolean wordBreak(String s, List<String> wordDict) {
+        boolean[] dp = new boolean[s.length() + 1];
+        HashSet<String> set = new HashSet<>(wordDict);
+        dp[0] = true;
+        for (int i=1;i<s.length()+1;i++){
+            for (int j=0;j<i;j++){ //j<i，因此j的最大值能到s.length()
+                //substring函数左闭右开，因此i的最大值s.length()是取不到的，因此不会出现越界
+                if (dp[j]&&set.contains(s.substring(j,i))){
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[s.length()];
+    }
 
 
     /*300.
@@ -254,7 +238,14 @@ public class _14DP {
 
     public static void main(String[] args) {
         _14DP dp = new _14DP();
-        System.out.println(dp.numSquares(13));
+//        System.out.println(dp.numSquares(13));
+
+        String s = "leetcode";
+        ArrayList<String> strings = new ArrayList<>() {{
+            add("leet");
+            add("code");
+        }};
+        dp.wordBreak(s,strings);
     }
 
 }

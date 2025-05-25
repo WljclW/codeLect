@@ -45,15 +45,32 @@ public class _13tanXin {
         if(nums.length==1) return true;
 
         int cur = 0; //表示当前研究到的索引
-        int bound = 0; //表示当前最远可以到达的边界
+        int bound = 0; //表示 最远可以到达的边界
         while(cur<=bound){ /*只要当前到达的位置 没有越界(没有超过当前情况下最远可以去的地方)就循环逻辑*/
             int now = nums[cur]; //表示当前的位置最多走几步
             bound = Math.max(bound,cur+now); //更新可以到达的最远边界
             cur++;
             if(bound>= nums.length-1) return true;  /**err：bound是索引，因此达到“nums.length-1”就可以*/
         }
-        return false; //除了循环说明bound没有到数组末尾，但是不能再走了，因为cur已经超出能走的边界了
+        return false; //出了循环说明bound没有到数组末尾，但是不能再走了，因为cur已经超出能走的边界了
     }
+
+    //for循环的写法
+    public boolean canJump_for(int[] nums) {
+        int bound = 0;
+        for (int i=0;i<nums.length;i++){
+            /**err：这句话必须写在if中，保证位置i是有效的*/
+//            bound = Math.max(bound, i + nums[i]);
+            if (i <= bound) {
+                bound = Math.max(bound, i + nums[i]);
+                if (bound >= nums.length - 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     /*45.
     * 给定一个长度为 n 的 0 索引整数数组 nums。初始位置为 nums[0]。
@@ -63,6 +80,10 @@ public class _13tanXin {
     i + j < n
     返回到达 nums[n - 1] 的最小跳跃次数。生成的测试用例可以到达 nums[n - 1]。
     * */
+    /**
+     * 【注意】题目中说了，生成的用例可以到nums[n-1]，即肯定能到达最后一个元素
+     * 【关键】关键在于搞清楚什么时候让步数+1
+     * */
 //    public int jump(int[] nums) {
 //
 //    }
@@ -95,6 +116,7 @@ public class _13tanXin {
         for (int i = 0; i < s.length(); i++) {
             //每次到一个位置，先根据这个字符更新end的值。（end标记当前窗口内字符出现的右边界 这个信息）
             end = Math.max(flags[s.charAt(i) - 'a'], end);
+            //如果当前位置i 来到 边界位置i。则产生一个区间，将长度添加进res
             if (i == end) {
                 res.add(end - start + 1);
                 start = i;
@@ -131,5 +153,7 @@ public class _13tanXin {
         _13tanXin curClass = new _13tanXin();
         System.out.println(curClass.partitionLabels("dsadssbtyb"));
         System.out.println(curClass.partitionLabels0("dsadssbtyb"));
+
+        curClass.canJump_for(new int[]{3,2,1,0,4});
     }
 }
