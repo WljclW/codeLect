@@ -6,8 +6,24 @@ public class _10binarySearch {
     请必须使用时间复杂度为 O(log n) 的算法。
     * */
     /**
-     * 【关键】题目的本质是：查找给定元素第一次出现的位置(如果数组中有的话)
+     * 下面是关于闭区间的理解————
+     * 首先明确一点：闭区间的写法中，出循环时l一定等于r+1，因此返回值写l和r+1是等效的！！
+     * 【关键!!】题目的本质是：查找给定元素第一次出现的位置(如果数组中有的话)
      *                或者  查找大于目标元素的第一个数的位置(如果数组没有给定的元素)
+     * 【进一步理解】这个题是寻找目标值左边界的方法（注意：理论上这个题求的是目标值target应该插入到什么地方。并且如果数组中有多个目标值
+     *      的话，应该返回第一次出现的位置）。。。详细的说，所有情况分为三种：
+     *          情况1：如果目标值是在数组的最大值最小值之间(闭区间)，返回r+1或者l都可以。【注】返回的数也不一定就等于目标值，可能是大于
+     *      目标值的第一个位置。
+     *          情况2：如果目标值严格大于数组的最大值，则最后l会来到nums.length的位置，这个位置很明显越界了。此时说明数组中肯定没有目标
+     *      值。
+     *          情况3：如果目标值严格小于数组的最小值，则最后l会来到0的位置，这个位置不越界。【注】此时0位置的数很明显不等于目标值。
+     *          问题：情况2和情况3都是严格的大于小于，那如果目标值等于数组的最大值 或者 等于数组的最小值呢？
+     *            答：其实这种情况跟情况1是一样的。具体来说分为四种情况————
+     *               ①如果等于数组最小值，且最小值唯一。则l指针会指向0；
+     *               ②如果等于数组最小值，且最小值不唯一。则l指针会指向0；
+     *               ③如果等于数组最大值，且最大值唯一。则l会指向nums.length-1;
+     *               ④如果等于数组最大值，且最大值不唯一。则l指针会指向第一个最大值所在的位置
+     *               虽然分为以上四种情况，但是总结起来就一句话：指向目标值第一次出现的位置
      * 【说明】
      *      1. 二分查找有很多个版本，以后就使用“左闭右闭”的写法
      *      2. 这个题不同区间的写法建议看"https://leetcode.cn/problems/search-insert-position/solutions/2023391/er-fen-cha-zhao-zong-shi-xie-bu-dui-yi-g-nq23/?envType=study-plan-v2&envId=top-100-liked"
@@ -32,6 +48,7 @@ public class _10binarySearch {
         return l; //等价于return r+1;
     }
 
+    //下面的写法仅仅是上面写法的合并版本。没有本质的区别，这两种都是闭区间的写法
     public int searchInsert_(int[] nums,int target){
         int left=0,right=nums.length-1;
         while(left<=right){
@@ -59,9 +76,9 @@ public class _10binarySearch {
         int right = m*n-1,left = 0;
         while (left<=right){
             int mid = left + (right-left)/2;
-            int cur = matrix[mid/n][mid%n];
+            int cur = matrix[mid/n][mid%n]; /**err：其实这里就直接取余就可以。比如：一共8列，当前是16索引，应该是第三行的第0个位置，16/8=2因此是第三行，16%8=0因此是索引为0的数*/
             if (cur>target){
-                right = mid-1; /**当前区间包括right位置，mid位置不符合，因此right指向mid-1*/
+                right = mid-1; /**err：当前区间包括right位置，mid位置不符合，因此right指向mid-1*/
             }else if (cur<target){
                 left = mid+1;
             }else {
