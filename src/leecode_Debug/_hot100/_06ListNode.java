@@ -284,7 +284,8 @@ public class _06ListNode {
     请你将所有链表合并到一个升序链表中，返回合并后的链表。*/
     /**【】：1. "优先级队列"的编码有两点需要注意。①添加节点时校验不是null(优先级队列添加null时会抛NullPointerException)；
      *      ②更新cur指针
-     *      2. 需要熟悉一下"分治合并"————跟归并排序的思路是一样的，区别就是在merge的时候时两个链表的合并
+     *      2. 需要熟悉一下"分治合并"————跟归并排序的思路是一样的，区别就是在merge的时候时两个链表的合并。
+     *      关于"分治"的代码可以参考：https://leetcode.cn/problems/merge-k-sorted-lists/solutions/3787/leetcode-23-he-bing-kge-pai-xu-lian-biao-by-powcai/?envType=study-plan-v2&envId=top-100-liked
      * */
     public ListNode mergeKLists(ListNode[] lists) {
         /*优先级队列。空间复杂度O(K)，优先级队列需要存K个节点；
