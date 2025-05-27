@@ -287,6 +287,10 @@ public class _06ListNode {
      *      2. 需要熟悉一下"分治合并"————跟归并排序的思路是一样的，区别就是在merge的时候时两个链表的合并。
      *      关于"分治"的代码可以参考：https://leetcode.cn/problems/merge-k-sorted-lists/solutions/3787/leetcode-23-he-bing-kge-pai-xu-lian-biao-by-powcai/?envType=study-plan-v2&envId=top-100-liked
      * */
+    /*解法1：借助优先级队列。假设lists中有k个队列
+    * 时间复杂度：元素数量k*n,每一个元素进队列出队列一次，复杂度logK，因此总体时间复杂度O(kn*logk)
+    * 空间复杂度：O（K），优先级队列的耗费
+    * */
     public ListNode mergeKLists(ListNode[] lists) {
         /*优先级队列。空间复杂度O(K)，优先级队列需要存K个节点；
             时间复杂度O(kn*logk)，kn个节点，优先级队列k个节点，因此插入删除的时间复杂度logk。*/
@@ -309,6 +313,44 @@ public class _06ListNode {
             now.next = null;
         }
         return demmy.next;
+    }
+
+    /*解法2：分治思想
+    * 时间复杂度：第一轮合并k/2组链表，每一组的时间代价是O（2n）;第二轮合并k/4组链表，每一组的时间
+    *     复杂度是O(4n)....因此整体的时间复杂度是O(kn*logk)
+    * 空间复杂度：O（logk）
+    * */
+    public ListNode mergeKLists_01(ListNode[] lists) {
+        return merge(lists,0,lists.length-1);
+    }
+
+    private ListNode merge(ListNode[] lists, int l, int r) {
+        if (l==r) return lists[l];
+        if (l>r) return null; /**err：没有这一句问题很大。"[]"测试用例过不了*/
+        int mid = l+(r-l)/2;
+        ListNode mergeLeft = merge(lists, l, mid);
+        ListNode mergeRight = merge(lists, mid + 1, r);
+        return mergeTwoList(mergeLeft,mergeRight);
+    }
+
+    private ListNode mergeTwoList(ListNode mergeLeft, ListNode mergeRight) {
+        ListNode dummy = new ListNode(-1);
+        ListNode cur = dummy;
+        /*step1：只要两个都还有元素，就将val小的那一个拼接到结果链。。
+        * 【注】拼接后需要移动那个链表的指针 以及 结果链表的指针*/
+        while (mergeLeft!=null&&mergeRight!=null){
+            if (mergeLeft.val< mergeRight.val){
+                cur.next = mergeLeft;
+                mergeLeft = mergeLeft.next;
+            }else{
+                cur.next = mergeRight;
+                mergeRight = mergeRight.next;
+            }
+            cur = cur.next;
+        }
+        /*step2：将不空的那个链表的其他元素拼接到结果链后面*/
+        cur.next = mergeLeft==null?mergeRight:mergeLeft;
+        return dummy.next;
     }
 
 

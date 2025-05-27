@@ -214,9 +214,44 @@ public class _10binarySearch {
 给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
     * */
-//    public int search(int[] nums, int target) {
-//
-//    }
+    /**
+     * 【关键】理解二分查找的本质：是能根据一个条件排除一半的区间，每一步我们都知道下一步应该去哪一半查找
+     * 【解题的核心】对于任意一个index，其左区间和右区间至少有一个是有序的，那么就可以根据这个有序区间的
+     *      最大值和最小值来判断Target是否在该区间内————确定了接下来去哪一半查找。
+     * 【解题思路】
+     *      step1：基于二分查找的本质，我们需要先确定哪一边是有序的。如何确定？nums[mid]和nums[0]比较，
+     *  如果大于等于nums[0]说明左边是有序的（外层if干的事）；否则说明右边是有序的（外层的else干的事）；
+     *      step2：step1中确定了两边有一边是有序的。在这个基础上我们需要进一步判断去哪一边继续查找，如
+     *  何确定？？利用有序的一边来确定。
+     *          比如右边有序则右边值的区间(nums[mid],nums[r]]，左开右闭，如果target在这个区间就往右
+     *       边的那部分跑，因此l=mid+1；
+     *          比如左边有序则左边值的区间是[nums[0],nums[mid])，左闭右开，如果target在这个区间就往
+     *       左边的那部分找，因此r=mid-1。
+     * */
+    public int search(int[] nums, int target) {
+        if (nums.length == 0) return -1;
+        if (nums.length == 1) return nums[0] == target ? 0 : -1;
+        int l = 0, r = nums.length - 1;
+        while (l <= r) {
+            int mid = l + (r - l) / 2;
+            if (nums[mid] == target) return mid;
+            //if块说明左边是有序的
+            if (nums[mid] >= nums[0]) { /**err：这里必须带等于。不带的话“[3,1]”这个测试用例过不了*/
+                if (target >= nums[0] && target < nums[mid]) { /*条件语句实际上就是“nums[0]<=target<nums[mid]”，表明target位于有序的那一边*/
+                    r = mid - 1;
+                } else {
+                    l = mid + 1;
+                }
+            } else { //else说明右边是有序的
+                if (target <= nums[nums.length - 1] && target > nums[mid]) { /*右边有序，看看target是不是在右边*/
+                    l = mid + 1;
+                } else {
+                    r = mid - 1;
+                }
+            }
+        }
+        return -1;
+    }
 
 
     /*153.
@@ -250,6 +285,7 @@ public class _10binarySearch {
         _10binarySearch thisClass = new _10binarySearch();
 //        thisClass.searchInsert(new int[]{1,3,5,6},5);
 
+        thisClass.search(new int[]{3,1},1);
     }
 
 }
