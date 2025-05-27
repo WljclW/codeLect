@@ -21,18 +21,67 @@ public class All_05 {
      *  1. 为什么选择跟最后一个数比较？与第一个数比较行不行？
      *    答：
      * */
-    public int findMin(int[] nums) {
+//    public int findMin(int[] nums) {
+//        int l = 0,r = nums.length-1;
+//        while (l<=r){
+//            int mid = l+(r-l)/2;
+//            if (nums[mid]<=nums[nums.length-1]){
+//                r = mid-1;
+//            }else {
+//                l = mid+1;
+//            }
+//        }
+//        return nums[l];
+//    }
+    /*
+    eg1:[7,8,9,10,1,2,3]  中间数10，比右边界3大，因此中间数左边的数以及中间数都不是最小值，这时需要缩小搜索区间，往右走，左边界设置为left = mid + 1;
+    eg2:[6,7,1,2,3]  中间数1，比3小，说明1-3这个区间是升序的，那么中间数右边的数一定不是最小数（但是中间数就可能是最小数），故缩小搜索区间，设置有右边界为right = mid;
+    * */
+     public int findMin(int[] nums) {
+        int l = 0,r = nums.length-1;
+        while (l<r){
+            int mid = l+(r-l)/2;
+            if (nums[mid]>nums[r]){ /*只要大于右边界的值————说明mid一定在左半升序的那边，并且mid肯定不是最小值位置*/
+                l = mid+1;
+            }else { /*只要小于右边界的值————说明mid一定是在右半升序的那边，并且mid可能就是最小值的位置*/
+                r = mid; //mid位置可能是最小值，因此r不能赋值为mid-1.
+            }
+        }
+        return l;
+    }
+
+    //待验证
+    public int findMin_01(int[] nums) {
         int l = 0,r = nums.length-1;
         while (l<=r){
             int mid = l+(r-l)/2;
-            if (nums[mid]<=nums[nums.length-1]){
-                r = mid-1;
-            }else {
+            if (nums[mid]>nums[r]){
                 l = mid+1;
+            }else {
+                r = mid;
             }
         }
-        return nums[l];
+        return r;
     }
+
+
+    public int findMin_02(int[] nums){
+         int l=0,r=nums.length-1;
+         int min = nums[0];
+         while(l<=r){
+             int mid = l+(r-l)/2;
+             if (nums[mid]<nums[r]){
+                 min = nums[mid];
+                 r = mid-1;
+             }else {
+                 l = mid+1;
+             }
+         }
+         return min;
+    }
+
+
+
 
 
 
