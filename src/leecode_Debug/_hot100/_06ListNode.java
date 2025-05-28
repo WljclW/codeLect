@@ -268,9 +268,40 @@ public class _06ListNode {
 //    }
 
 
+
     /*138*/
-//    public Node copyRandomList(Node head) {
-//    }
+    public Node copyRandomList(Node head) {
+        if(head==null) return null; /**err：特例的判断*/
+        Node cur = head;
+        /*step1：给每一个节点后面放一个新创建的节点*/
+        while(cur!=null){
+            Node newCur = new Node(cur.val);
+            newCur.next = cur.next;
+            cur.next = newCur;
+            cur = cur.next.next;
+        }
+
+        /*step2：从头遍历到尾copy原来节点的random指针*/
+        cur = head;
+        while(cur!=null){
+            if(cur.random!=null){
+                cur.next.random = cur.random.next;
+            }else{
+                cur.next.random = null;
+            }
+            cur = cur.next.next;
+        }
+
+        /*step3：需要将原始链表 以及 copy后的链表拆分开*/
+        /**err：如果原始链表没有还原会报错*/
+        Node headNew = head.next;
+        for (Node node = head; node != null; node = node.next) {
+            Node nodeNew = node.next;
+            node.next = node.next.next;
+            nodeNew.next = (nodeNew.next != null) ? nodeNew.next.next : null;
+        }
+        return headNew;
+    }
 
     /*148.
     * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
@@ -321,12 +352,12 @@ public class _06ListNode {
     * 空间复杂度：O（logk）
     * */
     public ListNode mergeKLists_01(ListNode[] lists) {
+        if(lists==null||lists.length==0) return null;
         return merge(lists,0,lists.length-1);
     }
 
     private ListNode merge(ListNode[] lists, int l, int r) {
         if (l==r) return lists[l];
-        if (l>r) return null; /**err：没有这一句问题很大。"[]"测试用例过不了*/
         int mid = l+(r-l)/2;
         ListNode mergeLeft = merge(lists, l, mid);
         ListNode mergeRight = merge(lists, mid + 1, r);
