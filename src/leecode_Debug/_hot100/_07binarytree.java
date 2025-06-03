@@ -49,9 +49,17 @@ public class _07binarytree {
 
 
     /*101.给你一个二叉树的根节点 root ， 检查它是否轴对称。*/
-//    public boolean isSymmetric(TreeNode root) {
-//
-//    }
+    public boolean isSymmetric(TreeNode root) {
+        if(root==null) return true;
+        if (root.left==null || root.right==null) return false;
+        return isSymmetric(root.left,root.right);
+    }
+
+    public boolean isSymmetric(TreeNode l,TreeNode r){
+        if (l==null&&r==null) return true;
+        if (l==null||r==null) return false;
+        return l.val==r.val&&isSymmetric(l.right,r.left)&&isSymmetric(l.left,r.right);
+    }
 
     /*543.
     * 给你一棵二叉树的根节点，返回该树的 直径 。
