@@ -216,7 +216,7 @@ public class _10binarySearch {
             return new int[]{-1,-1}; //说明数组中压根就没有target这个数
         }
         int right = searchLeft(nums,target+1); //step3：求target+1的左边界，该左边界-1即为target的右边界
-        return new int[]{left,right-1};
+        return new int[]{left,right-1}; /*right-1表示求出的target+1的左边界-1，因为right其实返回的是target+1的左边界left，因此target的右边界需要往左*/
     }
     /*【目的】求target在数组中应该插入的位置————如果存在target求出的就是target的左边界
     * 【说明】就是53题的解法，一模一样*/

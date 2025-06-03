@@ -1,5 +1,7 @@
 package leecode_Debug._hot100;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 /**215、掌握最优的解法；347；295*/
@@ -27,16 +29,45 @@ public class _12heap {
 
 
 
-    /*347. //无思路
+    /*347.
     *给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率
     * 前 k 高的元素。你可以按 任意顺序 返回答案。
     * */
-//    public int[] topKFrequent(int[] nums, int k) {
-//        HashMap<Integer, Integer> map = new HashMap<>();
-//        for (int i:nums){
-//            map.put(i,map.getOrDefault(i,0)+1);
-//        }
-//    }
+    /**
+     * 【解题步骤】
+     *     step1：统计nums中每一个数出现的次数；
+     *     step2：根据map的entry，将"数字->出现的次数"这样的数组添加进优先级队
+     * 列，按照出现的次数升序(同时添加的时候保证优先级队列只有k个元素)
+     *     step3：从优先级队列依次弹出每个元素（数组形式），将数字添加进结果数组
+     * @author: Zhou
+     * @date: 2025/6/1 15:35
+     */
+    public int[] topKFrequent(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int num:nums){
+            map.put(num,map.getOrDefault(num,0)+1);
+        }
+
+        PriorityQueue<int[]> queue = new PriorityQueue<>((O1,O2)->{
+            return O1[1]-O2[1];
+        });
+        for (Map.Entry<Integer,Integer> entry:map.entrySet()){
+            int[] cur = new int[2];
+            cur[0] = entry.getKey();
+            cur[1] = entry.getValue();
+            queue.add(cur);
+            if (queue.size()>k){
+                queue.poll();
+            }
+        }
+
+        int[] res = new int[k];
+        int i=0;
+        while(!queue.isEmpty()){
+            res[i++] = queue.poll()[0];
+        }
+        return res;
+    }
 
 
 

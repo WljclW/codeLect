@@ -45,7 +45,7 @@ public class _06ListNode {
         while(p1!=p2){
             /*【注】由于headA和headB涉及到重新赋值，因此需要用两个备份指针p1,p2来遍历
             p1要是来到null，就指向HeadB;否则的话p1来到下一个；
-            * p2要是来到null，就指向HeadA;否则的话p2来到下一个*/
+            p2要是来到null，就指向HeadA;否则的话p2来到下一个*/
             p1 = (p1==null)?headB:p1.next;
             p2 = (p2==null)?headA:p2.next;
         }
@@ -202,6 +202,7 @@ public class _06ListNode {
     }
 
 
+    /*官方解*/
     /**【建议采样这种】官方解，官方解的通用性更好。。
      *      这种写法下fast指针指向slow指针前面的第n+1个节点，因此当fast指针指向null
      *  的时候，slow指针指向要删除节点的前一个节点。举个例子：

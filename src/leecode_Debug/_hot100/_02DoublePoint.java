@@ -57,7 +57,7 @@ public class _02DoublePoint {
         LinkedList<List<Integer>> res = new LinkedList<>();
         Arrays.sort(nums);
         for (int i=0;i< nums.length-2;i++){
-            if(i>0&&nums[i]==nums[i-1]){
+            if(i>0&&nums[i]==nums[i-1]){ /**err：用if不用while，while里面使用continue就只是回到了外层循环*/
                 continue;
             }
             int cur = nums[i];
@@ -66,6 +66,8 @@ public class _02DoublePoint {
             while (left<right){
                 int curRes = cur+nums[left]+nums[right];
                 if(curRes<0){
+                    /*>0，<0的时候不去重也可以，但是=0必须去重。
+                    * 比如：这里是<0，则下面的两句使用哪一句都可以，后面的一句去重只是把去重操作提前了*/
 //                    left++;
                     while (left<right && nums[left]==nums[++left]); /*关键语句：跳过所有相等的值*/
                 }else if(curRes>0){
@@ -77,8 +79,7 @@ public class _02DoublePoint {
 //                    curLev.add(nums[left]);
 //                    curLev.add(nums[right]);
 //                    res.add(curLev);
-//                    left++;
-                    res.add(new ArrayList<>(Arrays.asList(nums[i],nums[left],nums[right])));
+                    res.add(new ArrayList<>(Arrays.asList(nums[i],nums[left],nums[right]))); /**err：使用这个添加list方便*/
                     while (left<right && nums[left]==nums[++left]);
                     while (left<right && nums[right]==nums[--right]);
                 }

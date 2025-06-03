@@ -1,5 +1,9 @@
 package leecode_Debug;
 
+import leecode_Debug.top100.ListNode;
+
+import java.util.*;
+
 /**
  * @author mini-zch
  * @date 2025/5/26 19:14
@@ -109,4 +113,173 @@ public class All_05 {
         }
         return l;
     }
+
+
+
+    public List<List<Integer>> threeSum(int[] nums) {
+        LinkedList<List<Integer>> res = new LinkedList<>();
+        Arrays.sort(nums);
+        for (int i=0;i<nums.length-2;i++){
+            while(i>0&&nums[i]==nums[i-1]){
+                i++;
+                if(i>=nums.length-2) return res;
+                continue;
+            }
+            int sec = i+1,thr = nums.length-1;
+            while(sec<thr){
+                int sum = nums[i]+nums[sec]+nums[thr];
+                if (sum==0){
+                    int finalI = i;
+                    int finalSec = sec;
+                    int finalThr = thr;
+                    res.add(new LinkedList<Integer>(){{
+                        add(nums[finalI]);
+                        add(nums[finalSec]);
+                        add(nums[finalThr]);
+
+                    }});
+                    sec++;
+                    thr--;
+                    while (sec<thr&&nums[sec]==nums[sec-1]) sec++;
+                    while(sec<thr&&nums[thr]==nums[thr+1]) thr--;
+                }else if (sum<0){
+                    sec++;
+                    while (sec<thr&&nums[sec]==nums[sec-1])sec++;
+                }else {
+                    thr--;
+                    while (sec<thr&&nums[thr]==nums[thr+1])thr--;
+                }
+            }
+        }
+
+        return res;
+    }
+
+
+    public String removeDuplicates(String s) {
+        Stack<Character> stack = new Stack<Character>();
+        for(int i=0;i<s.length();i++){
+            Character c = s.charAt(i);
+            if(!stack.isEmpty()&&c!=stack.peek()){
+                stack.push(c);
+            }else{
+                stack.pop();
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        while(!stack.isEmpty()){
+            sb.append(stack.pop());
+        }
+        return sb.reverse().toString();
+    }
+
+    public static void main(String[] args) {
+        All_05 all_05 = new All_05();
+        all_05.threeSum(new int[]{-1,0,1,2,-1,-4});
+    }
+
+
+
+    class MyStack {
+        Deque<Integer> queue;
+        public MyStack() {
+            queue = new LinkedList<>();
+        }
+
+        public void push(int x) {
+            queue.addLast(x);
+        }
+
+        public int pop() {
+            int size = queue.size();
+            for (int i=0;i<size-1;i++){
+                queue.addLast(queue.pollFirst()); /**err：队列只能从队尾进入因此使用addLast，从队头出因此使用pollFirst()*/
+            }
+            return queue.pollFirst(); //这就是剩下的最后入队的那个元素，直接弹出
+        }
+
+        public int top() {
+//            int size = queue.size();
+//            for (int i=0;i<size;i++){
+//                queue.addLast(queue.pollFirst());
+//            }
+            return queue.peekLast(); //直接返回队列的最后一个
+        }
+
+        public boolean empty() {
+            return queue.isEmpty();
+        }
+    }
+
+
+    public int[] topKFrequent(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int num:nums){
+            map.put(num,map.getOrDefault(num,0)+1);
+        }
+
+        PriorityQueue<int[]> queue = new PriorityQueue<>((O1,O2)->{
+            return O1[1]-O2[1];
+        });
+        for (Map.Entry<Integer,Integer> entry:map.entrySet()){
+            int[] cur = new int[2];
+            cur[0] = entry.getKey();
+            cur[1] = entry.getValue();
+            queue.add(cur);
+            if (queue.size()>k){
+                queue.poll();
+            }
+        }
+
+        int[] res = new int[k];
+        int i=0;
+        while(!queue.isEmpty()){
+            res[i++] = queue.poll()[0];
+        }
+        return res;
+    }
+
+    public ListNode swapPairs1(ListNode head) {
+        ListNode dummy = new ListNode(-1, head);
+        ListNode cur = dummy;
+        while(cur.next!=null && cur.next.next!=null){
+            ListNode node1 = cur.next;
+            ListNode node2 = cur.next.next;
+            cur.next = node2;
+            node1.next = node2.next;
+            node2.next = node1;
+            cur = cur.next.next;
+        }
+        return dummy.next;
+    }
+
+
+
+    List<List<Integer>> res;
+    public List<List<Integer>> permute(int[] nums) {
+        res = new LinkedList<>();
+        List<Integer> path = new LinkedList<>();
+        boolean[] used = new boolean[nums.length];
+        permuteBack(nums,used,path);
+        return res;
+    }
+
+    private void permuteBack(int[] nums,boolean[] used,List<Integer> path) {
+        if (path.size()==nums.length){
+            res.add(new LinkedList<>(path));
+            return;
+        }
+        for (int i=0;i< nums.length;i++){
+            if (used[i]) continue;
+            used[i] = true;
+            path.add(nums[i]);
+            permuteBack(nums,used,path);
+            used[i] = false;
+            path.remove(path.size()-1);
+        }
+    }
+
+
+
+
 }
