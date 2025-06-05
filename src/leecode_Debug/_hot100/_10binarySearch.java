@@ -247,7 +247,7 @@ public class _10binarySearch {
 
 
 
-    /*33.
+    /*33.....81是扩展（允许有重复元素）
     整数数组 nums 按升序排列，数组中的值 互不相同 。
 在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。
 给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
@@ -261,7 +261,7 @@ public class _10binarySearch {
      *      step1：基于二分查找的本质，我们需要先确定哪一边是有序的。如何确定？nums[mid]和nums[0]比较，
      *  如果大于等于nums[0]说明左边是有序的（外层if干的事）；否则说明右边是有序的（外层的else干的事）；
      *      step2：step1中确定了两边有一边是有序的。在这个基础上我们需要进一步判断去哪一边继续查找，如
-     *  何确定？？利用有序的一边来确定。
+     *  何确定？？利用有序的一边来确定。【思想就是：判断target是不是在有序部分边界值的区间内】
      *          比如右边有序则右边值的区间(nums[mid],nums[r]]，左开右闭，如果target在这个区间就往右
      *       边的那部分跑，因此l=mid+1；
      *          比如左边有序则左边值的区间是[nums[0],nums[mid])，左闭右开，如果target在这个区间就往
@@ -274,14 +274,14 @@ public class _10binarySearch {
         while (l <= r) {
             int mid = l + (r - l) / 2;
             if (nums[mid] == target) return mid;
-            //if块说明左边是有序的
+            //step1：if块说明左边是有序的
             if (nums[mid] >= nums[0]) { /**err：这里必须带等于。不带的话“[3,1]”这个测试用例过不了*/
-                if (target >= nums[0] && target < nums[mid]) { /*条件语句实际上就是“nums[0]<=target<nums[mid]”，表明target位于有序的那一边*/
+                if (target >= nums[0] && target < nums[mid]) { /*【说明】条件语句实际上就是“nums[0]<=target<nums[mid]”，表明target位于有序的那一边*/
                     r = mid - 1;
                 } else {
                     l = mid + 1;
                 }
-            } else { //else说明右边是有序的
+            } else { //step2：else说明右边是有序的
                 if (target <= nums[nums.length - 1] && target > nums[mid]) { /*右边有序，看看target是不是在右边*/
                     l = mid + 1;
                 } else {
@@ -293,7 +293,7 @@ public class _10binarySearch {
     }
 
 
-    /*153.
+    /*153....154是这个的拓展（允许有重复元素）
     已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：
     若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]
 若旋转 7 次，则可以得到 [0,1,2,4,5,6,7]
@@ -310,7 +310,10 @@ public class _10binarySearch {
      *      1. 官方解。
      *      2.
      * */
-    /*解法1：建议使用的*/
+    /*解法1：建议使用的。
+    *    两种解法最大的区别在于：当找到小于的数时，右边界right更新到哪里的问题！
+    *       解法1中会把right更新为mid-1，但是此时可能错过最小值，mid位置可能就是最小值。。因此使用一个变量记录；
+    *       解法2中right不会更新为mid-1（防止错过最小值），但是循环的条件就不能带“=”了（带等于会导致死循环）*/
     public int findMin(int[] nums) {
         // 1.min初始值为第一段升序数组的最小值，而且目前不知道数组是有两段升序还是只有一段升序
         int min = nums[0]; /**err：使用一个变量标记碰到的最小值*/
@@ -322,7 +325,7 @@ public class _10binarySearch {
 
             // 3.如果中间位置比min小，那么这个mid位置一定在第二段升序数组中，那么最小值一定在mid或者它的左边，这是因为每段都是升序的
             // 先更新min，然后向左边遍历
-            if(nums[mid] < min){
+            if(nums[mid] < min){ /**err：小于min的时候，可能当前的数nums[mid]就是最小的数，使用min变量记录*/
                 min = nums[mid];
                 right = mid - 1;
             }

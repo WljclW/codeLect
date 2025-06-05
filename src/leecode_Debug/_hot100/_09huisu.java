@@ -1,9 +1,12 @@
 package leecode_Debug._hot100;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class _09huisu {
     /*46.
@@ -41,18 +44,61 @@ public class _09huisu {
     给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
 解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
     * */
-//    public List<List<Integer>> subsets(int[] nums) {
-//
-//    }
+    List<List<Integer>> resSubSets;
+    List<Integer> pathSubsets;
+    public List<List<Integer>> subsets(int[] nums) {
+        resSubSets = new LinkedList<>();
+        pathSubsets = new LinkedList<>();
+        subsetsBack(nums,0);
+        return resSubSets;
+    }
+
+    private void subsetsBack(int[] nums, int index) {
+        resSubSets.add(new LinkedList<>(pathSubsets));
+        for (int i=index;i< nums.length;i++){
+            pathSubsets.add(nums[index]);
+            subsetsBack(nums,index+1);
+            pathSubsets.remove(pathSubsets.size()-1);
+        }
+    }
+
 
 
     /*17.
     给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
 给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
     * */
-//    public List<String> letterCombinations(String digits) {
-//
-//    }
+    List<String> resLetterCombinations;
+    Map<Character,String> map;
+    StringBuilder sb = new StringBuilder();
+    public List<String> letterCombinations(String digits) {
+        resLetterCombinations = new LinkedList<>();
+        map = new HashMap<>(){{
+           put('2',"abc");
+           put('3',"def");
+           put('4',"ghi");
+           put('5',"jkl");
+           put('6',"mno");
+           put('7',"pqrs");
+           put('8',"tuv");
+           put('9',"wxyz");
+        }};
+        letterCombinationsBack(digits,0);
+        return resLetterCombinations;
+    }
+
+    private void letterCombinationsBack(String digits, int index) {
+        if (index==digits.length()){ //sb.length()==digits.length
+            resLetterCombinations.add(new String(sb));
+        }
+        char c = digits.charAt(index);
+        String str = map.get(c);
+        for (int i=0;i<str.length();i++){
+            sb.append(str.charAt(i));
+            letterCombinationsBack(digits,index+1);
+            sb.deleteCharAt(sb.length()-1);
+        }
+    }
 
 
     /*39.
@@ -60,9 +106,31 @@ public class _09huisu {
 candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。
 对于给定的输入，保证和为 target 的不同组合数少于 150 个。
     * */
-//    public List<List<Integer>> combinationSum(int[] candidates, int target) {
-//
-//    }
+    List<List<Integer>> resCombinationSum;
+    List<Integer> pathCombinationSum;
+    int sum = 0;
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        resCombinationSum = new LinkedList<>();
+        pathCombinationSum = new LinkedList<>();
+        combinationSumback(candidates,target,0);
+        return resCombinationSum;
+    }
+
+    private void combinationSumback(int[] candidates, int target, int index) {
+        if (sum==target){
+            resCombinationSum.add(new LinkedList<>(pathCombinationSum));
+        }
+        if (sum>target || index>=candidates.length){
+            return;
+        }
+        for (int i=index;i<candidates.length;i++){
+            path.add(candidates[i]);
+            sum += candidates[i];
+            combinationSumback(candidates,target,i);
+            path.remove(path.size()-1);
+            sum -= candidates[i];
+        }
+    }
 
 
     /*22.
