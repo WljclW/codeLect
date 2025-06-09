@@ -307,16 +307,16 @@ public class _10binarySearch {
      * 找，才能找到最小值。。即和最后一个元素比能把搜寻区间减半
      *
      * 【推荐解法】解析的话就看官方的
-     *      1. 官方解。
+     *      1. 写法的话推荐解法1。————多使用一个变量，存储遇到过的最小值
      *      2.
      * */
-    /*解法1：建议使用的。
+    /*解法1：建议使用的(因为right和left指针的变化规律与常规一致)。
     *    两种解法最大的区别在于：当找到小于的数时，右边界right更新到哪里的问题！
     *       解法1中会把right更新为mid-1，但是此时可能错过最小值，mid位置可能就是最小值。。因此使用一个变量记录；
     *       解法2中right不会更新为mid-1（防止错过最小值），但是循环的条件就不能带“=”了（带等于会导致死循环）*/
     public int findMin(int[] nums) {
         // 1.min初始值为第一段升序数组的最小值，而且目前不知道数组是有两段升序还是只有一段升序
-        int min = nums[0]; /**err：使用一个变量标记碰到的最小值*/
+        int min = nums[nums.length-1]; /**err：使用一个变量标记碰到的最小值*/
 
         // 2.先正常二分查找
         int left = 0, right = nums.length - 1;
@@ -336,6 +336,30 @@ public class _10binarySearch {
             }
         }
         return min;
+    }
+
+    /*
+    解法2：就是当mid数小于最后一个数时,right指针更新为mid，而不是mid-1。
+     */
+    public int findMin_01(int[] nums) {
+        int left = 0,right = nums.length-1;
+        /*
+            1. 这里必须是小于，因为一旦等于的时候就只有一个数了，其实这个数就是最小值。
+            2. 如果这里写的是“小于等于”，则对于[5,8,9,10]这个数组，运行时会出现死循环。想象一种场景：l和r都指向某一个
+         位置m，并且这个数小于数组的最后一个数，则按照代码逻辑“right=mid”，执行后l指向m，r也指向m.....由于l永远不大于
+         r，因此成死循环。。所以求最小值的时候，这里必须是“left<right”
+            ————死循环的本质原因在于：最后相等的时候，left指针和right指针是一样的；并且这个数小于nums[nums.length-1]，
+         逻辑上需要更新right，但是right更新为mid，因此更新后left==right依旧成立。
+        * */
+        while(left<right){
+            int mid = left+(right-left)/2;
+            if (nums[mid]>nums[nums.length-1]){
+                left = mid+1;
+            }else{
+                right = mid; /*此时mid位置的值可能就是最小值。并且是闭区间，因此right更新为mid而不是mid-1*/
+            }
+        }
+        return nums[right];
     }
 
 

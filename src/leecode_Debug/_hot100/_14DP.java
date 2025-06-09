@@ -191,9 +191,20 @@ public class _14DP {
     * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
     子序列 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺
     * 序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。*/
-//    public int lengthOfLIS(int[] nums) {
-//
-//    }
+    public int lengthOfLIS(int[] nums) {
+        int[] dp = new int[nums.length];
+        dp[0] = 1;
+        int res = 1;
+        for (int i=1;i<nums.length;i++){
+            for (int j=0;j<i;j++){
+                if (nums[j]<nums[i]){
+                    dp[i] = Math.max(1,dp[j]+1);
+                }
+            }
+            res = Math.max(dp[i],res);
+        }
+        return res;
+    }
 
 
     /*152.
@@ -246,6 +257,30 @@ public class _14DP {
             add("code");
         }};
         dp.wordBreak(s,strings);
+    }
+
+/**================================hot100之外======================================*/
+    /*718. 最长重复子数组
+    * 给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 。
+    *   子数组是连续的！
+    * */
+    public int findLength(int[] nums1, int[] nums2) {
+        int[][] dp = new int[nums1.length + 1][nums2.length + 1];
+        int res = 0;
+        for (int i=1;i<= nums1.length;i++)
+            for (int j=1;j<= nums2.length;j++){
+                if (nums1[i-1]==nums2[j-1]){
+                    dp[i][j] = dp[i-1][j-1]+1;
+                }
+                /**err：不能出现下面的else。因为子数组必须是连续的，如果nums1[i]≠nums2[j]，则以它两结尾
+                 * 的最长相同子数组就是0*/
+//                else{
+//                    dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
+//                }
+                res = Math.max(dp[i][j],res);
+            }
+
+        return res;
     }
 
 }

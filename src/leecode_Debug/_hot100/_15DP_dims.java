@@ -138,4 +138,30 @@ public class _15DP_dims {
         }
         return dp[m][n];
     }
+
+
+    /**===================================hot100外====================================*/
+    /*583. 两个字符串的删除操作
+    * */
+    public int minDistance_583(String word1, String word2) {
+        int[][] dp = new int[word1.length() + 1][word2.length() + 1];
+        int m = word1.length(),n = word2.length();
+        /**err：最长公共子序列"第一行第一列"不用初始化，因为空串的任何串的公共子序列长度为0。
+         * 但是这里是编辑距离的问题，必须要初始化为非空串的长度*/
+        for (int i=0;i<=m;i++){
+            dp[i][0] = i;
+        }
+        for (int i=0;i<=n;i++){
+            dp[0][i] = i;
+        }
+        for (int i=1;i<=word1.length();i++) /**i，j都需要从1开始；边界记得带等于*/
+            for (int j=1;j<=word2.length();j++){
+                if (word1.charAt(i-1)==word2.charAt(j-1)){
+                    dp[i][j] = dp[i-1][j-1];
+                }else{
+                    dp[i][j] = Math.min(dp[i-1][j],dp[i][j-1])+1;
+                }
+            }
+        return dp[word1.length()][word2.length()];
+    }
 }

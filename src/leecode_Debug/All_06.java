@@ -1,5 +1,7 @@
 package leecode_Debug;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,4 +66,93 @@ public class All_06 {
         }
         return true;
     }
+
+
+    List<List<String>> resSolveNQueens;
+    public List<List<String>> solveNQueens(int n) {
+        resSolveNQueens = new LinkedList<>();
+        char[][] chessBoard = new char[n][n];
+        for (int i=0;i<n;i++){
+            Arrays.fill(chessBoard[i],'.');
+        }
+        solveNQueensBack(n,chessBoard,0);
+        return resSolveNQueens;
+    }
+
+    private void solveNQueensBack(int n,char[][] chessBoard, int row) {
+        if (row>=n){
+            resSolveNQueens.add(Array2List(chessBoard));
+        }
+        for (int i=0;i<n;i++){
+            if (isValid(chessBoard,row,i)){
+                chessBoard[row][i] = 'Q';
+                solveNQueensBack(n,chessBoard,row+1);
+                chessBoard[row][i] = '.';
+            }
+        }
+    }
+
+    private boolean isValid(char[][] chessBoard, int row, int i) {
+        for (int cur=0;cur<row;cur++){
+            if (chessBoard[cur][i]=='Q') return false;
+        }
+        for (int cur=row-1,col=i-1;cur>=0&&col>=0;cur--,col--){
+            if (chessBoard[cur][col]=='Q') return false;
+        }
+        for (int cur=row-1,col=i+1;cur>=0&&col<chessBoard.length;cur--,col++){
+            if (chessBoard[cur][col]=='Q') return false;
+        }
+        return true;
+    }
+
+    private List<String> Array2List(char[][] chessBoard) {
+        ArrayList<String> res = new ArrayList<>();
+        for (char[] row:chessBoard){
+            res.add(String.copyValueOf(row));
+        }
+        return res;
+    }
+
+
+    /**
+     * 【难点】子串的区间问题很繁琐
+     * */
+    List<String> resRestoreIpAddresses1;
+    public List<String> restoreIpAddresses1(String s) {
+        resRestoreIpAddresses1 = new LinkedList<>();
+        StringBuilder sb = new StringBuilder(s);
+        resRestoreIpAddressesBack1(0,sb,0);
+        return resRestoreIpAddresses1;
+    }
+
+    private void resRestoreIpAddressesBack1(int index, StringBuilder sb,int pointNum) {
+        if (pointNum==3){
+            if (isValidIp01(index,sb.length()-1,sb))
+            resRestoreIpAddresses1.add(new String(sb.toString()));
+            return;
+        }
+        for (int i=index;i<sb.length();i++){
+            if (isValidIp01(index,i,sb)){
+                sb.insert(i+1,'.');
+                pointNum++;
+                resRestoreIpAddressesBack1(i+2,sb,pointNum);
+                pointNum--;
+                sb.deleteCharAt(i+1);
+            }
+        }
+    }
+
+    private boolean isValidIp01(int left, int right,StringBuilder sb) {
+        if (left>right) return false;
+        if (right== left) return true;
+        if (sb.charAt(left)!='0'&&right-left<=2&&Integer.parseInt(sb.substring(left,right+1))<=255) return true;
+        return false;
+    }
+
+
+    public static void main(String[] args) {
+        All_06 all_06 = new All_06();
+        System.out.println(all_06.restoreIpAddresses1("25525511135"));
+    }
+
 }
