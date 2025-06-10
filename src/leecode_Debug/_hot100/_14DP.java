@@ -170,13 +170,21 @@ public class _14DP {
     * 给你一个字符串 s 和一个字符串列表 wordDict 作为字典。如果可以利
     * 用字典中出现的一个或多个单词拼接出 s 则返回 true。
     注意：不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。*/
+    /**
+     * 【关键】dp[i]表示0~i-1的子串是否能由wordDict的数个字符串组成。
+     */
     public boolean wordBreak(String s, List<String> wordDict) {
         boolean[] dp = new boolean[s.length() + 1];
         HashSet<String> set = new HashSet<>(wordDict);
         dp[0] = true;
         for (int i=1;i<s.length()+1;i++){
             for (int j=0;j<i;j++){ //j<i，因此j的最大值能到s.length()
-                //substring函数左闭右开，因此i的最大值s.length()是取不到的，因此不会出现越界
+                /*
+                1. 解释一下if条件：dp[j]表示0~j-1的子串能不能由字典的词组成；然后我们再看[j,i-1]的子串是不是在字典中，如果
+                    在字典中就说明[0,i-1]的子串能由字典的一个或者多个词组成
+                2. ”set.contains(s.substring(j,i))“中i是能取到s.length()的，但是substring函数是左闭右开的区间，因此实
+                    际上获取子串时不会去拿s.length()的子串，不会导致越界异常
+                    */
                 if (dp[j]&&set.contains(s.substring(j,i))){
                     dp[i] = true;
                     break;
