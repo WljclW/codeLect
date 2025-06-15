@@ -24,7 +24,7 @@ public class _04normalArr {
     public int maxSubArray(int[] nums) {
         if(nums.length==1) return nums[0];
         int maxSum = Integer.MIN_VALUE; //记录最大子数组和
-        int curSum = 0; //记录当前位置 决策出的子数组和
+        int curSum = 0; //记录以当前位置结尾的最大子数组的和
         for(int i=0;i<nums.length;i++){
             curSum = Math.max(nums[i],curSum+nums[i]); /*nums[i]独自成一队；cur+nums[i]和前面的部分子数组组成新的子数组*/
             maxSum = Math.max(curSum,maxSum); /*更新找到的最大子数组和*/
@@ -62,7 +62,7 @@ public class _04normalArr {
                 res.add(cur);
             }
         }
-        return res.toArray(new int[res.size()][]); /**err：List转换为数组的方法*/
+        return res.toArray(new int[res.size()][]); /**err：List转换为数组的方法。。错了多次*/
     }
 
 
@@ -82,8 +82,8 @@ public class _04normalArr {
             int tmp = nums[l];
             nums[l] = nums[r];
             nums[r] = tmp;
-            l++;
-            r--;
+            l++; /**err：每一步之后，left指针++，但是right指针--。记得更新指针！！*/
+            r--;  /**err：忘记更新指针，出现了“超出时间限制”*/
         }
     }
 
@@ -126,10 +126,11 @@ public class _04normalArr {
         if(nums.length==1) return nums;
         int[] res = new int[nums.length];
         res[0] = 1;
-        int q = 1;
         for (int i=1;i<nums.length;i++){
             res[i] = res[i-1]*nums[i-1];
         }
+
+        int q = 1;  //用于记录当前位置以后的数的连乘积是多少
         for (int j=nums.length-2;j>=0;j--){ /**err：等于0的时候也需要计算。否则结果数组的第一个数是1*/
             q *= nums[j+1];
             res[j]*=q;

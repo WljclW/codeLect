@@ -46,7 +46,7 @@ public class _06ListNode {
             /*【注】由于headA和headB涉及到重新赋值，因此需要用两个备份指针p1,p2来遍历
             p1要是来到null，就指向HeadB;否则的话p1来到下一个；
             p2要是来到null，就指向HeadA;否则的话p2来到下一个*/
-            p1 = (p1==null)?headB:p1.next;
+            p1 = (p1==null)?headB:p1.next; /**err："p1==null"不能替换成p1.next==null，否则会出现“超出时间限制”*/
             p2 = (p2==null)?headA:p2.next;
         }
         return p1;
@@ -81,6 +81,18 @@ public class _06ListNode {
         ListNode pre = null,cur = head;
         while(cur!=null){
             ListNode next = cur.next; /*先将next指针更新,然后再该边cur的next域*/
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+
+    //第三种写法。
+    public leecode_Debug.linkList.ListNode reverseList2(leecode_Debug.linkList.ListNode head) {
+        leecode_Debug.linkList.ListNode pre = null,cur=head,next = head;
+        while(cur!=null){
+            next = next.next;
             cur.next = pre;
             pre = cur;
             cur = next;
@@ -160,16 +172,16 @@ public class _06ListNode {
     你可以假设除了数字 0 之外，这两个数都不会以 0 开头。*/
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         ListNode res = new ListNode(-1);
-        ListNode curLs = res; /*需要将结果链表的指针复制一份。一个指针不动代表返回值；两一个指针移动指向当前位置*/
-        int carry = 0, cur = 0;
-        while (l1 != null || l2 != null || carry != 0) { /**设置三个条件*/
+        ListNode cur = res; /*需要将结果链表的指针复制一份。一个指针不动代表返回值；两一个指针移动指向当前位置*/
+        int carry = 0;
+        while (l1 != null || l2 != null || carry != 0) { /**err：设置三个条件*/
             int l1Val = (l1 == null) ? 0 : l1.val;
             int l2Val = (l2 == null) ? 0 : l2.val;
-            cur = l1Val + l2Val + carry; /*计算当前位置的总和值*/
-            carry = cur / 10; //记录进位信息
-            cur %= 10; //当前位置的数值
-            curLs.next = new ListNode(cur); //给结果串 拼接数值为cur的节点
-            curLs = curLs.next;
+            int sum = l1Val + l2Val + carry; /*计算当前位置的总和值*/
+            carry = sum / 10; //记录进位信息
+            sum %= 10; //当前位置的数值
+            cur.next = new ListNode(sum); //给结果串 拼接数值为cur的节点
+            cur = cur.next;
             l1 = (l1 == null) ? l1 : l1.next;
             l2 = (l2 == null) ? l2 : l2.next;
         }
@@ -185,15 +197,15 @@ public class _06ListNode {
      *      2. 一开始，要让fast指针先走N步*/
     /*自己的解法*/
     public ListNode removeNthFromEnd(ListNode head, int n) {
-        ListNode slow = head,fast = head;
-        while(fast!=null&&n>0){
-            fast=fast.next;
+        ListNode slow = head, fast = head;
+        while (fast != null && n > 0) {
+            fast = fast.next;
             n--;
         }
-        if(fast==null){
+        if (fast == null) {
             return head.next;
         }
-        while(fast.next!=null){
+        while (fast.next != null) {
             slow = slow.next;
             fast = fast.next;
         }
@@ -210,7 +222,7 @@ public class _06ListNode {
      *  第3个节点，想象一下*/
     public ListNode removeNthFromEnd1(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head);
-        /**官方解中慢指针开始时指向了head节点的前一个；快指针指向head节点*/
+        /**官方解中，慢指针开始时指向了head节点的前一个；快指针指向head节点*/
         ListNode fast = head;
         ListNode slow = dummy;
         for (int i = 0; i < n; ++i) {
@@ -221,8 +233,7 @@ public class _06ListNode {
             slow = slow.next;
         }
         slow.next = slow.next.next;
-        ListNode res = dummy.next;
-        return res;
+        return dummy.next;
     }
 
 
@@ -235,12 +246,13 @@ public class _06ListNode {
      */
     /*非递归的形式；非递归形式看官方讲解*/
     public ListNode swapPairs1(ListNode head) {
-        ListNode dummy = new ListNode(-1);
-        dummy.next = head;
+        ListNode dummy = new ListNode(-1,head);
         ListNode cur = dummy;
         while (cur.next!=null&&cur.next.next!=null){
+            /**step1：每一轮开始前，用node1、node2分别记录原始链表的节点顺序。。*/
             ListNode node1 = cur.next; //原始的第一个节点
             ListNode node2 = cur.next.next; //原始的第二个节点
+            /**step2：然后进行节点的拼接*/
             /*以前是cur——>node1——>node2，下面的语句完成变成cur——>node2——>node1的形式*/
             cur.next = node2;
             node1.next = node2.next;
@@ -275,6 +287,16 @@ public class _06ListNode {
 
 
     /*138*/
+    /**
+     * 【分解步骤】：
+     *      1. 从头到尾遍历：给原始链表每一个节点后面添加一个与之val相等的新节点
+     *      2. 从头到尾遍历：如果一个节点的random指针不是null，给它的下一个节点(即它的副本节点
+     *  random指针赋值)
+     *      3. 从头到尾遍历拆分原始链表，和copy的链表。【注意】每一个节点都要对，且原始链表不能
+     *  改变！！否则会报错，信息类似于："Next pointer of node with label 7 from the original
+     *  list was modified."
+     *  【出错步骤】第三步的代码难写
+     * */
     public Node copyRandomList(Node head) {
         if(head==null) return null; /**err：特例的判断*/
         Node cur = head;
@@ -290,7 +312,7 @@ public class _06ListNode {
         cur = head;
         while(cur!=null){
             if(cur.random!=null){
-                cur.next.random = cur.random.next;
+                cur.next.random = cur.random.next; //如果if条件不判断，这里会出现空指针异常
             }else{
                 cur.next.random = null;
             }
@@ -306,6 +328,19 @@ public class _06ListNode {
             nodeNew.next = (nodeNew.next != null) ? nodeNew.next.next : null;
         }
         return headNew;
+
+        /*step3，也可以改写成下面的形式*/
+//        if (head==null) return null;
+//        Node res = head.next,ress = res;
+//        while(ress.next!=null){
+//            head.next = ress.next;
+//            ress.next = head.next.next;
+//            head = head.next;
+//            ress = ress.next;
+//        }
+//        head.next = null;
+//        ress.next=null;
+//        return res;
     }
 
     /*148.

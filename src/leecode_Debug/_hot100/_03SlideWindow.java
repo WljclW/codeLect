@@ -35,9 +35,8 @@ public class _03SlideWindow {
     *   找呢？因此需要借助left指针
     * */
     public int lengthOfLongestSubstring(String s) {
-        int left = 0; //窗口左边界
+        int left = 0,right=0; //窗口左边界、右边界
         int res = 0;
-        int right = 0; //窗口右边界
         HashMap<Character, Integer> map = new HashMap<>();
         while(right<s.length()){
             char c = s.charAt(right);
@@ -49,7 +48,8 @@ public class _03SlideWindow {
                 map.put(cur,map.get(cur)-1);
                 left++;
             }
-            res = Math.max(res,right-left+1); //③保证窗口合法在更新结果
+            right++;
+            res = Math.max(res,right-left); //③保证窗口合法在更新结果
         }
         return res;
     }

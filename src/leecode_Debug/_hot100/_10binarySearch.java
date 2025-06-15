@@ -17,7 +17,8 @@ public class _10binarySearch {
      *      目标值的第一个位置。
      *          情况2：如果目标值严格大于数组的最大值，则最后l会来到nums.length的位置，这个位置很明显越界了。此时说明数组中肯定没有目标
      *      值。
-     *          情况3：如果目标值严格小于数组的最小值，则最后l会来到0的位置，这个位置不越界。【注】此时0位置的数很明显不等于目标值。
+     *          情况3：如果目标值严格小于数组的最小值，则最后l会来到0的位置，这个位置不越界。【注】但是因为target小于数组的最小值，因此
+     *      0位置的数很明显不等于目标值。
      *          问题：情况2和情况3都是严格的大于小于，那如果目标值等于数组的最大值 或者 等于数组的最小值呢？
      *            答：其实这种情况跟情况1是一样的。具体来说分为四种情况————
      *               ①如果等于数组最小值，且最小值唯一。则l指针会指向0；
@@ -73,6 +74,12 @@ public class _10binarySearch {
     每行的第一个整数大于前一行的最后一个整数。
     给你一个整数 target ，如果 target 在矩阵中，返回 true ；否则，返回 false 。
     * */
+    /**
+     * 【迷茫的点】
+     *      1. 建议使用左闭右闭的写法。即开始时left=0,right=nums.length-1;
+     *      2. 无论是左闭右开，还是左闭右闭区间的写法。根据mid计算该位置的坐
+     *  标方法是一样的，都是[mid/n][mid%n]。
+     * */
     //左闭右闭的写法
     public boolean searchMatrix(int[][] matrix, int target) {
         int m = matrix.length, n = matrix[0].length;
@@ -222,11 +229,11 @@ public class _10binarySearch {
      */
     public int[] searchRange_01(int[] nums, int target) {
         int left = searchLeft(nums,target); //step1：找target的左边界
-        if (left==nums.length || nums[left]!=target){ //step2：验证左边界是不是越界？左边界的数是不是target
+        if (left==nums.length || nums[left]!=target){ //step2：验证左边界是不是越界？左边界的数是不是target？？
             return new int[]{-1,-1}; //说明数组中压根就没有target这个数
         }
         int right = searchLeft(nums,target+1); //step3：求target+1的左边界，该左边界-1即为target的右边界
-        return new int[]{left,right-1}; /*right-1表示求出的target+1的左边界-1，因为right其实返回的是target+1的左边界left，因此target的右边界需要往左*/
+        return new int[]{left,right-1}; /**【注意】right-1表示求出的target+1的左边界-1，因为right其实返回的是target+1的左边界left，因此target的右边界需要往左*/
     }
     /*【目的】求target在数组中应该插入的位置————如果存在target求出的就是target的左边界
     * 【说明】就是53题的解法，一模一样*/
@@ -303,8 +310,12 @@ public class _10binarySearch {
     * */
     /**
      * 【解题关键】
-     *      1. 必须是和数组中的最后一个元素比。原因：比之后能知道 应该向左还是向右继续寻
-     * 找，才能找到最小值。。即和最后一个元素比能把搜寻区间减半
+     *      1. 必须是和数组中的最后一个元素比！！！！原因：比之后能知道 应该向左还是向右继续寻
+     * 找，才能找到最小值。。即和最后一个元素比能把搜寻区间减半。解释：
+     *          ①如果nums[mid]大于等于最后一个数，则这个数组一定是分为两段有序，并且最小值是在
+     *      mid的右边；
+     *          ②如果nums[mid]小于最后一个数，则这个数组不一定是分为一段还是两段。但是最小值一
+     *      定是在mid往左的区域中（包含mid位置）
      *
      * 【推荐解法】解析的话就看官方的
      *      1. 写法的话推荐解法1。————多使用一个变量，存储遇到过的最小值
@@ -316,7 +327,9 @@ public class _10binarySearch {
     *       解法2中right不会更新为mid-1（防止错过最小值），但是循环的条件就不能带“=”了（带等于会导致死循环）*/
     public int findMin(int[] nums) {
         // 1.min初始值为第一段升序数组的最小值，而且目前不知道数组是有两段升序还是只有一段升序
-        int min = nums[nums.length-1]; /**err：使用一个变量标记碰到的最小值*/
+        /**err【重要】：使用一个变量标记碰到的最小值。。
+         * 并且min必须初始化为nums[nums.length-1]，如果初始化为nums[0]，则"[2,1]"这个测试用例过不了*/
+        int min = nums[nums.length-1];
 
         // 2.先正常二分查找
         int left = 0, right = nums.length - 1;

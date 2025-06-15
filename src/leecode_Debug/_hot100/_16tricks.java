@@ -163,6 +163,45 @@ public class _16tricks {
         nums[j] = temp;
     }
 
+    /*下一个排列自己的写法*/
+    public void nextPermutation_myMethod(int[] nums) {
+        int flag = nums.length;
+        /*step1：从后面开始找到第一个降序的位置，即nums[i]<nums[i+1]*/
+        for (int i=nums.length-2;i>=0;i--){
+            if (nums[i]<nums[i+1]){
+                flag = i;
+                break;  /**err：找到第一个就返回*/
+            }
+        }
+
+        if (flag==nums.length){ //flag没有更新说明原来的排列就是最大的排列，需要整体逆序
+            reverse1(nums,0,nums.length-1);
+        }
+
+        /*step2：倒着找第一个大于升序位置数nums[flag]的数nums[i]，并交换；交换后把flag（不包含
+            flag）之后的所有数逆序。*/
+        for (int i=nums.length-1;i>=flag;i--){
+            if (nums[i]>nums[flag]){
+                int tmp = nums[flag];
+                nums[flag] = nums[i];
+                nums[i] = tmp;
+                reverse1(nums,flag+1,nums.length-1);
+                break;  /**err：【注意】找到第一个大于的操作，完成后直接返回*/
+            }
+
+        }
+    }
+
+    private void reverse1(int[] nums, int l, int r) {
+        while(l<r){
+            int tmp = nums[l];
+            nums[l] = nums[r];
+            nums[r] = tmp;
+            l++;
+            r--;
+        }
+    }
+
 
 
     public static void main(String[] args) {

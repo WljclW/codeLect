@@ -42,15 +42,13 @@ public class _13tanXin {
     /**1. "能不能到最后一个下标"只是看能走的最远距离，用一个变量标识能到的最远距离
      * 2. "贪心"贪的是什么？？是当前走过的位置，决定了最远能到达多远*/
     public boolean canJump(int[] nums) {
-        if(nums.length==1) return true;
-
         int cur = 0; //表示当前研究到的索引
-        int bound = 0; //表示 最远可以到达的边界
+        int bound = 0; //表示 最远可以到达的边界。【注意】这里bound的值是下标，而不是真正的长度，因此判断的时候应该是和"nums.length-1"比较
         while(cur<=bound){ /*只要当前到达的位置 没有越界(没有超过当前情况下最远可以去的地方)就循环逻辑*/
             int now = nums[cur]; //表示当前的位置最多走几步
             bound = Math.max(bound,cur+now); //更新可以到达的最远边界
             cur++;
-            if(bound>= nums.length-1) return true;  /**err：bound是索引，因此达到“nums.length-1”就可以*/
+            if(bound>= nums.length-1) return true;  /**err(多次错)：bound是索引，因此达到“nums.length-1”就可以*/
         }
         return false; //出了循环说明bound没有到数组末尾，但是不能再走了，因为cur已经超出能走的边界了
     }
@@ -97,9 +95,11 @@ public class _13tanXin {
     * */
     /**
      * 思路：官方解、灵茶山艾
-     * 关键的点：
+     * 【关键的点】：
      *    1."flags数组"记录每个字母出现的最后的位置
-     *    2.“依次遍历更新窗口内所有字符的最后位置变量，如果当前遍历到的位置能匹配上‘最后位置’说明就是一个合格的子串”
+     *    2.从左开始遍历字符串，每次到一个新的位置先更新end标记。
+     *      “依次遍历更新窗口内所有字符的最后位置变量，如果当前遍历到的位置能匹配上‘最后位置’说明就是一个合格的子串”
+     * 【建议】建议使用下面的解法2.
      * */
     // 763的写法1
     public List<Integer> partitionLabels(String s) {
@@ -108,7 +108,8 @@ public class _13tanXin {
         /*记录每一个字符最后出现的位置*/
         int[] flags = new int[26];
         for (int i = 0; i < s.length(); i++) {
-            flags[s.charAt(i) - 'a'] = i;
+            char c = s.charAt(i);
+            flags[c - 'a'] = i;
         }
 
         /*循环遍历，求满足要求的子串*/
@@ -131,19 +132,22 @@ public class _13tanXin {
         LinkedList<Integer> res = new LinkedList<>();
         int[] flags = new int[26];
         for (int i=0;i<s.length();i++){
-            flags[s.charAt(i)-'a'] = i;
+            char c = s.charAt(i);
+            flags[c-'a'] = i;
         }
 
-        int start = 0; /*表示当前一个划分的左边界*/
-        int cur = 0; /*初始化遍历的位置为当前位置*/
-        int bound = flags[s.charAt(0)-'a']; /*初始化边界为第一个字符的边界*/
+        int start =0,end = 0; /*分别表示当前所研究划分的左边界、右边界*/
+        int cur = 0; //表示当前研究到的位置
         while(cur<s.length()){
-            bound = Math.max(bound,flags[s.charAt(cur)-'a']/*表示当前这个字符最后出现的位置(索引，从0开始的)*/);
-            if(cur==bound){ //到最后一个字符的时候必然会进入到这个if(最后一段区间的边界必然就是s的长度)，因为if外面不用额外添加剩余区间了
-                res.add(bound-start+1);
-                start = bound;
+            /**    每到一个位置做三件事：①首先更新右边界end；②判断是不是形成一个合理的解；③更新cur指针研究
+             * 下一个位置*/
+            char c = s.charAt(cur);
+            end = Math.max(end,flags[c-'a']); //①更新end边界
+            if (cur==end){ //②到最后一个字符的时候必然会进入到这个if(最后一段区间的边界必然就是s的长度)，因为if外面不用额外添加剩余区间了
+                res.add(end-start+1);
+                start = end+1;
             }
-            cur++;
+            cur++; /**err：while循环注意再循环内更新循环便利*/ //③更新cur指针来到下一个位置
         }
         return res;
     }

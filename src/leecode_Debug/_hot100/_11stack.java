@@ -129,7 +129,9 @@ public class _11stack {
      *              如果待添加有重复元素，则每一个位置需要放一个链表，存放所有元素值相等的index。大于小于栈顶都会操作（即当前
      *           元素添加进链表入栈 或者 栈顶的链表所有元素出栈），等于栈顶的时候，将当前元素添加到栈顶的哪个链表
      *      2. 【重要说明】
-     *          针对这个题，其实并不要求栈内的元素严格单调递增 或者 递减。等于栈顶index对应元素值的时候直接入栈就可以了*/
+     *          针对这个题，其实并不要求栈内的元素严格单调递增 或者 递减。等于栈顶index对应元素值的时候直接入栈就可以了
+     *      3. 建议使用第二中种解法*/
+    //解法1
     public int[] dailyTemperatures(int[] temperatures) {
         int[] res = new int[temperatures.length];
         LinkedList<Integer> stack = new LinkedList<>();
@@ -163,18 +165,40 @@ public class _11stack {
     /**[建议使用]：求解每日温度问题更好的解。
      *    求解每日温度题目 并不要求栈内索引对应的值严格单调，相邻的数相等也是可以的！————
      * 因此每一个位置存放索引就行，不用存放链表*/
-    public int[] dailyTemperatures01(int[] temperatures) {
+    //解法2，这其实是一种精简的写法。精简的原型见解法3
+    public int[] dailyTemperatures02(int[] temperatures) {
         Deque<Integer> stack = new ArrayDeque<>();
         int[] res = new int[temperatures.length];
-        for(int i=0;i<temperatures.length;i++){
+        for (int i = 0; i < temperatures.length; i++) {
             /*只要当前值大于栈顶索引对应的值，就弹出栈顶并生成栈顶索引的信息；
-            * 经过while保证单调栈符合单调栈的规则，然后当前索引入栈*/
-            while(!stack.isEmpty()&&temperatures[i]>temperatures[stack.peek()]){
-                int index = stack.poll();
-                res[index] = i-index;
+             * 经过while保证"当前的场景"符合单调栈的规则，然后当前索引入栈*/
+            while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {
+                int index = stack.pop();
+                res[index] = i - index;
             }
             stack.push(i);
         }
+        return res;
+    }
+
+    public int[] dailyTemperatures03(int[] temperatures) {
+        int[] res = new int[temperatures.length];
+        LinkedList<Integer> stack = new LinkedList<>();
+        for (int i = 0; i < temperatures.length; i++) {
+            //这里的入栈的判断可以省略。。。。省略后即为解法2
+            if (stack.isEmpty() || temperatures[stack.peek()] >= temperatures[i]) {
+                stack.push(i);
+                continue;
+            }
+            /**每一次入栈之前保证合法，如何保证？？将栈顶不合规的数据依次弹出，并生成res信息。
+             * 【注意】栈顶可能不止弹出一次，因此需要使用while循环*/
+            while (!stack.isEmpty() && temperatures[stack.peek()] < temperatures[i]) {
+                Integer cur = stack.pop();
+                res[cur] = i - cur;
+            }
+            stack.push(i);
+        }
+
         return res;
     }
 
