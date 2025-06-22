@@ -1,9 +1,6 @@
 package leecode_Debug._hot100;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 
 
 /**84、*/
@@ -48,6 +45,28 @@ public class _11stack {
         }else{
             return ']';
         }
+    }
+
+    /*推荐使用下面的写法*/
+    public boolean isValid_01(String s) {
+        LinkedList<Character> stack = new LinkedList<>();
+        HashMap<Character, Character> map = new HashMap<>(){{
+            put(')','(');
+            put('}','{');
+            put(']','[');
+        }};
+        for (int i=0;i<s.length();i++){
+            char c = s.charAt(i);
+            if (!map.containsKey(c)){ //说明是左括号直接入栈
+                stack.push(c);
+            }else{ //说明是右括号
+                if (stack.isEmpty()||stack.peek()!=map.get(c)){ //如果栈顶不是c对应的左括号
+                    return false;
+                }
+                stack.pop(); /**err：切记验证完后pop出栈顶。。在if条件中写也可以*/
+            }
+        }
+        return stack.isEmpty();
     }
 
 
@@ -123,6 +142,7 @@ public class _11stack {
      i 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 0 来代替。
     * */
     /**找右边第一个比当前位置的数大的索引。。因此小于栈顶的入栈，大于栈顶(说明栈顶对应的结果已经计算出来了)的时候栈顶索引要出栈。
+     * 【建议】使用解法4！！
      * 【说明】
      *      1. 如果解决题目时要求栈中的数严格递减或递增————
      *              如果没有相同元素，好说，直接入栈 或者 出栈生成信息；
@@ -161,27 +181,7 @@ public class _11stack {
         return res;
     }
 
-
-    /**[建议使用]：求解每日温度问题更好的解。
-     *    求解每日温度题目 并不要求栈内索引对应的值严格单调，相邻的数相等也是可以的！————
-     * 因此每一个位置存放索引就行，不用存放链表*/
-    //解法2，这其实是一种精简的写法。精简的原型见解法3
     public int[] dailyTemperatures02(int[] temperatures) {
-        Deque<Integer> stack = new ArrayDeque<>();
-        int[] res = new int[temperatures.length];
-        for (int i = 0; i < temperatures.length; i++) {
-            /*只要当前值大于栈顶索引对应的值，就弹出栈顶并生成栈顶索引的信息；
-             * 经过while保证"当前的场景"符合单调栈的规则，然后当前索引入栈*/
-            while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {
-                int index = stack.pop();
-                res[index] = i - index;
-            }
-            stack.push(i);
-        }
-        return res;
-    }
-
-    public int[] dailyTemperatures03(int[] temperatures) {
         int[] res = new int[temperatures.length];
         LinkedList<Integer> stack = new LinkedList<>();
         for (int i = 0; i < temperatures.length; i++) {
@@ -202,6 +202,43 @@ public class _11stack {
         return res;
     }
 
+    public int[] dailyTemperatures03(int[] temperatures) {
+        LinkedList<Integer> stack = new LinkedList<>();
+        int[] res = new int[temperatures.length];
+        for (int i = 0; i < temperatures.length; i++) {
+            if (stack.isEmpty()||temperatures[stack.peek()]>=temperatures[i]){
+                stack.push(i);
+            }else{
+                while(!stack.isEmpty()&&temperatures[stack.peek()]<temperatures[i]){
+                    Integer cur = stack.pop();
+                    res[cur] = i-cur;
+                }
+                stack.push(i);
+            }
+        }
+
+        return res;
+    }
+
+    /**[建议使用]：求解每日温度问题更好的解。
+     *    求解每日温度题目 并不要求栈内索引对应的值严格单调，相邻的数相等也是可以的！————
+     * 因此每一个位置存放索引就行，不用存放链表*/
+    //解法2，这其实是一种精简的写法。精简的原型见dailyTemperatures02、dailyTemperatures03
+    public int[] dailyTemperatures04(int[] temperatures) {
+        Deque<Integer> stack = new ArrayDeque<>();
+        int[] res = new int[temperatures.length];
+        for (int i = 0; i < temperatures.length; i++) {
+            /*只要当前值大于栈顶索引对应的值，就弹出栈顶并生成栈顶索引的信息；
+             * 经过while保证"当前的场景"符合单调栈的规则，然后当前索引入栈*/
+            while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {
+                int index = stack.pop();
+                res[index] = i - index;
+            }
+            stack.push(i);
+        }
+        return res;
+    }
+
 
 
     /*84.
@@ -209,6 +246,7 @@ public class _11stack {
     求在该柱状图中，能够勾勒出来的矩形的最大面积。
     * */
     /**
+     * 【建议的解法】使用下面的largestRectangleArea2
      * 这个题目的本质————针对每一个位置i，找到左右两边最近的小于heights[i]的位置。就得到了该位置所能绘制出的最大矩形，等
      * 每一个位置的值都求出来了，全局的最大矩形也就得到了。
      *    这个题也可以用一维数组来表示，完整的可能情况：枚举每一个位置，比如该位置的高度是m，从该位置向左右两边查找第一个
@@ -254,13 +292,10 @@ public class _11stack {
         return res;
     }
 
-    /**【推荐下面的做法】由于要找到左右两边最近且小于的数，因此只要当前的数大于栈顶对应的数就入栈*/
+    /**由于要找到左右两边最近且小于的数，因此只要当前的数大于栈顶对应的数就入栈*/
     public int largestRectangleArea1(int[] heights){
         int max = Integer.MIN_VALUE;
         LinkedList<Integer> stack = new LinkedList<>();
-        int[] left = new int[heights.length];
-        Arrays.fill(left,-1);
-        int[] right = new int[heights.length];
         /*
         * 遍历每一个位置，对于来到的每一个位置：
         *    1.什么时候入栈？
@@ -288,6 +323,32 @@ public class _11stack {
             max = Math.max(max,heights[cur]*(cur-L-1));
         }
         return max;
+    }
+
+    public int largestRectangleArea2(int[] heights) {
+        Deque<Integer> stack = new LinkedList<>(); // 存储索引
+        int maxArea = 0;
+        int n = heights.length;
+
+        for (int i = 0; i <= n; i++) {
+            /**这一步就相等于清理最后栈中残留的索引。。。
+             *      因为任何一个高度都大于0，索引当i来到n的时候，我们将当前的高度赋值为0，根
+             * 据"currHeight<height[stack.peek()]"可知，此时stack中所有的索引都会出栈，并计
+             * 算出可以绘制的矩形的面积
+             * * */
+            int currHeight = (i == n) ? 0 : heights[i]; // 处理最后一个元素
+
+            // 当前高度小于栈顶元素，弹出栈顶并计算面积
+            while (!stack.isEmpty() && currHeight < heights[stack.peek()]) {
+                int height = heights[stack.pop()];
+                int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+                maxArea = Math.max(maxArea, height * width);
+            }
+
+            stack.push(i); // 当前索引入栈
+        }
+
+        return maxArea;
     }
 
 

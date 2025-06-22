@@ -10,6 +10,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 【易错】
+ *      1. 模板中for循环的调用时，一般是和当前i有关系，而不和形参的index有关系。比如：
+ *  ①见combinationSumTrace的for循环，递归调用时需要使用i而不是index，使用index的话会有重
+ *      复的现象；
+ *  ②再比如subsetsBack方法中的for循环中递归调用时要从i+1开始，而不是index+1！！！
+ *      2.
+ * */
 public class _09huisu {
     /*46.
     给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
@@ -48,6 +56,32 @@ public class _09huisu {
         }
     }
 
+    /*全排列的另一种写法：形参数量变多*/
+    List<List<Integer>> permuteRes;
+    public List<List<Integer>> permute1(int[] nums) {
+        permuteRes = new LinkedList<>();
+        List<Integer> path = new LinkedList<Integer>();
+        boolean[] used = new boolean[nums.length];
+        permuteTrace(nums,path,used);
+        return permuteRes;
+    }
+
+    private void permuteTrace(int[] nums, List<Integer> path, boolean[] used) {
+        if (path.size()==nums.length){
+            permuteRes.add(new LinkedList<>(path));
+            return;
+        }
+        for (int i=0;i<nums.length;i++){
+            if (!used[i]){
+                path.add(nums[i]);
+                used[i] = true;
+                permuteTrace(nums,path,used);
+                path.remove(path.size()-1);
+                used[i] = false;
+            }
+        }
+    }
+
 
     /*78.
     给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
@@ -65,7 +99,7 @@ public class _09huisu {
     private void subsetsBack(int[] nums, int index) {
         resSubSets.add(new LinkedList<>(pathSubsets)); /**err：子集问题每次添加到结果集不用return，因为要研究树所有的节点*/
         for (int i=index;i< nums.length;i++){
-            pathSubsets.add(nums[i]); /**err：循环中的循环变量已经是i了*/
+            pathSubsets.add(nums[i]); /**err：【注意，反复错】循环中的循环变量已经是i了!!!*/
             subsetsBack(nums,i+1); /**err：循环中的循环变量已经是i了*/
             pathSubsets.remove(pathSubsets.size()-1);
         }
@@ -120,7 +154,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     List<List<Integer>> resCombinationSum;
     List<Integer> pathCombinationSum;
     int sum = 0;
-    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+    public List<List<Integer>> combinationSum1(int[] candidates, int target) {
         resCombinationSum = new LinkedList<>();
         pathCombinationSum = new LinkedList<>();
         combinationSumback(candidates,target,0);
@@ -144,12 +178,92 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
     }
 
+    /*解法2：只用一个target来表示sum*/
+    List<List<Integer>> combinationSumRes;
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        combinationSumRes = new LinkedList<>();
+        combinationSumTrace(candidates,0,target,new LinkedList<Integer>());
+        return combinationSumRes;
+    }
+    private void combinationSumTrace(int[] candidates, int index, int target, LinkedList<Integer> path) {
+        if (target==0){
+            combinationSumRes.add(new LinkedList<>(path));
+            return;
+        }
+        if (target<0){
+            return;
+        }
+        for (int i=index;i<candidates.length;i++){
+            target -= candidates[i];
+            path.add(candidates[i]);
+            /**err：递归的时候要从i开始而不是index...*/
+//            combinationSumTrace(candidates,index,target,path);
+            combinationSumTrace(candidates,i,target,path);
+            target += candidates[i];
+            path.removeLast();
+        }
+    }
+
 
     /*22.
     数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。*/
-//    public List<String> generateParenthesis(int n) {
-//
-//    }
+    /**
+     * 【解题关键】尝试，用open和close分别表示左右括号，在合法（合法要求：任意时刻左括号的
+     *      数量必须不小于右括号的数量 且 左括号的数量小于n）的前提下，尝试添加一个左括号或
+     *      者右括号。
+     */
+    /*解法1：官方解回溯法*/
+    public List<String> generateParenthesis_offical(int n) {
+        List<String> ans = new ArrayList<String>();
+        backtrack(ans, new StringBuilder(), 0, 0, n);
+        return ans;
+    }
+
+    public void backtrack(List<String> ans, StringBuilder cur, int open, int close, int max) {
+        if (cur.length() == max * 2) {
+            ans.add(cur.toString());
+            return;
+        }
+        if (open < max) {
+            cur.append('(');
+            backtrack(ans, cur, open + 1, close, max);
+            cur.deleteCharAt(cur.length() - 1);
+        }
+        if (close < open) {
+            cur.append(')');
+            backtrack(ans, cur, open, close + 1, max);
+            cur.deleteCharAt(cur.length() - 1);
+        }
+    }
+
+    /*解法2：基于官方解回溯法的改进。。。
+    * 【想说明的问题】回溯问题中只有当前回溯依赖的信息必须通过形参传递，其他的信息都可以使
+    *       用全局变量。*/
+    List<String> ans = new ArrayList<String>();
+    int max;
+    StringBuilder cur = new StringBuilder();
+    public List<String> generateParenthesis(int n) {
+        max = n;
+        backtrack( 0, 0);
+        return ans;
+    }
+
+    public void backtrack(int open, int close) {
+        if (cur.length() == max * 2) {
+            ans.add(cur.toString());
+            return;
+        }
+        if (open < max) {
+            cur.append('(');
+            backtrack( open + 1, close);
+            cur.deleteCharAt(cur.length() - 1);
+        }
+        if (close < open) {
+            cur.append(')');
+            backtrack(  open, close + 1);
+            cur.deleteCharAt(cur.length() - 1);
+        }
+    }
 
 
     /*79.
@@ -160,10 +274,12 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      * 【思路】从每一个位置展开研究(即从这个位置开始，一一对比word的每一个字符，看能不能找到可行解)。
      *      "展开研究"的具体逻辑(即for循环的逻辑)：
      *          ①什么时候找到了可行解？来到了word的最后字符的后面，即word字符的所有数据都匹配成功了。
+     *      即递归方法的形参index来到word.length()。
      *          ②特殊情况？下标越界需要直接返回false，认为当前方式匹配失败；
      *                    当前来到的word字符校验失败，返回false。
-     *          ③到这里就说明word的index索引的字符检验成功！此时首先标记一下这个位置在当前的路径种已
-     *       经研究过了(使用布尔数组 或者 特殊字符)，然后递归调用研究index+1位置，最后撤销之前的选择。
+     *          ③到这里就说明word的index索引的字符检验成功！此时首先标记下这个位置在当前的路径中已经
+     *       研究过了(参考官方解的布尔数组 或者 解法1的特殊字符)，然后递归调用研究index+1位置，最后
+     *       撤销之前的选择即取消做的标记。
      * */
     /*
     * 解法1：在每一轮中，研究过的元素使用字符'\0'来标记
@@ -180,7 +296,8 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
     private boolean dfs(char[][] board, int i, int j, int index, String word) {
-        if (index == word.length()) return true; /*写成"index==word.length()-1"就错了*/
+        if (index == word.length())
+            return true; /*写成"index==word.length()-1"就错了*/
         if (i >= 0 && j >= 0 && i < board.length && j < board[0].length && board[i][j] == word.charAt(index)) {
             board[i][j] = '\0';
             boolean cur = dfs(board, i + 1, j, index + 1, word) ||
@@ -345,6 +462,8 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 每一种解法包含一个不同的 n 皇后问题 的棋子放置方案，该方案中 'Q' 和 '.' 分别代表了皇后和空位。
     * */
     /**
+     * 【注意】这里的chessBoard是当前的棋盘样子，必须要进行初始化使用字符'.'进行填充，否则可能会报如下的错：
+     *      [[".Q\u0000\u0000","\u0000\u0000.Q","Q.\u0000\u0000","\u0000\u0000Q\u0000"],["..Q\u0000","Q\u0000..","..\u0000Q","\u0000Q.\u0000"]]
      * 【解题思路】从第0行开始，依次研究每一行。
      *      找到可行解的标志：本轮研究的行来到了最后一行的下一行；
      *      for处理逻辑：对于本轮研究行的每一个位置(即每一列)，判断放皇后是不是合理。如果合理的话就放一个皇后
@@ -357,7 +476,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     List<List<String>> resSolveNQueens = new ArrayList<>();
     public List<List<String>> solveNQueens(int n) {
         char[][] chessBoard = new char[n][n];
-        for (int i=0;i<n;i++){
+        for (int i=0;i<n;i++){ /**err：必须进行初始化*/
             Arrays.fill(chessBoard[i],'.');
         }
         solveNQueensBack(n,0,chessBoard);

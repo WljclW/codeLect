@@ -7,7 +7,7 @@ public class _01bag {
     个子集，使得两个子集的元素和相等。
     * */
     /**
-     * 【关键】1.target的背包能放下的最大价值是不是target
+     * 【关键】问题等价于求解：target的背包能放下的最大价值是不是target
      * 【实质】实质是一道0-1背包问题。。。转化为0-1背包问题：
      *      每一个物品的重量是nums[i]，价值是nums[i]，背包容量是target，能否放下target
      *  价值的物品（其中target=sum/2）.
@@ -18,12 +18,15 @@ public class _01bag {
         for (int num:nums){
             target += num;
         }
-        int[] dp = new int[target + 1];
         if (target%2!=0) return false;
         target /= 2;
-        /*0-1背包一维数组形式的核心逻辑*/
+
+        int[] dp = new int[target + 1];
+        /*0-1背包一维数组形式的核心逻辑————
+        *   ①一维的写法中遍历的顺序不能颠倒（先遍历背包容量再遍历数组元素）；
+        *   ②一维的写法中背包容量必须从大到小遍历；*/
         for (int i=0;i<nums.length;i++)
-            for (int j=target;j>=nums[i];j--){  /**还是双重循环，但是内循环需要“倒着遍历求值”*/
+            for (int j=target;j>=nums[i];j--){  /**err：还是双重循环，但是内循环需要“倒着遍历求值”*/
                 dp[j] = Math.max(dp[j],dp[j-nums[i]]+nums[i]);
             }
         return dp[target]==target;

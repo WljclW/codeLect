@@ -180,14 +180,17 @@ public class _14DP {
         for (int i=1;i<s.length()+1;i++){
             for (int j=0;j<i;j++){ //j<i，因此j的最大值能到s.length()
                 /*
-                1. 解释一下if条件：dp[j]表示0~j-1的子串能不能由字典的词组成；然后我们再看[j,i-1]的子串是不是在字典中，如果
+                if条件语句的解释————
+                    dp[j]：0~j-1这段子串能有列表的字符串拼出来；
+                    set.contains(s.substring(j,i))：j~i-1这段子串是不是在题目字符串的列表中
+                1. 解释一下if条件：dp[j]表示0~j-1的子串能不能由字典的词组成；然后我们再看[j,i-1)的子串是不是在字典中，如果
                     在字典中就说明[0,i-1]的子串能由字典的一个或者多个词组成
                 2. ”set.contains(s.substring(j,i))“中i是能取到s.length()的，但是substring函数是左闭右开的区间，因此实
-                    际上获取子串时不会去拿s.length()的子串，不会导致越界异常
+                    际上获取子串时不会去拿s.length()的子串，不会导致越界异常。
                     */
                 if (dp[j]&&set.contains(s.substring(j,i))){
                     dp[i] = true;
-                    break;
+                    break; //这里加break会继续研究s串的下一个位置，不加也没啥问题
                 }
             }
         }
@@ -243,6 +246,7 @@ public class _14DP {
     /*416.
     * 给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两
     * 个子集，使得两个子集的元素和相等。*/
+    /**见leecode_Debug._hot100._01bag*/
 //    public boolean canPartition(int[] nums) {
 //
 //    }
@@ -250,9 +254,24 @@ public class _14DP {
     /*32.
     * 给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的
     * 长度。*/
-//    public int longestValidParentheses(String s) {
-//
-//    }
+    public int longestValidParentheses(String s) {
+        int res = 0;
+        int[] dp = new int[s.length()];
+        for (int i=1;i<s.length();i++){
+            char c = s.charAt(i);
+            if (c==')'){ /**【说明】只研究右括号的位置.。因为如果当前位置是左括号，以左括号结尾的有效括号串长度必然是0*/
+                if (s.charAt(i-1)=='('){
+                    dp[i] = (i>=2)?dp[i-2]+2:2;
+                }else { //说明前面的一个位置也是右括号')'
+                    if (i-dp[i-1]>0&&s.charAt(i-dp[i-1]-1)=='('){
+                        dp[i] = (i-dp[i-1]-2>=0)?dp[i-dp[i-1]-2]+2+dp[i-1]:2+dp[i-1];
+                    }
+                }
+                res = Math.max(res,dp[i]); //更新结果。。如果index位置不是右括号，则对应的dp[index]就是0，也不用更新最大值
+            }
+        }
+        return res;
+    }
 
 
     public static void main(String[] args) {

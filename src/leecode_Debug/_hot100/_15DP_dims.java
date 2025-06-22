@@ -85,7 +85,7 @@ public class _15DP_dims {
                     如果当前位置的字符相等，也可以写成(结果是一样的)：
                     dp[i][j] = Math.max(Math.max(dp[i - 1][j], dp[i][j - 1]),dp[i - 1][j - 1] + 1);
                     * */
-                    dp[i][j] = dp[i-1][j-1]+1;
+                    dp[i][j] = dp[i-1][j-1]+1; /**【说明】简化的写法，其实是单中做法的最大值*/
                 }else {
                     /*情况2：
                     如果当前字符不一样，dp[i][j]的值取决于dp[i-1][j]和dp[i][j-1]的最大值。
@@ -145,11 +145,32 @@ public class _15DP_dims {
                 if (word1.charAt(i-1)==word2.charAt(j-1)){
                     tmp = dp[i-1][j-1];
                 }else
-                    tmp = dp[i-1][j-1]+1;
+                    tmp = dp[i-1][j-1]+1; //当前位置不相等，需要多一次操作
                 /**三种操作方式：选出 操作数最少 的那种方式*/
                 dp[i][j] = Math.min(Math.min(dp[i-1][j],dp[i][j-1])+1,tmp);
             }
         }
+        return dp[m][n];
+    }
+
+    /*编辑距离另外的写法*/
+    public int minDistance1(String word1, String word2) {
+        int m = word1.length(),n = word2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        for (int i = 0; i <= m; i++)
+            for (int j = 0; j <= n; j++) {
+                if (i==0||j==0){ //第一行和第一列的情况
+                    dp[i][j] = (i==0)?j:i;
+                    continue;
+                }
+                if (word1.charAt(i-1)==word2.charAt(j-1)){
+                    /**其实等价于三种情况的最小值，即：Math.min(dp[i-1][j-1],Math.min(dp[i][j-1],dp[i-1][j])+1)..
+                     * 和else情况的区别就是当前位置的字符相同，所以dp[i-1][j-1]就行，不用再+1*/
+                    dp[i][j] = dp[i-1][j-1];
+                }else{
+                    dp[i][j] = Math.min(dp[i-1][j],Math.min(dp[i][j-1],dp[i-1][j-1]))+1;
+                }
+            }
         return dp[m][n];
     }
 

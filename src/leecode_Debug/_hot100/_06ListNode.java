@@ -191,8 +191,10 @@ public class _06ListNode {
 
     /*19.
     * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。*/
-    /**【解题关键】开始时slow指向虚拟头dummy节点；
-     *            但是fast指向head 并且 fast先走n步
+    /**    强烈建议使用官方解
+     * 【解题关键&&官方解精髓】开始时slow指向虚拟头dummy节点；
+     *                      但是fast指向head 并且 fast先走n步
+     *                      （最后fast指向null的时候，slow正好指向倒数第n+1个节点）
      * 【注】1. 这个题重要的是在删除的时候slow指针指向要删除节点的前一个节点。
      *      2. 一开始，要让fast指针先走N步*/
     /*自己的解法*/
@@ -241,8 +243,9 @@ public class _06ListNode {
     * 给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下
     * 完成本题（即，只能进行节点交换）。*/
     /**
-     * 【关键】1. 创建虚拟头节点（虚拟头节点的本质就是记录了 前一组"两两节点"的最后节点，也即当前这组“两两节点”的前置节点）；
-     *       2. 在每一轮循环中先记录两两节点————第一个node1，第二个node2，然后调整指针指向
+     * 【关键】1. 创建虚拟头节点（虚拟头节点的本质就是记录了 前一组"两两节点"的最后节点，也即当前这组“两两节
+     *      点”的前置节点）。。这就要求每一轮反转完两个节点后，需要将cur指针指向它两中的最后一个节点；
+     *        2. 在每一轮循环中先记录两两节点————第一个node1，第二个node2，然后调整指针指向
      */
     /*非递归的形式；非递归形式看官方讲解*/
     public ListNode swapPairs1(ListNode head) {
@@ -400,7 +403,7 @@ public class _06ListNode {
         if (l==r) return lists[l];
         int mid = l+(r-l)/2;
         ListNode mergeLeft = merge(lists, l, mid);
-        ListNode mergeRight = merge(lists, mid + 1, r);
+        ListNode mergeRight = merge(lists, mid + 1, r); /**err：右边界是r不是nums.length-1*/
         return mergeTwoList(mergeLeft,mergeRight);
     }
 
@@ -417,7 +420,7 @@ public class _06ListNode {
                 cur.next = mergeRight;
                 mergeRight = mergeRight.next;
             }
-            cur = cur.next;
+            cur = cur.next; /**err：注意移动cur指针*/
         }
         /*step2：将不空的那个链表的其他元素拼接到结果链后面*/
         cur.next = mergeLeft==null?mergeRight:mergeLeft;

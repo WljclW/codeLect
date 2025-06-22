@@ -51,7 +51,7 @@ public class _16tricks {
         int cur = 0;
         while(cur<=right) {
             if (nums[cur] < 1) { /*如果是0，交换到left指向位置，*/
-                swap(nums,left++,cur++);
+                swap(nums,left++,cur++); /**err：注意，这种情况cur也得++，因为此时cur位置的值要麽是0要麽是1，不可能是2*/
             } else if (nums[cur] == 1) {
                 cur++;
             } else { //交换后cur交换来的数还没有比较，所以cur指针不能动

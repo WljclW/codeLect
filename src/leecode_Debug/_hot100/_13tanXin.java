@@ -95,14 +95,21 @@ public class _13tanXin {
     * */
     /**
      * 思路：官方解、灵茶山艾
-     * 【关键的点】：
+     * 【解题步骤】：
      *    1."flags数组"记录每个字母出现的最后的位置
      *    2.从左开始遍历字符串，每次到一个新的位置先更新end标记。
-     *      “依次遍历更新窗口内所有字符的最后位置变量，如果当前遍历到的位置能匹配上‘最后位置’说明就是一个合格的子串”
+     *      “依次遍历更新窗口内所有字符的最后位置变量，如果当前遍历到的位置能匹配上当前这组的‘最后位置’说明
+     *      就是一个合格的子串”，此时将长度添加到结果集中
      * 【建议】建议使用下面的解法2.
+     * 【细节】partitionLabels3中解释了left初始化为0和-1的区别————最根本的区别在于left初始化为0表示左闭右
+     *      闭区间，因此这一段的长度就是cur-left+1；但是left初始化为-1表示是左开右闭区间，此时这一段的长度
+     *      就是cur-left。带来代码的区别体现在：
+     *          ①left初始值的不同；②找到一个区间时，计算长度的表达式不同；③每遭到一个区间时，下一个区间
+     *      的left值取的不同(如果是闭区间，left取下一个区间的第一个元素；如果是左开右闭区间，left取得是
+     *      当前区间的最后一个元素)
      * */
     // 763的写法1
-    public List<Integer> partitionLabels(String s) {
+    public List<Integer> partitionLabels1(String s) {
         ArrayList<Integer> res = new ArrayList<>(); //记录结果
 
         /*记录每一个字符最后出现的位置*/
@@ -120,7 +127,7 @@ public class _13tanXin {
             //如果当前位置i 来到 边界位置i。则产生一个区间，将长度添加进res
             if (i == end) {
                 res.add(end - start + 1);
-                start = i;
+                start = i+1;
             }
         }
         return res;
@@ -128,7 +135,7 @@ public class _13tanXin {
 
 
     //763的写法2.
-    public List<Integer> partitionLabels0(String s) {
+    public List<Integer> partitionLabels2(String s) {
         LinkedList<Integer> res = new LinkedList<>();
         int[] flags = new int[26];
         for (int i=0;i<s.length();i++){
@@ -136,7 +143,7 @@ public class _13tanXin {
             flags[c-'a'] = i;
         }
 
-        int start =0,end = 0; /*分别表示当前所研究划分的左边界、右边界*/
+        int start =0,end = 0; /*分别表示当前所研究划分的左边界、右边界(包括左右边界位置)*/
         int cur = 0; //表示当前研究到的位置
         while(cur<s.length()){
             /**    每到一个位置做三件事：①首先更新右边界end；②判断是不是形成一个合理的解；③更新cur指针研究
@@ -152,11 +159,35 @@ public class _13tanXin {
         return res;
     }
 
+    public List<Integer> partitionLabels3(String s) {
+        int[] flag = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            flag[s.charAt(i)-'a'] = i;
+        }
+
+        LinkedList<Integer> res = new LinkedList<>();
+        int left = 0,cur = 0; //这种写法是包括left并且包括cur，因此这段的元素数量：cur-left+1
+//        int left = -1,cur = 0; //区别1：这种写法不包括left但是包含cur，因此这段的元素数量：cur-left
+        int bound = 0;
+        while(cur<s.length()){
+            bound = Math.max(bound,flag[s.charAt(cur)-'a']);
+            if (cur==bound){
+                res.add(cur-left+1);
+//                res.add(cur-left); //区别2：计算长度的表达式不同
+                left = bound+1; //下一组的数是从bound+1开始的，因为left初始化为0，表示闭区间！所以下一组的left是bound+1
+//                left = bound; //区别3：下一组的数是从bound+1开始的，因为left初始化为-1，表示左开右闭！所以下一组的left是bound
+            }
+            cur++;
+        }
+        return res;
+
+    }
+
 
     public static void main(String[] args) {
         _13tanXin curClass = new _13tanXin();
-        System.out.println(curClass.partitionLabels("dsadssbtyb"));
-        System.out.println(curClass.partitionLabels0("dsadssbtyb"));
+        System.out.println(curClass.partitionLabels1("dsadssbtyb"));
+        System.out.println(curClass.partitionLabels2("dsadssbtyb"));
 
         curClass.canJump_for(new int[]{3,2,1,0,4});
     }
