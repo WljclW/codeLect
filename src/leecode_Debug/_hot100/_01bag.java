@@ -7,20 +7,21 @@ public class _01bag {
     个子集，使得两个子集的元素和相等。
     * */
     /**
-     * 【关键】问题等价于求解：target的背包能放下的最大价值是不是target
+     * 【关键】问题等价于求解：target的背包能放下物品的最大价值是不是target
      * 【实质】实质是一道0-1背包问题。。。转化为0-1背包问题：
      *      每一个物品的重量是nums[i]，价值是nums[i]，背包容量是target，能否放下target
      *  价值的物品（其中target=sum/2）.
      * */
     /*一维数组的形式*/
     public boolean canPartition(int[] nums) {
+        /*step1：求出数组的和，看看是不是能平分为两部分*/
         int target = 0;
         for (int num:nums){
             target += num;
         }
         if (target%2!=0) return false;
         target /= 2;
-
+        /*step2：0-1背包的核心逻辑*/
         int[] dp = new int[target + 1];
         /*0-1背包一维数组形式的核心逻辑————
         *   ①一维的写法中遍历的顺序不能颠倒（先遍历背包容量再遍历数组元素）；

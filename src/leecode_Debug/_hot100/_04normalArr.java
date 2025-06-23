@@ -18,7 +18,7 @@ public class _04normalArr {
     * 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元
     *   素），返回其最大和。( 子数组是数组中的一个连续部分)
     * */
-    /**到达任何一个数有两种选择：要麽和前面的数组成子数组；要麽自己单独成一个数组。
+    /**【解题思想】到达任何一个数有两种选择：要麽和前面的数组成子数组；要麽自己单独成一个数组。
      *      两种选择到底采用哪一个呢？取最大的那个。
      *      那到底最大子数组和是多少呢？使用一个外面的变量来标记,每计算出一个位置的值时更新。*/
     public int maxSubArray(int[] nums) {
@@ -36,8 +36,8 @@ public class _04normalArr {
     *以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。请你合并所有重
     * 叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。
     * */
-    /**这个题的关键：将intervals中的区间先加进结果集(此时默认加在最后一位)，然后往后判断来更新结果集
-     *      中最后一个数组的结尾界线。【注意】如果不是先将最后一个元素加进结果集，直接研究会显得很复杂，
+    /**【题的关键】：将intervals中的区间先加进结果集(此时默认加在最后一位)，然后往后判断来更新结果集
+     *      中最后一个数组的结尾界线。【注意】如果不是先将第一个元素加进结果集，直接研究会显得很复杂，
      *      逻辑上容易乱
      * 判断的标准：
      *      如果下一个区间的开始值 小于 结果集最后一个元素的结尾界限，比如：[1,4],[2,5]。则将结果集
@@ -53,12 +53,12 @@ public class _04normalArr {
                 else return o1[1] - o2[1];
             }
         });
-        res.add(intervals[0]); /*关键步骤：先将区间加到结果集里面，然后再利用后续元素更新这个元素的结尾界限*/
-        for (int i=1;i<intervals.length;i++){
+        res.add(intervals[0]); /*step1关键步骤：先将区间加到结果集里面，然后再利用后续元素更新这个元素的结尾界限*/
+        for (int i=1;i<intervals.length;i++){ /*step2：遍历剩下的数组。更新res中最后一个元素的右边界？还是往res中新添加一个区间？*/
             int[] cur = intervals[i];
             if(res.getLast()[1]>=cur[0]){ //情况1：更新res中最后一个区间的右边界
                 res.getLast()[1] = Math.max(res.getLast()[1],cur[1]);
-            }else{ //需要在res中添加新区见
+            }else{ //情况2：需要在res中添加新区间
                 res.add(cur);
             }
         }
@@ -118,9 +118,9 @@ public class _04normalArr {
 //    }
 
     /**其实可以在返回的数组基础上进行记录，从而避免其余空间的浪费。
-     * 思路：
+     * 【思路】：
      *     第一次正着遍历原始数组nums,res数组位置i存放它的前缀积，遍历到末尾位置。。。。然后接着反序遍历结果数组，
-     *  利用局部变量来记录当前索引j的后缀乘积，这样的话倒着遍历的时候每到一个位置，“局部变量”*“结果集的当
+     *  利用局部变量来记录当前索引j的后缀乘积，这样的话倒着遍历的时候每到一个位置，“局部变量”✖“结果集的当
      *  前位置值”就是该位置的结果*/
     public int[] productExceptSelf(int[] nums){
         if(nums.length==1) return nums;
@@ -146,12 +146,14 @@ public class _04normalArr {
     * 给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
         请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
     * */
+    /*写法1：简洁*/
     public int firstMissingPositive(int[] nums) {
         for (int i = 0; i < nums.length; i++) {
             /**while会不断的将i位置的元素放到正确的位置....
              * 【注意】
              *      1.虽然交换但是i位置不能变，因为换过来的数还需要继续判断，这就是
-             * 为什么这里是while循环。。(跟"颜色交换(荷兰国旗类似)"，交换后不能移动cur指针)
+             * 为什么这里是while循环。。(跟"颜色交换(荷兰国旗类似)"，交换后不能移动cur指针)，
+             * 因为交换来的元素需要研究一下
              *      2.与"小于 等于 大于"将数组的数分开有异曲同工，如果当前遍历的位置
              * 的数发现大于flag需要换到大于区域，因此需要继续判断这个"从大于区域换来
              * 的数"应该放到哪里————也就意味着swap之后不能变换当前研究的索引cur。
@@ -167,13 +169,39 @@ public class _04normalArr {
             if (nums[i] != i + 1) return i + 1;
         }
 
-        return nums.length+1; /**err：到了这里说明数组中不缺，因此应该返回下一个数*/
+        return nums.length + 1; /**err：到了这里说明数组中不缺，因此应该返回下一个数*/
     }
 
     public void swap(int[] nums,int i,int j){
         int temp = nums[i];
         nums[i] = nums[j];
         nums[j] = temp;
+    }
+
+    /*解法2：*/
+    public int firstMissingPositive01(int[] nums) {
+        int cur = 0;
+        /*step1：将每一个数放在正确的位置*/
+        while(cur<nums.length){
+            if (nums[cur]>0&&nums[cur]<=nums.length&&nums[nums[cur]-1]!=nums[cur]){ //进入if说明数没有放在正确的位置
+                swap01(nums,nums[cur]-1,cur);
+                continue; //交换来的数可能也不在正确的位置，因此cur指针不能动，下一轮循环还需要继续研究交换来的数
+            }
+            cur++; //走到这一步必然没有进入if，没有进入if说明nums[cur]放在正确的位置，下一轮循环继续研究下一个位置即cur++;
+        }
+        /*step2：从index=0开始，找第一个缺失的数*/
+        for (int i=0;i<nums.length;i++){
+            if (nums[i]!=i+1){ /**err：if条件语句写错。索引0处的应该是1，因此nums[i]和i+1比较*/
+                return i+1; /**err：返回i+1。。求的是第一个缺失的整数，而不是索引*/
+            }
+        }
+        return nums.length+1; /**err：如果所有的数都在正确位置比如：[1,2,3]。这种情况应该返回4*/
+    }
+
+    private void swap01(int[] nums, int num, int cur) {
+        int tmp = nums[num];
+        nums[num] = nums[cur];
+        nums[cur] = tmp;
     }
 
 

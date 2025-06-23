@@ -76,13 +76,15 @@ public class _00hard {
     * */
     public int firstMissingPositive(int[] nums) {
         int cur = 0;
+        /*step1：将每一个数放在正确的位置*/
         while(cur<nums.length){
-            if (nums[cur]>0&&nums[cur]<=nums.length&&nums[nums[cur]-1]!=nums[cur]){
+            if (nums[cur]>0&&nums[cur]<=nums.length&&nums[nums[cur]-1]!=nums[cur]){ //进入if说明数没有放在正确的位置
                 swap(nums,nums[cur]-1,cur);
-                continue;
+                continue; //交换来的数可能也不在正确的位置，因此cur指针不能动，下一轮循环还需要继续研究交换来的数
             }
-            cur++;
+            cur++; //走到这一步必然没有进入if，没有进入if说明nums[cur]放在正确的位置，下一轮循环继续研究下一个位置即cur++;
         }
+        /*step2：从index=0开始，找第一个缺失的数*/
         for (int i=0;i<nums.length;i++){
             if (nums[i]!=i+1){ /**err：if条件语句写错。索引0处的应该是1，因此nums[i]和i+1比较*/
                 return i+1; /**err：返回i+1。。求的是第一个缺失的整数，而不是索引*/
@@ -104,23 +106,29 @@ public class _00hard {
     public ListNode reverseKGroup(ListNode head, int k) {
         ListNode dummy = new ListNode(-1, head);
         ListNode pre = dummy,end = dummy;
-        while(end.next!=null){
-            for (int i=0;i<k&&end!=null;i++){
+        while(end.next!=null){ /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。“end.next!=null”是保证下一组A组还有节点*/
+            /*step1：先数k个节点，如果不够k个(end==null)，则结束循环，返回*/
+            for (int i=0;i<k&&end!=null;i++){ //经过这一轮循环，end会来到新的一组即A组的最后一个节点
                 end = end.next;
             }
-            if (end==null)  break;
+            if (end==null)  break; //说明这一组不够k个节点了，因此不用动结束循环即可
+            /*step2：记录几个节点。此时——————
+             *      start指向这一组的第一个节点；end指向这一组的最后一个节点；pre指向这一组前面的那个节点（即前一组的最后一个节点）；next指
+             *  向下一组的第一个节点*/
             ListNode start = pre.next;
             ListNode next = end.next;
+            /*step3：几个节点之间调整连接关系*/
             end.next = null;
-            pre.next = reverse(pre);
-            start.next = next;
+            pre.next = reverse(pre); //reverse返回的是 这一组翻转 之后的开始节点。
+            start.next = next; //这一组翻转完成后，start变成了这一组的最后一个节点。。因此将start.next赋值为next，其中next为下一组的第一个节点
+            /*step4：pre和end更新，更新为这一组的最后一个节点。。和最开始的“pre = dummy,end = dummy”呼应，每一轮之后状态回归到开始的样子*/
             pre = start;
-
-            end = pre;
+            end = start;
         }
         return dummy.next;
     }
 
+    /*翻转链表的原始代码————不变*/
     public ListNode reverse(ListNode pre){
         ListNode cur = pre.next,next = pre.next;
         while(cur!=null){

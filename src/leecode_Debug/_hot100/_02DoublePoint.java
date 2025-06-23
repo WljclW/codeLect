@@ -33,13 +33,20 @@ public class _02DoublePoint {
     * 【】：注意这个题和接雨水是不一样的，这个题目中挡板的宽度忽略不计。但是接雨水问题42其实是一个个柱子组
     *    成的，柱子之间是没有间隙的。
     * */
+    /**
+     * 【步骤】双指针相向而行，计算以它们为边界能盛多少水。。只要中间有间距（即left<right）
+     *      1. 每到一个位置计算能盛的水
+     *      2. 看两个指针对应的height哪一个高，更新height小的哪一个边界
+     */
     public int maxArea(int[] height) {
         int left = 0;
         int right = height.length-1;
         int result = Integer.MIN_VALUE;
         while(left<right){
+            /*step1：计算当前left和right能盛的水，并更新结果*/
             int cur = (right-left)*Math.min(height[left],height[right]);
             result = Math.max(cur,result);
+            /*step2：看看是更新left指针还是更新right指针*/
             if(height[left]<height[right]){
                 left++;
             }else{
@@ -59,8 +66,8 @@ public class _02DoublePoint {
      * 【去重】必须去重的地方有两个————
      *      ①遍历到位置cur，如果它和前面的数相等即nums[cur-1]==nums[cur]，说明cur-1位置的时候已经研究过
      *  了，cur位置需要跳过。【举例】：{-2，-2，-1，0，2}如果0位置的-2作为cur已经研究过了，cur来到1时就要跳
-     *  过来到2位置的-1。。如果不跳过就会出现相同的组合：[-2(索引0的-2)，0，2]、[-2(索引1的-2)，0，2]，实
-     *  际上是同一种解。
+     *  过，直接来到2位置的-1。。如果不跳过就会出现相同的组合：[-2(索引0的-2)，0，2]、[-2(索引1的-2)，0，2]，
+     *  实际上是同一种解。
      *      ②如果找到一个可行解即nums[cur]+nums[left]+nums[right]==0，此时需要移动left指针和right指针，
      *  移动时也必须跳过所有相同的元素。【举例】：{-2，-1，0，0，1，1，2，2}在cur=0、left=2、right=7时
      *  得到了一组可行解[-2,0,2]....此时需要left++，right--，left来到了索引3处的0，right指针指向了索
@@ -73,12 +80,18 @@ public class _02DoublePoint {
         LinkedList<List<Integer>> res = new LinkedList<>();
         Arrays.sort(nums);
         for (int i=0;i< nums.length-2;i++){
+            /*step1：第一个指针就是i位置，需要跳过和前面元素相等的位置*/
             if(i>0&&nums[i]==nums[i-1]){ /**err：用if不用while，while里面使用continue就只是回到了外层循环*/
                 continue;
             }
             int cur = nums[i];
             int left = i+1;
             int right = nums.length-1;
+            /*step2：只要left<right就持续寻找可行解。
+            * 根据i、left、right指针指向的三个数与0的大小关系来移动left、right指针。具体的来说————
+            *       ①如果他们三个指向的数之和小于0，说明要变大，因此需要移动left指针，即left++;
+            *       ②如果他们三个指向的数之和大于0，说明要变小，因此需要移动right指针，即right--
+            *       ③如果等于0需要移动left、right指针，并且此过程需要跳过相同的元素*/
             while (left<right){
                 int curRes = cur+nums[left]+nums[right];
                 if(curRes<0){
@@ -141,19 +154,18 @@ public class _02DoublePoint {
     * */
     public int trap(int[] height) {
         int res = 0;
-        if(height.length<=2){
-            return res;
-        }
-        int leftMax = height[0];
-        int rightMax = height[height.length-1];
-        int result = 0;
-        int left = 1;
-        int right = height.length-2;
-
-        while(left<right){
-
-            leftMax = Math.max(leftMax,height[left]);
-            rightMax = Math.max(rightMax,height[right]);
+        int left = 0,right = height.length-1;
+        int leftMax = 0,rightMax = 0;
+        while (left<right){
+            leftMax = Math.max(height[left],leftMax);
+            rightMax = Math.max(height[right],rightMax);
+            if (height[left]<height[right]){
+                res += (leftMax-height[left]);
+                left++;
+            }else{
+                res += (rightMax-height[right]);
+                right--;
+            }
         }
         return res;
     }

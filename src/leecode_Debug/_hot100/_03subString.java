@@ -10,31 +10,34 @@ public class _03subString {
     * 侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
     * 返回 滑动窗口中的最大值 。
     * */
+    /**
+     * 【思路】使用双端队列，队列内的数严格单调减（换言之，只要当前的数nums[i]大于等于双端队列最后一个数nums[m]，则nums[m]永远不可能是
+     * 最大值了）。。
+     *      1。先将前面的k个数组添加进双端队列，此时会生成0位置的信息；
+     *      2. for循环内依次将剩下的元素添加进双端队列；每一轮循环需要确保双端队列头的位置还在窗口内
+     */
     public int[] maxSlidingWindow(int[] nums, int k) {
-        LinkedList<Integer> deque = new LinkedList<>();
-        int[] res = new int[nums.length - k + 1]; //存放结果的数组
-        //刚开始窗口先移动到指定的大小
-        for (int i=0;i<k;i++){
-            while(!deque.isEmpty()&&nums[deque.peekLast()]<nums[i]){
-                deque.pollLast();
+        int[] res = new int[nums.length - k + 1]; //比如nums长度为3，窗口大小为3，则res中应该包含一个数
+        LinkedList<Integer> queue = new LinkedList<>();
+        /*step1：先将窗口的大小扩大为k，结束后生成res[0]的信息*/
+        for (int i = 0; i < k; i++) {
+            //队列内要求单调减
+            while (!queue.isEmpty() && nums[i] >= nums[queue.peekLast()]) { /**等于的时候队尾也要出队，比如"2,4"（2,4位置的值都是7）则2位置的7永远不会成为窗口内的最大值了*/
+                queue.pollLast();
             }
-            deque.addLast(i);
+            queue.offerLast(i);
         }
-        res[0] = nums[deque.peek()];
-
-        //i作为右边界不断的移动，每次移动i都能生成res中一个位置的结果
-        for (int i=k;i<nums.length;i++){
-            if (deque.peek()==i-k){ //1.如果当前的队头是左边界则出队列
-                deque.poll();
+        res[0] = nums[queue.peekFirst()];
+        /*step2：对于剩下的元素依次进入。【注意】由于窗口的大小固定k，因此要注意判断队列头的元素是不是已经出窗口了*/
+        for (int i = k; i < nums.length; i++) {
+            while (!queue.isEmpty() && nums[i] >= nums[queue.peekLast()]) { //①先将当前位置的元素入栈
+                queue.pollLast();
             }
-            //2.队列中需要满足单调递减，不满足时从“队尾”弹出元素
-            while(!deque.isEmpty()&&nums[deque.peekLast()]<nums[i]){
-                deque.pollLast();
+            queue.offerLast(i);
+            if (queue.peekFirst() == i - k) { //②判断队头元素是不是变得不合法（即当前队列头的索引是不是已经出窗口了），不合法时弹出
+                queue.pollFirst();
             }
-            //3.队列满足条件时添加当前索引
-            deque.addLast(i);
-            //4.每次右边界移动一次，总能生成一个位置的信息
-            res[i-k+1] = nums[deque.peek()];
+            res[i - k + 1] = nums[queue.peekFirst()]; //③这一轮会生成”i-k+1位置“的信息
         }
         return res;
     }
@@ -57,7 +60,7 @@ public class _03subString {
      * */
     public int subarraySum(int[] nums, int k) {
         HashMap<Integer, Integer> map = new HashMap<>();
-        int pre = 0;
+        int pre = 0; /**err：需要先放入pre为0的key-value*/
         map.put(0,1);
         int res = 0;
         for (int num:nums){
@@ -66,7 +69,7 @@ public class _03subString {
             if (map.containsKey(pre-k)){
                 res += map.get(num-k);
             }
-            map.put(pre,map.getOrDefault(pre,0)+1);
+            map.put(pre,map.getOrDefault(pre,0)+1); //将pre对应的value加1.
         }
         return res;
     }

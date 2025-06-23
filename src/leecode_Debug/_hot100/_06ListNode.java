@@ -251,6 +251,8 @@ public class _06ListNode {
     public ListNode swapPairs1(ListNode head) {
         ListNode dummy = new ListNode(-1,head);
         ListNode cur = dummy;
+
+        //保证下一次还能搞到2个节点，如果不够两个了，说明不必要进行下一轮操作了
         while (cur.next!=null&&cur.next.next!=null){
             /**step1：每一轮开始前，用node1、node2分别记录原始链表的节点顺序。。*/
             ListNode node1 = cur.next; //原始的第一个节点
@@ -260,6 +262,9 @@ public class _06ListNode {
             cur.next = node2;
             node1.next = node2.next;
             node2.next = node1;
+            /**step3：每一轮结束后cur节点移动到这一组的最后一个节点————其实就相当于等一轮循环开始前，cur节点的位置应该不变类似
+             * 于状态一致（一定要处于前面已经完成的最后一个节点。比如：开始的时候cur指向head的前一个节点；每一轮结束后我们将cur
+             * 指向了node1，而node1节点就是这一轮研究结束时的最后一个节点）*/
             cur = node1;
         }
         return dummy.next;
@@ -283,9 +288,42 @@ public class _06ListNode {
     * 给你链表的头节点 head ，每 k 个节点一组进行翻转，请你返回修改后的链表。
     k 是一个正整数，它的值小于或等于链表的长度。如果节点总数不是 k 的整数倍，那么请将最后剩余的节点保持原有顺序。
     你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。*/
-//    public ListNode reverseKGroup(ListNode head, int k) {
-//
-//    }
+    public ListNode reverseKGroup(ListNode head, int k) {
+        ListNode dummy = new ListNode(-1, head);
+        ListNode pre = dummy,end = dummy;
+        while(end.next!=null){ /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。“end.next!=null”是保证下一组A组还有节点*/
+            /*step1：先数k个节点，如果不够k个(end==null)，则结束循环，返回*/
+            for (int i=0;i<k&&end!=null;i++){ //经过这一轮循环，end会来到新的一组即A组的最后一个节点
+                end = end.next;
+            }
+            if (end==null)  break; //说明这一组不够k个节点了，因此不用动结束循环即可
+            /*step2：记录几个节点。此时——————
+             *      start指向这一组的第一个节点；end指向这一组的最后一个节点；pre指向这一组前面的那个节点（即前一组的最后一个节点）；nextStart
+             * 指向下一组的第一个节点*/
+            ListNode start = pre.next;
+            ListNode nextStart = end.next;
+            /*step3：几个节点之间调整连接关系*/
+            end.next = null;
+            pre.next = reverse(pre); //reverse返回的是 这一组翻转 之后的开始节点。
+            start.next = nextStart; //这一组翻转完成后，start变成了这一组的最后一个节点。。因此将start.next赋值为nextStart，其中nextStart为下一组的第一个节点
+            /*step4：pre和end更新，更新为这一组的最后一个节点。。和最开始的“pre = dummy,end = dummy”呼应，每一轮之后状态回归到开始的样子*/
+            pre = start;
+            end = start;
+        }
+        return dummy.next;
+    }
+
+    /*翻转链表的原始代码————不变*/
+    public ListNode reverse(ListNode pre){
+        ListNode cur = pre.next,next = pre.next;
+        while(cur!=null){
+            next = next.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
 
 
 
@@ -317,7 +355,7 @@ public class _06ListNode {
             if(cur.random!=null){
                 cur.next.random = cur.random.next; //如果if条件不判断，这里会出现空指针异常
             }else{
-                cur.next.random = null;
+                cur.next.random = null; //由于指针的默认值其实就是null,因此这个else分支其实可以不要
             }
             cur = cur.next.next;
         }
@@ -356,8 +394,8 @@ public class _06ListNode {
     /*23.
     * 给你一个链表数组，每个链表都已经按升序排列。
     请你将所有链表合并到一个升序链表中，返回合并后的链表。*/
-    /**【】：1. "优先级队列"的编码有两点需要注意。①添加节点时校验不是null(优先级队列添加null时会抛NullPointerException)；
-     *      ②更新cur指针
+    /**【2种解法】：1. "优先级队列"的编码有两点需要注意。①添加节点时校验不是null(优先级队列添加null时会抛NullPointerException)；
+     *         ②更新cur指针
      *      2. 需要熟悉一下"分治合并"————跟归并排序的思路是一样的，区别就是在merge的时候时两个链表的合并。
      *      关于"分治"的代码可以参考：https://leetcode.cn/problems/merge-k-sorted-lists/solutions/3787/leetcode-23-he-bing-kge-pai-xu-lian-biao-by-powcai/?envType=study-plan-v2&envId=top-100-liked
      * */
@@ -372,11 +410,13 @@ public class _06ListNode {
         PriorityQueue<ListNode> queue = new PriorityQueue<>((a, b) -> {
             return a.val - b.val;
         });
+        /*step1：先将lists种所有链表的第一个节点加紧优先级队列*/
         for (ListNode node:lists){
             if(node!=null){ //①添加之前校验，保证不是空
                 queue.add(node);
             }
         }
+        /*step2：每一次弹出一个元素(一定是队列中最小的元素)；如果它后面还有元素，把它后面的元素入优先级队列*/
         while (!queue.isEmpty()){
             ListNode now = queue.poll();
             if (now.next!=null){

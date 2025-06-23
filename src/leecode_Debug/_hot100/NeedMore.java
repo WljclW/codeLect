@@ -1,5 +1,7 @@
 package leecode_Debug._hot100;
 
+import leecode_Debug.linkList.ListNode;
+
 /**
  * @author: Zhou
  * @date: 2025/6/21 16:23
@@ -18,4 +20,8 @@ package leecode_Debug._hot100;
  *  22. 括号生成
  */
 public class NeedMore {
+
+//    public ListNode reverseKGroup(ListNode head, int k) {
+//
+//    }
 }
