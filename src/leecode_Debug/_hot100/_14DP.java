@@ -257,17 +257,16 @@ public class _14DP {
     public int longestValidParentheses(String s) {
         int res = 0;
         int[] dp = new int[s.length()];
-        for (int i=1;i<s.length();i++){
-            char c = s.charAt(i);
-            if (c==')'){ /**【说明】只研究右括号的位置.。因为如果当前位置是左括号，以左括号结尾的有效括号串长度必然是0*/
-                if (s.charAt(i-1)=='('){
-                    dp[i] = (i>=2)?dp[i-2]+2:2;
-                }else { //说明前面的一个位置也是右括号')'
-                    if (i-dp[i-1]>0&&s.charAt(i-dp[i-1]-1)=='('){
-                        dp[i] = (i-dp[i-1]-2>=0)?dp[i-dp[i-1]-2]+2+dp[i-1]:2+dp[i-1];
+        for (int i = 1; i < s.length(); i++) {
+            if (s.charAt(i) == ')') { /*【说明】只研究右括号的位置.。因为如果当前位置是左括号，以左括号结尾的有效括号串长度必然是0*/
+                if (s.charAt(i - 1) == '(') { //if块说明跟前面一个位置形成有效括号
+                    dp[i] = (i >= 2) ? dp[i - 2] + 2 : 2;
+                } else { //else说明前面的一个位置也是右括号')'
+                    if (i - dp[i - 1] > 0 && s.charAt(i - dp[i - 1] - 1) == '(') { /**else里面的逻辑容易写错*/
+                        dp[i] = (i - dp[i - 1] - 2 >= 0) ? dp[i - dp[i - 1] - 2] + 2 + dp[i - 1] : 2 + dp[i - 1];
                     }
                 }
-                res = Math.max(res,dp[i]); //更新结果。。如果index位置不是右括号，则对应的dp[index]就是0，也不用更新最大值
+                res = Math.max(res, dp[i]); //更新结果。。如果index位置不是右括号，则对应的dp[index]就是0，也不用更新最大值
             }
         }
         return res;

@@ -762,7 +762,14 @@ public class review01 {
         return res;
     }
 
+//    public int subarraySum(int[] nums, int k) {
+//
+//    }
 
+
+    public boolean isdd(String str1,String str2){
+        return str1.contains(str2);
+    }
 
 
     public static void main(String[] args) {
@@ -771,7 +778,8 @@ public class review01 {
 //        review01.merge(new int[][]{{1,3},{2,6},{8,10},{15,18}});
 //        review01.findMin(new int[]{11,13,15,17});
 //        review01.nextPermutation(new int[]{2,2,0,4,3,1});
-        review01.threeSum(new int[]{-1,0,1,2,-1,-4});
+//        review01.threeSum(new int[]{-1,0,1,2,-1,-4});
+        System.out.println(review01.isdd("sdfghjklwe", "sdfghjklwe"));
     }
 
 }

@@ -29,7 +29,6 @@ public class _10binarySearch {
      * 【说明】
      *      1. 二分查找有很多个版本，以后就使用“左闭右闭”的写法
      *      2. 这个题不同区间的写法建议看"https://leetcode.cn/problems/search-insert-position/solutions/2023391/er-fen-cha-zhao-zong-shi-xie-bu-dui-yi-g-nq23/?envType=study-plan-v2&envId=top-100-liked"
-     *      3.
      * */
     public int searchInsert(int[] nums, int target) {
         int l =0,r = nums.length-1;
@@ -78,7 +77,7 @@ public class _10binarySearch {
      * 【迷茫的点】
      *      1. 建议使用左闭右闭的写法。即开始时left=0,right=nums.length-1;
      *      2. 无论是左闭右开，还是左闭右闭区间的写法。根据mid计算该位置的坐
-     *  标方法是一样的，都是[mid/n][mid%n]。
+     *  标方法是一样的，都是[mid/n][mid%n]。————这一点很重要！！
      * */
     //左闭右闭的写法
     public boolean searchMatrix(int[][] matrix, int target) {
@@ -221,11 +220,11 @@ public class _10binarySearch {
     /**解法2————求两次左边界，分别求target和target+1的左边界,其中target+1的左边界-1就是target的右边界
      * 【分为三步】
      *      step1：寻找target数字的左边界(其实这个左边界是target应该插入的位置)。
-     *      step2：验证step1中找到的数是不是位置越界？是不是等于target？为什么可能出现这两种情况，见35题的
-     * 注释。
-     *      step3：如果step2验证是符合的，则直接返回[-1,-1]；否则说明找到的左边界的数就是target，表明数组中
-     * 肯定存在target（只要存在target这个数，就一定存在这个数的右边界）。做法：继续寻找出target+1的左边界。
-     * 求出的target+1的左边界-1就是target的右边界（因为数组中的数都是int类型）。
+     *      step2：验证step1中找到的位置是不是索引越界？该位置的数是不是等于target？为什么可能出现这两种情况，见35题的
+     * 注释（方法searchInsert）。
+     *      step3：如果step2验证是符合的，则直接返回[-1,-1]————说明数组中压根就没有target这个数；否则说明找到的左边界
+     * 的数就是target，表明数组中肯定存在target（只要存在target这个数，就一定存在这个数的右边界）。做法：继续寻找
+     * 出target+1的左边界，target+1的左边界-1就是target的右边界（因为数组中的数都是int类型）。
      */
     public int[] searchRange_01(int[] nums, int target) {
         int left = searchLeft(nums,target); //step1：找target的左边界
@@ -265,7 +264,7 @@ public class _10binarySearch {
      * 【注意区别】二分的本质时每一次二分后排除一个区间，在另一个区间内继续二分！！！！
      *      在"旋转数组中寻找target"中，每一步的nums[mid]需要和nums[0]比较。只要nums[mid]>=nums[0]说明
      *  mid位置的左边一定是有序的（不论数组是整体有序还是分两段有序，mid的左边一定是有序的）；否则的话即
-     *  nums[mid]<nums[0]说明数组必然是两段，并且mid位置一定是在第二段中！！
+     *  nums[mid]<nums[0]说明数组必然是两段，并且mid位置一定是在第二段中，且mid的右边一定是有序的！！
      *      在"寻找旋转数组最小值"中，每一步的nums[mid]需要和nums[nums.length-1]比较。只要nums[mid]>=
      *  nums[nums.length-1]，则数组必然分为两半有序并且mid是在前一段中，此时最小值位置一定是在mid的右边
      *  并且不包括mid位置；否则nums[mid]<nums[nums.length-1]的时候数组可能是整体有序也可能是分两段有序，
@@ -273,7 +272,7 @@ public class _10binarySearch {
      * 【解题的核心】对于任意一个index，其左区间和右区间至少有一个是有序的，那么就可以根据这个有序区间的
      *      最大值和最小值来判断Target是否在该区间内(不再该区间就自然在另外一段内了)————确定了接下来去哪
      *      一半查找。
-     * 【解题思路】
+     * 【此题的解题思路】
      *      step1：基于二分查找的本质，我们需要先确定哪一边是有序的。如何确定？nums[mid]和nums[0]比较，
      *  如果大于等于nums[0]说明左边是有序的（外层if干的事）；否则说明右边是有序的（外层的else干的事）；
      *      step2：step1中确定了两边有一边是有序的。在这个基础上我们需要进一步判断去哪一边继续查找，如
@@ -290,7 +289,7 @@ public class _10binarySearch {
         while (l <= r) {
             int mid = l + (r - l) / 2;
             if (nums[mid] == target) return mid;
-            //step1：if块说明左边是有序的
+            //step1：nums[mid]与nums[0]判断，可以知道哪边是有序的；看看target是不是在有序的一边。。比如看else的注释
             if (nums[mid] >= nums[0]) { /**err：这里必须带等于。不带的话“[3,1]”这个测试用例过不了*/
                 //内部继续比较时就是利用有序的一部分看看target是不是在这个范围，并且target和nums[mid]比较时不用带等于，因为等于在前两行已经判断了
                 if (target >= nums[0] && target < nums[mid]) { /*【说明】条件语句实际上就是“nums[0]<=target<nums[mid]”，表明target位于有序的那一边*/
@@ -298,7 +297,7 @@ public class _10binarySearch {
                 } else {
                     l = mid + 1;
                 }
-            } else { //step2：else说明右边是有序的
+            } else { //else说明右边是有序的
                 if (target <= nums[nums.length - 1] && target > nums[mid]) { /*右边有序，看看target是不是在右边*/
                     l = mid + 1;
                 } else {

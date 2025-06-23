@@ -273,7 +273,7 @@ public class _11stack {
     * */
     /**
      * 【建议的解法】使用下面的largestRectangleArea2
-     * 这个题目的本质————针对每一个位置i，找到左右两边最近的小于heights[i]的位置。就得到了该位置所能绘制出的最大矩形，等
+     * 【题目的本质】————针对每一个位置i，找到左右两边最近的小于heights[i]的位置。就得到了该位置所能绘制出的最大矩形，等
      * 每一个位置的值都求出来了，全局的最大矩形也就得到了。
      *    这个题也可以用一维数组来表示，完整的可能情况：枚举每一个位置，比如该位置的高度是m，从该位置向左右两边查找第一个
      * 小于m的位置，分别即为L和R，则该位置能绘制的最大矩形就是长*高————(R-L-1)*m.
@@ -282,7 +282,9 @@ public class _11stack {
      *       方法1：第一次遍历找到任何一个数左边最近 的小于值；第二次遍历找到任何一个数右边最近 的小于值；第三次遍历
      *    计算每一个位置能画出的最大矩形(长就是两个小于值位置的间隔，高就是heights数组这个位置的值)。
      *            空间方面：一个栈；一个left数组记录左边最近的小于值 的索引；一个right记录右边最近的小于值的索引
-     *       方法2：
+     *       方法2：使用一次遍历，见方法largestRectangleArea2，遍历到height。length的时候，将高度视为0，此时栈中所有
+     *   索引位置的高度都一定大于0，因此根据“递增栈”的特性可知，所有的所有都会出栈，并生成对应位置的面积信息——————编码详见
+     *   largestRectangleArea2方法.
      * */
     public int largestRectangleArea(int[] heights) {
         int[] left = new int[heights.length];
@@ -364,7 +366,7 @@ public class _11stack {
              * * */
             int currHeight = (i == n) ? 0 : heights[i]; // 处理最后一个元素
 
-            // 当前高度小于栈顶元素，弹出栈顶并计算面积
+            // 只要满足 当前高度小于栈顶元素，弹出栈顶并计算面积
             while (!stack.isEmpty() && currHeight < heights[stack.peek()]) {
                 int height = heights[stack.pop()];
                 int width = stack.isEmpty() ? i : i - stack.peek() - 1;

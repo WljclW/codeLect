@@ -34,6 +34,9 @@ public class _03SlideWindow {
     *     关键在于如何当前的字符在map中得到的value>1，就循环出栈前面的元素。前面的元素如何查
     *   找呢？因此需要借助left指针
     * */
+    /**
+     * 【关键】遍历s的每一个字符。。。每到一个位置right，先将这个字符加进map；然后利用while循环保证窗口是合法的
+     * */
     public int lengthOfLongestSubstring(String s) {
         int left = 0,right=0; //窗口左边界、右边界
         int res = 0;
@@ -42,8 +45,8 @@ public class _03SlideWindow {
             char c = s.charAt(right);
             /*什么都不管，碰到的字符都先放进去；然后利用while循环保证当前窗口合法;
             * 保证当前窗口合法的前提下更新res的值*/
-            map.put(c,map.getOrDefault(c,0)+1); //①什么都不管，先入map
-            while(map.get(c)>1){ //②保证窗口合法
+            map.put(c,map.getOrDefault(c,0)+1); //step1：什么都不管，先入map
+            while(map.get(c)>1){ //step2：保证窗口合法
                 char cur = s.charAt(left);
                 map.put(cur,map.get(cur)-1);
                 left++;
