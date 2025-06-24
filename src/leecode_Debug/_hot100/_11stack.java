@@ -132,9 +132,35 @@ public class _11stack {
     此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的
     输入。
     * */
-//    public String decodeString(String s) {
-//
-//    }
+    /**
+     * 【建议】看K神的题解：https://leetcode.cn/problems/decode-string/solutions/19447/decode-string-fu-zhu-zhan-fa-di-gui-fa-by-jyd/?envType=study-plan-v2&envId=top-100-liked
+     *      重要的是看K神题解中的动图，理解整个过程
+     */
+    public String decodeString(String s) {
+        StringBuilder res = new StringBuilder();
+        int digit = 0;
+        LinkedList<Integer> stack_digit = new LinkedList<>();
+        LinkedList<String> stack_str = new LinkedList<>();
+        for (Character c:s.toCharArray()){
+            if (c>='0'&&c<='9') digit = 10*digit+Integer.parseInt(c+"");
+            else if (c=='['){
+                stack_digit.push(digit);
+                stack_str.push(res.toString());
+                digit = 0;
+                res= new StringBuilder();
+            }else if (c==']'){
+                StringBuilder tmp = new StringBuilder();
+                Integer cur_digit = stack_digit.pop();
+                for (int i = 0; i <cur_digit; i++) {
+                    tmp.append(res);
+                }
+                res = new StringBuilder(stack_str.pop()+tmp);
+            }else{
+                res.append(c);
+            }
+        }
+        return res.toString();
+    }
 
 
     /*739.
