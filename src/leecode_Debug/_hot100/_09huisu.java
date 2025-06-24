@@ -12,11 +12,17 @@ import java.util.Map;
 
 /**
  * 【易错】
- *      1. 模板中for循环的调用时，一般是和当前i有关系，而不和形参的index有关系。比如：
- *  ①见combinationSumTrace的for循环，递归调用时需要使用i而不是index，使用index的话会有重
- *      复的现象；
- *  ②再比如subsetsBack方法中的for循环中递归调用时要从i+1开始，而不是index+1！！！
- *      2.
+ *    1. 模板中for循环的调用时，一般是和当前i有关系，而不和形参的index有关系。原因：因为for循环是挨个看哪一个选择可以做，
+ *          这一步做出选择之后往往需要继续后面的步骤，因此往往要从i+1之后开始继续研究。比如：
+ *      ①见combinationSumTrace的for循环，递归调用时需要使用i而不是index，使用index的话会有重
+ *          复的现象；
+ *      ②再比如subsetsBack方法中的for循环中递归调用时要从i+1开始，而不是index+1！！！
+ *    2. 回溯的模板中，for循环负责某一层的选择和操作；递归的调用实现的是向更深的一层（下一层）的继续研究
+ *    3. 关于这里去重的逻辑，见网址：https://programmercarl.com/0040.%E7%BB%84%E5%90%88%E6%80%BB%E5%92%8CII.html#%E6%80%9D%E8%B7%AF
+ *      3.1 【这一点很重要】全排列Ⅱ去重的问题中used[i-1]==true也可完成去重的底层原理：
+ *          https://programmercarl.com/0047.%E5%85%A8%E6%8E%92%E5%88%97II.html#%E6%8B%93%E5%B1%95
+ *      3.2 【需要测试】组合Ⅱ问题中，是不是3.1的理论就不行了？？验证一下
+ *
  * */
 public class _09huisu {
     /*46.
@@ -208,9 +214,8 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     /*22.
     数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。*/
     /**
-     * 【解题关键】尝试，用open和close分别表示左右括号，在合法（合法要求：任意时刻左括号的
-     *      数量必须不小于右括号的数量 且 左括号的数量小于n）的前提下，尝试添加一个左括号或
-     *      者右括号。
+     * 【解题关键】尝试，用open和close分别表示左右括号，在合法的前提下（合法要求：任意时刻左括号的
+     *      数量必须不小于右括号的数量 且 左括号的数量小于n），尝试添加一个左括号或者右括号。
      */
     /*解法1：官方解回溯法*/
     public List<String> generateParenthesis_offical(int n) {
@@ -224,11 +229,13 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             ans.add(cur.toString());
             return;
         }
+        /*如果左括号小于最大数量。可以添加一个左括号*/
         if (open < max) {
-            cur.append('(');
+            cur.append('('); /**做选择：添加一个左括号*/
             backtrack(ans, cur, open + 1, close, max);
-            cur.deleteCharAt(cur.length() - 1);
+            cur.deleteCharAt(cur.length() - 1); /**撤销 上上一行 刚刚做出的选择*/
         }
+        /*如果右括号数量小于左括号数量。可以做选择添加一个右括号*/
         if (close < open) {
             cur.append(')');
             backtrack(ans, cur, open, close + 1, max);
@@ -287,7 +294,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     public boolean exist(char[][] board, String word) {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
-                if (dfs(board, i, j, 0, word)) {
+                if (dfs(board, i, j, 0, word)) { /*从word的第0个字符开始；从二维数据的(i,j)开始递归搜索单词word*/
                     return true;
                 }
             }
@@ -349,6 +356,15 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     /*131.
     给你一个字符串 s，请你将 s 分割成一些 子串，使每个子串都是 回文串 。返回 s 所有可能的分割方案。
     * */
+    /**
+     *【思路】假设当前这一轮需要从i位置开始，我们就从i位置开始划分子串（i~i+1的子串、i~1+2的子串、i~i+3的子串），如果划
+     * 分出的子串是回文的，则继续往后尝试剩下的部分，具体来说————
+     *      如果尝试划分的子串是回文的，则将划分的子串添加进路径pathPartition，接着从子串后的下一个位置继续研究；
+     *      否则如果划分出的子串不是回文的，我们就继续下一个位置划分子串。具体的代码是在for循环内if的条件语句
+     *【解法】解法1和解法2的区别在于，如何判断某一个子串是不是回文的。其中————
+     *      解法1对于每一个子串使用双指针相向而行，每到一个位置判断字符是不是相等；
+     *      解法2使用动态规划提前计算，二维布尔数组标识每一个子串是不是回文的
+     */
     /*
     * 解法1：朴素的解法。
     *       可以通过引入布尔数组来优化"判断某个子串是不是回文串"的这个过程，见解法2
@@ -363,7 +379,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     List<String> pathPartition;
     public List<List<String>> partition(String s) {
         resPartition = new LinkedList<>();
-        pathPartition = new LinkedList<>();
+        pathPartition = new LinkedList<>(); //存放当前选择的路径
         partitionBack(s,0);
         return resPartition;
     }
@@ -376,19 +392,19 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
         /*从该位置开始，依次判断生成的子串是不是回文。如果是回文则递归调用“partitionBack(s,i+1)”*/
         for (int i=index;i<s.length();i++){
-            if (isPalindrome(s.substring(index,i+1))){ /**err：每一轮截取子串时左边界是index，但是右边界是i+1。左开右闭区间索引i右边界至少是index+1*/
-                pathPartition.add(s.substring(index,i+1));
+            if (isPalindrome(s.substring(index,i+1))){ /**err：每一轮截取子串时左边界是index，但是右边界是i+1。取子串是左闭右开区间，右边界至少是index+1*/
+                pathPartition.add(s.substring(index,i+1)); /*做出选择。这里做选择的反映就是 把某一段回文子串添加到路径pathPartition*/
                 partitionBack(s,i+1);
-                pathPartition.remove(pathPartition.size()-1);
+                pathPartition.remove(pathPartition.size()-1); /*上一步是递归，会不断的向树的更深层寻找；到这一行代码会回到初始调用的地方，撤销做出的选择*/
             }
         }
     }
 
-    /*判断一个串是不是回文串*/
+    /*双指针判断一个串是不是回文串*/
     private boolean isPalindrome(String substring) {
         //两个指针相向而行，判断是不是指向的字符永远相等。。一旦出现不相等就返回false
-        for (int i=0,j=substring.length()-1;i<j;i++,j--){
-            if (substring.charAt(i)!=substring.charAt(j)){
+        for (int i = 0, j = substring.length() - 1; i < j; i++, j--) {
+            if (substring.charAt(i) != substring.charAt(j)) {
                 return false;
             }
         }
@@ -406,7 +422,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         result_partition_dp = new ArrayList<>();
         char[] str = s.toCharArray();
         path_partition_dp = new LinkedList<>();
-        dp_partition_dp = new boolean[str.length + 1][str.length + 1];
+        dp_partition_dp = new boolean[str.length][str.length];
         isPalindrome(str);
         backtracking(s, 0);
         return result_partition_dp;
@@ -417,12 +433,11 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             //如果起始位置大于s的大小，说明找到了一组分割方案
             result_partition_dp.add(new ArrayList<>(path_partition_dp));
         } else {
-            for (int i = startIndex; i < str.length(); ++i) {
+            for (int i = startIndex; i < str.length(); ++i) { /**i从startIndex开始，取不到str.length()。因此这里截取子串是左闭右闭的思想*/
                 if (dp_partition_dp[startIndex][i]) {
-                    //是回文子串，进入下一步递归
-                    //先将当前子串保存入path
-                    path_partition_dp.addLast(str.substring(startIndex, i + 1));
-                    //起始位置后移，保证不重复
+                    //是回文子串，先将当前子串保存入path，然后进入下一步递归
+                    path_partition_dp.offerLast(str.substring(startIndex, i + 1));
+                    //要从下一个位置开始研究，保证不重复
                     backtracking(str, i + 1);
                     path_partition_dp.pollLast();
                 } else {
@@ -435,18 +450,24 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     //通过动态规划判断是否是回文串,参考动态规划篇 52 回文子串
     public void isPalindrome(char[] str) {
-        for (int i = 0; i <= str.length; ++i) {
-            dp_partition_dp[i][i] = true;
-        }
-        for (int i = 1; i < str.length; ++i) {
-            for (int j = i; j >= 0; --j) {
+        for (int i = str.length-1; i >=0 ; --i) {
+            for (int j = i; j < str.length; ++j) {
                 if (str[j] == str[i]) {
-                    if (i - j <= 1) {
-                        dp_partition_dp[j][i] = true;
-                    } else if (dp_partition_dp[j + 1][i - 1]) {
-                        dp_partition_dp[j][i] = true;
+                    if (j - i <= 1) { //情况1：当前子串的长度为1或者为2
+                        dp_partition_dp[i][j] = true;
+                    } else if (dp_partition_dp[i + 1][j - 1]) { //情况2：中间的一大段子串都是回文的
+                        dp_partition_dp[i][j] = true;
                     }
                 }
+
+                /*for循环的逻辑也可以使用下面的逻辑实现，这两行代码就集结了情况1和情况2。
+                *       【补充说明】虽然i是从最后一行开始，并且dp[i][j]依赖dp[i+1][j-1]，看着依赖了下一行，其
+                * 实并不会越界，因为第二层for循环规定了j从i开始到str.length-1，因此最后一行只有一个元素需要计算，
+                * 并且这个元素的位置i和j是相等的，因此"j-i<=1"就得到true了，后面不会继续计算的
+                * */
+//                if (str[i]==str[j] || (j-i<=1 || dp_partition_dp[i+1][j-1])){
+//                    dp_partition_dp[i][j] = true;
+//                }
             }
         }
     }
@@ -484,14 +505,14 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     }
 
     private void solveNQueensBack(int n, int row /*现在需要研究哪一行*/, char[][] chessBoard) {
-        /*if语句块添加结果集*/
+        /*step1：如果row已经不小于n，说明所有行都放了皇后且合规————即找到一个可行解，添加进resSolveNQueens*/
         if (row>=n){ //只要当前需要研究的row来到最后一行的后一行，就说明找到了一个可行解。
             resSolveNQueens.add(Array2List(chessBoard));
             return;
         }
-        /*尝试*/
+        /*step2：依次尝试第row行的每一个位置，如果放皇后合法的话就放皇后继续研究第row+1行的位置*/
         for (int i=0;i<n;i++){ //研究当前行的每一个（列）位置
-            if (isVaid(row,i,n,chessBoard)){ //如果该位置放置皇后不会冲突的话
+            if (isVaid(row,i,n,chessBoard)){ /**如果该位置放置皇后不会冲突的话,才做选择并向更深的一层研究*/
                 chessBoard[row][i] = 'Q';
                 solveNQueensBack(n,row+1,chessBoard); //递归的决策后面的行
                 chessBoard[row][i] = '.';
@@ -501,17 +522,17 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 
     /*判断如果(row,col)放置一个皇后，是否合规*/
     private boolean isVaid(int row, int col, int n, char[][] chessBoard) {
-        //判断col这一列是不是有皇后
+        //①判断col这一列是不是有皇后
         for (int rowIndex=0;rowIndex<row;rowIndex++){
             if (chessBoard[rowIndex][col]=='Q')
                 return false;
         }
-        //判断45方向，是不是有皇后。。此时每一次"行坐标-1，纵坐标也是-1"
+        //②判断45方向，是不是有皇后。。此时每一次"行坐标-1，纵坐标也是-1"
         for (int i=row-1,j=col-1;i>=0&&j>=0;i--,j--){
             if (chessBoard[i][j]=='Q')
                 return false;
         }
-        //判断135度方向，是不是有皇后。。此时每一次"行坐标-1，但是纵坐标+1"
+        //③判断135度方向，是不是有皇后。。此时每一次"行坐标-1，但是纵坐标+1"
         for (int i=row-1,j=col+1;i>=0&&j<=n-1;i--,j++){
             if (chessBoard[i][j]=='Q')
                 return false;
