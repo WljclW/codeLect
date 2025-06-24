@@ -186,7 +186,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     /*解法2：只用一个target来表示sum*/
     List<List<Integer>> combinationSumRes;
-    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+    public List<List<Integer>> combinationSum02(int[] candidates, int target) {
         combinationSumRes = new LinkedList<>();
         combinationSumTrace(candidates,0,target,new LinkedList<Integer>());
         return combinationSumRes;
@@ -245,7 +245,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     /*解法2：基于官方解回溯法的改进。。。
     * 【想说明的问题】回溯问题中只有当前回溯依赖的信息必须通过形参传递，其他的信息都可以使
-    *       用全局变量。*/
+    *       用全局变量。  */
     List<String> ans = new ArrayList<String>();
     int max;
     StringBuilder cur = new StringBuilder();
@@ -603,7 +603,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 
 
     /**
-     * 47
+     * 47.全排列Ⅱ ————注意对比40组合总和Ⅱ，尤其是去重这里的逻辑
      * 一组可能有重复值的数组，写出所有的全排列。要求不能有重复的全排列
      */
     List<List<Integer>> resUnique;
@@ -632,10 +632,15 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
             通俗理解：
                 当前数和前面的数相等，但是前面的数没有选，当前数就不能选。
             详细的理解见：https://programmercarl.com/0047.%E5%85%A8%E6%8E%92%E5%88%97II.html#%E5%85%B6%E4%BB%96%E8%AF%AD%E8%A8%80%E7%89%88%E6%9C%AC
+            尤其是注意理解卡尔给出的"used[i - 1] == true"和"used[i - 1] == false"都能去重，在树中的区别体现
             * */
             if (i > 0 && nums[i - 1] == nums[i] && !used[i - 1]) {
                 continue;
             }
+            /*上面if的等价写法。（但是在“组合总和Ⅱ”就不等价了，那个题下面的if块不能用）*/
+//            if (i > 0 && nums[i - 1] == nums[i] && used[i - 1]) {
+//                continue;
+//            }
             if (!used[i]) { /**err：全排列每一个数都必须选 并且 每一个数字只能选一次*/
                 path.add(nums[i]);
                 used[i] = true;
@@ -730,6 +735,55 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
             combinationSum3Back(i+1,k,n,sum); /**err：这里index变量也是要使用i+1*/
             pathCombinationSum3.remove(pathCombinationSum3.size()-1);
             sumCombinationSum3-=i;
+        }
+    }
+
+    /*
+    * 40.组合总和Ⅱ【注意去重的地方】
+    * 给定一个候选人编号的集合 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。
+       candidates 中的每个数字在每个组合中只能使用 一次 。
+       注意：解集不能包含重复的组合。（但是candidates可能会有重复的数）
+    * */
+    LinkedList<Integer> pathCombinationSum2 = new LinkedList<>();
+    List<List<Integer>> ansCombinationSum2 = new ArrayList<>();
+    boolean[] usedCombinationSum2;
+    int sumCombinationSum2 = 0;
+
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        usedCombinationSum2 = new boolean[candidates.length];
+        // 加标志数组，用来辅助判断同层节点是否已经遍历
+        Arrays.fill(usedCombinationSum2, false);
+        // 为了将重复的数字都放到一起，所以先进行排序
+        Arrays.sort(candidates);
+        backTracking(candidates, target, 0);
+        return ansCombinationSum2;
+    }
+
+    private void backTracking(int[] candidates, int target, int startIndex) {
+        if (sumCombinationSum2 == target) {
+            ansCombinationSum2.add(new ArrayList(pathCombinationSum2));
+        }
+        for (int i = startIndex; i < candidates.length; i++) {
+            if (sumCombinationSum2 + candidates[i] > target) {
+                break;
+            }
+            // 出现重复节点，同层的第一个节点已经被访问过，所以直接跳过
+            if (i > 0 && candidates[i] == candidates[i - 1] && !usedCombinationSum2[i - 1]) {
+                continue;
+            }
+            /**【注意】下面的if块就是错的。。思考为什么？？
+             * 和全排列Ⅱ是有区别的*/
+//            if (i > 0 && candidates[i] == candidates[i - 1] && usedCombinationSum2[i - 1]) {
+//                continue;
+//            }
+            usedCombinationSum2[i] = true;
+            sumCombinationSum2 += candidates[i];
+            pathCombinationSum2.add(candidates[i]);
+            // 每个节点仅能选择一次，所以从下一位开始
+            backTracking(candidates, target, i + 1);
+            usedCombinationSum2[i] = false;
+            sumCombinationSum2 -= candidates[i];
+            pathCombinationSum2.removeLast();
         }
     }
 
