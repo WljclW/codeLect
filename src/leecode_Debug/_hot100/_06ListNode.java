@@ -105,9 +105,45 @@ public class _06ListNode {
     /*234.
     * 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返
     * 回 true ；否则，返回 false 。*/
-//    public boolean isPalindrome(ListNode head) {
-//
-//    }
+    /**
+     * 【思路】
+     *      1. 正常找出链表的 中点（1，4，7会来到4） 或者 中间的后一个节点（1，4，6，7会
+     *  来到6）。。。此时后半部分的节点数必然不大于前半部分的节点数。
+     *      2. 反转后半部分，拿到反转后的头结点head2。
+     *      3. 因为后半部分的节点数少，因此“head2!=null”时挨个判断值是不是相等
+     * */
+    public boolean isPalindrome(ListNode head) {
+        /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点。。
+        *     根据这个位置可以知道，以slow为头的后半部分的节点数量小于等于第一部分，因此
+        * 下面的while循环判断的时候使用“head2!=null”来判断是不是判断结束了*/
+        ListNode slow = head,fast = head;
+        while(fast!=null&&fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        /*step2：head2是后半部分反转后的头结点*/
+        ListNode head2 = reverseIsPalindrome(slow);
+        while(head2!=null){
+            if (head2.val!= head.val){ //挨个比较值，不相等时直接返回false
+                return false;
+            }
+            head2 = head2.next; /*后半部分反转后的遍历*/
+            head = head.next; /*前半部分的遍历*/
+        }
+        return true;
+    }
+
+    /*完整的反转链表代码————一模一样*/
+    private ListNode reverseIsPalindrome(ListNode slow) {
+        ListNode pre = null,cur = slow;
+        while(cur!=null){
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
 
 
     /*141
@@ -225,8 +261,8 @@ public class _06ListNode {
     public ListNode removeNthFromEnd1(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head);
         /**官方解中，慢指针开始时指向了head节点的前一个；快指针指向head节点*/
-        ListNode fast = head;
         ListNode slow = dummy;
+        ListNode fast = head;
         for (int i = 0; i < n; ++i) {
             fast = fast.next;
         }
@@ -253,7 +289,7 @@ public class _06ListNode {
         ListNode cur = dummy;
 
         //保证下一次还能搞到2个节点，如果不够两个了，说明不必要进行下一轮操作了
-        while (cur.next!=null&&cur.next.next!=null){
+        while (cur.next != null && cur.next.next != null) {
             /**step1：每一轮开始前，用node1、node2分别记录原始链表的节点顺序。。*/
             ListNode node1 = cur.next; //原始的第一个节点
             ListNode node2 = cur.next.next; //原始的第二个节点
@@ -291,12 +327,12 @@ public class _06ListNode {
     public ListNode reverseKGroup(ListNode head, int k) {
         ListNode dummy = new ListNode(-1, head);
         ListNode pre = dummy,end = dummy;
-        while(end.next!=null){ /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。“end.next!=null”是保证下一组A组还有节点*/
+        while (end.next != null) { /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。“end.next!=null”是保证下一组A组还有节点*/
             /*step1：先数k个节点，如果不够k个(end==null)，则结束循环，返回*/
-            for (int i=0;i<k&&end!=null;i++){ //经过这一轮循环，end会来到新的一组即A组的最后一个节点
+            for (int i = 0; i < k && end != null; i++) { //经过这一轮循环，end会来到新的一组即A组的最后一个节点
                 end = end.next;
             }
-            if (end==null)  break; //说明这一组不够k个节点了，因此不用动结束循环即可
+            if (end == null) break; //说明这一组不够k个节点了，因此不用动结束循环即可
             /*step2：记录几个节点。此时——————
              *      start指向这一组的第一个节点；end指向这一组的最后一个节点；pre指向这一组前面的那个节点（即前一组的最后一个节点）；nextStart
              * 指向下一组的第一个节点*/
@@ -315,9 +351,9 @@ public class _06ListNode {
 
     /*翻转链表的原始代码————不变*/
     public ListNode reverse(ListNode pre){
-        ListNode cur = pre.next,next = pre.next;
+        ListNode cur = pre.next;
         while(cur!=null){
-            next = next.next;
+            ListNode next = cur.next;
             cur.next = pre;
             pre = cur;
             cur = next;
@@ -382,6 +418,21 @@ public class _06ListNode {
 //        head.next = null;
 //        ress.next=null;
 //        return res;
+
+        /*step3，chatgpt的写法*/
+//        Node dummy = new Node(0);
+//        Node copyCur = dummy;     //①copy的链表的遍历指针
+//        Node cur = head;          //②原始链表的遍历指针
+//
+//        while (cur != null) {     /*使用原始链表的节点部位null作为终止条件*/
+//            Node copy = cur.next; //开始的3行拼接复制后的链表
+//            copyCur.next = copy;
+//            copyCur = copy;
+//
+//            cur.next = copy.next; // 这两行 还原 原始链表
+//            cur = cur.next;
+//        }
+//        return dummy.next;
     }
 
     /*148.
@@ -435,7 +486,7 @@ public class _06ListNode {
     * 空间复杂度：O（logk）
     * */
     public ListNode mergeKLists_01(ListNode[] lists) {
-        if(lists==null||lists.length==0) return null;
+        if (lists == null || lists.length == 0) return null;
         return merge(lists,0,lists.length-1);
     }
 
@@ -447,6 +498,7 @@ public class _06ListNode {
         return mergeTwoList(mergeLeft,mergeRight);
     }
 
+    /*合并两个升序链表的原始代码————一模一样*/
     private ListNode mergeTwoList(ListNode mergeLeft, ListNode mergeRight) {
         ListNode dummy = new ListNode(-1);
         ListNode cur = dummy;
