@@ -42,10 +42,10 @@ public class _15DP_dims {
         int res = Integer.MAX_VALUE;
         int[][] dp = new int[grid.length][grid[0].length];
         dp[0][0] = grid[0][0];
-        for (int i = 1;i<grid.length;i++){ //到第一行任何一个位置的路径和，就是第一行之前数的累加和。【因为第一行只能从0，0位置横着到达】
+        for (int i = 1;i<grid.length;i++){ //到第一列任何一个位置的路径和，就是第一行之前数的累加和。【因为第一行只能从0，0位置横着到达】
             dp[i][0] = dp[i-1][0]+grid[i][0];
         }
-        for (int j=1;j<grid[0].length;j++){ //第一列也是一样的道理
+        for (int j=1;j<grid[0].length;j++){ //第一行也是一样的道理
             dp[0][j] = dp[0][j-1]+grid[0][j];
         }
         for (int i=1;i<grid.length;i++)
@@ -75,8 +75,9 @@ public class _15DP_dims {
     public int longestCommonSubsequence(String text1, String text2) {
         int m = text1.length(),n = text2.length();
         int[][] dp = new int[m+1][n+1];
-        /*对于初始值第一行的dp[0][i]和第一列的dp[i][0]，公共子序列都是0，数组元素
+        /*step1：对于初始值第一行的dp[0][i]和第一列的dp[i][0]，公共子序列都是0，数组元素
         的默认值就是零值，因此省略base case的初始化*/
+        /*step2：针对每一个位置分别研究。。。根据i-1和j-1位置的字符是否相等来决定dp[i][j]*/
         for (int i=1;i<=m;i++){
             char c = text1.charAt(i-1);
             for (int j=1;j<=n;j++){
@@ -153,7 +154,10 @@ public class _15DP_dims {
         return dp[m][n];
     }
 
-    /*编辑距离另外的写法*/
+    /*编辑距离另外的写法，简化的地方：
+    *   1. dp的初始化放在了for循环中，避免了专门的初始化
+    *   2. word1的“i-1”位置和word2的“j-1”位置字符相等时，dp[i][j]= dp[i-1][j-1]。简化了取最小
+    * 值的过程*/
     public int minDistance1(String word1, String word2) {
         int m = word1.length(),n = word2.length();
         int[][] dp = new int[m + 1][n + 1];

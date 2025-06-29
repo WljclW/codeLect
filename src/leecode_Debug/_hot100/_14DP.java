@@ -181,7 +181,7 @@ public class _14DP {
             for (int j=0;j<i;j++){ //j<i，因此j的最大值能到s.length()
                 /*
                 if条件语句的解释————
-                    dp[j]：0~j-1这段子串能有列表的字符串拼出来；
+                    dp[j]：0~j-1这段子串能有列表的字符串拼出来；【注意：dp[j]对应的是0~j-1的子串是否可匹配到】
                     set.contains(s.substring(j,i))：j~i-1这段子串是不是在题目字符串的列表中
                 1. 解释一下if条件：dp[j]表示0~j-1的子串能不能由字典的词组成；然后我们再看[j,i-1)的子串是不是在字典中，如果
                     在字典中就说明[0,i-1]的子串能由字典的一个或者多个词组成
@@ -202,7 +202,19 @@ public class _14DP {
     * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
     子序列 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺
     * 序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。*/
-    public int lengthOfLIS(int[] nums) {
+    /**
+     * 【强烈建议】使用lengthOfLIS2————解法2
+     * 【解法1的思路】定义 dp[i] 表示以 nums[i] 结尾的最长递增子序列长度。
+            对于每个 i，遍历 0 ~ i-1 的所有 j：
+                如果 nums[j] < nums[i]，可以接在 nums[j] 后面，更新 dp[i] = max(dp[i], dp[j] + 1)。
+            最终答案为所有 dp[i] 中的最大值。
+      【解法2的思路】维护一个数组 tails，tails[i] 表示长度为 i+1 的递增子序列的的末尾元素 的最小值。
+            遍历 nums，对每个元素二分查找 tails 中第一个 ≥ 当前值的位置替换；若找不到，则说明当
+       前元素比所有尾部都大，直接追加到 tails。tails 的长度就是最长递增子序列的长度。
+     * */
+    /*解法1：朴素的做法
+    * dp[i]：表示以第i个元素结尾的最长递增子序列有多长*/
+    public int lengthOfLIS1(int[] nums) {
         int[] dp = new int[nums.length];
         dp[0] = 1;
         int res = 1;
@@ -216,6 +228,38 @@ public class _14DP {
         }
         return res;
     }
+
+
+    /*解法2：优化解法————贪心+二分查找。（左闭右闭区间的写法）
+    * 看K神的讲解：https://leetcode.cn/problems/longest-increasing-subsequence/，K神的写法是左闭右开的写法
+    * 此时dp[i]的定义如下：
+    * */
+    public int lengthOfLIS2(int[] nums) {
+        /*step1：初始化*/
+        int[] tails = new int[nums.length];
+        int size = 0; //size的含义：0~size-1的位置都有需要放的数
+
+        for (int num : nums) {
+            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置*/
+            int left = 0, right = size - 1;
+            while (left <= right) {
+                int mid = (left + right) / 2;
+                if (tails[mid] < num) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+            /*step3：将num放在应该插入的位置*/
+            tails[left] = num;
+            /*step4：如果num插在了最后的位置，则更新size*/
+            if (left == size)
+                size++; // 如果 num 比所有 tail 都大，size 扩大
+        }
+
+        return size;
+    }
+
 
 
     /*152.

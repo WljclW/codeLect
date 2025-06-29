@@ -141,21 +141,29 @@ public class _11stack {
         int digit = 0;
         LinkedList<Integer> stack_digit = new LinkedList<>();
         LinkedList<String> stack_str = new LinkedList<>();
-        for (Character c:s.toCharArray()){
-            if (c>='0'&&c<='9') digit = 10*digit+Integer.parseInt(c+"");
-            else if (c=='['){
+        for (Character c : s.toCharArray()) {
+            if (c >= '0' && c <= '9') //①碰到数字，计算multi
+                digit = 10 * digit + Integer.parseInt(c + "");
+            else if (c == '[') { //碰到左括号
+                /*只要碰到左括号，说明接下来要重新计算了。因此将目前的数字和res分别入栈；
+                然后将multi重置为0，res重置为新建状态
+                * */
                 stack_digit.push(digit);
                 stack_str.push(res.toString());
                 digit = 0;
-                res= new StringBuilder();
-            }else if (c==']'){
+                res = new StringBuilder();
+            } else if (c == ']') { //碰到右括号
+                /*【说明】这个题目的这个解法来说，只要碰到]，此时multi的值必然就是0；并且res就是
+                当前这组括号中的字符串————潜藏规则。因此从数字栈stack_digit中弹出数字，将res添加
+                对应的次数，然后在前面拼接上从res_stack弹出的字符串
+                * */
                 StringBuilder tmp = new StringBuilder();
                 Integer cur_digit = stack_digit.pop();
-                for (int i = 0; i <cur_digit; i++) {
+                for (int i = 0; i < cur_digit; i++) {
                     tmp.append(res);
                 }
-                res = new StringBuilder(stack_str.pop()+tmp);
-            }else{
+                res = new StringBuilder(stack_str.pop() + tmp);
+            } else {
                 res.append(c);
             }
         }
@@ -168,7 +176,7 @@ public class _11stack {
      i 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 0 来代替。
     * */
     /**找右边第一个比当前位置的数大的索引。。因此小于栈顶的入栈，大于栈顶(说明栈顶对应的结果已经计算出来了)的时候栈顶索引要出栈。
-     * 【建议】使用解法4！！
+     * 【强烈建议】使用解法4！！即dailyTemperatures04方法
      * 【说明】
      *      1. 如果解决题目时要求栈中的数严格递减或递增————
      *              如果没有相同元素，好说，直接入栈 或者 出栈生成信息；
@@ -249,12 +257,12 @@ public class _11stack {
     /**[建议使用]：求解每日温度问题更好的解。
      *    求解每日温度题目 并不要求栈内索引对应的值严格单调，相邻的数相等也是可以的！————
      * 因此每一个位置存放索引就行，不用存放链表*/
-    //解法2，这其实是一种精简的写法。精简的原型见dailyTemperatures02、dailyTemperatures03
+    //解法4，这其实是一种精简的写法。精简的原型见dailyTemperatures02、dailyTemperatures03
     public int[] dailyTemperatures04(int[] temperatures) {
-        Deque<Integer> stack = new ArrayDeque<>();
+        Deque<Integer> stack = new ArrayDeque<>(); //LinkedList也可以作为栈使用
         int[] res = new int[temperatures.length];
         for (int i = 0; i < temperatures.length; i++) {
-            /*只要当前值大于栈顶索引对应的值，就弹出栈顶并生成栈顶索引的信息；
+            /*只要当前值严格大于栈顶索引对应的值，就弹出栈顶并生成栈顶索引的信息；
              * 经过while保证"当前的场景"符合单调栈的规则，然后当前索引入栈*/
             while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {
                 int index = stack.pop();
@@ -282,7 +290,7 @@ public class _11stack {
      *       方法1：第一次遍历找到任何一个数左边最近 的小于值；第二次遍历找到任何一个数右边最近 的小于值；第三次遍历
      *    计算每一个位置能画出的最大矩形(长就是两个小于值位置的间隔，高就是heights数组这个位置的值)。
      *            空间方面：一个栈；一个left数组记录左边最近的小于值 的索引；一个right记录右边最近的小于值的索引
-     *       方法2：使用一次遍历，见方法largestRectangleArea2，遍历到height。length的时候，将高度视为0，此时栈中所有
+     *       方法2：使用一次遍历，见方法largestRectangleArea2，遍历到height.length的时候，将高度视为0，此时栈中所有
      *   索引位置的高度都一定大于0，因此根据“递增栈”的特性可知，所有的所有都会出栈，并生成对应位置的面积信息——————编码详见
      *   largestRectangleArea2方法.
      * */
@@ -353,13 +361,18 @@ public class _11stack {
         return max;
     }
 
+    /*【最好的解法】
+    * 【关键】循环i能取到height.length，height.length理论就越界了，但是我们提前判断，如果来到了末
+    * 尾位置，就将高度当为0，因此此时栈中所有的元素均会出栈————很好的避免了两次遍历分别寻找左边 和
+    * 右边的边界
+    * */
     public int largestRectangleArea2(int[] heights) {
         Deque<Integer> stack = new LinkedList<>(); // 存储索引
         int maxArea = 0;
         int n = heights.length;
 
         for (int i = 0; i <= n; i++) {
-            /**这一步就相等于清理最后栈中残留的索引。。。
+            /**当i=n时，就相当于清理最后栈中残留的索引。。。
              *      因为任何一个高度都大于0，索引当i来到n的时候，我们将当前的高度赋值为0，根
              * 据"currHeight<height[stack.peek()]"可知，此时stack中所有的索引都会出栈，并计
              * 算出可以绘制的矩形的面积
@@ -372,8 +385,7 @@ public class _11stack {
                 int width = stack.isEmpty() ? i : i - stack.peek() - 1;
                 maxArea = Math.max(maxArea, height * width);
             }
-
-            stack.push(i); // 当前索引入栈
+            stack.push(i); /**err：当前索引入栈。。漏掉时可能得出的结果总是0！！*/
         }
 
         return maxArea;

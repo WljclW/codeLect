@@ -61,18 +61,20 @@ public class _05matrix {
     * 给定一个 n × n 的二维矩阵 matrix 表示一个图像。请你将图像顺时针旋转 90 度。
     你必须在 原地 旋转图像，这意味着你需要直接修改输入的二维矩阵。请不要 使用另一个矩阵来旋转图像。*/
     public void rotate(int[][] matrix) {
-        for (int i=1;i<matrix.length;i++){
-            for (int j=0;j<i;j++){
+        /*step1：沿着主对角线，对折矩阵*/
+        for (int i = 1; i < matrix.length; i++) {
+            for (int j = 0; j < i; j++) {
                 int tmp = matrix[i][j];
                 matrix[i][j] = matrix[j][i];
-                matrix[j][i]= tmp;
+                matrix[j][i] = tmp;
             }
         }
-        /**【注】
+        /**【注】err：
          * 下面j变量的变化范围要明确，只能到列维度的一半。。。
          *     否则如果写成“j<matrix[0].length”，运行的结果就是列没有变化。。因为：同一行中，研究前半
          * 部分的时候完成了交换，但是研究后半部分的时候又交换回去了。
          * */
+        /*step2：沿着矩阵竖直的中心线（即matrix[0].length/2）对称翻转*/
         for (int i=0;i<matrix.length;i++){ //每一行都有要交换的元素，因此i要从0变化到matrix.length
             for (int j=0;j<matrix[0].length/2;j++){ //每一行中，只用交换前一半就可以了。因此在"同一行中"，列只研究一半即"j<matrix[0].length/2"
                 int tmp = matrix[i][j];

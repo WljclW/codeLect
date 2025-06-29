@@ -35,8 +35,8 @@ public class _02DoublePoint {
     * */
     /**
      * 【步骤】双指针相向而行，计算以它们为边界能盛多少水。。只要中间有间距（即left<right）
-     *      1. 每到一个位置计算能盛的水
-     *      2. 看两个指针对应的height哪一个高，更新height小的哪一个边界
+     *      1. 每到一个位置计算能盛的水（高度取决于左右指针height的最小值，宽度取决于两个指针的距离）
+     *      2. 看两个指针对应的height哪一个高，更新height小的那一个指针
      */
     public int maxArea(int[] height) {
         int left = 0;
@@ -46,7 +46,7 @@ public class _02DoublePoint {
             /*step1：计算当前left和right能盛的水，并更新结果*/
             int cur = (right-left)*Math.min(height[left],height[right]);
             result = Math.max(cur,result);
-            /*step2：看看是更新left指针还是更新right指针*/
+            /*step2：看看是更新left指针还是更新right指针。————哪一个位置的height小更新哪一个指针*/
             if(height[left]<height[right]){
                 left++;
             }else{
@@ -67,7 +67,7 @@ public class _02DoublePoint {
      *      ①遍历到位置cur，如果它和前面的数相等即nums[cur-1]==nums[cur]，说明cur-1位置的时候已经研究过
      *  了，cur位置需要跳过。【举例】：{-2，-2，-1，0，2}如果0位置的-2作为cur已经研究过了，cur来到1时就要跳
      *  过，直接来到2位置的-1。。如果不跳过就会出现相同的组合：[-2(索引0的-2)，0，2]、[-2(索引1的-2)，0，2]，
-     *  实际上是同一种解。
+     *  实际上是同一种解，就出现重复了。
      *      ②如果找到一个可行解即nums[cur]+nums[left]+nums[right]==0，此时需要移动left指针和right指针，
      *  移动时也必须跳过所有相同的元素。【举例】：{-2，-1，0，0，1，1，2，2}在cur=0、left=2、right=7时
      *  得到了一组可行解[-2,0,2]....此时需要left++，right--，left来到了索引3处的0，right指针指向了索
@@ -89,8 +89,8 @@ public class _02DoublePoint {
             int right = nums.length-1;
             /*step2：只要left<right就持续寻找可行解。
             * 根据i、left、right指针指向的三个数与0的大小关系来移动left、right指针。具体的来说————
-            *       ①如果他们三个指向的数之和小于0，说明要变大，因此需要移动left指针，即left++;
-            *       ②如果他们三个指向的数之和大于0，说明要变小，因此需要移动right指针，即right--
+            *       ①如果他们三个指向的数之和小于0，说明需要变大一些，因此需要移动left指针，即left++;
+            *       ②如果他们三个指向的数之和大于0，说明需要变小一些，因此需要移动right指针，即right--
             *       ③如果等于0需要移动left、right指针，并且此过程需要跳过相同的元素*/
             while (left<right){
                 int curRes = cur+nums[left]+nums[right];
@@ -175,8 +175,3 @@ public class _02DoublePoint {
         List<List<Integer>> lists = new _02DoublePoint().threeSum(new int[]{-1, 0, 1, 2, -1, -4});
     }
 }
-
-
-/**
- * 1. 双指针问题汇总
- * */

@@ -145,14 +145,14 @@ public class _01completeBag {
                 /**err：这里的条件多了一个。
                  * 只有之前的位置不是最大值时，才说明之前的位置由可达方案，否则说明dp[i][j - coins[i]]都不
                  * 可达，更不用说需要的最少硬币数了*/
-                if (j >= coins[i] && dp[j - coins[i]][j] != Integer.MAX_VALUE)
+                if (j >= coins[i] && dp[i][j-coins[i]] != Integer.MAX_VALUE)
                     /*if表明可以选择coins[i]。
                     情况1：不选coins[i]，需要的数量dp[i-1][j]，即用0~i-1的硬币凑成amount；
                     情况2：选coins[i]，因此要凑出amount-coins[i]的金额，硬币可以重复选，因此需要在
                         0~i的硬币凑出amount-coins[i]的金额，需要的硬币数dp[i][j-coins[i]]，并且由
                         于选择了使用coins[i]，因此还需要再＋1。即dp[i][j-coins[i]]+1。
                     综上，两种情况取最小值。*/
-                    dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - coins[i]] + 1);
+                    dp[i][j] = Math.min(dp[i - 1][j], dp[i][j-coins[i]] + 1);
                 else
                     dp[i][j] = dp[i - 1][j]; //否则说明coins[i]没法选，需要的硬币数的dp[i-1][j]
             }
@@ -161,18 +161,23 @@ public class _01completeBag {
 
 
     public int coinChange_1dim(int[] coins, int amount) {
-        int[] dp = new int[amount + 1];
-        dp[0] = 0;
-        for (int i=1;i<=amount;i++){
-            dp[i] = Integer.MAX_VALUE;
-        }
-        for (int i=0;i<coins.length;i++)
-            for (int j=1;j<=amount;j++) {
-                /**err：这里的if与二维的是一致的，必须保证之前的位置是可达的。*/
-                if (j >= coins[i] && dp[j - coins[i]] != Integer.MAX_VALUE)
-                    dp[j] = Math.min(dp[j], dp[j - coins[i]] + 1);
+            int[] dp = new int[amount + 1];
+            dp[0] = 0;
+            //初始化dp数组为最大值
+            for (int j = 1; j < dp.length; j++) {
+                dp[j] = Integer.MAX_VALUE;
             }
-        return dp[amount]<=0?-1:dp[amount];
+            for (int i = 0; i < coins.length; i++) {
+                //正序遍历：完全背包每个硬币可以选择多次
+                for (int j = coins[i]; j <= amount; j++) {
+                    //只有dp[j-coins[i]]不是初始最大值时，该位才有选择的必要
+                    if (dp[j - coins[i]] != Integer.MAX_VALUE) {
+                        //选择硬币数目最小的情况
+                        dp[j] = Math.min(dp[j], dp[j - coins[i]] + 1);
+                    }
+                }
+            }
+            return dp[amount] == Integer.MAX_VALUE ? -1 : dp[amount];
     }
 
 

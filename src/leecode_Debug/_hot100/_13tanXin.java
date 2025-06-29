@@ -23,13 +23,12 @@ public class _13tanXin {
      *     索引的价格-minPrice*/
     public int maxProfit(int[] prices) {
         int minPrice = prices[0];
-        int maxpro = Integer.MIN_VALUE;
+        int maxpro = 0;
         for (int i = 1; i < prices.length; i++) {
+            minPrice = Math.min(minPrice, prices[i]); /*每一个位置先更新最小值，对于未来的某个位置可以获得更多的位置*/
             maxpro = Math.max(prices[i] - minPrice, maxpro); /*遍历到每一个位置的决策*/
-            minPrice = Math.min(minPrice, prices[i]); /*每一个位置都需要更新最小值，对于未来的某个位置可以获得更多的位置*/
         }
-//        return maxpro;
-        return maxpro < 0 ? 0 : maxpro;  //利润最小是0，大不了不买。。其实把maxpro初始值设置为0就可以了
+        return maxpro;  //利润最小是0，大不了不买。。其实把maxpro初始值设置为0就可以了
     }
 
 
@@ -82,9 +81,24 @@ public class _13tanXin {
      * 【注意】题目中说了，生成的用例可以到nums[n-1]，即肯定能到达最后一个元素
      * 【关键】关键在于搞清楚什么时候让步数+1
      * */
-//    public int jump(int[] nums) {
-//
-//    }
+    public int jump(int[] nums) {
+        int step = 0;
+        //当前的这一跳能到的边界是哪里。最开始的时候边界就是0
+        int bound = 0;
+        //下一次最远能跳到哪里————在这次的可达范围研究时，更新下一次最远能跳到的位置
+        int maxPosition = 0;
+
+        /*遍历所有位置，每到一个位置先更新一下最远能到的位置；如果i来到了边界，就更新边界为maxPosition，就是
+        * 下一跳的边界*/
+        for (int i=0;i<nums.length-1;i++){ /**err：注意这里只能遍历到nums.length-1，否则得出的结果会多1。因为跳到最后一个位置就不用再跳了*/
+            maxPosition = Math.max(maxPosition,i+nums[i]); //每到一个位置，更新一下加入从这个位置跳，最远能到哪里
+            if (i==bound){ //一旦来到边界，step++ 并且 更新下一次能到的最远距离
+                step++;
+                bound = maxPosition;
+            }
+        }
+        return step;
+    }
 
     /*763.
     * 给你一个字符串 s 。我们要把这个字符串划分为尽可能多的片段，同一字母最多出现在一个片
@@ -112,14 +126,14 @@ public class _13tanXin {
     public List<Integer> partitionLabels1(String s) {
         ArrayList<Integer> res = new ArrayList<>(); //记录结果
 
-        /*记录每一个字符最后出现的位置*/
+        /*step1：记录每一个字符最后出现的位置*/
         int[] flags = new int[26];
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             flags[c - 'a'] = i;
         }
 
-        /*循环遍历，求满足要求的子串*/
+        /*step2：循环遍历，求满足要求的子串*/
         int start = 0, end = flags[s.charAt(0) - 'a'];
         for (int i = 0; i < s.length(); i++) {
             //每次到一个位置，先根据这个字符更新end的值。（end标记当前窗口内字符出现的右边界 这个信息）

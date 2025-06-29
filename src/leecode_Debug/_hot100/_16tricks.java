@@ -30,13 +30,13 @@ public class _16tricks {
      *      每一次碰到票数是0，就更新标记值（候选值），然后针对这个数投票
      */
     public int majorityElement(int[] nums) {
-        int cur = 0; //标记当前的票数
+        int total = 0; //标记当前的票数
         int flag = -1; //标记值，初始值无所谓
         for (int i:nums){
-            if (cur==0){ //如果票数为0，则更新标记值
+            if (total==0){ //如果票数为0，则更新标记值
                 flag = i;
             }
-            cur = flag==i?cur+1:cur-1; //票数不为0则投票，只要不是标记值，票数-1
+            total = flag==i?total+1:total-1; //票数不为0则投票，只要不是标记值，票数-1
         }
         return flag;
     }
@@ -46,6 +46,16 @@ public class _16tricks {
     * 得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
     我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
     必须在不使用库内置的 sort 函数的情况下解决这个问题。*/
+    /*
+    * 【注意】cur位置小于1的时候，left和cur指针都需要++。。。否则会报错，如下：
+    *       输入
+            nums =
+            [2,0,2,1,1,0]
+            输出
+            [1,1,2,2,0,0]
+            预期结果
+            [0,0,1,1,2,2]
+    * */
     public void sortColors(int[] nums) {
         int left = 0,right = nums.length-1;
         int cur = 0;
@@ -93,6 +103,7 @@ public class _16tricks {
 
     /*31.下一个排列*/
     /**
+     * 【强烈建议】使用官方解，见方法nextPermutation_offical
      * 【如果有下一个更大的排列，则做法分为三步】
      *      1. 从最后一个数倒着找，找到第一次升序的位置。即数组元素满足nums[i]<nums[i+1]
      *      2. 从最后一个数倒着找，找第一个大于nums[i]的数。。【注意】这里一定会找到，因为
@@ -137,24 +148,32 @@ public class _16tricks {
         }
     }
 
-    /**下一个排列的官方写法。。。官方的写法比较优雅且清晰*/
+    /**下一个排列的官方写法。。。官方的写法比较优雅且清晰。。
+     * 注意区别nextPermutation_offical写法 和 nextPermutation_another写法：
+     *      ①nextPermutation_offical方法中flag变量标记的是倒着数第一个降序位置，比如初始数组如果
+     * 是"[7,4,5,6,3,2,1]"，则最后flag会为2，即指向nums[2]=5。最后倒序需要从index=3开始————即从
+     * flag+1的位置开始倒序。
+     *      ②nextPermutation_another方法中flag变量标记的是倒着数第一个降序位置的后一个位置，比如
+     * 初始数组如果是"[7,4,5,6,3,2,1]"，则最后flag会为3，即指向nums[3]=6。最后倒序需要从index=3
+     * 开始————即flag的位置
+     *      因此两种写法会有区别！！*/
     public void nextPermutation_offical(int[] nums) {
-        int i = nums.length - 2;
-        //step1
-        while (i >= 0 && nums[i] >= nums[i + 1]) {
-            i--;
+        int flag = nums.length - 2;
+        //step1：只要是降序，就不断的向前找。最后来到第一个严格升序的位置
+        while (flag >= 0 && nums[flag] >= nums[flag + 1]) {
+            flag--;
         }
         //step2，说明确实找到了升序的位置
-        if (i >= 0) {
+        if (flag >= 0) {
             int j = nums.length - 1;
-            //倒着找第一个大于nums[i]的位置
-            while (j >= 0 && nums[i] >= nums[j]) {
+            //倒着找第一个nums[j]大于nums[i]的位置
+            while (j >= 0 && nums[flag] >= nums[j]) {
                 j--;
             }
-            swap1(nums, i, j);
+            swap1(nums, flag, j);
         }
         //step3：倒序i+1开始的子数组。。并且还包含了特殊情况：整个数组已经是最大的排列了
-        reverse(nums, i + 1);
+        reverse(nums, flag + 1);
     }
 
     public void swap1(int[] nums, int i, int j) {
@@ -162,6 +181,37 @@ public class _16tricks {
         nums[i] = nums[j];
         nums[j] = temp;
     }
+
+    /*下面的解法中flag变量标记的是————"正向看第一个升序的位置"*/
+    public void nextPermutation_another(int[] nums) {
+        int flag = nums.length-1;
+        while(flag>0&&nums[flag-1]>=nums[flag]){
+            flag--;
+        }
+
+        if (flag>0){
+            int j = nums.length-1;
+            while(j>flag-1&&nums[j]<=nums[flag-1]){
+                j--;
+            }
+            int tmp = nums[flag-1];
+            nums[flag-1] = nums[j];
+            nums[j] = tmp;
+        }
+        reverse_another(nums,flag);
+    }
+
+    private void reverse_another(int[] nums, int i) {
+        int left = i,right = nums.length-1;
+        while(left<right){
+            int tmp = nums[left];
+            nums[left] = nums[right];
+            nums[right] = tmp;
+            left++;
+            right--;
+        }
+    }
+
 
     /*下一个排列自己的写法*/
     public void nextPermutation_myMethod(int[] nums) {

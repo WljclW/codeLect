@@ -1,8 +1,6 @@
 package leecode_Debug._hot100;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class _01hash {
     /*1.
@@ -21,9 +19,28 @@ public class _01hash {
     /*49.
     * 给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。
     字母异位词 是由重新排列源单词的所有字母得到的一个新单词。*/
-//    public List<List<String>> groupAnagrams(String[] strs) {
-//
-//    }
+    /**
+     * 【解题思路】
+     *      解法1：对每一个字符串排序。排序后的作为键，原始串作为值，存入到map;
+     *      解法2：统计每一个字符串将统计值作为键值。
+     *   总之，两种解法都是把键-->字符串存入到map，区别在于键是什么的问题！!
+     * */
+    public List<List<String>> groupAnagrams(String[] strs) {
+        HashMap<String, List<String>> map = new HashMap<>();
+        for (String str:strs){
+            char[] chars = str.toCharArray();
+            Arrays.sort(chars);
+            String s = new String(chars);
+            if (map.containsKey(s)){
+                map.get(s).add(str);
+            }else{
+                LinkedList<String> ele = new LinkedList<>();
+                ele.add(str);
+                map.put(s,ele);
+            }
+        }
+        return new LinkedList<>(map.values()); /**err：返回之前强转类型*/
+    }
 
 
     /*128.

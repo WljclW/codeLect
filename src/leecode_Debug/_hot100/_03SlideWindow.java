@@ -35,7 +35,8 @@ public class _03SlideWindow {
     *   找呢？因此需要借助left指针
     * */
     /**
-     * 【关键】遍历s的每一个字符。。。每到一个位置right，先将这个字符加进map；然后利用while循环保证窗口是合法的
+     * 【关键】遍历s的每一个字符。。。
+     *      每到一个位置right，先将这个字符加进map（无脑的先加到map）；然后利用while循环保证窗口是合法的
      * */
     public int lengthOfLongestSubstring(String s) {
         int left = 0,right=0; //窗口左边界、右边界

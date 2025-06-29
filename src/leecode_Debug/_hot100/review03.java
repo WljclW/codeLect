@@ -94,6 +94,8 @@ public class review03 {
             int tmp = nums[left];
             nums[left] = nums[right];
             nums[right] = tmp;
+            left++;
+            right--;
         }
     }
 
@@ -117,9 +119,7 @@ public class review03 {
     public int firstMissingPositive(int[] nums) {
         for (int i = 0; i < nums.length; i++) {
             while(nums[i]>0&&nums[nums[i]-1]!=nums[i]){
-                int tmp  =nums[i];
-                nums[i] = nums[nums[i]-1];
-                nums[nums[i]-1] = tmp;
+                swap(nums,i,nums[i]-1);
             }
         }
 
@@ -129,6 +129,12 @@ public class review03 {
             }
         }
         return nums.length+1;
+    }
+
+    private void swap(int[] nums, int left, int right) {
+        int tmp = nums[left];
+        nums[left] = nums[right];
+        nums[right] = tmp;
     }
 
     //234
@@ -264,6 +270,14 @@ public class review03 {
     }
 
     //23
+    /*
+    lists =
+    [[1,4,5],[1,3,4],[2,6]]
+    输出
+    [1,1,2,3,4]
+    预期结果
+    [1,1,2,3,4,4,5,6]
+    * */
     public ListNode mergeKLists(ListNode[] lists) {
         if (lists==null||lists.length==0) return null;
         return merger(lists,0,lists.length-1);
@@ -272,8 +286,8 @@ public class review03 {
     private ListNode merger(ListNode[] lists, int left, int right) {
         if (left==right) return lists[left];
         int mid = left+(right-left)/2;
-        ListNode leftNode = merger(lists, left, mid - 1);
-        ListNode rightNode = merger(lists, mid, right);
+        ListNode leftNode = merger(lists, left, mid);
+        ListNode rightNode = merger(lists, mid+1, right);
         return mergerTwo(leftNode,rightNode);
     }
 
@@ -289,10 +303,11 @@ public class review03 {
             }
             cur = cur.next;
         }
+        cur.next = leftNode==null?rightNode:leftNode;
         return dummy.next;
     }
 
-    //138
+    /**================================138*/
     public Node copyRandomList(Node head) {
         Node cur = head;
         while(cur!=null){
@@ -395,15 +410,20 @@ public class review03 {
 
             while (!stack.isEmpty()&&curHeight<heights[stack.peek()]){
                 Integer cur = stack.pop();
+                /*为什么这里要赋值为-1？
+                    当前的循环变量i是右边第一个小于height[cur]的位置；
+                    left变量用于标记左边第一个小于height[cur]的位置。
+                  因此以height[cur]为高的矩形，长度最大是i-left-1。*/
                 int left = (stack.isEmpty())?-1:stack.peek();
                 int curVal = (i-left-1)*heights[cur];
                 res  =Math.max(curVal,res);
             }
+            stack.push(i);
         }
         return res;
     }
 
-    //33下一个排列
+    /**=========================================下一个排列*/
     public void nextPermutation(int[] nums) {
         int flag = nums.length;
         for (int i = nums.length-2; i >=0 ; i--) {
@@ -489,6 +509,8 @@ public class review03 {
     List<List<String>> resPartition;
     List<String> pathPartition;
     public List<List<String>> partition(String s) {
+        resPartition = new LinkedList<>();
+        pathPartition = new LinkedList<>();
         partitionBack(s,0);
         return resPartition;
     }
@@ -535,7 +557,7 @@ public class review03 {
         return flag[s.length()];
     }
 
-    //416
+    /**================================416*/
     public boolean canPartition(int[] nums) {
         int sum = 0;
         for (int num:nums){
@@ -552,6 +574,42 @@ public class review03 {
                 dp[j]  =Math.max(dp[j-nums[i]]+nums[i],dp[j]);
             }
         return dp[sum]==sum;
+    }
+
+
+        public int jump(int[] nums) {
+            int step = 0;
+            int bound = 0;
+            int maxPosition = 0;
+            for (int i=0;i<nums.length-1;i++){
+                maxPosition = Math.max(maxPosition,i+nums[i]);
+                if (i==bound){
+                    step++;
+                    bound = maxPosition;
+                }
+            }
+            return step;
+    }
+
+    public int coinChange(int[] coins, int amount) {
+        int[][] dp = new int[coins.length][amount + 1];
+
+        for (int i=0;i<coins.length;i++){
+            Arrays.fill(dp[i],-1);
+        }
+        for (int i=1;i<=amount;i++){
+            if (amount%coins[i]==0) dp[0][amount] = amount/coins[0];
+        }
+
+        for (int i=1;i<coins.length;i++)
+            for (int j=1;j<=amount;j++){
+                if (j>=coins[i] && dp[i][j-coins[i]]!=-1){
+                    dp[i][j]  = Math.min(dp[i][j-coins[i]]+1,dp[i-1][j]);
+                }else {
+                    dp[i][j] = dp[i-1][j];
+                }
+            }
+        return dp[coins.length-1][amount];
     }
 
 

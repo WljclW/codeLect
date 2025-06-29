@@ -11,10 +11,11 @@ public class _03subString {
     * 返回 滑动窗口中的最大值 。
     * */
     /**
-     * 【思路】使用双端队列，队列内的数严格单调减（换言之，只要当前的数nums[i]大于等于双端队列最后一个数nums[m]，则nums[m]永远不可能是
-     * 最大值了）。。
+     * 【思路】使用双端队列，队列内的数严格单调减（换言之，只要当前的数nums[i]"大于等于"双端队列最后一个
+     * 数nums[m]，则双端队列尾部的nums[m]永远不可能是最大值了）。。
      *      1。先将前面的k个数组添加进双端队列，此时会生成0位置的信息；
-     *      2. for循环内依次将剩下的元素添加进双端队列；每一轮循环需要确保双端队列头的位置还在窗口内
+     *      2. for循环内依次将剩下的元素添加进双端队列；每一轮循环需要确保双端队列头的位置还在窗口内，并
+     *  生成对应位置的信息
      */
     public int[] maxSlidingWindow(int[] nums, int k) {
         int[] res = new int[nums.length - k + 1]; //比如nums长度为3，窗口大小为3，则res中应该包含一个数
@@ -60,16 +61,14 @@ public class _03subString {
      * */
     public int subarraySum(int[] nums, int k) {
         HashMap<Integer, Integer> map = new HashMap<>();
-        int pre = 0; /**err：需要先放入pre为0的key-value*/
-        map.put(0,1);
+        int pre = 0;
+        map.put(0,1);   /**err：需要先放入pre为0的key-value*/
         int res = 0;
         for (int num:nums){
             //先更新前缀和，然后看前缀和pre-k的数量，有的话累加到res.（pre-k到当前位置的子数组和就是k）
             pre += num;
-            if (map.containsKey(pre-k)){
-                res += map.get(num-k);
-            }
-            map.put(pre,map.getOrDefault(pre,0)+1); //将pre对应的value加1.
+            res += map.getOrDefault(pre-k,0);
+            map.put(pre,map.getOrDefault(pre,0)+1); //将前缀和为pre对应的子数组数量加1.
         }
         return res;
     }
