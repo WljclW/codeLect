@@ -161,4 +161,9 @@ public class _01bag {
         }
         return dp[nums.length-1][remain];
     }
+
+    public static void main(String[] args) {
+        _01bag cla = new _01bag();
+        System.out.println(cla.canPartition(new int[]{1,2,3,4}));
+    }
 }

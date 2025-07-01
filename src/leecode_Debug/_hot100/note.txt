@@ -20,3 +20,24 @@
     ②出栈时，将元素依次从队头弹出，然后添加到队尾；剩下最后一个元素的时候直接弹出。（因为是一
   个队列，因此开始的时候需要获取队列的大小，从而判断是不是到达队尾）
     ③获取栈顶元素时。直接使用peekLast()获取队列的最后一个；
+
+4. 关于java的SPI机制参考：https://pdai.tech/md/java/advanced/java-advanced-spi.html
+5. Error的源码注释：error及其子类是不应该被捕获的，即不能写在throws子句；并且在编译期时期，error及其子类是不受检的异常。。————error及其子类是不应该发生的错误！
+   Exception的源码注释：Exception类及它的子类（子类不能同时是RuntimeException的子类）是受检异常。即这些异常是可以写在throws中被抛出
+ 来。
+====================================================final关键字的作用===================================================
+1. 说说final类型的类如何拓展? 比如String是final类型，我们想写个MyString复用所有String中方法，同时增加一个新的toMyString()的方法，应该如何做?
+    涉及模式中有两种重要的关系：一是继承/实现（继承父类，实现接口）；二是组合（类似于静态代理的模式即内部持有）。
+2. 方法的重载和重写
+    final修饰的方法是不能被重写的；但是是可以重载的
+        public class FinalExampleParent {
+            public final void test() {
+            }
+
+            public final void test(String str) {
+            }
+        }
+
+    private修饰的方法可以认为就是final修饰的
+3. 修饰字段的时候：
+    无法在方法中更改参数引用所指向的对象。这个特性主要用来向匿名内部类传递数据！
