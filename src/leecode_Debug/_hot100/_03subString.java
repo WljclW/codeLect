@@ -28,7 +28,7 @@ public class _03subString {
             }
             queue.offerLast(i);
         }
-        res[0] = nums[queue.peekFirst()];
+        res[0] = nums[queue.peekFirst()]; /**err：注意要去nums中取值*/
         /*step2：对于剩下的元素依次进入。【注意】由于窗口的大小固定k，因此要注意判断队列头的元素是不是已经出窗口了*/
         for (int i = k; i < nums.length; i++) {
             while (!queue.isEmpty() && nums[i] >= nums[queue.peekLast()]) { //①先将当前位置的元素入栈
@@ -38,7 +38,7 @@ public class _03subString {
             if (queue.peekFirst() == i - k) { //②判断队头元素是不是变得不合法（即当前队列头的索引是不是已经出窗口了），不合法时弹出
                 queue.pollFirst();
             }
-            res[i - k + 1] = nums[queue.peekFirst()]; //③这一轮会生成”i-k+1位置“的信息
+            res[i - k + 1] = nums[queue.peekFirst()]; //③这一轮会生成res的（注意别写错了）”i-k+1位置“的信息
         }
         return res;
     }
@@ -62,11 +62,15 @@ public class _03subString {
     public int subarraySum(int[] nums, int k) {
         HashMap<Integer, Integer> map = new HashMap<>();
         int pre = 0;
-        map.put(0,1);   /**err：需要先放入pre为0的key-value*/
         int res = 0;
+        map.put(0,1);   /**err：需要先放入pre为0的key-value*/
         for (int num:nums){
             //先更新前缀和，然后看前缀和pre-k的数量，有的话累加到res.（pre-k到当前位置的子数组和就是k）
             pre += num;
+            /**err：下面两行交换就错了！！
+             *      必须是先更新res，然后再将pre放进map。
+             *      否则，k=0的时候会出错，此时会出现pre-k=pre，如果先把pre放进去，就导致map.gte(pre-k)的
+             *  数值多了*/
             res += map.getOrDefault(pre-k,0);
             map.put(pre,map.getOrDefault(pre,0)+1); //将前缀和为pre对应的子数组数量加1.
         }

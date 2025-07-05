@@ -78,7 +78,7 @@ public class _05matrix {
         for (int i=0;i<matrix.length;i++){ //每一行都有要交换的元素，因此i要从0变化到matrix.length
             for (int j=0;j<matrix[0].length/2;j++){ //每一行中，只用交换前一半就可以了。因此在"同一行中"，列只研究一半即"j<matrix[0].length/2"
                 int tmp = matrix[i][j];
-                matrix[i][j] = matrix[i][matrix[0].length-1-j];
+                matrix[i][j] = matrix[i][matrix[0].length-1-j]; /**err：注意第1维度是“martrix[0].length-1再减i”*/
                 matrix[i][matrix[0].length-1-j] = tmp;
             }
         }

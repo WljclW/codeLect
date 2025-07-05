@@ -109,7 +109,7 @@ public class _06ListNode {
      * 【思路】
      *      1. 正常找出链表的 中点（1，4，7会来到4） 或者 中间的后一个节点（1，4，6，7会
      *  来到6）。。。此时后半部分的节点数必然不大于前半部分的节点数。
-     *      2. 反转后半部分，拿到反转后的头结点head2。
+     *      2. 反转后半部分，拿到反转后的头结点head2。————注意是翻转链表的后半部分而不是全部翻转
      *      3. 因为后半部分的节点数少，因此“head2!=null”时挨个判断head.val和head.val是不
      *  是相等
      * */
@@ -227,7 +227,7 @@ public class _06ListNode {
             sum %= 10; //当前位置的数值
             cur.next = new ListNode(sum); //给结果串 拼接数值为cur的节点
             cur = cur.next;
-            l1 = (l1 == null) ? l1 : l1.next;
+            l1 = (l1 == null) ? l1 : l1.next; /**err：这里如果没有移动指针，会报错“超出内存限制”*/
             l2 = (l2 == null) ? l2 : l2.next;
         }
         return res.next;
@@ -508,12 +508,22 @@ public class _06ListNode {
     private ListNode merge(ListNode[] lists, int l, int r) {
         if (l==r) return lists[l];
         int mid = l+(r-l)/2;
-        ListNode mergeLeft = merge(lists, l, mid);
+        ListNode mergeLeft = merge(lists, l, mid); /**右边界必须是mid，不能是mid-1..为什么？？*/
         ListNode mergeRight = merge(lists, mid + 1, r); /**err：右边界是r不是nums.length-1*/
         return mergeTwoList(mergeLeft,mergeRight);
     }
 
     /*合并两个升序链表的原始代码————一模一样*/
+    /*
+    有一种报错如下：
+        lists =
+        [[1,4,5],[1,3,4],[2,6]]
+        输出
+        [6]
+        预期结果
+        [1,1,2,3,4,4,5,6]
+        是因为在while内部没有移动cur指针“cur =cur.next”。
+    * */
     private ListNode mergeTwoList(ListNode mergeLeft, ListNode mergeRight) {
         ListNode dummy = new ListNode(-1);
         ListNode cur = dummy;

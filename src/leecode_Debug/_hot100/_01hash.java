@@ -39,7 +39,7 @@ public class _01hash {
                 map.put(s,ele);
             }
         }
-        return new LinkedList<>(map.values()); /**err：返回之前强转类型*/
+        return new LinkedList<>(map.values()); /**🔺err：返回之前强转类型*/
     }
 
 

@@ -90,7 +90,7 @@ public class _00hard {
                 return i+1; /**err：返回i+1。。求的是第一个缺失的整数，而不是索引*/
             }
         }
-        return nums.length+1; /**err：如果所有的数都在正确位置比如：[1,2,3]。这种情况应该返回4*/
+        return nums.length+1; /**▲err：如果所有的数都在正确位置比如：[1,2,3]。这种情况应该返回4*/
     }
 
     private void swap(int[] nums, int num, int cur) {

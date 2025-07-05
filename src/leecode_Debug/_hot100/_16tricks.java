@@ -32,11 +32,11 @@ public class _16tricks {
     public int majorityElement(int[] nums) {
         int total = 0; //标记当前的票数
         int flag = -1; //标记值，初始值无所谓
-        for (int i:nums){
-            if (total==0){ //如果票数为0，则更新标记值
+        for (int i : nums) {
+            if (total == 0) { //如果票数为0，则更新标记值
                 flag = i;
             }
-            total = flag==i?total+1:total-1; //票数不为0则投票，只要不是标记值，票数-1
+            total = flag == i ? total + 1 : total - 1; //票数不为0则投票，只要不是标记值，票数-1
         }
         return flag;
     }
@@ -64,7 +64,7 @@ public class _16tricks {
                 swap(nums,left++,cur++); /**err：注意，这种情况cur也得++，因为此时cur位置的值要麽是0要麽是1，不可能是2*/
             } else if (nums[cur] == 1) {
                 cur++;
-            } else { //交换后cur交换来的数还没有比较，所以cur指针不能动
+            } else { //交换后cur交换来的数还没有比较，所以cur指针不能动!!!
                 swap(nums,right--,cur);
             }
         }
@@ -105,7 +105,8 @@ public class _16tricks {
     /**
      * 【强烈建议】使用官方解，见方法nextPermutation_offical
      * 【如果有下一个更大的排列，则做法分为三步】
-     *      1. 从最后一个数倒着找，找到第一次升序的位置。即数组元素满足nums[i]<nums[i+1]
+     *      1. 从最后一个数倒着找，找到第一次升序的位置。即数组元素满足nums[i]<nums[i+1]。【注
+     * 意】这里必须找出严格小于的，等于的话不行！！
      *      2. 从最后一个数倒着找，找第一个大于nums[i]的数。。【注意】这里一定会找到，因为
      *  由第一步可以知道最起码nums[i+1]是大于nums[i]的。
      *      3. 倒序"从i+1位置往后的数"。。。【注意】此时i+1往后所有数一定是降序的，因为根据

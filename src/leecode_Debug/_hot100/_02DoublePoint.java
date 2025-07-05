@@ -18,7 +18,7 @@ public class _02DoublePoint {
         int cur = 0;
         while(cur<nums.length){
             if(nums[cur]!=0){
-                nums[left++] = nums[cur++];
+                nums[left++] = nums[cur++]; /**【注】left位置必然已经研究过了，因此left也要加加————荷兰国旗也是一样的*/
             }else
                 cur++;
         }
@@ -39,8 +39,7 @@ public class _02DoublePoint {
      *      2. 看两个指针对应的height哪一个高，更新height小的那一个指针
      */
     public int maxArea(int[] height) {
-        int left = 0;
-        int right = height.length-1;
+        int left = 0,right = height.length-1;
         int result = Integer.MIN_VALUE;
         while(left<right){
             /*step1：计算当前left和right能盛的水，并更新结果*/
@@ -84,32 +83,25 @@ public class _02DoublePoint {
             if(i>0&&nums[i]==nums[i-1]){ /**err：用if不用while，while里面使用continue就只是回到了外层循环*/
                 continue;
             }
-            int cur = nums[i];
-            int left = i+1;
-            int right = nums.length-1;
+            int left = i+1,right = nums.length-1;
             /*step2：只要left<right就持续寻找可行解。
             * 根据i、left、right指针指向的三个数与0的大小关系来移动left、right指针。具体的来说————
             *       ①如果他们三个指向的数之和小于0，说明需要变大一些，因此需要移动left指针，即left++;
             *       ②如果他们三个指向的数之和大于0，说明需要变小一些，因此需要移动right指针，即right--
             *       ③如果等于0需要移动left、right指针，并且此过程需要跳过相同的元素*/
             while (left<right){
-                int curRes = cur+nums[left]+nums[right];
+                int curRes = nums[i]+nums[left]+nums[right];
                 if(curRes<0){
                     /*>0，<0的时候不去重也可以，但是=0必须去重。
                     * 比如：这里是<0，则下面的两句使用哪一句都可以，后面的一句去重只是把去重操作提前了*/
 //                    left++; //这麽写表示不去重，也是可以的
-                    while (left<right && nums[left]==nums[++left]); /*关键语句：跳过所有相等的值*/
+                    while (left<right && nums[left]==nums[++left]); /*跳过所有相等的值*/
                 }else if(curRes>0){
 //                    right--; //这麽写表示不去重，也是可以的
                     while(left<right && nums[right]==nums[--right]);
                 }else {
-//                    ArrayList<Integer> curLev = new ArrayList<>();
-//                    curLev.add(nums[i]);
-//                    curLev.add(nums[left]);
-//                    curLev.add(nums[right]);
-//                    res.add(curLev);
                     res.add(new ArrayList<>(Arrays.asList(nums[i],nums[left],nums[right]))); /**err：使用这个添加list方便*/
-                    while (left<right && nums[left]==nums[++left]);
+                    while (left<right && nums[left]==nums[++left]); /**【注意】其实保证left<right就能保证l和r都不越界*/
                     while (left<right && nums[right]==nums[--right]);
                 }
             }

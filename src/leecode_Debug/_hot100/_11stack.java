@@ -91,28 +91,48 @@ public class _11stack {
      * @author: Zhou
      * @date: 2025/6/1 13:54
      */
-//    class MinStack {
-//
-//        public MinStack() {
-//
-//        }
-//
-//        public void push(int val) {
-//
-//        }
-//
-//        public void pop() {
-//
-//        }
-//
-//        public int top() {
-//
-//        }
-//
-//        public int getMin() {
-//
-//        }
-//    }
+    /*
+    输入
+        ["MinStack","push","push","push","push","pop","getMin","pop","getMin","pop","getMin"]
+        [[],[512],[-1024],[-1024],[512],[],[],[],[],[],[]]
+
+        添加到测试用例
+        输出
+        [null,null,null,null,null,null,-1024,null,-1024,null,-1024]
+        预期结果
+        [null,null,null,null,null,null,-1024,null,-1024,null,512]
+        注意判断相等使用equals方法，否则这个测试用例报错
+    * */
+    class MinStack {
+        Stack<Integer> allStack;
+        Stack<Integer> minStack;
+        public MinStack() {
+            allStack = new Stack<Integer>();
+            minStack = new Stack<>();
+        }
+
+        public void push(int val) {
+            allStack.push(val);
+            if (minStack.isEmpty() || val <= minStack.peek()) { /**err：两个条件缺一不可，否则可能空指针*/
+                minStack.push(val);
+            }
+        }
+
+        public void pop() {
+            Integer pop = allStack.pop();
+            if (minStack.peek().equals(pop)){ /**err：注意这里比u下使用equals。否则或有个用例“-1024”不对*/
+                minStack.pop();
+            }
+        }
+
+        public int top() {
+            return allStack.peek();
+        }
+
+        public int getMin() {
+            return minStack.peek();
+        }
+    }
 
 /**
  * Your MinStack object will be instantiated and called as such:
@@ -136,6 +156,15 @@ public class _11stack {
      * 【建议】看K神的题解：https://leetcode.cn/problems/decode-string/solutions/19447/decode-string-fu-zhu-zhan-fa-di-gui-fa-by-jyd/?envType=study-plan-v2&envId=top-100-liked
      *      重要的是看K神题解中的动图，理解整个过程
      */
+    /*
+    【注意】计算multi的公式，如果写成了“digit = 10 * digit + digit”，会出错如下：
+            s =
+            "3[a]2[bc]"
+            输出
+            ""
+            预期结果
+            "aaabcbc"
+    * */
     public String decodeString(String s) {
         StringBuilder res = new StringBuilder();
         int digit = 0;
@@ -349,7 +378,7 @@ public class _11stack {
                     int L = stack.isEmpty()?-1: stack.peek();
                     max = Math.max(max,heights[peek]*(i -L-1)); //i当前位置也是右边所求的数；L是弹出后新栈顶的数，也即左边所求的数
                 }
-                stack.push(i);
+                stack.push(i); /**▲err：注意如果没有入栈，会导致计算出的面积永远是0*/
             }
         }
         /*清空栈。依次弹出并生成对应的信息*/
@@ -381,8 +410,8 @@ public class _11stack {
 
             // 只要满足 当前高度小于栈顶元素，弹出栈顶并计算面积
             while (!stack.isEmpty() && currHeight < heights[stack.peek()]) {
-                int height = heights[stack.pop()];
-                int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+                int height = heights[stack.pop()]; //矩形的高：弹出来栈顶index对应的高度
+                int width = stack.isEmpty() ? i : i - stack.peek() - 1; //矩形的宽，注意此时栈顶的stack.peek()位置的高度是不满足的
                 maxArea = Math.max(maxArea, height * width);
             }
             stack.push(i); /**err：当前索引入栈。。漏掉时可能得出的结果总是0！！*/

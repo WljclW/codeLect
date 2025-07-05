@@ -1,9 +1,6 @@
 package leecode_Debug._hot100;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**暴力递归：更像是一个从所求 依次推到 已知的问题
  * 动态规划：更像是一个从已知的基础问题(base case) 依次推到 想要求解的问题*/
@@ -51,27 +48,21 @@ public class _14DP {
         在「杨辉三角」中，每个数是它左上方和右上方的数的和。
     * */
     public List<List<Integer>> generate(int numRows) {
-        /**这样写有问题，后面的行计算不方便*/
         LinkedList<List<Integer>> res = new LinkedList<>();
-        LinkedList<Integer> lev1 = new LinkedList<>();
-        lev1.add(1);
-        LinkedList<Integer> lev2 = new LinkedList<>();
-        lev2.add(1);
-        lev2.add(1);
-        if(numRows==1) res.add(lev1);
-        if (numRows==2){
-            res.add(lev1);
-            res.add(lev2);
-        }
-        for (int i=2;i<numRows;i++){
-            LinkedList<Integer> cur = new LinkedList<>();
-            cur.add(0,1);
-            for(int j=1;j<i;j++){
-                int curVal = res.get(i-1).get(j-1)+res.get(i-1).get(j);
-                cur.add(j,curVal);
+        res.add(new LinkedList<>(Arrays.asList(1)));
+        if (numRows==1) return res;
+        res.add(new LinkedList<>(Arrays.asList(1,1)));
+        if (numRows==2) return res;
+
+        for (int i = 3; i <= numRows; i++) {
+            LinkedList<Integer> ele = new LinkedList<>();
+            List<Integer> last = res.getLast();
+            for (int j = 0; j < i; j++) {
+                int leftVal = (j-1<0)?0:last.get(j-1); //计算上一行左边的那个数
+                int rightVal = (j>=last.size())?0:last.get(j); //计算上一行index相同的那个数
+                ele.add(leftVal+rightVal);
             }
-            cur.add(i,1);
-            res.add(new LinkedList<>(cur));
+            res.add(ele);
         }
         return res;
     }
@@ -178,7 +169,7 @@ public class _14DP {
         HashSet<String> set = new HashSet<>(wordDict);
         dp[0] = true;
         for (int i=1;i<s.length()+1;i++){
-            for (int j=0;j<i;j++){ //j<i，因此j的最大值能到s.length()
+            for (int j=0;j<i;j++){ //j<i，因此j其实并不能取到s.length()，但是i可以取到。
                 /*
                 if条件语句的解释————
                     dp[j]：0~j-1这段子串能有列表的字符串拼出来；【注意：dp[j]对应的是0~j-1的子串是否可匹配到】
