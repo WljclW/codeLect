@@ -126,15 +126,16 @@ public class _04normalArr {
     public int[] productExceptSelf(int[] nums){
         if(nums.length==1) return nums;
         int[] res = new int[nums.length];
+
         res[0] = 1;
         for (int i=1;i<nums.length;i++){
             res[i] = res[i-1]*nums[i-1]; /**err：注意两个index都是i-1..*/
         }
 
         int post = 1; //用于记录当前位置以后的数的连乘积是多少
-        for (int i=nums.length-2;i>=0;i--){ /**err：等于0的时候也需要计算。否则结果数组的第一个数是1*/
-            post *= nums[i+1];
+        for (int i = nums.length-1; i >= 0; i--){ /**err：等于0的时候也需要计算。否则结果数组的第一个数是1*/
             res[i] *= post;
+            post *= nums[i];
         }
         return res;
     }
@@ -148,7 +149,7 @@ public class _04normalArr {
         请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
     * */
     /**
-     * 【解题建议】建议使用解法1
+     * 【解题建议】建议使用解法1————firstMissingPositive
      */
     /*解法1：简洁*/
     public int firstMissingPositive(int[] nums) {
@@ -170,7 +171,7 @@ public class _04normalArr {
         }
         //经过上面的步骤理论上i位置存放的就是数字i+1.比如0位置存放1，1位置存放2....
         for (int i = 0; i < nums.length; i++) {
-            if (nums[i] != i + 1) return i + 1;
+            if (nums[i] != i + 1) return i + 1; //下标i的地方应该存储i+1
         }
 
         return nums.length + 1; /**err：到了这里说明数组中不缺，因此应该返回下一个数*/

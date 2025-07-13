@@ -79,7 +79,7 @@ public class review05 {
         LinkedList<List<Integer>> res = new LinkedList<>();
         for (int i = 0; i < nums.length - 2; i++) {
             if (i>0&&nums[i]==nums[i-1]) continue;
-            int left = i=1,right = nums.length-1;
+            int left = i+1,right = nums.length-1;
             while (left<right){
                 int curVal = nums[i] + nums[left] + nums[right];
                 if (curVal>0){
@@ -102,7 +102,7 @@ public class review05 {
      * */
     public int trap(int[] height) {
         int leftMax = height[0],rightMax = height[height.length-1];
-        int left = 0,right = 0;
+        int left = 0,right = height.length-1;
         int res = 0;
         while (left<right){
             leftMax = Math.max(leftMax,height[left]);
@@ -185,7 +185,7 @@ public class review05 {
 
         for (int i = 0; i < nums.length; i++) {
             if (nums[i] != i + 1) {
-                return i = 1;
+                return i+1;
             }
         }
         return nums.length + 1;
@@ -204,9 +204,9 @@ public class review05 {
             if (target==matrix[row][col]){
                 return true;
             } else if (target>matrix[row][col]) {
-                col--;
-            }else {
                 row++;
+            }else {
+                col--;
             }
         }
         return false;
@@ -336,7 +336,7 @@ public class review05 {
                 r = mid;
             }
         }
-        return r;
+        return nums[r];
     }
 
     //84
@@ -346,7 +346,7 @@ public class review05 {
         for (int i = 0; i <= heights.length; i++) {
             int curHeight = (i== heights.length)?0:heights[i];
 
-            while (!stack.isEmpty()&&heights[i]<heights[stack.peek()]){
+            while (!stack.isEmpty()&&curHeight<heights[stack.peek()]){
                 Integer pop = stack.pop();
                 int leftBound = stack.isEmpty()?-1:stack.peek();
                 int curArea = heights[pop]*(i-leftBound-1);
@@ -394,7 +394,7 @@ public class review05 {
         int left = 0,bound = 0;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            bound = Math.max(bound,flags[i]);
+            bound = Math.max(bound,flags[i-'a']);
             if (i==bound){
                 res.add(i-left+1);
                 left = bound+1;
@@ -410,9 +410,15 @@ public class review05 {
             if (ticket==0){
                 flag = num;
             }
-            flag += (flag==num)?1:-1;
+            ticket += (flag==num)?1:-1;
         }
         return flag;
+    }
+
+
+    public static void main(String[] args) {
+        review05 review05 = new review05();
+        review05.permute(new int[]{1,2,3});
     }
 
     //46
@@ -435,7 +441,7 @@ public class review05 {
             if (!used[i]){
                 used[i] = true;
                 pathPermute.add(nums[i]);
-                permute(nums);
+                permuteBack(nums);
                 used[i] = false;
                 pathPermute.remove(pathPermute.size()-1);
             }
@@ -456,7 +462,7 @@ public class review05 {
     private void subsetsBack(int[] nums, int index) {
         resSubsets.add(new LinkedList<>(pathSubsets));
         for (int i = index; i < nums.length; i++) {
-            pathSubsets.add(nums[index]);
+            pathSubsets.add(nums[i]);
             subsetsBack(nums,i+1);
             pathSubsets.remove(pathSubsets.size()-1);
         }
@@ -552,10 +558,12 @@ public class review05 {
             return false;
         }
         board[i][j] = '\n';
-        return traceBack(board,i-1,j,word,index+1)||
+        boolean cur = traceBack(board,i-1,j,word,index+1)||
          traceBack(board,i+1,j,word,index+1)||
          traceBack(board,i,j-1,word,index+1)||
          traceBack(board,i,j+1,word,index+1);
+        board[i][j] = word.charAt(index);
+        return cur;
     }
 
 

@@ -260,7 +260,9 @@ public class _14DP {
     /**    求的是最大值，但是不能仅仅记录之前子数组的最大值。比如"-2,3,-4"的最大值应该是24，如果
      * 仅仅选取最大值则遍历到元素3的时候，会选择单独成一个子数组，这样是不对的。应该到任何一个
      * 位置，都应该记录当前子数组的最大值、最小值...
-     *     然后到每一个位置的时候，需要决策出当前位置的最大目标值*/
+     *     然后到每一个位置的时候，需要决策出当前位置的最大目标值
+     * 【建议】建议使用maxProduct1
+     * */
     public int maxProduct(int[] nums) {
         //dp数组的定义：以nums[i-1]结尾的最大子数组的乘积..每一个数可以和前面的数个数合成一个子数组 或者 自己成立一个子数组
         int[] dp1 = new int[nums.length + 1];
@@ -274,6 +276,22 @@ public class _14DP {
             max = Math.max(max,dp1[i]);
         }
         return max;
+    }
+
+
+    public int maxProduct1(int[] nums) {
+        int preMax = 1,preMin = 1; //分别记录以前一个数结尾的子数组的最小乘积、最大乘积分别是多少。
+        int res = Integer.MIN_VALUE; //结果
+        for (int i = 0; i < nums.length; i++) {
+            /*计算以当前数nums[i]结尾子数组最大乘积是多少*/
+            int curMax = Math.max(nums[i],Math.max(preMax*nums[i],preMin*nums[i])); /**【注意】必须新声明变量，不能直接给preMax！！否则会导致preMin更新不准确*/
+            /*利用preMax（注意此时它是以nums[i-1]结尾的最大子数组乘积）来更新以nums[i]结尾的子数组
+            * 的最小值*/
+            preMin = Math.min(nums[i],Math.min(preMax*nums[i],preMin*nums[i]));
+            preMax = curMax;
+            res = Math.max(res,curMax);
+        }
+        return res;
     }
 
 

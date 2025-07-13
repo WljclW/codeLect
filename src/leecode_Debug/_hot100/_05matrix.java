@@ -97,15 +97,15 @@ public class _05matrix {
      *      是"m<matrix.length&&n>=0"*/
     public boolean searchMatrix(int[][] matrix, int target) {
         int m = 0;
-        int n = matrix[0].length-1;
-        while(m<matrix.length&&n>=0){
+        int n = matrix[0].length - 1;
+        while (m < matrix.length && n >= 0) {
             int cur = matrix[m][n];
-            if (cur==target){
+            if (cur == target) {
                 return true;
-            }else if (cur>target){
-                n--;
-            }else {
-                m++;
+            } else if (cur > target) {
+                n--; //需要将cur变小，因此需要列变小
+            } else {
+                m++; //需要cur变大，因此需要将行变大
             }
         }
         return false;

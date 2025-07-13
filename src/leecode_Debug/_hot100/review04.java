@@ -1,6 +1,7 @@
 package leecode_Debug._hot100;
 
 import leecode_Debug.top100.ListNode;
+import leecode_Debug.top100.TreeNode;
 
 import java.util.*;
 
@@ -1222,6 +1223,104 @@ public class review04 {
             }
         }
         return r;
+    }
+
+
+    /**================================二叉树==============================*/
+    /*
+
+    * */
+    public List<Integer> inorderTraversal(TreeNode root) {
+        LinkedList<Integer> res = new LinkedList<>();
+        TreeNode cur = root;
+        LinkedList<TreeNode> stack = new LinkedList<>();
+        while (cur!=null||!stack.isEmpty()){
+            if (cur!=null){
+                stack.push(cur);
+                cur = cur.left;
+            }else{
+                TreeNode curNode = stack.pop();
+                res.add(curNode.val);
+                cur = curNode.right;
+            }
+        }
+        return res;
+    }
+
+
+
+    /*
+
+    * */
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        LinkedList<List<Integer>> res = new LinkedList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        if (root!=null) queue.offer(root);
+
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            LinkedList<Integer> ele = new LinkedList<>();
+            for (int i = 0; i <size; i++) {
+                TreeNode curNode = queue.poll();
+                ele.add(curNode.val);
+                if (curNode.left!=null) queue.offer(curNode.left);
+                if (curNode.right!=null) queue.offer(curNode.right);
+            }
+            res.add(ele);
+        }
+        return res;
+    }
+
+    /*46.
+    给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
+    * */
+    List<List<Integer>> res;
+    List<Integer> path;
+    boolean[] flags;
+    public List<List<Integer>> permute(int[] nums) {
+        res = new LinkedList<List<Integer>>();
+        path = new LinkedList<Integer>();
+        flags = new boolean[nums.length];
+        permuteBack(nums);
+        return res;
+    }
+
+    private void permuteBack(int[] nums) {
+        if (path.size()==nums.length){
+            res.add(new LinkedList<>(path));
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if (!flags[i]){
+                path.add(nums[i]);
+                flags[i] = true;
+                permuteBack(nums);
+                flags[i] = false;
+                path.remove(path.size()-1);
+            }
+        }
+    }
+
+
+    /*78.
+    给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
+    解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
+    * */
+    List<List<Integer>> resSubSets;
+    List<Integer> pathSubsets;
+    public List<List<Integer>> subsets(int[] nums) {
+        resSubSets = new LinkedList<>();
+        pathSubsets = new LinkedList<Integer>();
+        subsetsBack(nums,0);
+        return resSubSets;
+    }
+
+    private void subsetsBack(int[] nums, int i) {
+        resSubSets.add(new LinkedList<>(pathSubsets));
+        for (int j = i; j < nums.length; j++) {
+            pathSubsets.add(nums[j]);
+            subsetsBack(nums,j+1);
+            pathSubsets.remove(pathSubsets.size()-1);
+        }
     }
 
 

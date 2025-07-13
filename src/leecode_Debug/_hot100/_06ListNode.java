@@ -1,7 +1,9 @@
 package leecode_Debug._hot100;
 
+import leecode_Debug._hot100_NeedMore.NeedMore01;
 import leecode_Debug.top100.ListNode;
 
+import java.util.HashMap;
 import java.util.PriorityQueue;
 
 /**142、23（优先级队列解法）、19、、、
@@ -240,6 +242,10 @@ public class _06ListNode {
      * 【解题关键&&官方解精髓】开始时slow指向虚拟头dummy节点；
      *                       开始时fast指向head 并且 fast先走n步（注意slow和fast的开始位置不一样）
      *                      （最后fast指向null的时候，slow正好指向倒数第n+1个节点）
+     * 【步骤】 1. slow结点指向dummy节点，fast节点指向head节点；
+     *         2. fast节点先走n步；
+     *         3. slow走一步，fast走一步。。。知道fast指向null节点
+     *         4. 删除slow的下一个节点————单链表的删除下一个节点，其实就是操作：slow.next=slow.next.next
      * 【注】1. 这个题重要的是在删除的时候slow指针指向要删除节点的前一个节点。
      *      2. 一开始，要让fast指针先走N步*/
     /*自己的解法*/
@@ -295,6 +301,7 @@ public class _06ListNode {
      *      组“两两节点”的前置节点）。。这就要求每一轮反转完两个节点后，需要将cur指针指向它两中的最
      *      后一个节点；
      *        2. 在每一轮循环中先记录两两节点————第一个node1，第二个node2，然后调整指针指向
+     *  【建议】使用非递归解法————swapPairs1方法
      */
     /*非递归的形式；非递归形式看官方讲解*/
     public ListNode swapPairs1(ListNode head) {
@@ -347,19 +354,19 @@ public class _06ListNode {
             }
             if (end == null) break; //说明这一组不够k个节点了，因此不用动，结束循环即可
             /*step2：记录几个节点。此时——————
-             *      start指向这一组的第一个节点；end指向这一组的最后一个节点；pre指向这一组前面的那个节点（即前一组的
-             * 最后一个节点，对于第一组来说，前一个结点即使dummy节点————此思想类似于“两两交换链表节点”）；nextStart指
+             *      curStart指向这一组的第一个节点；end指向这一组的最后一个节点；pre指向这一组前面的那个节点（即前一组的
+             * 最后一个节点，对于第一组来说，前一个结点即为dummy节点————此思想类似于“两两交换链表节点”）；nextStart指
              * 向下一组的第一个节点*/
-            ListNode start = pre.next;
-            ListNode nextStart = end.next;
+            ListNode curStart = pre.next; //当前这一组的第一个节点
+            ListNode nextStart = end.next; //下一组的第一个节点
             /*step3：几个节点之间调整连接关系*/
-            end.next = null;
-            pre.next = reverse(start); //reverse返回的是 这一组翻转 之后的开始节点，要拼在前一组后面————即赋给pre.next。
-            start.next = nextStart; //这一组翻转完成后，start变成了这一组的最后一个节点。。因此将start.next赋值为nextStart(其中nextStart为下一组的第一个节点)————这一步就将当前组和下一组连起来了
-            /*step4：pre和end更新，更新为这一组的最后一个节点。。和最开始的“pre = dummy,end = dummy”呼应，每一轮之后状
+            end.next = null; //当前这一组节点的最后一个节点的next置为null，便于翻转链表
+            pre.next = reverse(curStart); //reverse返回的是 这一组翻转 之后的开始节点，要拼在前一组后面————即赋给pre.next。
+            curStart.next = nextStart; //这一组翻转完成后，start变成了这一组的最后一个节点。。因此将start.next赋值为nextStart(其中nextStart为下一组的第一个节点)————这一步就将当前组和下一组连起来了
+            /*step4：pre和end更新，更新为这一组的最后一个节点。。和最开始的“pre = dummy,end = dummy”呼应，每一轮循环之后状
             态回归到循环开始时的样子*/
-            pre = start;
-            end = start;
+            pre = curStart;
+            end = curStart;
         }
         return dummy.next;
     }
@@ -387,7 +394,7 @@ public class _06ListNode {
      *      3. 从头到尾遍历拆分原始链表，和copy的链表。【注意】每一个节点都要对，且原始链表不能
      *  改变！！否则会报错，信息类似于："Next pointer of node with label 7 from the original
      *  list was modified."
-     *  【出错步骤】第三步的代码难写
+     *  【出错步骤】第三步的代码难写，建议看copyRandomList1
      * */
     public Node copyRandomList(Node head) {
         if(head==null) return null; /**err：特例的判断*/
@@ -450,11 +457,94 @@ public class _06ListNode {
 //        return dummy.next;
     }
 
+
+    /*解法2：K神的解法————
+    * https://leetcode.cn/problems/copy-list-with-random-pointer/solutions/2361362/138-fu-zhi-dai-sui-ji-zhi-zhen-de-lian-b-6jeo/
+        复制节点的操作不变；赋值random指针的操作不变。
+     唯一的区别在于第三步拆分链表的时候逻辑更清晰。
+    */
+    public Node copyRandomList1(Node head) {
+        if(head==null) return head;
+
+        Node cur = head;
+        while (cur!=null){
+            Node node = new Node(cur.val);
+            node.next = cur.next;
+            cur.next = node;
+            cur = cur.next.next;
+        }
+
+        cur =  head;
+        while (cur!=null){
+            if (cur.random!=null){
+                cur.next.random = cur.random.next;
+            }
+            cur = cur.next.next;
+        }
+
+        /*第三步：拆分原始链表和复制的链表*/
+        Node res = head.next,pre = head; /*res---复制得到的链表的头；pre---原始链表的头*/
+        cur = res;
+        while (cur.next!=null){
+            pre.next = pre.next.next;
+            cur.next = cur.next.next;
+            pre = pre.next;
+            cur = cur.next;
+        }
+        pre.next = null; /**err：最后需要把原始链表的末尾置为null*/
+        return res;
+    }
+
+
+
     /*148.
     * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
-//    public ListNode sortList(ListNode head) {
-//
-//    }
+    /**
+     * 【思路】归并排序
+     * */
+    public ListNode sortList(ListNode head) {
+        /*1.特殊情况的考虑————没有节点或者只有一个节点，此时不用排序*/
+        if (head==null||head.next==null) return head;
+        /*2.找到中间节点的*/
+        ListNode mid = findMid(head);
+        /*3.分别排序左、右两半链表*/
+        ListNode left = sortList(head);
+        ListNode right = sortList(mid);
+        /*4.合并左右排序后的两部分*/
+        return merge(left,right);
+    }
+
+    /*合并两个有序链表的原始代码，不动！！*/
+    private ListNode merge(ListNode left, ListNode right) {
+        ListNode dummy = new ListNode(-1),cur = dummy;
+        while (left!=null&&right!=null){
+            if (left.val<right.val){
+                cur.next =  left;
+                left = left.next;
+            }else{
+                cur.next = right;
+                right = right.next;
+            }
+            cur = cur.next;
+        }
+        cur.next = left==null?right:left;
+        return dummy.next;
+    }
+
+    /*找中间节点的代码。与hot100求中间节点不同，区别————
+    *       1. 如果是及数个节点，两种都会得到中间节点；
+    *       2. 如果是偶数个节点，下面的方案会得到中间两个的前一个节点*/
+    private ListNode findMid(ListNode head) {
+        ListNode slow = head,fast = head.next;
+        while (fast!=null && fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        //如果是偶数个节点，到这里slow会指向中间两个节点的第一个
+        ListNode res = slow.next;
+        slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”*/
+        return res;
+    }
 
 
     /*23.
@@ -561,20 +651,108 @@ public class _06ListNode {
     void put(int key, int value) 如果关键字 key 已经存在，则变更其数据值 value ；如果不存在，则向缓存中插入该组 key-value 。如果插入操作导致关键字数量超过 capacity ，则应该 逐出 最久未使用的关键字。
     函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
     * */
-//    class LRUCache {
-//
-//        public LRUCache(int capacity) {
-//
-//        }
-//
-//        public int get(int key) {
-//
-//        }
-//
-//        public void put(int key, int value) {
-//
-//        }
-//    }
+    class LRUCache {
+        /*
+        1. LRU中每一个节点的结构
+        2. 每一个节点都是key-value的形式存储值，并且有pre、next指针————可以实现前溯、后溯遍历*/
+        class DouListNode{
+            int key;
+            int value;
+            DouListNode pre;
+            DouListNode next;
+            public DouListNode(int key, int value) { /**【注】必须使用key-value构造器，涉及到put操作的时候新建节点存储key-value*/
+                this.key = key;
+                this.value = value;
+            }
+        }
+
+        int capacity;
+        int size;
+        DouListNode head;
+        DouListNode tail;
+        HashMap<Integer, DouListNode> map = new HashMap<Integer, DouListNode>();
+
+        /*
+        LRUCache构造器中完成：
+            ①capacity的指定；②size的初始化；③head节点、tail节点的初始化 以及 指针的连接
+        */
+        public LRUCache(int capacity) {
+            this.capacity = capacity;
+            this.size = 0;
+            head = new DouListNode(-1, -1);
+            tail = new DouListNode(-1, -1);
+            head.next = tail;
+            tail.pre = head;
+        }
+
+        /*
+        get的思路：从map里面获取————
+            情况1：如果找到的节点是null，说明没有直接返回-1；
+            情况2：如果找到了节点，则：①把这个节点移动到头节点；②返回节点的值————即node.value
+        * */
+        public int get(int key) {
+            DouListNode node = map.get(key);
+            if (node==null){
+                return -1;
+            }else {
+                removeNode(node);
+                addNodeToHead(node);
+                return node.value;
+            }
+        }
+
+        /*
+        put操作的思路：从map中获取节点node————
+            情况1：如果找到了node不是null，说明LRU链表中已经有key对应的节点。则：①移动这个节点到LRU的头结点；
+        ②把这个node的值更新为put方法的参数value
+            情况2：如果找到的node是null，说明LRU链表中之前没有key对应的节点。则：①使用key-value创建新的节点newNode；
+        ②map中添加key-newNode的映射关系；③将newNode添加到LRU的head节点；------至此完成了新节点的添加操作
+        ④更新size变量；④判断是不是超出容量，超出的话需要删除尾节点。------这两步完成添加节点的后置校验
+        * */
+        public void put(int key, int value) {
+            DouListNode node = map.get(key);
+            if (node==null){
+                DouListNode newNode = new DouListNode(key,value);
+                map.put(key,newNode);
+                addNodeToHead(newNode);
+                size++;
+                if (size>this.capacity){
+                    removeRealTail();
+                }
+            }else {
+                node.value = value;
+                removeNode(node);
+                addNodeToHead(node);
+            }
+        }
+
+        /*
+        删除尾部节点：
+            ①通过tail.pre拿到真正的尾节点删除；②从map中删除节点
+        * */
+        private void removeRealTail() {
+            DouListNode tailReal = tail.pre;
+            removeNode(tailReal);
+            map.remove(tailReal.key);
+        }
+
+        /*删除一个节点：*/
+        private void removeNode(DouListNode node) {
+            DouListNode pre = node.pre;
+            DouListNode next = node.next;
+            pre.next = next;
+            next.pre = pre;
+        }
+
+        /*把一个节点添加为头节点*/
+        private void addNodeToHead(DouListNode newNode) {
+            DouListNode next = head.next;
+            head.next = newNode;
+            newNode.next = next;
+            next.pre = newNode;
+            newNode.pre = head;
+        }
+    }
 
 
 

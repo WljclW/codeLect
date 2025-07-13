@@ -91,6 +91,7 @@ public class _11stack {
      * @author: Zhou
      * @date: 2025/6/1 13:54
      */
+    /**下面是常错的一个点！！！！！！！！！*/
     /*
     输入
         ["MinStack","push","push","push","push","pop","getMin","pop","getMin","pop","getMin"]
@@ -102,6 +103,9 @@ public class _11stack {
         预期结果
         [null,null,null,null,null,null,-1024,null,-1024,null,512]
         注意判断相等使用equals方法，否则这个测试用例报错
+        【说明】会发现最后的最小元素应该是512，但是错误的输出是-1024！！说明前面的pop操作并没有弹出
+    最小栈中栈顶的-1024，根源就在于Integer判断相等的时候需要使用equals方法，详细见下面的pop方法中的
+    代码：if (minStack.peek().equals(pop))
     * */
     class MinStack {
         Stack<Integer> allStack;
@@ -120,7 +124,7 @@ public class _11stack {
 
         public void pop() {
             Integer pop = allStack.pop();
-            if (minStack.peek().equals(pop)){ /**err：注意这里比u下使用equals。否则或有个用例“-1024”不对*/
+            if (minStack.peek().equals(pop)){ /**▲err：注意这里比u下使用equals。否则或有个用例“-1024”不对*/
                 minStack.pop();
             }
         }
@@ -187,7 +191,7 @@ public class _11stack {
                 对应的次数，然后在前面拼接上从res_stack弹出的字符串
                 * */
                 StringBuilder tmp = new StringBuilder();
-                Integer cur_digit = stack_digit.pop();
+                Integer cur_digit = stack_digit.pop(); /**err：【注意】这里必须用新的变量来记录弹出的数字，不能污染digit变量*/
                 for (int i = 0; i < cur_digit; i++) {
                     tmp.append(res);
                 }

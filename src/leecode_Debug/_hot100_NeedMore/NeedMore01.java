@@ -6,12 +6,9 @@ package leecode_Debug._hot100_NeedMore;
  *  31. 下一个排列
  *  287. 寻找重复数
  *  5. 最长回文子串
- *  152. 乘积最大子数组
  *  300. 最长递增子序列
  *  322. 零钱兑换
- *  45. 跳跃游戏 II
  *  279. 完全平方数
- *  84. 柱状图中最大的矩形
  *  394. 字符串解码
  *  4. 寻找两个正序数组的中位数
  *  131. 分割回文串
@@ -20,9 +17,9 @@ package leecode_Debug._hot100_NeedMore;
 
 import leecode_Debug.top100.ListNode;
 
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -40,66 +37,12 @@ public class NeedMore01 {
 //    }
 
     /*
-    239.
-    * 给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右
-    * 侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
-    * 返回 滑动窗口中的最大值 。
-    * */
-    public int[] maxSlidingWindow(int[] nums, int k) {
-        int[] res = new int[nums.length - k + 1];
-        LinkedList<Integer> Dqueue = new LinkedList<>();
-        for (int i = 0; i < k; i++) {
-            while (!Dqueue.isEmpty()&&nums[i]>=nums[Dqueue.getLast()]){
-                Dqueue.pollLast();
-            }
-            Dqueue.offerLast(i);
-        }
-        res[0] = nums[Dqueue.peekFirst()];
-
-        for (int i = k; i < nums.length; i++) {
-            while (!Dqueue.isEmpty()&&nums[i]>=nums[Dqueue.getLast()]){
-                Dqueue.pollLast();
-            }
-            Dqueue.offerLast(i);
-            if (Dqueue.peekFirst()==i-k){
-                Dqueue.pollFirst();
-            }
-            res[i-k+1] = nums[Dqueue.peekFirst()];
-        }
-
-        return res;
-    }
-
-    /*
      * 76.给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s
      * 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
      * */
 //    public String minWindow(String s, String t) {
 //
 //    }
-
-
-    /*238.
-    * 给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素
-    * 的乘积 。
-    题目数据 保证 数组 nums之中任意元素的全部前缀元素和后缀的乘积都在  32 位 整数范围内。
-    请 不要使用除法，且在 O(n) 时间复杂度内完成此题。
-    * */
-    public int[] productExceptSelf(int[] nums){
-        int[] res = new int[nums.length];
-        res[0] = 1;
-        for (int i = 1; i < nums.length; i++) {
-            res[i] = res[i-1]*nums[i-1];
-        }
-
-        int post = 1;
-        for (int i = nums.length-1; i >= 0; i--) {
-            res[i] *= post;
-            post *= nums[i];
-        }
-
-        return res;
-    }
 
     /*73.
      * 给定一个 m x n 的矩阵，如果一个元素为 0 ，则将其所在行和
@@ -118,70 +61,47 @@ public class NeedMore01 {
 //    }
 
 
-    //颜色分类
-    public void sortColors(int[] nums) {
-        int left = 0,cur = 0,right = nums.length-1;
-        while (cur<=right){
-            if (nums[cur]<1){
-                swap(nums,left++,cur++);
-            } else if (nums[cur]>1) {
-                swap(nums,cur,right--);
-            }else {
-                cur++;
-            }
-        }
-    }
-    private void swap(int[] nums, int left, int right) {
-        int tmp = nums[left];
-        nums[left] = nums[right];
-        nums[right] = tmp;
-    }
-
-
     //下一个排列
     public void nextPermutation(int[] nums) {
 
     }
 
-
-    //k个一组翻转链表
-    public ListNode reverseKGroup(ListNode head, int k) {
-        ListNode dummy = new ListNode(-1, head);
-        ListNode pre = dummy,end = dummy;
-        while (end.next!=null){
-            for (int i = 0; i < k&&end!=null; i++) {
-                end = end.next;
-            }
-            if (end==null) return dummy.next;
-
-            ListNode curStart = pre.next;
-            ListNode nextStart = end.next;
-
-            end.next = null;
-            pre.next = reverseK(curStart);
-            curStart.next = nextStart;
-
-            pre = curStart;
-            end = curStart;
-        }
-        return dummy.next;
-    }
-    private ListNode reverseK(ListNode curStart) {
-        ListNode pre = null,cur = curStart;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
-
     /*148.
      * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
-//    public ListNode sortList(ListNode head) {
-//
-//    }
+    public ListNode sortList(ListNode head) {
+        if (head==null||head.next==null) return head;
+        ListNode mid = findMid(head);
+        ListNode left = sortList(head);
+        ListNode right = sortList(mid);
+        return merge(left,right);
+    }
+
+    private ListNode merge(ListNode left, ListNode right) {
+        ListNode dummy = new ListNode(-1),cur = dummy;
+        while (left!=null&&right!=null){
+            if (left.val<right.val){
+                cur.next =  left;
+                left = left.next;
+            }else{
+                cur.next = right;
+                right = right.next;
+            }
+            cur = cur.next;
+        }
+        cur.next = left==null?right:left;
+        return dummy.next;
+    }
+
+    private ListNode findMid(ListNode head) {
+        ListNode slow = head,fast = head.next;
+        while (fast!=null && fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        ListNode res = slow.next;
+        slow.next = null;
+        return res;
+    }
 
 
     /*146.
@@ -193,11 +113,16 @@ public class NeedMore01 {
     函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
     * */
     class LRUCache {
+        /*
+        1. LRU中每一个节点的结构
+        2. 每一个节点都是key-value的形式存储值，并且有pre、next指针————可以实现前溯、后溯遍历*/
         class DouListNode{
+            int key;
             int value;
             DouListNode pre;
             DouListNode next;
-            public DouListNode(int value) {
+            public DouListNode(int key, int value) { /**【注】必须使用key-value构造器，涉及到put操作的时候新建节点存储key-value*/
+                this.key = key;
                 this.value = value;
             }
         }
@@ -208,15 +133,24 @@ public class NeedMore01 {
         DouListNode tail;
         HashMap<Integer,DouListNode> map = new HashMap<Integer,DouListNode>();
 
+        /*
+        LRUCache构造器中完成：
+            ①capacity的指定；②size的初始化；③head节点、tail节点的初始化 以及 指针的连接
+        */
         public LRUCache(int capacity) {
             this.capacity = capacity;
             this.size = 0;
-            head = new DouListNode(-1);
-            tail = new DouListNode(-1);
+            head = new DouListNode(-1, -1);
+            tail = new DouListNode(-1, -1);
             head.next = tail;
             tail.pre = head;
         }
 
+        /*
+        get的思路：从map里面获取————
+            情况1：如果找到的节点是null，说明没有直接返回-1；
+            情况2：如果找到了节点，则：①把这个节点移动到头节点；②返回节点的值————即node.value
+        * */
         public int get(int key) {
             DouListNode node = map.get(key);
             if (node==null){
@@ -228,25 +162,42 @@ public class NeedMore01 {
             }
         }
 
+        /*
+        put操作的思路：从map中获取节点node————
+            情况1：如果找到了node不是null，说明LRU链表中已经有key对应的节点。则：①移动这个节点到LRU的头结点；
+        ②把这个node的值更新为put方法的参数value
+            情况2：如果找到的node是null，说明LRU链表中之前没有key对应的节点。则：①使用key-value创建新的节点newNode；
+        ②map中添加key-newNode的映射关系；③将newNode添加到LRU的head节点；------至此完成了新节点的添加操作
+        ④更新size变量；④判断是不是超出容量，超出的话需要删除尾节点。------这两步完成添加节点的后置校验
+        * */
         public void put(int key, int value) {
             DouListNode node = map.get(key);
             if (node==null){
-                DouListNode newNode = new DouListNode(key);
+                DouListNode newNode = new DouListNode(key,value);
                 map.put(key,newNode);
                 addNodeToHead(newNode);
                 size++;
                 if (size>this.capacity){
-                    DouListNode tailReal = tail.pre;
-                    removeNode(tailReal);
-                    map.remove(tailReal.value);
+                    removeRealTail();
                 }
             }else {
-                node.value = key;
+                node.value = value;
                 removeNode(node);
                 addNodeToHead(node);
             }
         }
 
+        /*
+        删除尾部节点：
+            ①通过tail.pre拿到真正的尾节点删除；②从map中删除节点
+        * */
+        private void removeRealTail() {
+            DouListNode tailReal = tail.pre;
+            removeNode(tailReal);
+            map.remove(tailReal.key);
+        }
+
+        /*删除一个节点：*/
         private void removeNode(DouListNode node) {
             DouListNode pre = node.pre;
             DouListNode next = node.next;
@@ -254,6 +205,7 @@ public class NeedMore01 {
             next.pre = pre;
         }
 
+        /*把一个节点添加为头节点*/
         private void addNodeToHead(DouListNode newNode) {
             DouListNode next = head.next;
             head.next = newNode;
@@ -263,44 +215,34 @@ public class NeedMore01 {
         }
     }
 
-    /*234.
-     * 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返
-     * 回 true ；否则，返回 false 。*/
-    public boolean isPalindrome(ListNode head) {
-        ListNode midNode = findMid(head);
-        ListNode nextHead = reverse(midNode);
-        while (nextHead!=null){
-            if (nextHead.val!=head.val){
-                return false;
-            }
-            nextHead = nextHead.next;
-            head = head.next;
-        }
-        return true;
-    }
-
-    private ListNode reverse(ListNode midNode) {
-        ListNode pre = null,cur = midNode;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
-
-    private ListNode findMid(ListNode head) {
-        ListNode slow = head,fast = head;
-        while (fast!=null&&fast.next!=null){
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-        return slow;
-    }
-
     /*138复制链表*/
-//    public Node copyRandomList(Node head) {}
+    public Node copyRandomList(Node head) {
+        Node cur = head;
+        while (cur!=null){
+            Node node = new Node(cur.val);
+            node.next = cur.next;
+            cur.next = node;
+            cur = cur.next;
+        }
+
+        cur =  head;
+        while (cur!=null){
+            if (cur.random!=null){
+                cur.next.random = cur.random.next;
+            }
+            cur = cur.next.next;
+        }
+
+        Node res = head.next;
+        cur = res;
+        while (cur.next!=null){
+            head.next = head.next.next;
+            cur.next = cur.next.next;
+            head = head.next;
+            cur = cur.next;
+        }
+        return res.next;
+    }
 
     class Node {
         int val;
@@ -313,39 +255,6 @@ public class NeedMore01 {
             this.random = null;
         }
     }
-
-    /*23.
-    * 给你一个链表数组，每个链表都已经按升序排列。
-    请你将所有链表合并到一个升序链表中，返回合并后的链表。*/
-    public ListNode mergeKLists(ListNode[] lists) {
-        if (lists==null||lists.length==0) return null;
-        return mergeKLists(lists,0,lists.length-1);
-    }
-    public ListNode mergeKLists(ListNode[] lists,int l,int r){
-        if (l==r) return lists[l];
-        int mid = l+(r-l)/2;
-        ListNode left = mergeKLists(lists, l, mid - 1);
-        ListNode right = mergeKLists(lists, mid, r);
-        return mergeTwo(left,right);
-    }
-
-    private ListNode mergeTwo(ListNode left, ListNode right) {
-        ListNode dummy = new ListNode(-1),cur = dummy;
-        while (left!=null&&right!=null){
-            if (left.val<right.val){
-                cur.next = left;
-                left = left.next;
-            }else {
-                cur.next = right;
-                right = right.next;
-            }
-            cur = cur.next;
-        }
-        return dummy.next;
-    }
-
-
-
 
     /*394.
     给定一个经过编码的字符串，返回它解码后的字符串。
@@ -363,7 +272,7 @@ public class NeedMore01 {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c>='0'&&c<='9'){
-                multi = multi*10 + c-'0';
+                multi = multi*10 + (c-'0');
             } else if (c=='[') {
                 stringStack.push(res.toString());
                 multiStack.push(multi);
@@ -371,7 +280,8 @@ public class NeedMore01 {
                 res = new StringBuilder();
             } else if (c==']') {
                 StringBuilder tmp = new StringBuilder();
-                for (int j = 0; j < multi; j++) {
+                int cur = multiStack.pop();       /**必须使用新的变量记录*/
+                for (int j = 0; j < cur; j++) {
                     tmp.append(res);
                 }
                 res = new StringBuilder(stringStack.pop()+tmp);
@@ -383,83 +293,12 @@ public class NeedMore01 {
     }
 
 
-    //最小栈
-    class MinStack {
-        Stack<Integer> all;
-        Stack<Integer> min_stack;
-        public MinStack() {
-            all = new Stack<Integer>();
-            min_stack = new Stack<>();
-        }
-
-        public void push(int val) {
-            all.push(val);
-            if (min_stack.isEmpty()||val<=min_stack.peek()){
-                min_stack.push(val);
-            }
-        }
-
-        public void pop() {
-            Integer pop = all.pop();
-            if (pop==min_stack.peek()){
-                min_stack.pop();
-            }
-        }
-
-        public int top() {
-            return all.peek();
-        }
-
-        public int getMin() {
-            return min_stack.peek();
-        }
-    }
-
-
-    /*45.
-    * 给定一个长度为 n 的 0 索引整数数组 nums。初始位置为 nums[0]。
-    每个元素 nums[i] 表示从索引 i 向后跳转的最大长度。换句话说，如果你在 nums[i] 处，你
-    * 可以跳转到任意 nums[i + j] 处:
-    0 <= j <= nums[i]
-    i + j < n
-    返回到达 nums[n - 1] 的最小跳跃次数。生成的测试用例可以到达 nums[n - 1]。
-    * */
-    public int jump(int[] nums) {
-        int maxPosition = 0,curBound = 0,step = 0;
-        for (int i = 0; i < nums.length-1; i++) { /**注意这里必须是nums.length-1，因为这个题目是正好跳到最后一位。如果跳到最后一个位置，则代码中maxPosition必然等于curBound*/
-            maxPosition = Math.max(maxPosition,i+nums[i]);
-            if (i==curBound){
-                step++;
-                curBound = maxPosition;
-            }
-        }
-        return step;
-    }
-
-
     /*322.
     * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
     计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
     * 金额，返回 -1 。
     你可以认为每种硬币的数量是无限的。*/
 //    public int coinChange(int[] coins, int amount) {}
-
-
-    /*152.
-    * 给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续 子数组（该子数组中至
-    * 少包含一个数字），并返回该子数组所对应的乘积。
-    测试用例的答案是一个 32-位 整数。*/
-    public int maxProduct(int[] nums) {
-        int preMax = 1,preMin = 1;
-        int res = Integer.MIN_VALUE;
-        for (int i = 0; i < nums.length; i++) {
-            int curMax = Math.max(nums[i],Math.max(preMax*nums[i],preMin*nums[i]));
-            preMin = Math.min(nums[i],Math.min(preMax*nums[i],preMin*nums[i]));
-            preMax = curMax;
-            res = Math.max(res,curMax);
-        }
-        return res;
-    }
 
     /*300.
     * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
