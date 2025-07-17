@@ -225,6 +225,11 @@ public class _14DP {
     * 看K神的讲解：https://leetcode.cn/problems/longest-increasing-subsequence/，K神的写法是左闭右开的写法
     * 此时dp[i]的定义如下：
     * */
+    /**
+     * 【关键】把数字num放在以它结尾的最长递增序列处。对于每一个数研究应该放在哪一个位置。
+     * 【易错点】1. 研究任意一个数时，左边界是0，右边界是size-1，因为此时总共确定了size个数的
+     *      位置，因此右边界是size-1，而不能是nums.length-1!!!
+     * */
     public int lengthOfLIS2(int[] nums) {
         /*step1：初始化*/
         int[] tails = new int[nums.length];
@@ -232,10 +237,10 @@ public class _14DP {
 
         for (int num : nums) {
             /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置*/
-            int left = 0, right = size - 1;
+            int left = 0, right = size - 1; /**err：注意是在已经存放的数中查找应该放的位置，因此右边界是size-1*/
             while (left <= right) {
                 int mid = (left + right) / 2;
-                if (tails[mid] < num) {
+                if (tails[mid] < num) { /**err：注意是和tails数组的数比较，而不是和原始数组*/
                     left = mid + 1;
                 } else {
                     right = mid - 1;
