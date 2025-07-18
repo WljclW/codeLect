@@ -106,7 +106,17 @@ public class _11stack {
         【说明】会发现最后的最小元素应该是512，但是错误的输出是-1024！！说明前面的pop操作并没有弹出
     最小栈中栈顶的-1024，根源就在于Integer判断相等的时候需要使用equals方法，详细见下面的pop方法中的
     代码：if (minStack.peek().equals(pop))
-    * */
+    */
+    /**
+     * 补充说明Integer和int涉及到运算符时的区别：
+     *    1. 比较运算符只能用于基本数据类型！！因此Integer参与比较运算符时会自动拆箱成int。
+     *    2. 由于Integer比较时会自动拆箱成int，因此如果此时的Integer是null，拆箱时会报空指针异常。
+     *    3. “==”运算符时不同情况的区分————
+     *          情况1：两个int类型数据比较，直接比较；
+     *          情况2：一个int数据，一个Integer数据。比较时Integer会拆箱成int再比较
+     *          情况3：两个Integer类型数据比较。直接比较引用地址是不是相等
+     *    4. Integer有一个内部类IntegerCache，其中缓存了[-128,127]的所有Integer
+     * */
     class MinStack {
         Stack<Integer> allStack;
         Stack<Integer> minStack;
@@ -189,6 +199,8 @@ public class _11stack {
                 /*【说明】这个题目的这个解法来说，只要碰到]，此时multi的值必然就是0；并且res就是
                 当前这组括号中的字符串————潜藏规则。因此从数字栈stack_digit中弹出数字，将res添加
                 对应的次数，然后在前面拼接上从res_stack弹出的字符串
+                【tip】其中从stack_digit中弹出的数字就是“现在这对括号”之前的那个数字————暗示着括号
+                内的字符串重复的次数，而括号内的字符串其实就是此时此刻res的值
                 * */
                 StringBuilder tmp = new StringBuilder();
                 Integer cur_digit = stack_digit.pop(); /**err：【注意】这里必须用新的变量来记录弹出的数字，不能污染digit变量*/

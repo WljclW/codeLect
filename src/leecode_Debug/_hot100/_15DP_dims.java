@@ -39,21 +39,24 @@ public class _15DP_dims {
     * 径，使得路径上的数字总和为最小。
     说明：每次只能向下或者向右移动一步。*/
     public int minPathSum(int[][] grid) {
+        /*step1：变量的初始化*/
         int res = Integer.MAX_VALUE;
         int[][] dp = new int[grid.length][grid[0].length];
         dp[0][0] = grid[0][0];
-        for (int i = 1;i<grid.length;i++){ //到第一列任何一个位置的路径和，就是第一行之前数的累加和。【因为第一行只能从0，0位置横着到达】
-            dp[i][0] = dp[i-1][0]+grid[i][0];
+        /*step2：第一行和第一列的初始化*/
+        for (int i = 1; i < grid.length; i++) { //到第一列任何一个位置的路径和，就是第一行之前数的累加和。【因为第一行只能从0，0位置横着到达】
+            dp[i][0] = dp[i - 1][0] + grid[i][0];
         }
-        for (int j=1;j<grid[0].length;j++){ //第一行也是一样的道理
-            dp[0][j] = dp[0][j-1]+grid[0][j];
+        for (int j = 1; j < grid[0].length; j++) { //第一行也是一样的道理
+            dp[0][j] = dp[0][j - 1] + grid[0][j];
         }
-        for (int i=1;i<grid.length;i++)
-            for (int j=1;j<grid[0].length;j++){
+        /*step3：研究其他的每一个位置*/
+        for (int i = 1; i < grid.length; i++)
+            for (int j = 1; j < grid[0].length; j++) {
                 //其他任何位置的路径和最小值 = min（左边位置的最小路径和，上边位置的最小路径和）+ 当前位置的值
-                dp[i][j] = Math.min(dp[i-1][j],dp[i][j-1])+grid[i][j];
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
             }
-        return dp[grid.length-1][grid[0].length-1];
+        return dp[grid.length - 1][grid[0].length - 1];
     }
 
 

@@ -398,7 +398,7 @@ public class _06ListNode {
      *      3. 从头到尾遍历拆分原始链表，和copy的链表。【注意】每一个节点都要对，且原始链表不能
      *  改变！！否则会报错，信息类似于："Next pointer of node with label 7 from the original
      *  list was modified."
-     *  【出错步骤】第三步的代码难写，建议看copyRandomList1
+     *  【出错步骤】第三步的代码难写，建议看下面的方法copyRandomList1
      * */
     public Node copyRandomList(Node head) {
         if(head==null) return null; /**err：特例的判断*/
@@ -487,11 +487,21 @@ public class _06ListNode {
         }
 
         /*第三步：拆分原始链表和复制的链表*/
+        /*
+        解释：到了这里说明链表至少有两个节点，因为如果head等于null在第一行就返回了。
+            res初始值为head.next，用于组装复制后的链表————
+                因为复制的节点一定是最后一个，因此最后没有节点时res.next一定是null；
+            pre初始值为head，用于还原原来的链表；
+                因为对于每一个原始节点，复制的节点是在后面，原始的节点在前面。所以最后没有节点的时候pre会来到倒数第二个节点，这里
+            需要把它的next指针指向null.
+        * */
         Node res = head.next,pre = head; /*res---复制得到的链表的头；pre---原始链表的头*/
         cur = res;
         while (cur.next!=null){
+            //拼接原始链表、复制链表的后继节点
             pre.next = pre.next.next;
             cur.next = cur.next.next;
+            //原始链表、复制链表的指针后移
             pre = pre.next;
             cur = cur.next;
         }
@@ -505,6 +515,11 @@ public class _06ListNode {
     * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
     /**
      * 【思路】归并排序
+     * 【具体步骤】
+     *      1.结束时机？如果没有节点或者只有一个节点，不用排序即直接返回；
+     *      2.（说明目前的链表有不止一个节点）找到中间节点，同时需要把前一半最后节点next指针指向null
+     *      3.递归调用方法排序前半的链表、后半的链表
+     *      4.经过3两半的链表都排序完成，这里将排序后的两半链表合并为一个。。【力扣；合并两个有序链表】
      * */
     public ListNode sortList(ListNode head) {
         /*1.特殊情况的考虑————没有节点或者只有一个节点，此时不用排序*/

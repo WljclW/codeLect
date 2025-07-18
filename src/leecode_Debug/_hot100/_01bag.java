@@ -16,53 +16,53 @@ public class _01bag {
     public boolean canPartition(int[] nums) {
         /*step1：求出数组的和，看看是不是能平分为两部分*/
         int target = 0;
-        for (int num:nums){
+        for (int num : nums) {
             target += num;
         }
-        if (target%2!=0) return false;
+        if (target % 2 != 0) return false; //不能平均分两半直接返回false
         target /= 2;
         /*step2：0-1背包的核心逻辑*/
         int[] dp = new int[target + 1];
         /*0-1背包一维数组形式的核心逻辑————
-        *   ①一维的写法中遍历的顺序不能颠倒（先遍历背包容量再遍历数组元素————外层for循环是遍历物品）；
-        *   ②一维的写法中背包容量必须从大到小遍历；*/
-        for (int i=0;i<nums.length;i++)
-            for (int j=target;j>=nums[i];j--){  /**err：还是双重循环，但是内循环需要“倒着遍历求值”*/
-                dp[j] = Math.max(dp[j],dp[j-nums[i]]+nums[i]);
+         *   ①一维的写法中遍历的顺序不能颠倒（先遍历背包容量再遍历数组元素也即物品————外层for循环是遍历物品）；
+         *   ②一维的写法中背包容量必须从大到小遍历；*/
+        for (int i = 0; i < nums.length; i++)
+            for (int j = target; j >= nums[i]; j--) {  /**err：还是双重循环，但是内循环需要“倒着遍历求值”*/
+                dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i]);
             }
-        return dp[target]==target;
+        return dp[target] == target;
     }
 
 
     /*二维数组的形式*/
     public boolean canPartition_2dimdp(int[] nums) {
         int target = 0;
-        for (int num:nums){
-            target+=num;
+        for (int num : nums) {
+            target += num;
         }
-        if (target%2!=0) return false;
+        if (target % 2 != 0) return false;
         target /= 2;
 
         int[][] dp = new int[nums.length][target + 1];
         /*第一列代表背包的容量是0————放不下任何物品，因此全初始化为0*/
-        for (int i=0;i<nums.length;i++){ //数组的默认值就是0，可以省略
+        for (int i = 0; i < nums.length; i++) { //数组的默认值就是0，可以省略
             dp[i][0] = 0;
         }
         /*第一行代表只能选择装物品0，因此背包容量大于nums[0]时，物品0可以放进去，
-        * 最初化对应位置的最大值是nums[0]*/
-        for (int i=nums[0];i<=target;i++){
+         * 最初化对应位置的最大值是nums[0]*/
+        for (int i = nums[0]; i <= target; i++) {
             dp[0][i] = nums[0];
         }
-        for (int i=1;i<nums.length;i++)
-            for (int j=1;j<=target;j++){
-                if (j>=nums[i]){ //说明这种情况下可以选择物品i————物品i即当前物品
-                    dp[i][j] = Math.max(dp[i-1][j], /*不选取物品i，背包最大价值*/
-                            dp[i-1][j-nums[i]]+nums[i]); /*选取物品i，此时背包需要留出nums[i]的空间*/
-                }else{ //j<nums[i]，表示物品i不能选择，因为背包的容量都没物品i的重量大，放不下物品i
-                    dp[i][j] = dp[i-1][j];
+        for (int i = 1; i < nums.length; i++)
+            for (int j = 1; j <= target; j++) {
+                if (j >= nums[i]) { //说明这种情况下可以选择物品i————物品i即当前物品
+                    dp[i][j] = Math.max(dp[i - 1][j], /*不选取物品i，背包最大价值*/
+                            dp[i - 1][j - nums[i]] + nums[i]); /*选取物品i，此时背包需要留出nums[i]的空间*/
+                } else { //j<nums[i]，表示物品i不能选择，因为背包的容量都没物品i的重量大，放不下物品i
+                    dp[i][j] = dp[i - 1][j];
                 }
             }
-        return dp[nums.length-1][target]==target;
+        return dp[nums.length - 1][target] == target;
     }
 
 
@@ -86,17 +86,17 @@ public class _01bag {
      * */
     public int lastStoneWeightII(int[] stones) {
         int target = 0;
-        for (int num:stones){
+        for (int num : stones) {
             target += num;
         }
         int sum = target;
         target /= 2;
         int[] dp = new int[target + 1];
-        for (int i=0;i<stones.length;i++)
-            for (int j=target;j>=stones[i];j--){
-                dp[j] = Math.max(dp[j],dp[j-stones[i]]+stones[i]);
+        for (int i = 0; i < stones.length; i++)
+            for (int j = target; j >= stones[i]; j--) {
+                dp[j] = Math.max(dp[j], dp[j - stones[i]] + stones[i]);
             }
-        return sum-dp[target]-dp[target]; /**区别就是返回的不是最大价值，而是抵消后剩下的价值*/
+        return sum - dp[target] - dp[target]; /**区别就是返回的不是最大价值，而是抵消后剩下的价值*/
     }
 
     /*

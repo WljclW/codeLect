@@ -41,3 +41,79 @@
     private修饰的方法可以认为就是final修饰的
 3. 修饰字段的时候：
     无法在方法中更改参数引用所指向的对象。这个特性主要用来向匿名内部类传递数据！
+=====================================================StringBuffer和StringBuilder======================================
+相同的点：
+    可变的，不会像String一样每一次更新都会生成一个新的字符串；都是用char[]存储；可以动态扩容
+不同的点：
+    StringBuffer是线程安全的(通过syncronized关键字保证线程安全)，涉及加锁过程；StringBuilder不是线程安全的
+======================================================“==”equals/hashcode==============================================
+1. == 对于基本数据类型就是比较值是不是相等；对于引用类型判断的是引用是不是相等
+2. equals
+3. 规定“equals相等的时候，hashcode也必须是相等的”，反过来则不规定
+============================================================final、finally、finalize()==================================
+1. final修饰符：修饰类表示类不能被继承、修饰方法表示不能被重写、修饰变量表示只能被赋值一次
+2. finally
+3. finalize():Object 方法，GC 回收前由 垃圾回收线程调用一次(注意：只会被调用一次)；已被官方废弃（JDK 9 标注 @Deprecated），不建议
+使用。
+=========================================================dfs、递归、回溯===============================================
+1. dfs是一种搜索方式。指沿着一条路径一直搜索下去直到没路走，具体实现时可以使用栈 或者 递归 来实现。
+2. 递归是一种实现方式。指的是一个函数直接 或者 间接的 调用自己
+3. 本质就是”DFS+状态回退“
+============================================================算法题tips================================================
+1.  ①一般情况下寻找链表的中间节点都是下面的方法（奇数节点时，slow会来到中间节点；偶数个节点时，slow会来到中间两个节点的后一个）：
+            private ListNode findMid(ListNode head) {
+                ListNode slow = head,fast = head;
+                while (fast!=null&&fast.next!=null){
+                    slow = slow.next;
+                    fast  =fast.next.next;
+                }
+                return slow;
+            }
+
+    ②只有一个题例外情况，”排序链表“。这个题slow指针在偶数节点的情况下要来到中间节点的前一个节点，原因：需要将前一半的最后一个节点指
+        向null,否则会出现死循环。
+            private ListNode findMid(ListNode head) {
+                ListNode slow = head,fast = head.next;
+                while (fast!=null && fast.next!=null){
+                    slow = slow.next;
+                    fast = fast.next.next;
+                }
+                //如果是偶数个节点，到这里slow会指向中间两个节点的第一个
+                ListNode res = slow.next;
+                slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”*/
+                return res;
+            }
+    另一种关于②的写法：
+            ListNode slow = head, fast = head, prev = null;
+            while (fast != null && fast.next != null) {
+                prev = slow; //使用prev节点记录slow的前一个节点
+                slow = slow.next;
+                fast = fast.next.next;
+            }
+            prev.next = null; // 断开链表成两段
+2. LinkedList实现了List接口 以及 Deque接口，因此一般情况下LinkedList作为队列来使用————
+   如果作为队列使用：二叉树的迭代遍历、层序遍历
+            offer————元素入队。实际上等价于调用offerLast，即在尾部添加元素。
+            poll————元素出队列。实际上等价于调用pollFirst，即删除头部的元素
+   如果作为双端队列使用（想象成横着的双端队列，头部是在左边，尾部是在右边）：双端队列求解滑动窗口的最大值
+            offerLast————在双端队列的尾部添加元素
+            pollLast————删除双端队列的最后一个元素
+
+            offerFirst————在双端队列的头部添加元素
+            pollFirst————删除双端队列的头部元素
+   如果用作是栈，则调用push、pop、peek，与常规意义的含义是一样的。。但是这种情况下不能将变量声明为Stack<>，因为java中的栈有实际的
+        类————Stack，并且这是一个实际的类，不是接口
+3. 二叉树的前、中、后迭代遍历，需要使用栈结构；二叉树的层序遍历需要使用队列结构。。但是使用时都可以用LinkedList来代替，要注意的就是
+    变量需要使用LinkedList声明，即”LinkedList<Node> stack = new LinkedList<>();“、”LinkedList<Node> queue = new LinkedList<>();“
+    是可以的，但是如果声明成List或者Deque接口类型是不对的，比如
+            ”Stack<Node> stack = new LinkedList<>();“————错误的原因是LinkedList并不是Stack子类，并且Stack并不是接口；
+            ”Deque<Node> stack = new LinkedList<>();“————错误的原因是Deque只能使用Deque的方法，就不能使用push、pop等方法了。
+4. 更深入的理解”二叉树的题目就是使用遍历方法，对当前研究的节点做一些操作“？比如：
+      ①翻转二叉树。就是在遍历到每一个节点的时候，交换该节点的左右孩子，然后继续研究其他的节点
+      ②
+   关于”二叉树层序遍历的使用“。比如：
+      ①最大深度。最后队列为空的时候返回变量值
+      ②最小深度。如果发现某一个节点的左右孩子节点都是null，就返回变量值
+      ③最大宽度。使用两个队列，一个存放具体的节点，另一个存放节点对应的序号。使用层序遍历时常见的用法！！！
+      ④129路经总和。也是使用两个队列，一个用于存放具体的节点，另一个存放节点对应的路径值
+

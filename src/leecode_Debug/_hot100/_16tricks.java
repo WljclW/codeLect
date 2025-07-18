@@ -33,7 +33,7 @@ public class _16tricks {
         int total = 0; //标记当前的票数
         int flag = -1; //标记值，初始值无所谓
         for (int i : nums) {
-            if (total == 0) { //如果票数为0，则更新标记值
+            if (total == 0) { //如果票数为0，则更新标记值。。。total每次到0，说明一部份数已经抵消掉了
                 flag = i;
             }
             total = flag == i ? total + 1 : total - 1; //票数不为0则投票，只要不是标记值，票数-1
@@ -57,18 +57,24 @@ public class _16tricks {
             [0,0,1,1,2,2]
     * */
     public void sortColors(int[] nums) {
-        int left = 0,right = nums.length-1;
+        int left = 0, right = nums.length - 1;
         int cur = 0;
-        while(cur<=right) {
+        while (cur <= right) {
             if (nums[cur] < 1) { /*如果是0，交换到left指向位置，*/
-                swap(nums,left++,cur++); /**err：注意，这种情况cur也得++，因为此时cur位置的值要麽是0要麽是1，不可能是2*/
+                swap(nums, left++, cur++); /**err：注意，这种情况cur也得++，因为此时cur位置的值要麽是0要麽是1，left的位置要么是0要么是1，这两个位置的值不可能是2*/
             } else if (nums[cur] == 1) {
                 cur++;
             } else { //交换后cur交换来的数还没有比较，所以cur指针不能动!!!
-                swap(nums,right--,cur);
+                swap(nums, right--, cur);
             }
         }
     }
+    public void swap(int[] nums,int i,int j){
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+
 
     /*287.
     * 给定一个包含 n + 1 个整数的数组 nums ，其数字都在 [1, n] 范围内（包括 1
@@ -76,29 +82,14 @@ public class _16tricks {
     假设 nums 只有 一个重复的整数 ，返回 这个重复的数 。
     你设计的解决方案必须 不修改 数组 nums 且只用常量级 O(1) 的额外空间。
     * */
-    public int findDuplicate(int[] nums) {
-        int res = 0;
-        int i = 0;
-        while (i < nums.length) {
-            if (nums[i] == i + 1)
-                i++;
-            else {
-                if (nums[nums[i] - 1] != nums[i]) {
-                    swap(nums, nums[i] - 1, i);
-                } else {
-                    return nums[i];
-                }
-            }
-        }
-
-        return res;
-    }
-
-    public void swap(int[] nums,int i,int j){
-        int tmp = nums[i];
-        nums[i] = nums[j];
-        nums[j] = tmp;
-    }
+    /**
+     * 【注意】这个题要求不能修改数组
+     * */
+    /**
+     * 【快慢指针（Floyd 判圈法）】把数组中的每一个数看作是链表的next指针。
+     */
+//    public int findDuplicate(int[] nums) {
+//    }
 
 
     /*31.下一个排列*/
@@ -140,9 +131,9 @@ public class _16tricks {
             reverse(nums,0);
     }
 
-    public void reverse(int[] nums,int l){
-        int r = nums.length-1;
-        while (l<r){
+    public void reverse(int[] nums,int l) {
+        int r = nums.length - 1;
+        while (l < r) {
             int tmp = nums[r];
             nums[r--] = nums[l];
             nums[l++] = tmp;
@@ -160,8 +151,8 @@ public class _16tricks {
      *      因此两种写法会有区别！！*/
     public void nextPermutation_offical(int[] nums) {
         int flag = nums.length - 2;
-        //step1：只要是降序，就不断的向前找。最后来到第一个严格升序的位置
-        while (flag >= 0 && nums[flag] >= nums[flag + 1]) {
+        //step1：只要不是严格升序，就不断的向前找。最后来到第一个严格升序的位置
+        while (flag >= 0 && nums[flag] >= nums[flag + 1]) { //只要不满足要求，就执行j--。。while循环结束就找到了第一个严格升序的位置
             flag--;
         }
         //step2，说明确实找到了升序的位置
@@ -173,7 +164,7 @@ public class _16tricks {
             }
             swap1(nums, flag, j);
         }
-        //step3：倒序i+1开始的子数组。。并且还包含了特殊情况：整个数组已经是最大的排列了
+        //step3：倒序flag+1开始的子数组。。并且还包含了特殊情况：整个数组已经是最大的排列了,直接翻转整个数组
         reverse(nums, flag + 1);
     }
 
@@ -215,6 +206,13 @@ public class _16tricks {
 
 
     /*下一个排列自己的写法*/
+    /**
+     * 结合官方解写法 和 自己的写法 可以发现：
+     *      如果想做这样的事：“在数组中查找满足指定条件的第一个位置就终止”。做这种事有两种角度—————
+     *          角度1：从满足条件的角度考虑。遍历时如果满足条件则用额外的变量来记录位置；
+     *          角度2：从不满足条件的角度考虑。”while(不满足条件) 循环变量--“。。。更推荐这种写法，这种写法
+     *      while结束时循环变量就来到第一个满足的位置
+     */
     public void nextPermutation_myMethod(int[] nums) {
         int flag = nums.length;
         /*step1：从后面开始找到第一个降序的位置，即nums[i]<nums[i+1]*/

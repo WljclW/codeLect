@@ -41,14 +41,14 @@ public class _01completeBag {
     }
 
     /*
-    解法2：一维dp，题目中求解的是方案(组合)数，因此必须先遍历物品。
+    解法2：一维dp，题目中求解的是方案(组合)数。
     * */
     public int change_1dim(int amount, int[] coins) {
         int[] dp = new int[amount + 1];
         dp[0] = 1;
-        for (int j=0;j<coins.length;j++)
-            for (int i=1;i<=amount;i++){
-                if (i>=coins[j]) dp[i] += dp[i-coins[j]];
+        for (int j = 0; j < coins.length; j++)
+            for (int i = 1; i <= amount; i++) {
+                if (i >= coins[j]) dp[i] += dp[i - coins[j]];
             }
         return dp[amount];
     }

@@ -615,5 +615,105 @@ public class review05 {
         return res;
     }
 
+    /**========================================================================================================*/
+    /*139.
+    * 给你一个字符串 s 和一个字符串列表 wordDict 作为字典。如果可以利
+    * 用字典中出现的一个或多个单词拼接出 s 则返回 true。
+    注意：不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。*/
+    public boolean wordBreak(String s, List<String> wordDict) {
+        HashSet<String> set = new HashSet<>(wordDict);
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true;
+        for (int i = 1; i <= s.length(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (dp[j]&&set.contains(s.substring(j,i))){
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[s.length()];
+    }
+
+    //198
+    public int rob(int[] nums) {
+        int first = nums[0],sec = Math.max(nums[0],nums[1]);
+        for (int i = 2; i < nums.length; i++) {
+            int cur = Math.max(nums[i]+first,sec);
+            first = sec;
+            sec = cur;
+        }
+        return sec;
+    }
+
+    /*152.
+    * 给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续 子数组（该子数组中至
+    * 少包含一个数字），并返回该子数组所对应的乘积。
+    测试用例的答案是一个 32-位 整数。*/
+    public int maxProduct(int[] nums) {
+        int maxPre = nums[0],minPre = nums[0];
+        int res = Integer.MIN_VALUE;
+        for (int i = 1; i < nums.length; i++) {
+            res  = Math.max(res,maxPre);
+            int curMax = Math.max(Math.max(nums[i],nums[i]*maxPre),nums[i]*minPre);
+            int curMin = Math.min(Math.min(nums[i]*minPre,nums[i]*maxPre),nums[i]);
+            maxPre = curMax;
+            minPre = curMin;
+        }
+        return res;
+    }
+
+    /*32.
+     * 给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的
+     * 长度。*/
+//    public int longestValidParentheses(String s) {
+//        int[] dp = new int[s.length()];
+//        for (int i = 1; i < s.length(); i++) {
+//            if (s.charAt(i)==')'){
+//                if (s.charAt(i-1)=='('){
+//                    dp[i] = i>=2 ? dp[i-2]+2:2;
+//                }else{ //)
+//                    if (dp[i-1]>0&&i-dp[i-1]>0){
+//                        dp[i] = s.charAt(i-dp[i-1]-1)=='('?
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    //300
+    public int lengthOfLIS2(int[] nums) {
+        int[] dp = new int[nums.length];
+        int size = 0;
+        for (int num:nums){
+            int l = 0,r = nums.length-1;
+            while (l<=r){
+                int mid = l+(r-l)/2;
+                if (num>mid){
+                    l = mid+1;
+                }else{
+                    r = mid-1;
+                }
+            }
+            dp[l] = num;
+            if (l==size){
+                size++;
+            }
+        }
+        return size;
+    }
+
+
+    /*322.
+    * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
+    计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
+    * 金额，返回 -1 。
+    你可以认为每种硬币的数量是无限的。*/
+//    public int coinChange(int[] coins, int amount) {
+//        int[] dp = new int[amount + 1];
+//        Arrays.fill(dp,-1);
+//
+//    }
+
 
 }

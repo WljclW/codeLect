@@ -67,26 +67,26 @@ public class MergeSort {
         merge02(arr,l,mid,r);
     }
 
-    public static void merge02(int[] arr,int l, int mid,int r){
-        int[] helper = new int[r-l+1];
+    public static void merge02(int[] arr,int l, int mid,int r) {
+        int[] helper = new int[r - l + 1];
         int index = 0;
         int left = l;
-        int right = mid+1;
-        while(left<=mid&&right<=r){
-            if(arr[left]<arr[right]){
+        int right = mid + 1;
+        while (left <= mid && right <= r) {
+            if (arr[left] < arr[right]) {
                 helper[index++] = arr[left++];
-            }else{
+            } else {
                 helper[index++] = arr[right++];
             }
         }
-        while(left<=mid){
+        while (left <= mid) {
             helper[index++] = arr[left++];
         }
-        while(right<=r){
+        while (right <= r) {
             helper[index++] = arr[right++];
         }
-        for(int i=0;i<helper.length;i++){
-            arr[l+i] = helper[i];
+        for (int i = 0; i < helper.length; i++) {
+            arr[l + i] = helper[i];
         }
     }
 

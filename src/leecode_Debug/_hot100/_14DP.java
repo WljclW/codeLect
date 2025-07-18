@@ -50,17 +50,17 @@ public class _14DP {
     public List<List<Integer>> generate(int numRows) {
         LinkedList<List<Integer>> res = new LinkedList<>();
         res.add(new LinkedList<>(Arrays.asList(1)));
-        if (numRows==1) return res;
-        res.add(new LinkedList<>(Arrays.asList(1,1)));
-        if (numRows==2) return res;
+        if (numRows == 1) return res;
+        res.add(new LinkedList<>(Arrays.asList(1, 1)));
+        if (numRows == 2) return res;
 
         for (int i = 3; i <= numRows; i++) {
             LinkedList<Integer> ele = new LinkedList<>();
             List<Integer> last = res.getLast();
             for (int j = 0; j < i; j++) {
-                int leftVal = (j-1<0)?0:last.get(j-1); //计算上一行左边的那个数
-                int rightVal = (j>=last.size())?0:last.get(j); //计算上一行index相同的那个数
-                ele.add(leftVal+rightVal);
+                int leftVal = (j - 1 < 0) ? 0 : last.get(j - 1); //计算上一行左边的那个数
+                int rightVal = (j >= last.size()) ? 0 : last.get(j); //计算上一行index相同的那个数
+                ele.add(leftVal + rightVal);
             }
             res.add(ele);
         }
@@ -114,7 +114,7 @@ public class _14DP {
         if (nums.length==1) return nums[0];
         int first = nums[0],sec=Math.max(nums[0],nums[1]);
         for (int i=2;i<nums.length;i++){
-            int cur = Math.max(nums[i]+first,sec);
+            int cur = Math.max(nums[i]+first,sec); //偷现在这一家(nums[i]) 和 不偷现在这一家取最大值
             first = sec;
             sec = cur;
         }
@@ -168,8 +168,8 @@ public class _14DP {
         boolean[] dp = new boolean[s.length() + 1];
         HashSet<String> set = new HashSet<>(wordDict);
         dp[0] = true;
-        for (int i=1;i<s.length()+1;i++){
-            for (int j=0;j<i;j++){ //j<i，因此j其实并不能取到s.length()，但是i可以取到。
+        for (int i=1;i<s.length()+1;i++) {
+            for (int j = 0; j < i; j++) { //j<i，因此j其实并不能取到s.length()，但是i可以取到。
                 /*
                 if条件语句的解释————
                     dp[j]：0~j-1这段子串能有列表的字符串拼出来；【注意：dp[j]对应的是0~j-1的子串是否可匹配到】
@@ -179,7 +179,7 @@ public class _14DP {
                 2. ”set.contains(s.substring(j,i))“中i是能取到s.length()的，但是substring函数是左闭右开的区间，因此实
                     际上获取子串时不会去拿s.length()的子串，不会导致越界异常。
                     */
-                if (dp[j]&&set.contains(s.substring(j,i))){
+                if (dp[j] && set.contains(s.substring(j, i))) {
                     dp[i] = true;
                     break; //这里加break会继续研究s串的下一个位置，不加也没啥问题
                 }
@@ -234,9 +234,9 @@ public class _14DP {
         /*step1：初始化*/
         int[] tails = new int[nums.length];
         int size = 0; //size的含义：0~size-1的位置都有需要放的数
-
+        /**for循环的完整逻辑：遍历nums数组的每一个数，判断它应该插入到tails数组的什么位置*/
         for (int num : nums) {
-            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置*/
+            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置..跟力扣35题的原理是一样的*/
             int left = 0, right = size - 1; /**err：注意是在已经存放的数中查找应该放的位置，因此右边界是size-1*/
             while (left <= right) {
                 int mid = (left + right) / 2;
@@ -246,7 +246,7 @@ public class _14DP {
                     right = mid - 1;
                 }
             }
-            /*step3：将num放在应该插入的位置*/
+            /*step3：将num放在应该插入的位置left*/
             tails[left] = num;
             /*step4：如果num插在了最后的位置，则更新size*/
             if (left == size)

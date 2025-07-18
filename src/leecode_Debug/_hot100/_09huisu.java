@@ -123,10 +123,10 @@ public class _09huisu {
         resSubSets.add(new LinkedList<>(pathSubsets)); /**err：子集问题每次添加到结果集不用return，因为要研究树所有的节点*/
         /**    【说明】进入到for循环后循环的变量是i，研究的是i位置的数，因此往path中添加等操作都是针
          * 对index=i的那个数*/
-        for (int i=index;i< nums.length;i++){
+        for (int i = index; i < nums.length; i++) {
             pathSubsets.add(nums[i]); /**🔺err：【注意，反复错】循环中的循环变量已经是i了!!!*/
-            subsetsBack(nums,i+1); /**err：循环中的循环变量已经是i了*/
-            pathSubsets.remove(pathSubsets.size()-1);
+            subsetsBack(nums, i + 1); /**err：循环中的循环变量已经是i了*/
+            pathSubsets.remove(pathSubsets.size() - 1);
         }
     }
 
