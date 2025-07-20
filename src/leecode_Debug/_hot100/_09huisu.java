@@ -690,6 +690,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
     * */
     /**
+     * 【建议】建议看下面的解法restoreIpAddresses
      * 【难点】子串的区间问题很繁琐
      * 【思路】首先将字符串转换为StringBuilder方便'.'的插入。
      *      什么时候找到一个结果？已经添加了三个'.'，并且剩下的子串也符合ip规则
@@ -698,6 +699,45 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
      *  时继续研究从index开始长度为2的子串是不是满足ip规则，如果符合要求的话，则在这个子串后买你添加'.'，然后
      *  调用递归从index+2位置开始研究........
      * */
+    StringBuilder sbRestoreIpAddresses;
+    List<String> resRestoreIpAddresses;
+    public List<String> restoreIpAddresses(String s) {
+        sbRestoreIpAddresses = new StringBuilder(s);
+        resRestoreIpAddresses = new LinkedList<>();
+        traceback(s,0,0);
+        return resRestoreIpAddresses;
+    }
+
+    private void traceback(String s, int index, int pointNum) {
+        if (pointNum == 3 && isValid(s.substring(index))) {
+            resRestoreIpAddresses.add(new String(sbRestoreIpAddresses));
+            return;
+        }
+        if (pointNum==3){ /**err：这里必须加这一句，因为前面的if是两个条件，可以发现如果pointNum等于3但是不符合条件会走到这里，就会导致栈溢出*/
+            return;
+        }
+        for (int i = index; i < s.length(); i++) {
+            if (isValid(s.substring(index, i + 1))) {
+                sbRestoreIpAddresses.insert(i+1 + pointNum, '.');
+                traceback(s, i+1, pointNum + 1); /**这里不执行pointNum+=1行不行*/
+                sbRestoreIpAddresses.deleteCharAt(i+1 + pointNum);
+            }
+        }
+    }
+
+    private boolean isValid(String substring) {
+        if (substring.length()==0) return false;
+        if (substring.length() != 1 && substring.charAt(0) == '0') {
+            return false;
+        }
+        if (substring.length() > 3 || (substring.length() == 3 && Integer.valueOf(substring) > 255)) {
+            return false;
+        }
+        return true;
+    }
+
+
+    /*解法2：根上面的解法大同小异，只不过这里将sb也声明为了局部变量*/
     List<String> resRestoreIpAddresses1;
     public List<String> restoreIpAddresses1(String s) {
         resRestoreIpAddresses1 = new LinkedList<>();

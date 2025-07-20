@@ -430,7 +430,7 @@ public class _11stack {
                 int width = stack.isEmpty() ? i : i - stack.peek() - 1; //矩形的宽，注意此时栈顶的stack.peek()位置的高度是不满足的
                 maxArea = Math.max(maxArea, height * width);
             }
-            stack.push(i); /**err：当前索引入栈。。漏掉时可能得出的结果总是0！！*/
+            stack.push(i); /**err：当前索引入栈。。漏掉时得出的结果总是0！！！（反馈的测试用例就是这样）*/
         }
 
         return maxArea;

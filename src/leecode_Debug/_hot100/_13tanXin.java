@@ -78,7 +78,9 @@ public class _13tanXin {
     返回到达 nums[n - 1] 的最小跳跃次数。生成的测试用例可以到达 nums[n - 1]。
     * */
     /**
-     * 【注意】题目中说了，生成的用例可以到nums[n-1]，即肯定能到达最后一个元素
+     * 【注意】题目中说了，生成的用例可以到nums[n-1]，即肯定能到达最后一个元素，也就是说当i==nums.length-1的时候，
+     *      maxPostion也一定是nums.length-1，满足for循环中的if条件，因此要注意i<nums.length-1。否则进入到if后，
+     *      step就多加了1.
      * 【关键】关键在于搞清楚什么时候让步数+1————即搞清楚bound、maxPosition的含义是什么
      * */
     public int jump(int[] nums) {
