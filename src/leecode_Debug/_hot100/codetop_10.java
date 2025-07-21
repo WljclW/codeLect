@@ -54,7 +54,7 @@ public class codetop_10 {
         }
         for (int i = 0; i < nums.length; i++) {
             if (!flag[i]){
-                if (i>0&&!flag[i-1]) continue;
+                if (i>0&&!flag[i-1]&&nums[i]==nums[i-1]) continue;
                 flag[i] = true;
                 pathPermuteUnique.add(nums[i]);
                 back(nums);
@@ -72,7 +72,7 @@ public class codetop_10 {
         LinkedList<Character> stack = new LinkedList<>();
         /*step1：维持一个最小栈————只要当前的数比栈顶的数小，栈顶的数就出栈*/
         for (char c : num.toCharArray()) {
-            while (!stack.isEmpty() && k > 0 && c < num.charAt(stack.peekLast())) {
+            while (!stack.isEmpty() && k > 0 && c<stack.peekLast()) { /**err：这里直接入栈的是字符，而不是索引，因此比较的是"c<stack.peekLast()"*/
                 stack.pollLast();
                 k--;
             }
@@ -391,17 +391,18 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /**
      * 【注意】这个必须用两个sum————
      *      ①一个curSum表示当前的总剩余油量。每当它小于0，就重新置0，并暗示从下一个位置开始”才有可能“能转一圈
-     *      ②一个totalSum表示总的gas-cost。如果这个值小于0，说明从哪里开始都不行，因为转一圈能得到的油少于花费的油
+     *      ②一个totalSum表示总的gas-cost。如果这个值小于0，说明从哪里开始都不行，因为转一圈能得到的油少于需
+     *  要花费的油
      * @return
      */
     public int canCompleteCircuit(int[] gas, int[] cost) {
         int totalSum = 0 /*记录总体的gas-cost*/, curSum = 0 /*记录当前遍历的gas-cost*/;
-        int res = -1;
+        int res = 0; /**err：存在一种特殊情况，curSum==0，此时不会进入for循环中的if，因此res初始值为-1不合适*/
         for (int i = 0; i < gas.length; i++) {
             totalSum += (gas[i] - cost[i]);
             curSum += (gas[i] - cost[i]);
             if (curSum < 0) {
-                res = i + 1;
+                res = i + 1; //每次curSum<0，说明即使存在解，也得从下一位开始尝试，因此更新答案res为i+1
                 curSum = 0;
             }
         }
@@ -456,7 +457,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     }
 
 
-    /*解法2：回溯的解法*/
+    /*解法2：回溯的解法。。。。会超出时间限制*/
     public boolean checkValidString_huisu(String s) {
         return dfs(s, 0, 0);
     }
@@ -500,15 +501,17 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     }
 
     private TreeNode build(int[] postorder, int left, int right) {
-        if (left>right) return null;
+        if (left>right || postIndex<0) return null;
         /*step1：拿到当前的根节点的值，并构造出节点*/
         int rootVal = postorder[postIndex--];
         TreeNode root = new TreeNode(rootVal);
         /*step2：拿到rootVal在中序遍历中的位置index*/
         Integer index = inorderMap.get(rootVal);
-        /*step3：递归index左右两部分完成root.left、root.right的构造*/
+        /*step3：递归index左右两部分完成root.left、root.right的构造
+        * 【出错点】是从后往前遍历（postIndex--），顺序是：根 -> 右子树 -> 左子树，所以在构造时必须先构造右子
+        *       树，再构造左子树。*/
+        root.right = build(postorder,index+1,right); /**err：这里的顺序重要*/
         root.left = build(postorder,left,index-1);
-        root.right = build(postorder,index+1,right);
         return root;
     }
 
@@ -558,6 +561,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                 int curVal = heights[cur]*(i-left-1);
                 curRowMaxArea = Math.max(curVal,curRowMaxArea);
             }
+            stack.push(i); /**err：注意，这里记得将i入栈，否则样例的结果一直是0*/
         }
         return curRowMaxArea;
     }
@@ -601,21 +605,19 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*611
     给定一个包含非负整数的数组 nums ，返回其中可以组成三角形三条边的三元组个数。
      */
-
     /**
-     *
      * @param nums
      * @return
      */
     public int triangleNumber(int[] nums) {
         Arrays.sort(nums);
         int res = 0;
-        for (int k = nums.length-1; k > 2; k--) {
+        for (int k = nums.length-1; k >= 2; k--) { /**err：k=2的时候也需要执行循环。k=2时，i=0,j=1*/
             int i = 0,j = k-1;
             while (i<j){
                 if (nums[i]+nums[j]>nums[k]){
-                    res += (j-i);
-                    j--; /**为什么这里需要j--，不会重复吗？？*/
+                    res += (j-i); /*想象成j不动时，i可以选择i、i+1、i+2...j-2、j-1*/
+                    j--; /**为什么这里需要j--，不会重复吗？？不会，因为j--之后，j肯定不一样了。结合上一行的注解可知不会重复*/
                 }else {
                     i++;
                 }
