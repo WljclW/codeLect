@@ -1,5 +1,7 @@
 package zuo_course_01base.No_5_binaryTree.ershua;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 
@@ -44,6 +46,7 @@ public class feidigui_bianli {
      * 的节点同样压入到第二个栈。因此最后从第二个栈弹出的顺序就是左子树、右子树、
      * 根节点
      * */
+    /*方法1：使用两个栈来倒腾一下*/
     public void houxu(Node head) {
         if (head == null) return;
         LinkedList<Node> stack1 = new LinkedList<>();
@@ -66,6 +69,44 @@ public class feidigui_bianli {
             System.out.println(stack2.pop().value);
         }
     }
+
+
+    /*方法2：使用一个栈，但是将元素逆序输出*/
+    public void houxu_oneStack(Node head) {
+        if (head==null) return;
+        LinkedList<Node> stack = new LinkedList<>(); //仅仅使用这一个栈
+        LinkedList<Integer> res = new LinkedList<>(); //这个列表用于存放后序遍历的结果
+        stack.push(head);
+        while (!stack.isEmpty()){
+            Node cur = stack.pop();
+            res.add(cur.value);
+            if (cur.left!=null){
+                stack.push(cur.left);
+            }
+            if (cur.right!=null){
+                stack.push(cur.right);
+            }
+        }
+
+        Collections.reverse(res);
+        /*对于列表元素依次打印的实现方法1——使用迭代器*/
+        Iterator<Integer> iterator = res.iterator();
+        while (iterator.hasNext()){
+            iterator.remove();
+            System.out.println(iterator.next());
+        }
+
+        /*方法2————for循环*/
+//        for (int i = 0; i < res.size(); i++) {
+//            System.out.println(res.get(i));
+//        }
+
+        /*方法3————for each循环*/
+//        for (Integer cur:res){
+//            System.out.println(cur);
+//        }
+    }
+
 
     /*中序遍历的第一种写法*/
     public void zhongxu(Node head) {

@@ -4,10 +4,8 @@ import leecode_Debug.linkList.ListNode;
 import leecode_Debug.top100.TreeNode;
 
 import javax.sound.sampled.Line;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class codetop_10 {
     /*297
@@ -37,17 +35,62 @@ public class codetop_10 {
     /*47
     给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
      */
-//    public List<List<Integer>> permuteUnique(int[] nums) {
-//
-//    }
+    List<List<Integer>> resPermuteUnique;
+    List<Integer> pathPermuteUnique;
+    boolean[] flag;
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        resPermuteUnique = new LinkedList<>();
+        pathPermuteUnique = new LinkedList<>();
+        flag = new boolean[nums.length];
+        Arrays.sort(nums);
+        back(nums);
+        return resPermuteUnique;
+    }
+
+    private void back(int[] nums) {
+        if (pathPermuteUnique.size()==nums.length){
+            resPermuteUnique.add(new LinkedList<>(pathPermuteUnique));
+            return;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if (!flag[i]){
+                if (i>0&&!flag[i-1]) continue;
+                flag[i] = true;
+                pathPermuteUnique.add(nums[i]);
+                back(nums);
+                flag[i] = false;
+                pathPermuteUnique.remove(pathPermuteUnique.size()-1);
+            }
+        }
+    }
 
     /*402
     给你一个以字符串表示的非负整数 num 和一个整数 k ，移除这个数中的 k 位数字，使得剩下的数字最小。请你以字
     符串形式返回这个最小的数字。
     * */
-//    public String removeKdigits(String num, int k) {
-//
-//    }
+    public String removeKdigits(String num, int k) {
+        LinkedList<Character> stack = new LinkedList<>();
+        /*step1：维持一个最小栈————只要当前的数比栈顶的数小，栈顶的数就出栈*/
+        for (char c : num.toCharArray()) {
+            while (!stack.isEmpty() && k > 0 && c < num.charAt(stack.peekLast())) {
+                stack.pollLast();
+                k--;
+            }
+            stack.offerLast(c);
+        }
+        /*step2：剩下的是单调递增的。倒着删除剩余的k位*/
+        while (k > 0 && !stack.isEmpty()) {
+            stack.pollLast();
+            k--;
+        }
+        /*step3：使用StringBuilder手机结果并返回*/
+        StringBuilder sb = new StringBuilder();
+        for (char c : stack) {
+            if (sb.length() == 0 && c == '0') continue;
+            sb.append(c);
+        }
+        return sb.length() == 0 ? "0" : sb.toString();
+    }
 
     /*LCR 170. 交易逆序对的总数
     在股票交易中，如果前一天的股价高于后一天的股价，则可以认为存在一个「交易逆序对」。请设计一个程序，输入一段时
@@ -60,7 +103,7 @@ public class codetop_10 {
     /*40
     给定一个候选人编号的集合 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。
 candidates 中的每个数字在每个组合中只能使用 一次 。
-注意：解集不能包含重复的组合。
+    注意：解集不能包含重复的组合。
      */
 //    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
 //
@@ -175,8 +218,11 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             }
         }
 
-        Collections.reverse(res); /**err：将res的顺序反序*/
-        /**使用下面的代码进行反序时，会超时*/
+        Collections.reverse(res); /**err：将res的顺序反序用此方法*/
+        /**使用下面的代码进行反序时，会超时。。。
+         * 【注意】下面的方法翻转链表是错误的！！！因为”res.add(i,right);“是在特定的位置插入一个值，但是没有删除之前i位置的值，因此
+         *      会导致链表不断的变长
+         * */
         // for (int i = 0; i < res.size()/2; i++) {
         //     Integer left = res.get(i);
         //     Integer right = res.get(res.size() - 1 - i);
@@ -199,16 +245,24 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
     /*328
     给定单链表的头节点 head ，将所有索引为奇数的节点和索引为偶数的节点分别分组，保持它们原有的相对顺序，然后把偶数索引节点分组连接到奇数索引节点分组之后，返回重新排序的链表。
-
-第一个节点的索引被认为是 奇数 ， 第二个节点的索引为 偶数 ，以此类推。
-
-请注意，偶数组和奇数组内部的相对顺序应该与输入时保持一致。
-
-你必须在 O(1) 的额外空间复杂度和 O(n) 的时间复杂度下解决这个问题。
+    第一个节点的索引被认为是 奇数 ， 第二个节点的索引为 偶数 ，以此类推。
+    请注意，偶数组和奇数组内部的相对顺序应该与输入时保持一致。
+    你必须在 O(1) 的额外空间复杂度和 O(n) 的时间复杂度下解决这个问题。
      */
-//    public ListNode oddEvenList(ListNode head) {
-//
-//    }
+    public ListNode oddEvenList(ListNode head) {
+        if (head==null||head.next==null||head.next.next==null) return head;
+        ListNode evenHead = head.next,even = evenHead;
+        ListNode odd = head;
+        while (even!=null&&even.next!=null){
+            odd.next = even.next;
+            odd = odd.next;
+
+            even.next = odd.next;
+            even = even.next;
+        }
+        odd.next = evenHead;
+        return head;
+    }
 
 
     /*230
@@ -257,6 +311,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*LCR 144. 翻转二叉树
     给定一棵二叉树的根节点 root，请左右翻转这棵二叉树，并返回其根节点。
     * */
+    /*方法1：迭代法前序遍历，对于遍历到的每一个节点，交换它的左、右孩子节点*/
     public TreeNode flipTree(TreeNode root) {
         if (root==null) return root;
         LinkedList<TreeNode> stack = new LinkedList<>();
@@ -333,15 +388,25 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 你有一辆油箱容量无限的的汽车，从第 i 个加油站开往第 i+1 个加油站需要消耗汽油 cost[i] 升。你从其中的一个加油站出发，开始时油箱为空。
 给定两个整数数组 gas 和 cost ，如果你可以按顺序绕环路行驶一周，则返回出发时加油站的编号，否则返回 -1 。如果存在解，则 保证 它是 唯一 的。
      */
-
     /**
-     * 【注意】这个必须用两个sum，一个表示当前的总剩余油量；一个表示总的gas-cost
-     * @param triangle
+     * 【注意】这个必须用两个sum————
+     *      ①一个curSum表示当前的总剩余油量。每当它小于0，就重新置0，并暗示从下一个位置开始”才有可能“能转一圈
+     *      ②一个totalSum表示总的gas-cost。如果这个值小于0，说明从哪里开始都不行，因为转一圈能得到的油少于花费的油
      * @return
      */
-//    public int canCompleteCircuit(int[] gas, int[] cost) {
-//
-//    }
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int totalSum = 0 /*记录总体的gas-cost*/, curSum = 0 /*记录当前遍历的gas-cost*/;
+        int res = -1;
+        for (int i = 0; i < gas.length; i++) {
+            totalSum += (gas[i] - cost[i]);
+            curSum += (gas[i] - cost[i]);
+            if (curSum < 0) {
+                res = i + 1;
+                curSum = 0;
+            }
+        }
+        return totalSum < 0 ? -1 : res; //如果totalSum小于0，说明实现不了
+    }
 
     /*LCR 187. 破冰游戏
     社团共有 num 位成员参与破冰游戏，编号为 0 ~ num-1。成员们按照编号顺序围绕圆桌而坐。社长抽取一个数字 target，从 0 号成员起开始计数，排在第 target 位的成员离开圆桌，且成员离开后从下一个成员开始计数。请返回游戏结束时最后一位成员的编号。
@@ -361,16 +426,92 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 左括号 '(' 必须在对应的右括号之前 ')'。
 '*' 可以被视为单个右括号 ')' ，或单个左括号 '(' ，或一个空字符串 ""。
      */
-//    public boolean checkValidString(String s) {
-//
-//    }
+    /**
+     *【关键】使用两个变量。
+     *      low含义：最少可能的未匹配的左括号数量；
+     *      high含义：最多可能的未匹配的左括号数量。
+     *      这个两个变量构成一个区间[low,high],未匹配的左括号数量位于这个区间
+     * @param s
+     * @return
+     */
+
+    /*解法1：贪心的解法*/
+    public boolean checkValidString(String s) {
+        int low = 0, high = 0;
+        for (char c : s.toCharArray()) {
+            if (c == '(') { //碰到左括号，low和high都增大
+                low++;
+                high++;
+            } else if (c == ')') { //碰到右括号，low和high都减小
+                low--;
+                high--;
+            } else { //否则说明是*,乐观情况下当作右括号，因此low--；悲观情况下当作左括号，因此high++
+                low--;
+                high++;
+            }
+            if (high < 0) return false; /*high只有在碰到右括号才会减1，小于0说明右括号多了，返回false*/
+            if (low < 0) low = 0; /*low小于0的时候置为0，符合实际含义*/
+        }
+        return low == 0;
+    }
+
+
+    /*解法2：回溯的解法*/
+    public boolean checkValidString_huisu(String s) {
+        return dfs(s, 0, 0);
+    }
+
+    private boolean dfs(String s, int index /*当前需要遍历的位置*/, int count/*当前未闭合的左括号数*/) {
+        // 剪枝：右括号多于左括号，非法
+        if (count < 0) return false;
+
+        // 结束条件：遍历完整个字符串
+        if (index == s.length()) return count == 0;
+
+        if (s.charAt(index)=='('){ //如果是左括号，则未闭合的左括号数+1
+            return dfs(s,index+1,count+1);
+        } else if (s.charAt(index)==')') { //如果是右括号，则未闭合的左括号数-1
+            return dfs(s,index+1,count-1);
+        }else { //否则。*当作是(，未闭合的左括号数+1；*当作是)，未闭合的左括号数-1；*当作是空串，未闭合的左括号数不变
+            return dfs(s,index+1,count+1) ||
+                    dfs(s,index+1,count-1) ||
+                    dfs(s,index+1,count);
+        }
+    }
+
 
     /*106
     给定两个整数数组 inorder 和 postorder ，其中 inorder 是二叉树的中序遍历， postorder 是同一棵树的后序遍历，请你构造并返回这颗 二叉树 。
      */
-//    public TreeNode buildTree(int[] inorder, int[] postorder) {
-//
-//    }
+    /**
+     *【思路】构造出map存放节点值——>索引的映射；声明全局变量标识在postorder中研究到哪个位置了
+     *      1.每一次从postorder中拿出最后一个值，就是当前的根节点root。
+     *      2.从map中找到这个值在inorder的位置index。（此时index左边的节点就是root的左子树，index右边的节点就是root的右子树）
+     *      3.根据2中的备注，递归的调用左、右两部分即可构造出root的左。右子树
+     */
+    int postIndex;
+    HashMap<Integer,Integer> inorderMap = new HashMap<>();
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        postIndex = inorder.length-1; //标识当前postorder研究到哪个位置了
+        for (int i = 0; i < inorder.length; i++) { //意义：根据从postorder拿到的值快速得到它在inorder中的位置
+            inorderMap.put(inorder[i],i);
+        }
+        return build(postorder,0,inorder.length-1);
+    }
+
+    private TreeNode build(int[] postorder, int left, int right) {
+        if (left>right) return null;
+        /*step1：拿到当前的根节点的值，并构造出节点*/
+        int rootVal = postorder[postIndex--];
+        TreeNode root = new TreeNode(rootVal);
+        /*step2：拿到rootVal在中序遍历中的位置index*/
+        Integer index = inorderMap.get(rootVal);
+        /*step3：递归index左右两部分完成root.left、root.right的构造*/
+        root.left = build(postorder,left,index-1);
+        root.right = build(postorder,index+1,right);
+        return root;
+    }
+
 
     /*887. 鸡蛋掉落
     给你 k 枚相同的鸡蛋，并可以使用一栋从第 1 层到第 n 层共有 n 层楼的建筑。
@@ -385,9 +526,41 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*85
     给定一个仅包含 0 和 1 、大小为 rows x cols 的二维二进制矩阵，找出只包含 1 的最大矩形，并返回其面积。
      */
-//    public int maximalRectangle(char[][] matrix) {
-//
-//    }
+    /**
+     * 【关键】遍历每一行，在每一行的时候研究每一列的高度，并调用类似84题的方法求解此时的最大矩形，那这个结果去更新最终的返回结果。
+     */
+    public int maximalRectangle(char[][] matrix) {
+        int[] heights = new int[matrix[0].length];
+        int res = 0;
+        for (int row = 0; row < matrix.length; row++) { /*研究每一行*/
+            for (int col = 0; col < matrix[0].length; col++) { /*在第row行中，计算每一个柱状图的高度*/
+                if (matrix[row][col]=='1')
+                    heights[col]++;
+                else
+                    heights[col] = 0;
+            }
+            /*此时的heights存放着第row行每一列柱状图的高度，用方法largestRectangleArea计算这个heights的最大矩形————即方
+            法largestRectangleArea的返回值。根据结果更新全局最大值res*/
+            res = Math.max(res,largestRectangleArea(heights));
+        }
+        return res;
+    }
+
+    /*第84题的原代码，不用动*/
+    private int largestRectangleArea(int[] heights) {
+        LinkedList<Integer> stack = new LinkedList<>();
+        int curRowMaxArea = 0; /*此时这个方法的返回值代表的是heights这一行数据能画出的最大矩形*/
+        for (int i = 0; i <= heights.length; i++) {
+            int curHeight = (i==heights.length)?0:heights[i];
+            while (!stack.isEmpty()&&curHeight<heights[stack.peek()]){
+                Integer cur = stack.pop();
+                int left = stack.isEmpty()?-1:stack.peek();
+                int curVal = heights[cur]*(i-left-1);
+                curRowMaxArea = Math.max(curVal,curRowMaxArea);
+            }
+        }
+        return curRowMaxArea;
+    }
 
 
     /*44
@@ -428,9 +601,28 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*611
     给定一个包含非负整数的数组 nums ，返回其中可以组成三角形三条边的三元组个数。
      */
-//    public int triangleNumber(int[] nums) {
-//
-//    }
+
+    /**
+     *
+     * @param nums
+     * @return
+     */
+    public int triangleNumber(int[] nums) {
+        Arrays.sort(nums);
+        int res = 0;
+        for (int k = nums.length-1; k > 2; k--) {
+            int i = 0,j = k-1;
+            while (i<j){
+                if (nums[i]+nums[j]>nums[k]){
+                    res += (j-i);
+                    j--; /**为什么这里需要j--，不会重复吗？？*/
+                }else {
+                    i++;
+                }
+            }
+        }
+        return res;
+    }
 
     /*120
     给定一个三角形 triangle ，找出自顶向下的最小路径和。

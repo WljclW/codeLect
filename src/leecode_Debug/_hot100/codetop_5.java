@@ -16,6 +16,10 @@ import java.util.List;
  * 93. 复原 IP 地址
  * 堆排序
  */
+
+/**
+ * 82、124、129
+ */
 public class codetop_5 {
     /*93
     有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
@@ -136,6 +140,7 @@ public class codetop_5 {
             [1,2,3,3]
             预期结果
             [1,2,3]
+        出错原因：除了while循环时fast指向null，slow指向第一个3，但是第一个3和第二个三的链没有断开！！
     * */
     public ListNode deleteDuplicates_83(ListNode head) {
         if (head == null||head.next==null) return head;
@@ -151,7 +156,7 @@ public class codetop_5 {
         }
         slow.next = null; /**err：如果没有这句话，有测试用例是错的*/
 
-        return head;
+        return head; /*这个题返回head是没有问题的，因为相同的节点会保留一个，因此head一定是保留的！！*/
     }
 
 
@@ -224,6 +229,7 @@ public class codetop_5 {
                 val2 = val2 * 10 + version2.charAt(cur2) - '0';
             }
             cur2++;
+
             if (val1 != val2) {
                 return val1 > val2 ? 1 : -1;
             }
@@ -290,7 +296,7 @@ public class codetop_5 {
             /*step3：将不是null的节点添加进treeNodes，并且在integers中加入对应的路径和*/
             if (cur.left!=null){
                 treeNodes.offer(cur.left);
-                integers.offer(curVal *10+cur.left.val); //一个节点到根节点的路径和，就是 父节点路径和的10倍+节点自身的值
+                integers.offer(curVal *10+cur.left.val); //一个节点到根节点的路径和，就是 父节点路径和的10倍 + 节点自身的值（其实就是1、2、3组装成123的过程）
             }
             if (cur.right!=null){
                 treeNodes.offer(cur.right);
@@ -321,7 +327,7 @@ public class codetop_5 {
         return isValidBST(root, null, null);
     }
 
-    /* 限定以 root 为根的子树节点必须满足 max.val > root.val > min.val */
+    /* 方法参数含义：限定以 root 为根的子树节点必须满足 max.val > root.val > min.val */
     boolean isValidBST(TreeNode root, TreeNode min, TreeNode max) {
         // step1：base case
         if (root == null) return true;
@@ -382,12 +388,13 @@ public class codetop_5 {
      *  的节点3，此时后半部分只用从slow.next翻转即可，反转后第一个链表1——>2———>3——>null，后一个链表5——>4——>null，循环的判断条件是head2!=null
      *      情况2：偶数个节点，比如1——>2———>3——>4——>null，重拍之后需要变为1——>4———>2——>3——>null。。而偶数个节点slow指针会来到中间两
      *  个的后一个节点即节点3，此时后半部分只用从slow.next翻转即可，反转后第一个链表是1——>2———>3——>null,后一个链表变为4——>null，循环结
-     *  束的条件依然是head2!=null。
+     *  束的条件依然是head2!=null。这种情况下后一半链表的节点数比前一半链表的节点数少2。
      *      综上，不论是奇数节点还是偶数节点(slow会来到中间节点 或者 中间的后一个节点)，只用从slow.next翻转后半部分的链表；然后把slow.next
      *  置为null
      *      其实，这个题之所以能从中间节点的下一位开始翻转的底层细节原理：如果链表的节点数是偶数，则中间的两个节点比如上面的“2——>3”在重排
      *  链表之后就位于结果的最后面，并且顺序不变，因此翻转3这个节点之后的链表就可以了
      * */
+    /*第一种写法。*/
     public void reorderList(ListNode head) {
         if (head==null||head.next==null) return;
         ListNode mid = findMid(head);
@@ -426,6 +433,8 @@ public class codetop_5 {
     }
 
 
+
+    /*第二种写法，建议*/
     public void reorderList1(ListNode head) {
         if (head==null||head.next==null||head.next.next==null) return;
         /*step1：找到链表的中间节点。常规做法*/
@@ -439,6 +448,8 @@ public class codetop_5 {
         merge(head,head2);
     }
 
+    /*合并两个链表。
+    *      此时后面那一个链表的节点数一定比前面一半链表的节点数少。。少一个（如果原链表节点数是奇数）或者两个（如果原链表节点数是偶数）*/
     private void merge(ListNode first, ListNode second) {
         while (second != null) {
             /*step1：记录两个节点的下一个节点*/
@@ -459,7 +470,11 @@ public class codetop_5 {
     注意：不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
     * */
     /**
-     *【说明】i位数的整数 和 j位数的整数相乘，结果是“i+j”位数，最少是“i+j-1”位数
+     *【说明】
+     *      1. i位数的整数 和 j位数的整数相乘，结果是“i+j”位数，最少是“i+j-1”位数。
+     *      2. 第一个数第i位的数 和 第二个数第j位的数 相乘，结果对应的是第”i+j+1“位置
+     *      3. 【注意】在计算过程中，结果位置的数是直接赋值，赋值给res[i+j+1]；但是进位信息是附加的，需要将计算出来的进位
+     *  信息，加到res[i+j]。
      *【解题思路】声明一个len1+len2长度的数组，来存放计算出来的每一位。第一个数index=i的数和第二个数index=j的
      *      数相乘后的结果应该放在结果中的i+j+1的位置。
      */
@@ -611,10 +626,10 @@ public class codetop_5 {
      *      窗口的长度（即更新left的值）；研究完每一个数之后返回res
      */
     public int minSubArrayLen(int target, int[] nums) {
-        int left = 0,cur = 0;
+        int left = 0, cur = 0;
         int sum = 0;
         int res = Integer.MAX_VALUE;
-        while (cur<nums.length){
+        while (cur < nums.length) {
             /*step1：不管三七二十一，都先放进窗口*/
             sum += nums[cur];
             /*step2：满足条件时，不断的缩小窗口*/
@@ -624,7 +639,7 @@ public class codetop_5 {
             }
             cur++;
         }
-        return res==Integer.MAX_VALUE?0:res;
+        return res == Integer.MAX_VALUE ? 0 : res;
     }
 
 
@@ -662,16 +677,16 @@ public class codetop_5 {
     /**
      * 【思路】
      *      1. 树的直径 = 某个节点左子树深度 + 右子树深度
-            2. 用后序遍历计算每个节点的左右子树深度，并在过程中更新最大直径。
-            使用全局变量记录最大直径。
+            2. 用后序遍历计算每个节点的左右子树深度，并在过程中更新最大直径。使用全局变量记录最大直径。
+       【注意】看上面124题的注释————题目要求的信息和每个节点返回给父节点的信息不一致，这种不一致导致：必须使用额外的方法来进行遍历。
      * */
     int maxDiameterOfBinaryTree = 0;
-    public int diameterOfBinaryTree(TreeNode root) {
+    public int diameterOfBinaryTree(TreeNode root) { /*原始方法：需要返回最大直径这个信息*/
         depth(root);
         return maxDiameterOfBinaryTree;
     }
 
-    private int depth(TreeNode root) {
+    private int depth(TreeNode root) { /*新创建函数，返回以root为根节点树的高度*/
         if (root==null) return 0;
         /*step1：分别计算出这个节点的左子树、右子树的高度*/
         int left = depth(root.left);
