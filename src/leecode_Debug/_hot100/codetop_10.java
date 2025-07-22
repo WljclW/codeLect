@@ -105,9 +105,38 @@ public class codetop_10 {
 candidates 中的每个数字在每个组合中只能使用 一次 。
     注意：解集不能包含重复的组合。
      */
-//    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
-//
-//    }
+    List<List<Integer>> resCombinationSum2;
+    List<Integer> pathCombinationSum2;
+    boolean[] used;
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        resCombinationSum2 = new LinkedList<>();
+        pathCombinationSum2 = new LinkedList<>();
+        Arrays.sort(candidates);
+        used = new boolean[candidates.length];
+        combinationSum2Back(candidates,target,0);
+        return resCombinationSum2;
+    }
+
+    private void combinationSum2Back(int[] candidates, int target, int index) {
+        if (target==0){
+            resCombinationSum2.add(new LinkedList<>(pathCombinationSum2));
+        }
+        if (target<0 || index==candidates.length){
+            return;
+        }
+        for (int i = index; i < candidates.length; i++) {
+            if (i>0&&candidates[i]==candidates[i-1]&&!used[i]){
+                continue;
+            }
+            pathCombinationSum2.add(candidates[i]);
+            used[i] = true;
+            target -= candidates[i];
+            combinationSum2Back(candidates,target,i+1);
+            pathCombinationSum2.remove(pathCombinationSum2.size()-1);
+            used[i] = false;
+            target += candidates[i];
+        }
+    }
 
     /*61
     给你一个链表的头节点 head ，旋转链表，将链表每个节点向右移动 k 个位置。
@@ -122,9 +151,24 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
 展开后的单链表应该与二叉树 先序遍历 顺序相同。
      */
-//    public void flatten(TreeNode root) {
-//
-//    }
+    public void flatten(TreeNode root) {
+        if (root==null) return;
+        TreeNode cur = null; /*声明cur节点，将所有的节点串起来*/
+        LinkedList<TreeNode> stack = new LinkedList<>();
+        stack.push(root);
+        while (!stack.isEmpty()){
+            TreeNode nowNode = stack.pop();
+            if (cur==null)  /*cur如果是null说明是第一个节点，将cur指向根节点*/
+                cur = nowNode;
+            else{   /*否则的话将节点拼接到right指针，然后cur指针右移*/
+                cur.left = null;
+                cur.right = nowNode;
+                cur = cur.right;        /**err：更新cur指针*/
+            }
+            if (nowNode.right!=null) stack.push(nowNode.right);
+            if (nowNode.left!=null) stack.push(nowNode.left);
+        }
+    }
 
 
     /*958
@@ -172,7 +216,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             int l = i+1,r = nums.length-1;
             while (l<r){
                 int curSum = nums[i]+nums[l]+nums[r];
-                if (Math.abs(curSum-target)<max){
+                if (Math.abs(curSum-target)<max){ /*如果curSum和target更接近则更新最后返回的结果res*/
                     max = Math.abs(curSum-target);
                     res = curSum;
                     if (res==target) return res;
@@ -249,6 +293,9 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     请注意，偶数组和奇数组内部的相对顺序应该与输入时保持一致。
     你必须在 O(1) 的额外空间复杂度和 O(n) 的时间复杂度下解决这个问题。
      */
+    /**
+     *【思路】奇数位置、偶数位置使用不同的头节点
+     */
     public ListNode oddEvenList(ListNode head) {
         if (head==null||head.next==null||head.next.next==null) return head;
         ListNode evenHead = head.next,even = evenHead;
@@ -258,6 +305,22 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             odd = odd.next;
 
             even.next = odd.next;
+            even = even.next;
+        }
+        odd.next = evenHead;
+        return head;
+    }
+
+    /*另一种写法，区别就在于while循环中*/
+    public ListNode oddEvenList_(ListNode head) {
+        if (head == null || head.next == null) return head;
+        ListNode evenHead = head.next, even = evenHead;
+        ListNode odd = head;
+        while (even != null && even.next != null) { /**注意，while循环内会使用到”even.next.next“，因此while条件需要保证”even.next!=null“*/
+            odd.next = odd.next.next;
+            odd = odd.next;
+
+            even.next = even.next.next;
             even = even.next;
         }
         odd.next = evenHead;
@@ -276,15 +339,41 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*135
     n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的评分。
 
-你需要按照以下要求，给这些孩子分发糖果：
+    你需要按照以下要求，给这些孩子分发糖果：
 
-每个孩子至少分配到 1 个糖果。
-相邻两个孩子评分更高的孩子会获得更多的糖果。
-请你给每个孩子分发糖果，计算并返回需要准备的 最少糖果数目 。
+    每个孩子至少分配到 1 个糖果。
+    相邻两个孩子评分更高的孩子会获得更多的糖果。
+    请你给每个孩子分发糖果，计算并返回需要准备的 最少糖果数目 。
      */
-//    public int candy(int[] ratings) {
-//
-//    }
+    /**
+     *【思路】两次遍历。
+     *      ①一次是从左向右遍历，满足左边的条件。对于index位置，如果index-1的位置值小，则index位置的最小值是index位置的糖果+1.这样
+     *  一轮结束可以保证每一个位置左边条件是满足的
+     *      ②一次是从右向左遍历，满足右边的条件。对于index位置，如果index+1的位置值小，则index位置的最小值是index+1位置的糖果+1，这
+     *  样一轮结束可以保证每一个位置右边条件是满足的
+     */
+    public int candy(int[] ratings) {
+        int[] flags = new int[ratings.length];
+        Arrays.fill(flags,1);
+
+        for (int i = 1; i < ratings.length; i++) {
+            if (ratings[i]>ratings[i-1]){
+                flags[i] = Math.max(flags[i-1]+1, flags[i]);
+            }
+        }
+
+        for (int i = ratings.length-2; i >=0 ; i--) {
+            if (ratings[i]>ratings[i+1]){
+                flags[i] = Math.max(flags[i+1]+1,flags[i]);
+            }
+        }
+
+        int sum = 0;
+        for (int num:flags){
+            sum += num;
+        }
+        return sum;
+    }
 
 
     /*450
@@ -311,6 +400,10 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*LCR 144. 翻转二叉树
     给定一棵二叉树的根节点 root，请左右翻转这棵二叉树，并返回其根节点。
     * */
+    /**
+     *【思路】使用前序遍历，遍历到每一个节点的时候交换它的左右孩子。。不要使用中序遍历.
+     *      层序遍历也是一样的道理
+     */
     /*方法1：迭代法前序遍历，对于遍历到的每一个节点，交换它的左、右孩子节点*/
     public TreeNode flipTree(TreeNode root) {
         if (root==null) return root;
@@ -335,6 +428,36 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         cur.left = cur.right;
         cur.right = left;
     }
+
+
+    /*方法2：递归的方式*/
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) return null;
+
+        // 交换左右子树
+        TreeNode temp = root.left;
+        root.left = invertTree(root.right);
+        root.right = invertTree(temp);
+
+        return root;
+    }
+
+    /*方法3：层序遍历的过程中交换*/
+    public TreeNode invertTree_layer(TreeNode root) {
+        if (root==null) return root;
+        LinkedList<TreeNode> deque = new LinkedList<>();
+        deque.offer(root);
+
+        while (!deque.isEmpty()){
+            TreeNode curNode = deque.poll();
+            swap(curNode);
+
+            if (curNode.left!=null) deque.offer(curNode.left);
+            if (curNode.right!=null) deque.offer(curNode.right);
+        }
+        return root;
+    }
+
 
 
     /*395
@@ -390,14 +513,13 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
     /**
      * 【注意】这个必须用两个sum————
-     *      ①一个curSum表示当前的总剩余油量。每当它小于0，就重新置0，并暗示从下一个位置开始”才有可能“能转一圈
-     *      ②一个totalSum表示总的gas-cost。如果这个值小于0，说明从哪里开始都不行，因为转一圈能得到的油少于需
-     *  要花费的油
-     * @return
+     *      ①一个curSum表示当前的总剩余油量。每当它小于0，就重新置0，并更新res为i+1。暗示从下一个位置开始”才有可能!!!“能转一圈
+     *      ②一个totalSum表示总的gas-总的cost。如果这个值小于0，说明从哪里开始都不行。因为转一圈能得到的油 少于 转一圈需要花费
+     *  的油
      */
     public int canCompleteCircuit(int[] gas, int[] cost) {
         int totalSum = 0 /*记录总体的gas-cost*/, curSum = 0 /*记录当前遍历的gas-cost*/;
-        int res = 0; /**err：存在一种特殊情况，curSum==0，此时不会进入for循环中的if，因此res初始值为-1不合适*/
+        int res = 0; /**err：存在一种特殊情况，curSum最小值为0，此时不会进入for循环中的if，因此res初始值为-1不合适*/
         for (int i = 0; i < gas.length; i++) {
             totalSum += (gas[i] - cost[i]);
             curSum += (gas[i] - cost[i]);
@@ -410,11 +532,23 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     }
 
     /*LCR 187. 破冰游戏
-    社团共有 num 位成员参与破冰游戏，编号为 0 ~ num-1。成员们按照编号顺序围绕圆桌而坐。社长抽取一个数字 target，从 0 号成员起开始计数，排在第 target 位的成员离开圆桌，且成员离开后从下一个成员开始计数。请返回游戏结束时最后一位成员的编号。
+    社团共有 num 位成员参与破冰游戏，编号为 0 ~ num-1。成员们按照编号顺序围绕圆桌而坐。社长抽取一个数字 target，从 0 号成员起开始计数，排在第 target 位的成员离开圆桌，且成员离开后从下一个成员开始计数。请返回游戏
+    结束时最后一位成员的编号。
      */
-//    public int iceBreakingGame(int num, int target) {
-//
-//    }
+    /**
+     *【约瑟夫环问题】定义f(n, m)：表示 n 个人、每次数到第 m 个出局，最终剩下的人的编号。则有递推公式————
+     *      f(1,m)=0         //只剩下一个人，不论m是多少，最后剩下的那个人编号都是0.
+     *      f(n,m)=(f(n-1,m) + m) % n
+     *   这个公式表示：当前人数是 n 时的生还者编号等于上一步 n - 1 人时生还者编号向右移动 m 位后的结果。
+     *
+     */
+    public int iceBreakingGame(int num, int target) {
+        int res = 0;
+        for (int i = 2; i <= num; i++) {
+            res = (res+target)%i;
+        }
+        return res;
+    }
 
 
     /*678
@@ -432,8 +566,10 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *      low含义：最少可能的未匹配的左括号数量；
      *      high含义：最多可能的未匹配的左括号数量。
      *      这个两个变量构成一个区间[low,high],未匹配的左括号数量位于这个区间
-     * @param s
-     * @return
+     *【具体的思路】在上面关键信息的基础上————
+     *      每次碰到'('，则low和high都得+1.因为左括号是确认的，必须要匹配到右括号；
+     *      每次碰到')'，则low和high都得-1，因为右括号能明确的匹配左括号；
+     *      每次碰到‘*’。如果我们把它当作左括号，则high需要加1；如果我们把它当右括号，则low需要加1
      */
 
     /*解法1：贪心的解法*/
@@ -450,8 +586,8 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                 low--;
                 high++;
             }
-            if (high < 0) return false; /*high只有在碰到右括号才会减1，小于0说明右括号多了，返回false*/
-            if (low < 0) low = 0; /*low小于0的时候置为0，符合实际含义*/
+            if (high < 0) return false; /**high只有在碰到右括号才会减1，小于0说明右括号明确的多了，返回false*/
+            if (low < 0) low = 0; /**low小于0的时候置为0，符合实际含义*/
         }
         return low == 0;
     }
@@ -531,20 +667,22 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
     /**
      * 【关键】遍历每一行，在每一行的时候研究每一列的高度，并调用类似84题的方法求解此时的最大矩形，那这个结果去更新最终的返回结果。
+     * 【难点】遍历每一行的时候，heights数组如何计算————只要(row,col)位置的值是0，就将heights[col]置为0；否则的话说明该位置
+     *      是1，heights[col]++。
      */
     public int maximalRectangle(char[][] matrix) {
         int[] heights = new int[matrix[0].length];
         int res = 0;
         for (int row = 0; row < matrix.length; row++) { /*研究每一行*/
             for (int col = 0; col < matrix[0].length; col++) { /*在第row行中，计算每一个柱状图的高度*/
-                if (matrix[row][col]=='1')
+                if (matrix[row][col] == '1')
                     heights[col]++;
                 else
-                    heights[col] = 0;
+                    heights[col] = 0; /**每次碰到一个0，heights数组对应位置的值归零*/
             }
             /*此时的heights存放着第row行每一列柱状图的高度，用方法largestRectangleArea计算这个heights的最大矩形————即方
             法largestRectangleArea的返回值。根据结果更新全局最大值res*/
-            res = Math.max(res,largestRectangleArea(heights));
+            res = Math.max(res, largestRectangleArea(heights));
         }
         return res;
     }
@@ -554,12 +692,12 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         LinkedList<Integer> stack = new LinkedList<>();
         int curRowMaxArea = 0; /*此时这个方法的返回值代表的是heights这一行数据能画出的最大矩形*/
         for (int i = 0; i <= heights.length; i++) {
-            int curHeight = (i==heights.length)?0:heights[i];
-            while (!stack.isEmpty()&&curHeight<heights[stack.peek()]){
+            int curHeight = (i == heights.length) ? 0 : heights[i];
+            while (!stack.isEmpty() && curHeight < heights[stack.peek()]) {
                 Integer cur = stack.pop();
-                int left = stack.isEmpty()?-1:stack.peek();
-                int curVal = heights[cur]*(i-left-1);
-                curRowMaxArea = Math.max(curVal,curRowMaxArea);
+                int left = stack.isEmpty() ? -1 : stack.peek();
+                int curVal = heights[cur] * (i - left - 1);
+                curRowMaxArea = Math.max(curVal, curRowMaxArea);
             }
             stack.push(i); /**err：注意，这里记得将i入栈，否则样例的结果一直是0*/
         }
@@ -598,28 +736,51 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*400
     给你一个整数 n ，请你在无限的整数序列 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ...] 中找出并返回第 n 位上的数字。
      */
-//    public int findNthDigit(int n) {
-//
-//    }
+    /**
+     *【思路】规律：1位数共有1*9*1位；2位数共有10*9*2位；3位数共有100*9*3位
+     *     1. 根据规律，利用while循环每一次过掉所有的m位数
+     *     2. 最后如果n对应的是i位数，则start就是10^(i-1)次方————即i位数中最小的那个数
+     * */
+    public int findNthDigit(int n) {
+        int digit = 1; //当前研究的轮次是几位数。1位数、2位数、3位数....
+        long start = 1; //当前研究轮次的第一个数。1位数的第一个数是1、2位数的第一个数是10、3位数的第一个数是100....
+        long count = 9; //当前研究的这轮次所有数的总位数。count其实就是9*digit*start
+        /*step1：遍历不同的轮次，每一轮次分别是————所有的2位数、所有的3位数...*/
+        while (n>count){
+            n -= count;
+            digit++;
+            start *= 10;
+            count = digit*start*9;
+        }
+        /*step2：看第n个数对应的是哪一个整数*/
+        long num = start + (n-1)/digit; /**err：n-1的原因是索引是从0开始的*/
+        /*step3：将对应的数转换为字符串，并取出对应位置的字符*/
+        String s = String.valueOf(num);
+        return s.charAt((n - 1) % digit) - '0';
+    }
 
     /*611
     给定一个包含非负整数的数组 nums ，返回其中可以组成三角形三条边的三元组个数。
      */
     /**
-     * @param nums
-     * @return
+     * 【思路】首先对整个数组排序，然后倒着研究每一个数
+     *      每次研究到一个数（比如索引是k）时，固定left指针为0，right指针为k-1。根据left、right位置两数和与m位置数的大小关系
+     *  来移动指针————
+     *          ①如果nums[left]+nums[right]>nums[k]，则这是一组解。可知left指针从left可以移动到right-1都是可行解，因此
+     *      一共有”right-left“这麽多的可行解。更新完总数，移动right指针，right--。
+     *          ②如果nums[left]+nums[right]≤nums[k]，则说明这个和太小了，和需要变大一点，因此left指针++。
      */
     public int triangleNumber(int[] nums) {
         Arrays.sort(nums);
         int res = 0;
         for (int k = nums.length-1; k >= 2; k--) { /**err：k=2的时候也需要执行循环。k=2时，i=0,j=1*/
-            int i = 0,j = k-1;
-            while (i<j){
-                if (nums[i]+nums[j]>nums[k]){
-                    res += (j-i); /*想象成j不动时，i可以选择i、i+1、i+2...j-2、j-1*/
-                    j--; /**为什么这里需要j--，不会重复吗？？不会，因为j--之后，j肯定不一样了。结合上一行的注解可知不会重复*/
+            int left = 0,right = k-1;
+            while (left<right){
+                if (nums[left]+nums[right]>nums[k]){
+                    res += (right-left); /*想象成j不变，i可以选择i、i+1、i+2...j-2、j-1。因此选择后下一行改变j就不会有重复的组合*/
+                    right--; /**为什么这里需要j--，不会重复吗？？不会，因为j--之后，j肯定不一样了。结合上一行的注解可知不会重复*/
                 }else {
-                    i++;
+                    left++;
                 }
             }
         }

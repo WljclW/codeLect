@@ -80,6 +80,20 @@
        Iterator 是集合内部的合法访问器，它记录了集合的修改次数（expectedModCount），每次调用 iterator.remove()，都会：
             删除当前元素；更新 modCount 和 expectedModCount 保持一致
             所以不会触发 ConcurrentModificationException
+==========================================================整型数组求和================================================
+        比如，有一个数组：int[] flags = new int[ratings.length];
+1. 使用for循环
+    int sum = 0;
+    for (int i = 0; i < flags.length; i++) {
+        sum += flags[i];
+    }
+2. 增强for循环
+    int sum = 0;
+    for (int val : flags) {
+        sum += val;
+    }
+3. 使用java8的Stream
+    Arrays.stream(flags).sum();
 ============================================================算法题tips================================================
 1.  ①一般情况下寻找链表的中间节点都是下面的方法（奇数节点时，slow会来到中间节点；偶数个节点时，slow会来到中间两个节点的后一个）：
             private ListNode findMid(ListNode head) {

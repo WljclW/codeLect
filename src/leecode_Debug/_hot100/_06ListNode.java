@@ -495,6 +495,7 @@ public class _06ListNode {
                 因为对于每一个原始节点，复制的节点是在后面，原始的节点在前面。所以最后没有节点的时候pre会来到倒数第二个节点，这里
             需要把它的next指针指向null.
         * */
+        /**链表拆分时可以参考328题*/
         Node res = head.next,pre = head; /*res---复制得到的链表的头；pre---原始链表的头*/
         cur = res;
         while (cur.next!=null){

@@ -91,7 +91,7 @@ public class _13tanXin {
         /*遍历所有位置，每到一个位置先更新一下最远能到的位置；如果i来到了边界，就更新边界为maxPosition，就是
         * 下一跳的边界，此时就需要增加一步*/
         for (int i=0;i<nums.length-1;i++){ /**err：注意这里只能遍历到nums.length-1，否则得出的结果会多1。因为跳到最后一个位置就不用再跳了*/
-            maxPosition = Math.max(maxPosition,i+nums[i]); //每到一个位置，更新一下加入从这个位置跳，最远能到哪里
+            maxPosition = Math.max(maxPosition,i+nums[i]); //每到一个位置，根据"从这个位置跳，最远能到哪里"更新最远的可达边界
             if (i==bound){ //一旦来到边界，step++ 并且 更新下一次能到的最远距离
                 step++;
                 bound = maxPosition;
