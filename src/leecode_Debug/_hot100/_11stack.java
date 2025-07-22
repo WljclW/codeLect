@@ -93,6 +93,7 @@ public class _11stack {
      */
     /**下面是常错的一个点！！！！！！！！！*/
     /*
+    ======================错误1
     输入
         ["MinStack","push","push","push","push","pop","getMin","pop","getMin","pop","getMin"]
         [[],[512],[-1024],[-1024],[512],[],[],[],[],[],[]]
@@ -106,6 +107,18 @@ public class _11stack {
         【说明】会发现最后的最小元素应该是512，但是错误的输出是-1024！！说明前面的pop操作并没有弹出
     最小栈中栈顶的-1024，根源就在于Integer判断相等的时候需要使用equals方法，详细见下面的pop方法中的
     代码：if (minStack.peek().equals(pop))
+    =============================错误2
+    java.util.EmptyStackException
+          at line 103, java.base/java.util.Stack.peek
+          at line 29, MinStack.getMin
+          at line 74, __Driver__.__helperSelectMethod__
+          at line 92, __Driver__.__helper__
+          at line 113, __Driver__.main
+    最后执行的输入
+    ["MinStack","push","push","push","getMin","pop","getMin"]
+    [[],[0],[1],[0],[],[],[]]
+        【原因】if的判断条件"if (minStack.isEmpty() || val <= minStack.peek())"中的
+    "val <= minStack.peek()"漏掉了等于条件
     */
     /**
      * 补充说明Integer和int涉及到运算符时的区别：
@@ -127,6 +140,9 @@ public class _11stack {
 
         public void push(int val) {
             allStack.push(val);
+            /**err：小于等于栈顶的时候，都需要进入最小栈！！不能漏掉等于，否则一个等于minStack栈顶
+             * 的时候，到底应不应该出栈呢？就没有标准了。
+             * */
             if (minStack.isEmpty() || val <= minStack.peek()) { /**err：两个条件缺一不可，否则可能空指针*/
                 minStack.push(val);
             }

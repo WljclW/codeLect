@@ -266,7 +266,7 @@ public class _14DP {
      * 仅仅选取最大值则遍历到元素3的时候，会选择单独成一个子数组，这样是不对的。应该到任何一个
      * 位置，都应该记录当前子数组的最大值、最小值...
      *     然后到每一个位置的时候，需要决策出当前位置的最大目标值
-     * 【建议】建议使用maxProduct1
+     * 【建议】建议使用maxProduct2，条理清晰
      * */
     public int maxProduct(int[] nums) {
         //dp数组的定义：以nums[i-1]结尾的最大子数组的乘积..每一个数可以和前面的数个数合成一个子数组 或者 自己成立一个子数组
@@ -295,6 +295,19 @@ public class _14DP {
             preMin = Math.min(nums[i],Math.min(preMax*nums[i],preMin*nums[i]));
             preMax = curMax;
             res = Math.max(res,curMax);
+        }
+        return res;
+    }
+
+    public int maxProduct2(int[] nums) {
+        int minPre = nums[0],maxPre = nums[0];
+        int res = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            int curMin = Math.min(nums[i],Math.min(minPre*nums[i],maxPre*nums[i]));
+            int curMax = Math.max(nums[i],Math.max(maxPre*nums[i],maxPre*nums[i]));
+            minPre = curMin;
+            maxPre = curMax;
+            res = Math.max(res,maxPre);
         }
         return res;
     }

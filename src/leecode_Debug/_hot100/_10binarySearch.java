@@ -10,7 +10,7 @@ public class _10binarySearch {
      * 用"5，7，7，8，8，10"来捋过程
      * 下面是关于闭区间的理解————
      * 首先明确一点：闭区间的写法中，出循环时l一定等于r+1，因此返回值写l和r+1是等效的！！
-     * 【建议的解法】键searchInsert_01
+     * 【建议的解法】看searchInsert_01
      * 【关键!!】题目的本质是(左边界问题)：查找给定元素第一次出现的位置(如果数组中有的话)
      *                或者  查找大于目标元素的第一个数的位置(如果数组没有给定的元素)
      * 【进一步理解】这个题是寻找目标值左边界的方法（注意：理论上这个题求的是目标值target应该插入到什么地方。并且如果数组中有多个目标值
@@ -58,7 +58,7 @@ public class _10binarySearch {
             int mid=(left+right)/2;
             if(nums[mid]<target){
                 left=mid+1;
-            }else{
+            }else{ /**因为本质上想求解的是左边界，因此即使nums[mid]与target相等了，right也左移*/
                 right=mid-1;
             }
         }
@@ -336,6 +336,19 @@ public class _10binarySearch {
      *          比如左边有序则左边值的区间是[nums[0],nums[mid])，左闭右开，如果target在这个区间就往
      *       左边的那部分找，因此r=mid-1。
      * */
+    /*
+    ==================错误点1
+    输入
+        nums =
+        [3,1]
+        target =
+        1
+    输出
+        -1
+    预期结果
+        1
+        原因：“if (nums[mid] >= nums[0])”说明左边是有序的，不能漏掉等于。
+    * */
     public int search(int[] nums, int target) {
         int l = 0, r = nums.length - 1;
         while (l <= r) {
@@ -406,7 +419,7 @@ public class _10binarySearch {
 
             // 3.如果中间位置比min小，那么这个mid位置一定在第二段升序数组中，那么最小值一定在mid或者它的左边，这是因为每段都是升序的
             // 先更新min，然后向左边遍历
-            if(nums[mid] < min){ /**err：小于min的时候，可能当前的数nums[mid]就是最小的数，使用min变量记录*/
+            if(nums[mid] < min){ /**err：（由于数组不存在重复数，这里带不带等于都可以）小于min的时候，可能当前的数nums[mid]就是最小的数，使用min变量记录*/
                 min = nums[mid];
                 right = mid - 1;
             }

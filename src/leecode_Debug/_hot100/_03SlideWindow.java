@@ -35,6 +35,7 @@ public class _03SlideWindow {
     *   找呢？因此需要借助left指针
     * */
     /**
+     * 【建议】建议使用lengthOfLongestSubstring2 或者 lengthOfLongestSubstring01
      * 【关键】遍历s的每一个字符。。。
      *      每到一个位置right，先将这个字符加进map（无脑的先加到map）；然后利用while循环保证窗口是合法的
      * */
@@ -73,6 +74,23 @@ public class _03SlideWindow {
             max = Math.max(max,i-left+1);
         }
         return max;
+    }
+
+    public int lengthOfLongestSubstring2(String s) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        int left = 0,cur = 0;
+        int res = 0;
+        while (cur<s.length()){
+            char c = s.charAt(cur);
+            map.put(c,map.getOrDefault(c,0)+1);
+            while (map.get(c)>1){
+                char cLeft = s.charAt(left++);
+                map.put(cLeft,map.get(cLeft)-1);
+            }
+            res = Math.max(res,cur-left+1);
+            cur++; /**这句话如果是在上一句话的上面，就不用使用”cur-left+1“了，不需要+1*/
+        }
+        return res;
     }
 
 

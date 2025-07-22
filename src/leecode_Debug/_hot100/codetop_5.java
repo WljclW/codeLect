@@ -479,7 +479,7 @@ public class codetop_5 {
      *      数相乘后的结果应该放在结果中的i+j+1的位置。
      */
     public String multiply(String num1, String num2) {
-        if ("0".equals(num1) || "0".equals(num2)) return "0";
+        if ("0".equals(num1) || "0".equals(num2)) return "0"; /**err：没有不行。没有的话，如果结果是0，会输出""，两个数相乘再怎么也得有个数*/
 
         int len1 = num1.length(), len2 = num2.length();
         /**【说明】i位数的整数 和 j位数的整数相乘，结果是“i+j”位数，最少是“i+j-1”位数*/
@@ -626,9 +626,9 @@ public class codetop_5 {
      *      窗口的长度（即更新left的值）；研究完每一个数之后返回res
      */
     public int minSubArrayLen(int target, int[] nums) {
-        int left = 0, cur = 0;
-        int sum = 0;
-        int res = Integer.MAX_VALUE;
+        int left = 0, cur = 0; //窗口的左、右边界
+        int sum = 0; //窗口内所有数的和
+        int res = Integer.MAX_VALUE; //窗口内数字和不小于target的最小窗口大小
         while (cur < nums.length) {
             /*step1：不管三七二十一，都先放进窗口*/
             sum += nums[cur];

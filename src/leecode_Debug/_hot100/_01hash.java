@@ -24,6 +24,12 @@ public class _01hash {
      *      解法1：对每一个字符串排序。排序后的作为键，原始串作为值，存入到map;
      *      解法2：统计每一个字符串将统计值作为键值。
      *   总之，两种解法都是把键-->字符串存入到map，区别在于键是什么的问题！!
+     * 【难点】
+     *      1. 最后的返回值需要使用“new LinkedList<>(map.values());”。注意不能使用下面的方
+     *  式：“(List<List<String>>) map.values()”，错误原因：
+     *       java.lang.ClassCastException: class java.util.HashMap$Values cannot be cast
+     *  to class java.util.List (java.util.HashMap$Values and java.util.List are in module
+     *  java.base of loader 'bootstrap')
      * */
     public List<List<String>> groupAnagrams(String[] strs) {
         HashMap<String, List<String>> map = new HashMap<>();

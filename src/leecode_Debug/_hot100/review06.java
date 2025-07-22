@@ -8,6 +8,15 @@ import javax.sound.sampled.Line;
 import java.util.*;
 
 /**
+ * 25. K 个一组翻转链表
+ * 23. 合并 K 个升序链表
+ * 155. 最小栈
+ * 287. 寻找重复数
+ * 300. 最长递增子序列
+ * 41. 缺失的第一个正数
+ * 24. 两两交换链表中的节点
+ * 105. 从前序与中序遍历序列构造二叉树
+ * 31. 下一个排列
  * @author mini-zch
  * @date 2025/7/22 16:20
  */
@@ -477,7 +486,7 @@ public class review06 {
             }else
                 map.get(s).add(str);
         }
-        return (List<List<String>>) map.values();
+        return new LinkedList<>(map.values());
     }
 
 
@@ -1092,7 +1101,10 @@ public class review06 {
                 break;
             }
         }
-        reverseNum(nums,index);
+        int tmp = nums[index];
+        nums[index]  =nums[flag];
+        nums[flag] = tmp;
+        reverseNum(nums,flag+1);
         return;
     }
 
