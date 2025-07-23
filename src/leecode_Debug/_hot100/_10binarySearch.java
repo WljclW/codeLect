@@ -52,14 +52,14 @@ public class _10binarySearch {
     }
 
     //下面的写法仅仅是上面写法的合并版本。没有本质的区别，这两种都是闭区间的写法
-    public int searchInsert_01(int[] nums,int target){
-        int left=0,right=nums.length-1;
-        while(left<=right){
-            int mid=(left+right)/2;
-            if(nums[mid]<target){
-                left=mid+1;
-            }else{ /**因为本质上想求解的是左边界，因此即使nums[mid]与target相等了，right也左移*/
-                right=mid-1;
+    public int searchInsert_01(int[] nums, int target) {
+        int left = 0, right = nums.length - 1;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (nums[mid] < target) {
+                left = mid + 1;
+            } else { /**因为本质上想求解的是左边界，因此即使nums[mid]与target相等了，right也左移*/
+                right = mid - 1;
             }
         }
         return left;

@@ -33,7 +33,7 @@ public class _16tricks {
         int total = 0; //标记当前的票数
         int flag = -1; //标记值，初始值无所谓
         for (int i : nums) {
-            if (total == 0) { //如果票数为0，则更新标记值。。。total每次到0，说明一部份数已经抵消掉了
+            if (total == 0) { //如果票数为0，就先更新标记值。。。total每次到0，说明一部分数已经抵消掉了
                 flag = i;
             }
             total = flag == i ? total + 1 : total - 1; //票数不为0则投票，只要不是标记值，票数-1

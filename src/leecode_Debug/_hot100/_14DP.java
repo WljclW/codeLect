@@ -325,6 +325,18 @@ public class _14DP {
     /*32.
     * 给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的
     * 长度。*/
+
+    /**
+     * 【dp思路】1. 从index=1的位置开始研究。（因为以index=0的字符结尾的有效括号长度必然为0————就只有一个字符不可能是有效的）。
+     *       2. 仅仅研究”）“的位置，因为以左括号结尾的有效括号长度必然是0，有效括号子串必须是以右括号结尾的
+     * 【难点】研究右括号位置的时候，需要根据前一个位置的字符来分别研究（即for循环if块内的if-else块）————
+     *      情况1：if (s.charAt(i - 1) == '(')。说明前一个位置是左括号，则可以与当前的位置结合形成”()“；因此需要判断”前
+     *  前一个位置“的有效括号长度，即获取值dp[i-2]，如果i-2<0则dp[i]=2，否则dp[i]=dp[i-2]+2。
+     *      情况2：else.说明其哪一个位置是右括号。则记住这句话，很关键！！！！！”①跳过前一个位置有效长度后索引是大于0的 并且
+     *  ②跳过前一个位置有效括号的长度后前面那个字符是”(“，dp[i]才可能不是0.。。否则dp[i]必然是0，即不用赋值“————这句话中的
+     *  两个条件缺一不可。
+     */
+    /*动态规划的解法：*/
     public int longestValidParentheses(String s) {
         int res = 0;
         int[] dp = new int[s.length()];
@@ -333,7 +345,7 @@ public class _14DP {
                 if (s.charAt(i - 1) == '(') { //if块说明跟前面一个位置形成有效括号
                     dp[i] = (i >= 2) ? dp[i - 2] + 2 : 2;
                 } else { //else说明前面的一个位置也是右括号')'
-                    if (i - dp[i - 1] > 0 && s.charAt(i - dp[i - 1] - 1) == '(') { /**else里面的逻辑容易写错*/
+                    if (i - dp[i - 1] > 0 && s.charAt(i - dp[i - 1] - 1) == '(') { /**else里面的逻辑容易写错。【注意】else中我们只关注dp[i]不是0的情况，如果dp[i]必然是0，就不用研究和赋值，因为int数组的默认值就是0*/
                         dp[i] = (i - dp[i - 1] - 2 >= 0) ? dp[i - dp[i - 1] - 2] + 2 + dp[i - 1] : 2 + dp[i - 1];
                     }
                 }
@@ -342,6 +354,35 @@ public class _14DP {
         }
         return res;
     }
+
+    /*双指针的解法————空间复杂度降到O(n)*/
+    /**
+     *【双指针的解法】两次遍历，分别用left和right记录遍历过程遇到的左括号和右括号。两次遍历的区别在于————
+     *     1. 从左到右遍历时，如果过程中右括号的数量大于左括号的数量即right>left，则需要将left和right重置为0......因为此时
+     *  在当前的基础上增加有效括号的长度；但是left>right时，后续如果遇到right，就有可能增大有效括号的长度
+     *     2. 从右到左遍历时，正好相反。如果某一时刻left>right，则将left以及right重置为0
+     * 【疑问】为什么需要两次遍历？
+     */
+    public int longestValidParentheses_point(String s) {
+        int left = 0,right = 0; //分别记录遍历中遇到的左括号、右括号
+        int res = 0; //记录答案
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i)=='(') left++;
+            else right++;
+            if (left==right) res = Math.max(res,2*right);
+            if (right>left) left = right =0;  /**两次遍历的唯一区别*/
+        }
+
+        left = right = 0;
+        for (int i = s.length()-1; i >=0 ; i--) {
+            if (s.charAt(i)==')') right++;
+            else  left++;
+            if (left==right) res = Math.max(res,2*right);
+            if (left>right) left = right = 0;
+        }
+        return res;
+    }
+
 
 
     public static void main(String[] args) {

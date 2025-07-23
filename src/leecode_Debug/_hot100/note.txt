@@ -139,7 +139,7 @@
    如果用作是栈，则调用push、pop、peek，与常规意义的含义是一样的。。但是这种情况下不能将变量声明为Stack<>，因为java中的栈有实际的
         类————Stack，并且这是一个实际的类，不是接口
    如果用做是列表，则调用用add()，remove().
-3. 二叉树的前、中、后迭代遍历，需要使用栈结构；二叉树的层序遍历需要使用队列结构。。但是使用时都可以用LinkedList来代替，要注意的就是
+3. 二叉树的前、中、后迭代遍历，需要使用"栈"结构；二叉树的层序遍历需要使用"队列"结构。。但是使用时都可以用LinkedList来代替，要注意的就是
     变量需要使用LinkedList声明，即”LinkedList<Node> stack = new LinkedList<>();“、”LinkedList<Node> queue = new LinkedList<>();“
     是可以的，但是如果声明成List或者Deque接口类型是不对的，比如
             ”Stack<Node> stack = new LinkedList<>();“————错误的原因是LinkedList并不是Stack子类，并且Stack并不是接口；

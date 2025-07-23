@@ -17,7 +17,7 @@ import java.util.Map;
  *      ①见combinationSumTrace的for循环，递归调用时需要使用i而不是index，使用index的话会有重
  *          复的现象；
  *      ②再比如subsetsBack方法中的for循环中递归调用时要从i+1开始，而不是index+1！！！
- *    2. 回溯的模板中，for循环负责某一层的选择和操作；递归的调用实现的是向更深的一层（下一层）的继续研究
+ *    2. 回溯的模板中，for循环负责某一层的选择和操作；for循环中递归的调用实现的是从当前节点向更深的一层（下一层）的继续研究
  *    3. 关于这里去重的逻辑，需要详细理解”树层去重“ 和 ”树枝去重“，可参见方法combinationSum2
  *          见网址：https://programmercarl.com/0040.%E7%BB%84%E5%90%88%E6%80%BB%E5%92%8CII.html#%E6%80%9D%E8%B7%AF
  *      3.1 去重的通用代码
@@ -38,8 +38,13 @@ import java.util.Map;
  *      3.2 【这一点很重要】全排列Ⅱ去重的问题中used[i-1]==true也可完成去重的底层原理：
  *          https://programmercarl.com/0047.%E5%85%A8%E6%8E%92%E5%88%97II.html#%E6%8B%93%E5%B1%95
  *      3.3 【需要测试】组合总和Ⅱ问题中，是不是3.1的理论就不行了？？验证一下，确实不行！！，见方法注释
- *
- *
+ * 【变量的声明位置】
+ *      1. 对于最终的返回结果，这里通常是List<String>、List<List<String>>这种类型。。。建议声明为全局变量，这种变量是只增不减的。
+ *      2. 其他的不可变的变量建议声明为全局变量，比如力扣17题中，map是不变的，因此建议将map声明为全局变量。
+ *      3. 除了1、2两点之外的变量，建议将变量写在形参的位置。。。。比如力扣17题中的StringBuilder，虽然声明为全局变量代码看起来不用
+ *  动，但是在一些情况下会存在严重的问题，比如：多个实例同时调用的时候、并发的时候，导致问题的根本原因就是StringBuilder是全局变量，但
+ *  是在回溯的过程中会改变，因此任何实例走完一遍后需要将StringBuilder恢复到初始状态，从而保证不会玷污下次调用！！！————综上，对于类似
+ *  的这种 在调用中会发生改变的量并且深度绑定本次调用过程 的量，强烈建议声明在形参的位置。
  * */
 public class _09huisu {
     /*46.
@@ -73,9 +78,9 @@ public class _09huisu {
             if (used[i]) continue;
             used[i] = true;
             path.add(nums[i]);
-            permuteBack(nums);
+            permuteBack(nums); /*相当于选择了当前元素，继续研究当前节点的子节点*/
             used[i] = false;
-            path.remove(path.size() - 1);
+            path.remove(path.size() - 1); /*相当于撤销选择，即不选择i元素，研究下一个元素nums[i+1]————对应同一层的下一个节点*/
         }
     }
 
@@ -336,7 +341,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             return true; /*写成"index==word.length()-1"就错了*/
         if (i >= 0 && j >= 0 && i < board.length && j < board[0].length && board[i][j] == word.charAt(index)) {
             board[i][j] = '\0';
-            boolean cur = dfs(board, i + 1, j, index + 1, word) ||
+            boolean cur = dfs(board, i + 1, j, index + 1, word) || /**只要四个方法有一个方向能匹配到index+1字符，就返回true*/
                     dfs(board, i - 1, j, index + 1, word) ||
                     dfs(board, i, j + 1, index + 1, word) ||
                     dfs(board, i, j - 1, index + 1, word);

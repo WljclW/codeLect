@@ -143,16 +143,16 @@ public class _07binarytree {
     * 给你二叉树的根结点 root ，请你将它展开为一个单链表：
     展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
     展开后的单链表应该与二叉树 先序遍历 顺序相同。*/
-    public void flatten(leecode_Debug.top100.TreeNode root) {
+    public void flatten(TreeNode root) {
         if (root==null) return;
-        LinkedList<leecode_Debug.top100.TreeNode> stack = new LinkedList<>();
+        LinkedList<TreeNode> stack = new LinkedList<>();
         stack.push(root);
-        leecode_Debug.top100.TreeNode cur = null;
+        TreeNode cur = null;
         while (!stack.isEmpty()){
-            leecode_Debug.top100.TreeNode nowNode = stack.pop();
-            if (cur==null){
+            TreeNode nowNode = stack.pop();
+            if (cur==null){ //cur是null，说明nowNode是先序遍历的第一个节点
                 cur = nowNode;
-            }else{
+            }else{ //否则的话将nowNode拼接到cur节点后面
                 cur.right = nowNode;
                 cur.left = null;
                 cur = cur.right;

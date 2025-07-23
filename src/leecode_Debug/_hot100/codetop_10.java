@@ -68,6 +68,12 @@ public class codetop_10 {
     给你一个以字符串表示的非负整数 num 和一个整数 k ，移除这个数中的 k 位数字，使得剩下的数字最小。请你以字
     符串形式返回这个最小的数字。
     * */
+
+    /**
+     *【思路】先依照最小栈的原则遍历一次num，每次删除字符维护k的值；如果k>0，则从栈的末尾删k个字符。。。最后栈中的字符组成字符串返回。
+     *【关键】这个题虽然用到了单调栈，但是由于最后拼接字符串需要从栈底开始拿字符，因此实际上最好不用使用Stack类，而是使用LinkedList，
+     *      把LinkedList当作双端队列使用
+     */
     public String removeKdigits(String num, int k) {
         LinkedList<Character> stack = new LinkedList<>();
         /*step1：维持一个最小栈————只要当前的数比栈顶的数小，栈顶的数就出栈*/
