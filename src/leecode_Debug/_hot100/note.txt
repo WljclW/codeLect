@@ -113,12 +113,13 @@
                     slow = slow.next;
                     fast = fast.next.next;
                 }
-                //如果是偶数个节点，到这里slow会指向中间两个节点的第一个
+                //如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个
                 ListNode res = slow.next;
                 slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”*/
                 return res;
             }
-    另一种关于②的写法：
+   【总结】在快慢指针找中间节点时，fast指针的初始位置决定了寻找中间哪一个节点。slow指针不影响，固定初始值是head
+    另一种关于②的写法（但是建议不要使用下面的写法）：
             ListNode slow = head, fast = head, prev = null;
             while (fast != null && fast.next != null) {
                 prev = slow; //使用prev节点记录slow的前一个节点

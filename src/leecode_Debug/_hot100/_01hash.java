@@ -75,7 +75,7 @@ public class _01hash {
 //        }
 //        return res;
 
-        int res = 1;
+        int res = 0; /**err：res的初始值必须是0，因为数组可能没有元素*/
         for (int num:set){ /**err：这个题的关键，从set中拿取数进行研究以它开始的序列长度*/
             if (!set.contains(num-1)){ //要求这个num必须是序列开始的那个数
                 int length = 0;

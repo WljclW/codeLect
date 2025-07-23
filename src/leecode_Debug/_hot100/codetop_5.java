@@ -143,7 +143,7 @@ public class codetop_5 {
         出错原因：除了while循环时fast指向null，slow指向第一个3，但是第一个3和第二个三的链没有断开！！
     * */
     public ListNode deleteDuplicates_83(ListNode head) {
-        if (head == null||head.next==null) return head;
+        if (head == null) return head; /**err：必须要有，因为下面fast指针的初始值是head.next*/
 
         ListNode slow = head,fast = head.next;
 
@@ -351,7 +351,7 @@ public class codetop_5 {
         if (root==null) return true;
         LinkedList<TreeNode> deque = new LinkedList<>();
         TreeNode cur = root;
-//        int preValent= Integer.MIN_VALUE; /*这里用int类型是错误的！！！*/
+//        int preValent= Integer.MIN_VALUE; /*这里用int类型是错误的！！！用int范围过小了————原因：系欸但的最小值是int的最小值*/
         long preValent = Long.MIN_VALUE; /**err：注意这里不能使用Integer.MIN_VALUE；并且不能声明为Long类型。*/
         while (cur!=null || !deque.isEmpty()){
             if (cur!=null){
@@ -359,7 +359,7 @@ public class codetop_5 {
                 cur = cur.left;
             }else{  /*修改中序遍历中打印节点的值的过程*/
                 TreeNode nowNode = deque.pop();
-                if (nowNode.val<=preValent){ /**err：二叉搜索树是严格升序的*/
+                if (nowNode.val<=preValent){ /**err：二叉搜索树是严格升序的。相邻值是不行的*/
                     return false;
                 }
                 preValent = nowNode.val; /*preValent声明为long类型时这里才能隐式转换完成；否则如果声明为Long类型，这里会编译报错*/
@@ -574,11 +574,9 @@ public class codetop_5 {
                     treeNodes.add(cur.right);
                     integers.add(curVal*2+1);
                 }
-                /*2.4：来到每一层的最后一个节点，则本层的节点数是last-first+1，更新res*/
-                if (i==size-1){
-                    res = Math.max(last-first+1,res);
-                }
             }
+            /*2.4：遍历完一层，更新res*/
+            res = Math.max(last-first+1,res); /**err：*/
         }
         return res;
     }

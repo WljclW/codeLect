@@ -522,6 +522,7 @@ public class _06ListNode {
      *      2.（说明目前的链表有不止一个节点）找到中间节点，同时需要把前一半最后节点next指针指向null
      *      3.递归调用方法排序前半的链表、后半的链表
      *      4.经过3两半的链表都排序完成，这里将排序后的两半链表合并为一个。。【力扣；合并两个有序链表】
+     * 【难点】在找中间节点的时候，一定要把前一半链表的最后节点指向null，否则会死循环，超出运行时间。
      * */
     public ListNode sortList(ListNode head) {
         /*1.特殊情况的考虑————没有节点或者只有一个节点，此时不用排序*/
@@ -553,7 +554,7 @@ public class _06ListNode {
     }
 
     /*找中间节点的代码。与hot100求中间节点不同，区别————
-    *       1. 如果是及数个节点，两种都会得到中间节点；
+    *       1. 如果是奇数个节点，两种都会得到中间节点；
     *       2. 如果是偶数个节点，下面的方案会得到中间两个的前一个节点*/
     private ListNode findMid(ListNode head) {
         ListNode slow = head,fast = head.next;
@@ -561,9 +562,9 @@ public class _06ListNode {
             slow = slow.next;
             fast = fast.next.next;
         }
-        //如果是偶数个节点，到这里slow会指向中间两个节点的第一个
+        //如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个
         ListNode res = slow.next;
-        slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”*/
+        slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”，我们是用null作为链表结束的标志*/
         return res;
     }
 

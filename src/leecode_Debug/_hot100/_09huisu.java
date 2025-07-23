@@ -340,7 +340,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         if (index == word.length())
             return true; /*写成"index==word.length()-1"就错了*/
         if (i >= 0 && j >= 0 && i < board.length && j < board[0].length && board[i][j] == word.charAt(index)) {
-            board[i][j] = '\0';
+            board[i][j] = '\0'; /**err：这里需要使用特殊字符标记遍历过的位置，否则会导致本来没有的结果返回true*/
             boolean cur = dfs(board, i + 1, j, index + 1, word) || /**只要四个方法有一个方向能匹配到index+1字符，就返回true*/
                     dfs(board, i - 1, j, index + 1, word) ||
                     dfs(board, i, j + 1, index + 1, word) ||

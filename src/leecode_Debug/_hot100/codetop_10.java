@@ -98,6 +98,34 @@ public class codetop_10 {
         return sb.length() == 0 ? "0" : sb.toString();
     }
 
+    /*下面是自己的写法，自己的写法细节太多了，很容易错*/
+    public String removeKdigits_own(String num, int k) {
+        LinkedList<Character> stack = new LinkedList<>();
+        for (int i = 0; i < num.length(); i++) {
+            char c = num.charAt(i);
+            while (!stack.isEmpty()&&c-'0'<stack.peekLast()-'0'&&k>0){
+                k--;
+                stack.pollLast();
+            }
+            stack.offerLast(c);
+        }
+
+        while (k>0){
+            k--;
+            stack.pollLast();
+        }
+        StringBuilder sb = new StringBuilder();
+        int size = stack.size();
+        for (int i = 0; i < size; i++) {
+            Character c = stack.pollFirst();
+            if (sb.length()==0&&c=='0') continue;
+            sb.append(c);
+        }
+        return sb.toString()==""?"0":sb.toString();
+    }
+
+
+
     /*LCR 170. 交易逆序对的总数
     在股票交易中，如果前一天的股价高于后一天的股价，则可以认为存在一个「交易逆序对」。请设计一个程序，输入一段时
     间内的股票交易记录 record，返回其中存在的「交易逆序对」总数。
@@ -268,7 +296,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             }
         }
 
-        Collections.reverse(res); /**err：将res的顺序反序用此方法*/
+        Collections.reverse(res); /**err：将res的顺序反序用此方法."Collections.reverse原地翻转collection"*/
         /**使用下面的代码进行反序时，会超时。。。
          * 【注意】下面的方法翻转链表是错误的！！！因为”res.add(i,right);“是在特定的位置插入一个值，但是没有删除之前i位置的值，因此
          *      会导致链表不断的变长

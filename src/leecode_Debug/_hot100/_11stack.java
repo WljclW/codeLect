@@ -401,7 +401,7 @@ public class _11stack {
                     int L = stack.isEmpty()?-1: stack.peek();
                     max = Math.max(max,heights[peek]*(i -L-1)); //i当前位置也是右边所求的数；L是弹出后新栈顶的数，也即左边所求的数
                 }
-                stack.push(i); /**▲err：注意如果没有入栈，会导致计算出的面积永远是0*/
+                stack.push(i); /**▲err：注意如果没有入栈，会导致计算出的面积永远是0————这是单调栈中常见的马虎*/
             }
         }
         /*清空栈。依次弹出并生成对应的信息*/

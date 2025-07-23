@@ -15,6 +15,13 @@ import java.util.*;
  * 24. 两两交换链表中的节点
  * 105. 从前序与中序遍历序列构造二叉树
  * 31. 下一个排列
+ * 101
+ * 300. 最长递增子序列
+ * 416
+ * 82. 删除排序链表中的重复元素 II
+ * 143. 重排链表
+ * 328
+ * 402. 移掉 K 位数字
  * @author mini-zch
  * @date 2025/7/22 16:20
  */
@@ -1234,7 +1241,7 @@ public class review06 {
     请你设计并实现时间复杂度为 O(n) 的算法解决此问题。*/
     public int longestConsecutive(int[] nums) {
         HashSet<Integer> set = new HashSet<>();
-        int res =1;
+        int res =0;
         for (int num:nums){
             set.add(num);
         }
@@ -1257,7 +1264,7 @@ public class review06 {
     public void moveZeroes(int[] nums) {
         int left = 0,right = 0;
         while (right<nums.length){
-            if (right!=0){
+            if (nums[right]!=0){
                 nums[left++] = nums[right++];
             }else{
                 right++;
@@ -1285,8 +1292,8 @@ public class review06 {
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[0].length / 2; j++) {
                 int tmp = matrix[i][j];
-                matrix[i][j] = matrix[i][m-1-i];
-                matrix[i][m-1-i] = tmp;
+                matrix[i][j] = matrix[i][m-1-j];
+                matrix[i][m-1-j] = tmp;
             }
         }
     }
@@ -1414,6 +1421,7 @@ public class review06 {
                 if (cur.val<=pre){
                     return false;
                 }
+                pre = cur.val;
                 root = cur.right;
             }
         }
@@ -1431,6 +1439,7 @@ public class review06 {
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[0].length; j++) {
                 if (grid[i][j]=='1'){
+                    res++;
                     dfs(grid,i,j);
                 }
             }
@@ -1500,8 +1509,8 @@ public class review06 {
     public boolean isValid(String s) {
         HashMap<Character, Character> map = new HashMap<>() {{
             put(')','(');
-            put('[',']');
-            put('{','}');
+            put(']','[');
+            put('}','{');
         }};
         Stack<Character> characters = new Stack<>();
         for (char c:s.toCharArray()){
@@ -1528,6 +1537,7 @@ public class review06 {
                 int curArea = heights[pop]*(i-left-1);
                 res = Math.max(curArea,res);
             }
+            stack.push(i);
         }
         return res;
     }
@@ -1683,6 +1693,27 @@ public class review06 {
     }
 
 
+//    public int longestValidParentheses(String s) {
+//        int left = 0,right = 0;
+//        int res = 0;
+//        for (int i = 0; i < s.length(); i++) {
+//            if (s.charAt(i)=='(') left++;
+//            else right++;
+//            if (left==right) res = Math.max(res,2*left);
+//            if (left<right) left=right=0;
+//        }
+//
+//        left=right=0;
+//        for (int i = s.length()-1; i >=0 ; i--) {
+//            if (s.charAt(i)=='(') left++;
+//            else right++;
+//            if (left==right) res = Math.max(res,2*left);
+//            if (left>right) left=right=0;
+//        }
+//        return res;
+//    }
+
+
     /*46.
     给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
     * */
@@ -1714,6 +1745,36 @@ public class review06 {
         }
     }
 
+    /**
+     * 比较上面的代码和下面的代码，会发现：仅仅是把变量pathPermute、usedPermute放在了形参的位置。其他的代码
+     * 都没有变——————体会回溯这里 全局变量和形参变量的区别
+     */
+//    List<List<Integer>> resPermute1;
+//    public List<List<Integer>> permute(int[] nums) {
+//        resPermute1=new LinkedList<>();
+//        List<Integer> pathPermute = new LinkedList<>();
+//        boolean[] usedPermute = new boolean[nums.length];
+//        permuteBack1(nums,pathPermute,usedPermute);
+//        return resPermute1;
+//    }
+//
+//    private void permuteBack1(int[] nums, List<Integer> pathPermute, boolean[] usedPermute) {
+//        if (pathPermute.size()==nums.length){
+//            resPermute1.add(new LinkedList<>(pathPermute));
+//            return;
+//        }
+//        for (int i = 0; i < nums.length; i++) {
+//            if (!usedPermute[i]){
+//                usedPermute[i] = true;
+//                pathPermute.add(nums[i]);
+//                permuteBack1(nums,pathPermute,usedPermute);
+//                usedPermute[i] = false;
+//                pathPermute.remove(pathPermute.size()-1);
+//            }
+//        }
+//    }
+
+
     /*78.
     给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
     解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
@@ -1737,6 +1798,28 @@ public class review06 {
         }
     }
 
+    /**
+     * 上面的代码和下面的代码唯一的区别是pathSubsets放在了形参的位置，其他的diamond都是一样的。这两种都没问题
+     */
+//    List<List<Integer>> resSubSets;
+//    public List<List<Integer>> subsets(int[] nums) {
+//        resSubSets = new LinkedList<>();
+//        List<Integer> pathSubsets = new LinkedList<>();
+//        subsetsBack(nums,0,pathSubsets);
+//        return resSubSets;
+//    }
+//
+//    private void subsetsBack(int[] nums, int index,List<Integer> pathSubsets) {
+//        resSubSets.add(new LinkedList<>(pathSubsets));
+//        if (index==nums.length) return;
+//        for (int i = index; i < nums.length; i++) {
+//            pathSubsets.add(nums[i]);
+//            subsetsBack(nums,i+1,pathSubsets);
+//            pathSubsets.remove(pathSubsets.size()-1);
+//        }
+//    }
+
+
 
     /*17.
     给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
@@ -1758,6 +1841,7 @@ public class review06 {
             put('8',"tuv");
             put('9',"wxyz");
         }};
+        if (digits.length()==0) return resLetterCombinations;
         letterCombinationsBack(digits,0);
         return resLetterCombinations;
     }
@@ -1805,6 +1889,8 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     /**
      * 【解题关键】尝试，用open和close分别表示左右括号，在合法的前提下（合法的要求：①任意时刻左括号的
      *      数量必须不小于右括号的数量 且 ②左括号的数量小于n），尝试添加一个左括号或者右括号。
+     * 【同理】这段代码sbGenerateParenthesis放在形参的位置，其他的代码也不用变，把它作为形参变量每一
+     *      次递归的时候传即可。
      */
     /*解法1：官方解回溯法*/
     List<String> resGenerateParenthesis;
@@ -1822,14 +1908,14 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             return;
         }
         if (left<n){
-            sb.append('(');
+            sbGenerateParenthesis.append('(');
             generateParenthesisBack(n,left+1,right);
-            sb.deleteCharAt(sb.length()-1);
+            sbGenerateParenthesis.deleteCharAt(sbGenerateParenthesis.length()-1);
         }
         if (right<left){
-            sb.append(')');
+            sbGenerateParenthesis.append(')');
             generateParenthesisBack(n,left,right+1);
-            sb.deleteCharAt(sb.length()-1);
+            sbGenerateParenthesis.deleteCharAt(sbGenerateParenthesis.length()-1);
         }
     }
 
@@ -1950,6 +2036,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 
     /*83*/
     public ListNode deleteDuplicates1(ListNode head) {
+        if (head==null) return head;
         ListNode slow = head,fast = head.next;
         while (fast!=null){
             if (slow.val!=fast.val){
@@ -2093,8 +2180,8 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
                     integers.offer(curVal*2+1);
                 }
                 if (i==size-1) right = curVal;
-                res  =Math.max(res,right-left+1);
             }
+            res  =Math.max(res,right-left+1);
         }
         return res;
     }
@@ -2186,7 +2273,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 
         k %= size;
         cur = head;
-        for (int i = 0; i < size - k; i++) {
+        for (int i = 0; i < size - k -1; i++) {
             cur = cur.next;
         }
         ListNode res = cur.next;
@@ -2201,23 +2288,33 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     * */
     public String removeKdigits(String num, int k) {
         LinkedList<Character> stack = new LinkedList<>();
-        for (int i = 0; i < num.length()&&k>0; i++,k--) {
+        for (int i = 0; i < num.length(); i++) {
             char c = num.charAt(i);
-            while (!stack.isEmpty()&&c<stack.peek()){
+            while (!stack.isEmpty()&&c-'0'<stack.peekLast()-'0'&&k>0){
+                k--;
                 stack.pollLast();
             }
             stack.offerLast(c);
         }
 
         while (k>0){
+            k--;
             stack.pollLast();
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < stack.size(); i++) {
-            if (sb.length()==0&&stack.peekFirst()=='0') continue;
-            sb.append(stack.pollFirst());
+        int size = stack.size();
+        for (int i = 0; i < size; i++) {
+            Character c = stack.pollFirst();
+            if (sb.length()==0&&c=='0') continue;
+            sb.append(c);
         }
-        return sb.toString();
+        return sb.toString()==""?"0":sb.toString();
+    }
+
+
+    public static void main(String[] args) {
+        review06 review06 = new review06();
+        review06.removeKdigits("10200",1);
     }
 
     /*145
@@ -2249,9 +2346,9 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     请注意，偶数组和奇数组内部的相对顺序应该与输入时保持一致。
     你必须在 O(1) 的额外空间复杂度和 O(n) 的时间复杂度下解决这个问题。
      */
-    public ListNode oddEvenList(ListNode head) {
-
-    }
+//    public ListNode oddEvenList(ListNode head) {
+//
+//    }
 
     /*135
     n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的评分。
@@ -2272,7 +2369,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
         }
 
         for (int i = ratings.length-2; i >=0 ; i--) {
-            if (ratings[i]>ratings[i=1]){
+            if (ratings[i]>ratings[i+1]){
                 dp[i] = Math.max(dp[i],dp[i+1]+1);
             }
         }
