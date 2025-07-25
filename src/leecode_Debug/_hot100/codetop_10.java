@@ -72,19 +72,23 @@ public class codetop_10 {
     /**
      *【思路】先依照最小栈的原则遍历一次num，每次删除字符维护k的值；如果k>0，则从栈的末尾删k个字符。。。最后栈中的字符组成字符串返回。
      *【关键】这个题虽然用到了单调栈，但是由于最后拼接字符串需要从栈底开始拿字符，因此实际上最好不用使用Stack类，而是使用LinkedList，
-     *      把LinkedList当作双端队列使用
+     *   把LinkedList当作双端队列使用；
+     *      从前向后遍历的时候、以及最后需要从双端队列头开始挨个获取元素，都建议使用”for (char c : xxxxx)“的方法，可以知道这种方
+     *   法就是从头开始拿取元素的
      */
     public String removeKdigits(String num, int k) {
         LinkedList<Character> stack = new LinkedList<>();
         /*step1：维持一个最小栈————只要当前的数比栈顶的数小，栈顶的数就出栈*/
         for (char c : num.toCharArray()) {
-            while (!stack.isEmpty() && k > 0 && c<stack.peekLast()) { /**err：这里直接入栈的是字符，而不是索引，因此比较的是"c<stack.peekLast()"*/
+            /**err：①这里直接入栈的是字符，而不是索引，因此比较的是"c<stack.peekLast()"
+             *      ②k的含义是要删除的字符数量，因此k-1应该绑定在删除字符的时候，每一次字符弹出双端队列时k-1*/
+            while (!stack.isEmpty() && k > 0 && c<stack.peekLast()) {
                 stack.pollLast();
                 k--;
             }
             stack.offerLast(c);
         }
-        /*step2：剩下的是单调递增的。倒着删除剩余的k位*/
+        /*step2：剩下的是单调递增的。倒着删除k位*/
         while (k > 0 && !stack.isEmpty()) {
             stack.pollLast();
             k--;
@@ -175,15 +179,48 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*61
     给你一个链表的头节点 head ，旋转链表，将链表每个节点向右移动 k 个位置。
      */
-//    public ListNode rotateRight(ListNode head, int k) {
-//
-//    }
+    /**
+     *【思路】两次遍历：第一次遍历做两件事————①统计链表的节点数；②将链表的尾部和首部串起来；
+     *               第二次遍历做两件事————①找到第size-k个节点；②将next指针置null（但要先记录一下，因为要返回，它时新的头节点）
+     *【难点】第一次遍历时：size的初始值是1，循环的条件是while(cur.next！=null)————这样最终cur会指向最后一个非null节点
+     *       第二次遍历时：也是从head开始，因此此题没有使用dummy节点，并且也尽量不要使用，就会导致其实初始就已经过了一个节点————因此
+     *   for循环遍历i的范围是”i<size-k-1“。
+     */
+    public ListNode rotateRight(ListNode head, int k) {
+        if (head==null||head.next==null||k==0) return head; //特殊情况的判断。”head==null“的判断是必不可少的，其他的可以省
+        /*step1：计算出链表的节点数量。
+        【难点】size的初始值需要设置为1；并且while的循环条件应该是”cur.next!=null“
+               原因：因为size的初始值是1，因此head已经计数过了；如果cur.next不是null的时候才能更新size*/
+        int size = 1;
+        ListNode cur = head;
+        while (cur.next!=null){
+            cur = cur.next;
+            size++;
+        }
+        /*step2：经过上面的while循环之后，cur指针会来到最后一个非null的节点————此时需要将cur.next指向head,完成首尾相接*/
+        cur.next = head;
+        /*step3：从头开始遍历，找到需要断开连接的地方。因为要旋转k位，因此应该是第(size-k)个节点之后断开连接。【注意】但是由于
+        * 我们是从head节点开始数的，并且i初始值是0，因此必须要满足i<(size-k-1)*/
+        cur = head;
+        for (int i = 0; i < size - k - 1; i++) {
+            cur = cur.next;
+        }
+        /*step4：先记录下cur.next，这是要返回的头；然后cur.next=null————断开cur节点和后面节点的连接*/
+        ListNode res = cur.next;
+        cur.next = null;
+        return res;
+    }
 
     /*114
     给你二叉树的根结点 root ，请你将它展开为一个单链表：
 
 展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
 展开后的单链表应该与二叉树 先序遍历 顺序相同。
+     */
+    /**
+     * 【思路】使用前序比哪里依次将节点串起来。
+     * 【难点】方法是没有返回值的————因此不能虚拟头节点。导致拼接指针的初始值只能初始化为null 或者 root(建议初始化为null)
+     * @param root
      */
     public void flatten(TreeNode root) {
         if (root==null) return;
@@ -197,7 +234,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             else{   /*否则的话将节点拼接到right指针，然后cur指针右移*/
                 cur.left = null;
                 cur.right = nowNode;
-                cur = cur.right;        /**err：更新cur指针*/
+                cur = cur.right;        /**err：更新cur指针。。。。如果忘记变更，会导致最终的结果最多只有两个节点*/
             }
             if (nowNode.right!=null) stack.push(nowNode.right);
             if (nowNode.left!=null) stack.push(nowNode.left);
@@ -381,10 +418,10 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
     /**
      *【思路】两次遍历。
-     *      ①一次是从左向右遍历，满足左边的条件。对于index位置，如果index-1的位置值小，则index位置的最小值是index位置的糖果+1.这样
-     *  一轮结束可以保证每一个位置左边条件是满足的
-     *      ②一次是从右向左遍历，满足右边的条件。对于index位置，如果index+1的位置值小，则index位置的最小值是index+1位置的糖果+1，这
-     *  样一轮结束可以保证每一个位置右边条件是满足的
+     *      ①一次是从左向右遍历，满足左边的条件。对于index位置，如果index-1的位置值小，则index位置的最小值是index位置的糖果+1.
+     *          ————这样一轮结束可以保证每一个位置左边条件是满足的
+     *      ②一次是从右向左遍历，满足右边的条件。对于index位置，如果index+1的位置值小，则index位置的最小值是index+1位置的糖果+1。
+     *          ————这样一轮结束可以保证每一个位置右边条件是满足的
      */
     public int candy(int[] ratings) {
         int[] flags = new int[ratings.length];
@@ -507,6 +544,20 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*316
     给你一个字符串 s ，请你去除字符串中重复的字母，使得每个字母只出现一次。需保证 返回结果的字典序最小（要求不能打乱其他字符的相对位置）。
      */
+    /**
+     *【思路】
+     *      1. 统计灭一个字符最晚出现的位置
+     *      2. 维护一个栈来构建答案（想法是最小栈————即只要当前字符比栈顶元素小，栈顶元素就需要出栈）【但是】与之前常规的最最小栈有
+     *  区别，这里并不能仅仅依靠字符的大小来决定出栈，而是要结合后面剩下的串中还有没有栈顶字符来决定。。。。。因为题目要求最后每一个字
+     *  符都必须出现且仅出现一次！！
+     *         综上，元素出栈的条件：①当前遍历到的字符比栈顶元素小；②当前字符后面的子串中还有栈顶字符。满足①和②时，栈顶元素才能出栈。
+     *      3. 基于2，需要引入一个数组————用一个集合 visited[] 标记哪些字符已经在栈中，防止重复加入
+     *      4. 最后从”栈底“一次弹出每一个字符组装成结果
+     *【tips】使用”最小栈“的思想，但是最后从栈底依次弹出每一个元素组装成最后的节点。常见两种处理方式——————
+     *          方式1：最后从栈底依次弹出每一个元素时，使用 “ for (char ch : stack) ”
+     *          方式2：虽然使用的是栈，但是变量使用LinkedList。此时入栈、出栈分别使用”offerLast()“、”pollLast()“，最后从栈底弹出元
+     *    素时使用方法”pollFirst()“——————即”把栈顶想象成双端队列尾部，把栈底想象成双端队列头部“
+     */
 //    public String removeDuplicateLetters(String s) {
 //
 //    }
@@ -588,12 +639,12 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*678
     给你一个只包含三种字符的字符串，支持的字符类型分别是 '('、')' 和 '*'。请你检验这个字符串是否为有效字符串，如果是 有效 字符串返回 true 。
 
-有效 字符串符合如下规则：
+    有效 字符串符合如下规则：
 
-任何左括号 '(' 必须有相应的右括号 ')'。
-任何右括号 ')' 必须有相应的左括号 '(' 。
-左括号 '(' 必须在对应的右括号之前 ')'。
-'*' 可以被视为单个右括号 ')' ，或单个左括号 '(' ，或一个空字符串 ""。
+    任何左括号 '(' 必须有相应的右括号 ')'。
+    任何右括号 ')' 必须有相应的左括号 '(' 。
+    左括号 '(' 必须在对应的右括号之前 ')'。
+    '*' 可以被视为单个右括号 ')' ，或单个左括号 '(' ，或一个空字符串 ""。
      */
     /**
      *【关键】使用两个变量。
@@ -741,9 +792,9 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
     /*44
     给你一个输入字符串 (s) 和一个字符模式 (p) ，请你实现一个支持 '?' 和 '*' 匹配规则的通配符匹配：
-'?' 可以匹配任何单个字符。
-'*' 可以匹配任意字符序列（包括空字符序列）。
-判定匹配成功的充要条件是：字符模式必须能够 完全匹配 输入字符串（而不是部分匹配）。
+    '?' 可以匹配任何单个字符。
+    '*' 可以匹配任意字符序列（包括空字符序列）。
+    判定匹配成功的充要条件是：字符模式必须能够 完全匹配 输入字符串（而不是部分匹配）。
      */
 //    public boolean isMatch(String s, String p) {
 //
@@ -827,12 +878,13 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 每一步只能移动到下一行中相邻的结点上。相邻的结点 在这里指的是 下标 与 上一层结点下标 相同或者等于 上一层结点下标 + 1 的两个结点。也就是说，如果正位于当前行的下标 i ，那么下一步可以移动到下一行的下标 i 或 i + 1 。
      */
 //    public int minimumTotal(List<List<Integer>> triangle) {
-//        LinkedList<Integer> ls = new LinkedList<>();
-//        ls.add(triangle.get(0).get(0));
-//        for (int i=0;i<triangle.size();i++){
+//        LinkedList<Integer> res = new LinkedList<>();
+//        res.add(triangle.get(0).get(0));
+//        for (int i = 1; i < triangle.size(); i++) {
 //            List<Integer> integers = triangle.get(i);
 //            for (int j = 0; j < integers.size(); j++) {
-//                ls.add(0,ls.get(0)+integers.get(0));
+//                Integer cur = integers.get(i);
+//                res.add(j);
 //            }
 //        }
 //    }

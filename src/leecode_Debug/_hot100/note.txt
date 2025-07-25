@@ -113,7 +113,7 @@
                     slow = slow.next;
                     fast = fast.next.next;
                 }
-                //如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个
+                //如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个；如果是奇数个节点，指向中间节点
                 ListNode res = slow.next;
                 slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”*/
                 return res;

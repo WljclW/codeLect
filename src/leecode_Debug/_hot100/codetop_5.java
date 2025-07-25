@@ -576,7 +576,7 @@ public class codetop_5 {
                 }
             }
             /*2.4：遍历完一层，更新res*/
-            res = Math.max(last-first+1,res); /**err：*/
+            res = Math.max(last - first + 1, res); /**err：for循环会完成某一层节点的挨个遍历，出了for循环统计该层的节点数比较靠谱*/
         }
         return res;
     }

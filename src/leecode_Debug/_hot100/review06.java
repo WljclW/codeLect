@@ -262,48 +262,48 @@ public class review06 {
 
 
     /*138复制链表*/
-    public Node copyRandomList(Node head) {
-        if (head==null) return head;
-        Node cur = head;
-        while (cur!=null){
-            Node node = new Node(cur.val);
-            node.next = cur.next;
-            cur.next = node;
-            cur = cur.next.next;
-        }
-
-        cur = head;
-        while (cur!=null){
-            if (cur.random!=null){
-                cur.next.random = cur.random.next;
-            }
-            cur = cur.next.next;
-        }
-
-        Node res = head.next,now = res;
-        Node origin = head;
-        while (now.next!=null){
-            origin.next = origin.next.next;
-            origin = origin.next;
-
-            now.next = now.next.next;
-            now = now.next;
-        }
-        origin.next = null;
-        return res;
-    }
-
-    class Node {
-        int val;
-        Node next;
-        Node random;
-
-        public Node(int val) {
-            this.val = val;
-            this.next = null;
-            this.random = null;
-        }
-    }
+//    public Node copyRandomList(Node head) {
+//        if (head==null) return head;
+//        Node cur = head;
+//        while (cur!=null){
+//            Node node = new Node(cur.val);
+//            node.next = cur.next;
+//            cur.next = node;
+//            cur = cur.next.next;
+//        }
+//
+//        cur = head;
+//        while (cur!=null){
+//            if (cur.random!=null){
+//                cur.next.random = cur.random.next;
+//            }
+//            cur = cur.next.next;
+//        }
+//
+//        Node res = head.next,now = res;
+//        Node origin = head;
+//        while (now.next!=null){
+//            origin.next = origin.next.next;
+//            origin = origin.next;
+//
+//            now.next = now.next.next;
+//            now = now.next;
+//        }
+//        origin.next = null;
+//        return res;
+//    }
+//
+//    class Node {
+//        int val;
+//        Node next;
+//        Node random;
+//
+//        public Node(int val) {
+//            this.val = val;
+//            this.next = null;
+//            this.random = null;
+//        }
+//    }
 
 
 
@@ -2262,13 +2262,15 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     给你一个链表的头节点 head ，旋转链表，将链表每个节点向右移动 k 个位置。
      */
     public ListNode rotateRight(ListNode head, int k) {
-        if (head==null||head.next==null) return head;
+        if (head==null||head.next==null||k==0) return head;
+        /*step1：*/
         int size = 1;
         ListNode cur = head;
         while (cur.next!=null){
             cur = cur.next;
             size++;
         }
+
         cur.next = head;
 
         k %= size;
@@ -2400,4 +2402,94 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
         }
         return total<0?-1:res;
     }
+
+
+    /**
+     * ===========================================================7.25===============================================
+     */
+    /*LCR 155. 将二叉搜索树转化为排序的双向链表
+    将一个 二叉搜索树 就地转化为一个 已排序的双向循环链表 。
+对于双向循环列表，你可以将左右孩子指针作为双向循环链表的前驱和后继指针，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
+特别地，我们希望可以 就地 完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中最小元素的指针。
+     */
+    class Node {
+        public int val;
+        public Node left;
+        public Node right;
+
+        public Node() {}
+
+        public Node(int _val) {
+            val = _val;
+        }
+
+        public Node(int _val, Node _left, Node _right) {
+            val = _val;
+            left = _left;
+            right = _right;
+        }
+    }
+    /**这个题最后需要返回，双向链表。因此尽量不要使用虚拟头节点*/
+    public Node treeToDoublyList(Node root) {
+        //循环迭代的指针
+        Node cur = null;
+        //需要额外变量记录头节点、伪节点
+        Node tail = null;
+        Node head = root;
+        LinkedList<Node> stack = new LinkedList<>();
+        while (root!=null||!stack.isEmpty()){
+            if (root!=null){
+                stack.push(root);
+                root = root.left;
+            }else {
+                Node curNode = stack.pop();
+                if (cur==null){
+                    cur = curNode;
+                }else{
+                    curNode.left = cur;
+                    cur.right = curNode;
+                    cur = cur.right;
+                }
+                root = curNode.right;
+                if(root==null&&stack.isEmpty()){
+                    tail = curNode;
+                }
+            }
+        }
+        tail.right = head;
+        head.left = tail;
+        return head;
+    }
+
+
+    /*678
+    给你一个只包含三种字符的字符串，支持的字符类型分别是 '('、')' 和 '*'。请你检验这个字符串是否为有效字符串，如果是 有效 字符串返回 true 。
+
+    有效 字符串符合如下规则：
+
+    任何左括号 '(' 必须有相应的右括号 ')'。
+    任何右括号 ')' 必须有相应的左括号 '(' 。
+    左括号 '(' 必须在对应的右括号之前 ')'。
+    '*' 可以被视为单个右括号 ')' ，或单个左括号 '(' ，或一个空字符串 ""。
+     */
+    public boolean checkValidString(String s) {
+        int low = 0,high = 0;
+        for (char c:s.toCharArray()){
+            if (c=='('){
+                low++;
+                high++;
+            } else if (c==')') {
+                low--;
+                high--;
+            }else {
+                low--;
+                high++;
+            }
+            if (high<0) return false;
+            /**这里写的代码和原始方案是不一样的，确认一下是不是可行*/
+        }
+        return low<=0;
+    }
+
+    //https://mp.weixin.qq.com/s?__biz=MzA4NDE4MzY2MA==&mid=2647522825&idx=1&sn=302c27da39845ab4952a2de067cfdea8&scene=21&poc_token=HGZug2ij4wx7mT7pbRLRTaHh3HHWsK6WRmMarBm3
 }
