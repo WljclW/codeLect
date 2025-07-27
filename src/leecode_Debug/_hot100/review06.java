@@ -3,6 +3,7 @@ package leecode_Debug._hot100;
 import leecode_Debug.top100.ListNode;
 import leecode_Debug.top100.TreeNode;
 
+import javax.sound.sampled.Line;
 import java.util.*;
 
 /**
@@ -2313,12 +2314,6 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
         return sb.toString()==""?"0":sb.toString();
     }
 
-
-    public static void main(String[] args) {
-        review06 review06 = new review06();
-        review06.removeKdigits("10200",1);
-    }
-
     /*145
     给你一棵二叉树的根节点 root ，返回其节点值的 后序遍历 。
     * */
@@ -2431,34 +2426,29 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     }
     /**这个题最后需要返回，双向链表。因此尽量不要使用虚拟头节点*/
     public Node treeToDoublyList(Node root) {
-        //循环迭代的指针
-        Node cur = null;
-        //需要额外变量记录头节点、伪节点
-        Node tail = null;
-        Node head = root;
-        LinkedList<Node> stack = new LinkedList<>();
-        while (root!=null||!stack.isEmpty()){
-            if (root!=null){
-                stack.push(root);
-                root = root.left;
+        Node cur = root;
+        Node pre = null;
+        Stack<Node> stack = new Stack<>();
+        while (cur!=null||!stack.isEmpty()){
+            if (cur!=null){
+                stack.push(cur);
+                cur = cur.left;
             }else {
-                Node curNode = stack.pop();
-                if (cur==null){
-                    cur = curNode;
+                cur = stack.pop();
+                if (pre!=null){
+                   cur.left = pre;
+                   pre.right = cur;
                 }else{
-                    curNode.left = cur;
-                    cur.right = curNode;
-                    cur = cur.right;
+//                    cur = pre;
                 }
-                root = curNode.right;
-                if(root==null&&stack.isEmpty()){
-                    tail = curNode;
-                }
+                pre = cur;
+                cur = cur.left;
             }
         }
-        tail.right = head;
-        head.left = tail;
-        return head;
+        root.left = pre;
+        pre.right = root;
+
+        return root;
     }
 
 
@@ -2486,9 +2476,13 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
                 high++;
             }
             if (high<0) return false;
-            /**这里写的代码和原始方案是不一样的，确认一下是不是可行*/
+            /**这里写的代码和原始方案是不一样的，确认一下是不是可行，no*/
         }
         return low<=0;
+    }
+
+    public static void main(String[] args) {
+        review06 review06 = new review06();
     }
 
     //https://mp.weixin.qq.com/s?__biz=MzA4NDE4MzY2MA==&mid=2647522825&idx=1&sn=302c27da39845ab4952a2de067cfdea8&scene=21&poc_token=HGZug2ij4wx7mT7pbRLRTaHh3HHWsK6WRmMarBm3

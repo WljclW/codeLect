@@ -222,8 +222,10 @@ public class _14DP {
 
 
     /*解法2：优化解法————贪心+二分查找。（左闭右闭区间的写法）
+    【理解一个关键】要想让某一个子序列尽可能的长，则子序列最后一个数应该尽可能的小
     * 看K神的讲解：https://leetcode.cn/problems/longest-increasing-subsequence/，K神的写法是左闭右开的写法
-    * 此时dp[i]的定义如下：
+    * 此时tails[i]的定义如下：
+    *       tails[i]的值为num代表————数组nums 以num结尾的最长子序列长度为i+1。
     * */
     /**
      * 【关键】把数字num放在以它结尾的最长递增序列处。对于每一个数研究应该放在哪一个位置。
@@ -233,10 +235,11 @@ public class _14DP {
     public int lengthOfLIS2(int[] nums) {
         /*step1：初始化*/
         int[] tails = new int[nums.length];
-        int size = 0; //size的含义：0~size-1的位置都有需要放的数
+        int size = 0; //size的含义：tails数组中0~size-1的位置已经放了满足的数字
         /**for循环的完整逻辑：遍历nums数组的每一个数，判断它应该插入到tails数组的什么位置*/
         for (int num : nums) {
-            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置..跟力扣35题的原理是一样的*/
+            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置..跟力扣35题的原理是一样的
+            * 【目的】计算出num应该插入到tails数组的什么位置*/
             int left = 0, right = size - 1; /**err：注意是在已经存放的数中查找应该放的位置，因此右边界是size-1*/
             while (left <= right) {
                 int mid = (left + right) / 2;
@@ -246,11 +249,13 @@ public class _14DP {
                     right = mid - 1;
                 }
             }
-            /*step3：将num放在应该插入的位置left*/
+            /*step3：left就是num应该插入的索引位置，将num放在应该插入的位置left*/
             tails[left] = num;
-            /*step4：如果num插在了最后的位置，则更新size*/
+            /*step4：如果num插在了索引为size的位置（实际上该位置之前还没有放过数，如果是换做35题的话就相当
+            于本来是size大小的数组，下标0~size-1，但是计算出的插入位置是在size，相当于放在数组的最后），则
+            更新size*/
             if (left == size)
-                size++; // 如果 num 比所有 tail 都大，size 扩大
+                size++;     // 或者也可以理解为：如果 num 比所有 tail 中的元素都大，size 扩大
         }
 
         return size;

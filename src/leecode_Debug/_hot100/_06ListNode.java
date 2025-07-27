@@ -497,17 +497,17 @@ public class _06ListNode {
             需要把它的next指针指向null.
         * */
         /**链表拆分时强烈建议参考328题！！！*/
-        Node res = head.next,origin = head; /*res---复制得到的链表的头；origin---原始链表的头，用这个origin指针完成遍历拆分*/
-        cur = res; /*cur---拼接复制的链表的指针*/
-        while (cur.next!=null){
-            //拼接原始链表，拼接后移动origin指针
-            origin.next = origin.next.next;
-            origin = origin.next;
-            //拼接复制的链表的节点，拼接后移动cur指针
+        Node res = head.next,resCur = res; /*res---复制得到的链表的头；resCur---拼接复制得到的链表指针，用这个resCur指针完成遍历拆分*/
+        cur = head; /*cur---拼接原始的链表的指针*/
+        while (resCur.next!=null){
+            //拼接原始链表，拼接后移动cur指针
             cur.next = cur.next.next;
             cur = cur.next;
+            //拼接复制的链表的节点，拼接后移动resCur指针
+            resCur.next = resCur.next.next;
+            resCur  =resCur.next;
         }
-        origin.next = null; /**err：最后需要把原始链表的末尾置为null*/
+        cur.next = null; /**err：最后需要把原始链表的末尾置为null*/
         return res;
     }
 

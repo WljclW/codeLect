@@ -4,6 +4,7 @@ import leecode_Debug.linkList.ListNode;
 import leecode_Debug.top100.TreeNode;
 
 import javax.sound.sampled.Line;
+import javax.xml.stream.events.Characters;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -29,6 +30,37 @@ public class codetop_10 {
 //
 //        }
     }
+
+
+    /*
+    460. LFU 缓存
+    请你为 最不经常使用（LFU）缓存算法设计并实现数据结构。
+
+实现 LFUCache 类：
+
+LFUCache(int capacity) - 用数据结构的容量 capacity 初始化对象
+int get(int key) - 如果键 key 存在于缓存中，则获取键的值，否则返回 -1 。
+void put(int key, int value) - 如果键 key 已存在，则变更其值；如果键不存在，请插入键值对。当缓存达到其容量 capacity 时，则应该在插入新项之前，移除最不经常使用的项。在此问题中，当存在平局（即两个或更多个键具有相同使用频率）时，应该去除 最久未使用 的键。
+为了确定最不常使用的键，可以为缓存中的每个键维护一个 使用计数器 。使用计数最小的键是最久未使用的键。
+
+当一个键首次插入到缓存中时，它的使用计数器被设置为 1 (由于 put 操作)。对缓存中的键执行 get 或 put 操作，使用计数器的值将会递增。
+
+函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
+     */
+//    class LFUCache {
+//
+//        public LFUCache(int capacity) {
+//
+//        }
+//
+//        public int get(int key) {
+//
+//        }
+//
+//        public void put(int key, int value) {
+//
+//        }
+//    }
 
 
 
@@ -68,7 +100,6 @@ public class codetop_10 {
     给你一个以字符串表示的非负整数 num 和一个整数 k ，移除这个数中的 k 位数字，使得剩下的数字最小。请你以字
     符串形式返回这个最小的数字。
     * */
-
     /**
      *【思路】先依照最小栈的原则遍历一次num，每次删除字符维护k的值；如果k>0，则从栈的末尾删k个字符。。。最后栈中的字符组成字符串返回。
      *【关键】这个题虽然用到了单调栈，但是由于最后拼接字符串需要从栈底开始拿字符，因此实际上最好不用使用Stack类，而是使用LinkedList，
@@ -81,7 +112,7 @@ public class codetop_10 {
         /*step1：维持一个最小栈————只要当前的数比栈顶的数小，栈顶的数就出栈*/
         for (char c : num.toCharArray()) {
             /**err：①这里直接入栈的是字符，而不是索引，因此比较的是"c<stack.peekLast()"
-             *      ②k的含义是要删除的字符数量，因此k-1应该绑定在删除字符的时候，每一次字符弹出双端队列时k-1*/
+             *      ②k的含义是要删除的字符数量，因此k-1应该绑定在删除字符（从栈中弹出字符）的时候，每一次字符弹出双端队列时k-1*/
             while (!stack.isEmpty() && k > 0 && c<stack.peekLast()) {
                 stack.pollLast();
                 k--;
@@ -96,7 +127,7 @@ public class codetop_10 {
         /*step3：使用StringBuilder手机结果并返回*/
         StringBuilder sb = new StringBuilder();
         for (char c : stack) {
-            if (sb.length() == 0 && c == '0') continue;
+            if (sb.length() == 0 && c == '0') continue; /*去除前导零的核心逻辑*/
             sb.append(c);
         }
         return sb.length() == 0 ? "0" : sb.toString();
@@ -184,10 +215,15 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *               第二次遍历做两件事————①找到第size-k个节点；②将next指针置null（但要先记录一下，因为要返回，它时新的头节点）
      *【难点】第一次遍历时：size的初始值是1，循环的条件是while(cur.next！=null)————这样最终cur会指向最后一个非null节点
      *       第二次遍历时：也是从head开始，因此此题没有使用dummy节点，并且也尽量不要使用，就会导致其实初始就已经过了一个节点————因此
-     *   for循环遍历i的范围是”i<size-k-1“。
+     *   for循环遍历i的范围是“i<size-k-1”。
+     *【易错点】
+     *      1. 开始的时候，特殊情况的判断————"head==null" 提前返回；
+     *      2. 计算节点数目的时候。开始位置是head，初始的size值是1.
+     *      3. 从前开始数节点的时候，i的范围是"0~size-k-1"，因为"0、1、2、3....size-k-1"就是size-k个节点了
+     *      4. 最后需要先记录一下head.next节点，然后再执行head.next=null。
      */
     public ListNode rotateRight(ListNode head, int k) {
-        if (head==null||head.next==null||k==0) return head; //特殊情况的判断。”head==null“的判断是必不可少的，其他的可以省
+        if (head == null || head.next == null || k == 0) return head; //特殊情况的判断。”head==null“的判断是必不可少的，其他的可以省
         /*step1：计算出链表的节点数量。
         【难点】size的初始值需要设置为1；并且while的循环条件应该是”cur.next!=null“
                原因：因为size的初始值是1，因此head已经计数过了；如果cur.next不是null的时候才能更新size*/
@@ -280,6 +316,10 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*
     16. 最接近的三数之和
      */
+    /**
+     *【说明】这个题甚至不用跳过相同的组合，因为相同的组合不影响结果，结果只是求最接近target的三数之
+     *      和是多少？而不是求有多少种，因此比"15三数之和"题目简单
+     */
     public int threeSumClosest(int[] nums, int target) {
         int res = 0,max = Integer.MAX_VALUE;
         Arrays.sort(nums);
@@ -287,7 +327,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             int l = i+1,r = nums.length-1;
             while (l<r){
                 int curSum = nums[i]+nums[l]+nums[r];
-                if (Math.abs(curSum-target)<max){ /*如果curSum和target更接近则更新最后返回的结果res*/
+                if (Math.abs(curSum-target)<max){ /**如果curSum和target更接近则更新res*/
                     max = Math.abs(curSum-target);
                     res = curSum;
                     if (res==target) return res;
@@ -307,6 +347,50 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 注意，空树 不会是以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
      */
 //    public boolean isSubStructure(TreeNode A, TreeNode B) {
+//
+//    }
+
+    /*
+    91. 解码方法
+    一条包含字母 A-Z 的消息通过以下映射进行了 编码 ：
+
+"1" -> 'A'
+
+"2" -> 'B'
+
+...
+
+"25" -> 'Y'
+
+"26" -> 'Z'
+
+然而，在 解码 已编码的消息时，你意识到有许多不同的方式来解码，因为有些编码被包含在其它编码当中（"2" 和 "5" 与 "25"）。
+
+例如，"11106" 可以映射为：
+
+"AAJF" ，将消息分组为 (1, 1, 10, 6)
+"KJF" ，将消息分组为 (11, 10, 6)
+消息不能分组为  (1, 11, 06) ，因为 "06" 不是一个合法编码（只有 "6" 是合法的）。
+注意，可能存在无法解码的字符串。
+
+给你一个只含数字的 非空 字符串 s ，请计算并返回 解码 方法的 总数 。如果没有合法的方式解码整个字符串，返回 0。
+
+题目数据保证答案肯定是一个 32 位 的整数。
+     */
+//    public int numDecodings(String s) {
+//
+//    }
+
+
+    /*
+    440. 字典序的第K小数字
+    给定整数 n 和 k，返回  [1, n] 中字典序第 k 小的数字。
+        示例 1:
+        输入: n = 13, k = 2
+        输出: 10
+        解释: 字典序的排列是 [1, 10, 11, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9]，所以第二小的数字是 10。
+     */
+//    public int findKthNumber(int n, int k) {
 //
 //    }
 
@@ -407,6 +491,36 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 //    }
 
 
+    /*442
+    给你一个长度为 n 的整数数组 nums ，其中 nums 的所有整数都在范围 [1, n] 内，且每个整数出现 最多两次 。请你找出所有出现 两次 的整数，并以数组形式返回。
+
+你必须设计并实现一个时间复杂度为 O(n) 且仅使用常量额外空间（不包括存储输出所需的空间）的算法解决此问题。
+    * */
+    /**
+     *【思路】碰到一个数num，将num-1位置的值改为负数。遍历过程中，如果发现某个数应该放在的位置存的是一个负
+     *      数，说明这个数重复了
+     *【总结】关于数组中重复数的题目————
+     *      ①136只出现一次的数字：使用异或运算，出现两次的数异或为0.
+     *      ②442：标记num应该出现的位置，因为都是正数，此时将对应的位置|num|-1标记为负数，说
+     *  明这个位置已经有对应的数了，如果下次哪个数对应的位置时负数，说明这个数就重复了
+     *      ③
+     */
+    public List<Integer> findDuplicates(int[] nums) {
+        LinkedList<Integer> res = new LinkedList<>();
+        for (int i = 0; i < nums.length; i++) {
+            int cur = Math.abs(nums[i]);
+            if (nums[cur-1]<0){
+                res.add(cur);
+            }else {
+                nums[cur-1] *= -1;
+            }
+        }
+
+        return res;
+    }
+
+
+
     /*135
     n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的评分。
 
@@ -426,19 +540,19 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     public int candy(int[] ratings) {
         int[] flags = new int[ratings.length];
         Arrays.fill(flags,1);
-
+        /*step1：从左到右遍历。如果某同学比左边的同学高，则该同学糖果数加1————只关注自己左边的同学*/
         for (int i = 1; i < ratings.length; i++) {
             if (ratings[i]>ratings[i-1]){
-                flags[i] = Math.max(flags[i-1]+1, flags[i]);
+                flags[i] = Math.max(flags[i-1]+1, flags[i]); //这里不要Math.max也可以，因此初始值都是1，flags[i-1]+1肯定比1大
             }
         }
-
-        for (int i = ratings.length-2; i >=0 ; i--) {
+        /*step2：从右到左遍历。如果某同学比右边的同学高，则该同学糖果数取最大值————只关注右边的同学*/
+        for (int i = ratings.length-2; i >=0 ; i--) { /**err：关注右边的同学，因索引范围0~rating.length-2*/
             if (ratings[i]>ratings[i+1]){
                 flags[i] = Math.max(flags[i+1]+1,flags[i]);
             }
         }
-
+        /*step3：计算需要的糖果数*/
         int sum = 0;
         for (int num:flags){
             sum += num;
@@ -461,7 +575,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
     /*329
     给定一个 m x n 整数矩阵 matrix ，找出其中 最长递增路径 的长度。
-
 对于每个单元格，你可以往上，下，左，右四个方向移动。 你 不能 在 对角线 方向上移动或移动到 边界外（即不允许环绕）。
      */
 //    public int longestIncreasingPath(int[][] matrix) {
@@ -546,7 +659,8 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
     /**
      *【思路】
-     *      1. 统计灭一个字符最晚出现的位置
+     *      1. 一个int [25]————统计每一个字符出现的次数；（也可以用出现的最晚位置代替）
+     *         一个boolean [26]————统计栈里面是不是有某个字符
      *      2. 维护一个栈来构建答案（想法是最小栈————即只要当前字符比栈顶元素小，栈顶元素就需要出栈）【但是】与之前常规的最最小栈有
      *  区别，这里并不能仅仅依靠字符的大小来决定出栈，而是要结合后面剩下的串中还有没有栈顶字符来决定。。。。。因为题目要求最后每一个字
      *  符都必须出现且仅出现一次！！
@@ -558,9 +672,70 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *          方式2：虽然使用的是栈，但是变量使用LinkedList。此时入栈、出栈分别使用”offerLast()“、”pollLast()“，最后从栈底弹出元
      *    素时使用方法”pollFirst()“——————即”把栈顶想象成双端队列尾部，把栈底想象成双端队列头部“
      */
-//    public String removeDuplicateLetters(String s) {
-//
-//    }
+    /*解法1：记录出现的次数 以及 栈中是不是有某个字符*/
+    public String removeDuplicateLetters(String s) {
+        LinkedList<Character> stack = new LinkedList<>();
+        int[] count = new int[26]; // 每个字符剩余的出现次数
+        boolean[] visited = new boolean[26]; // 当前栈中是否已有该字符
+        /*step1：统计每一个字符最后出现的位置*/
+        for (int i=0;i<s.length();i++){
+            count[s.charAt(i)-'a']++;
+        }
+        /*step2：遍历研究每一个字符，代码的主要内容*/
+        for (char c:s.toCharArray()) {
+            /*第一步：更新剩下的子串中c字符还有几个*/
+            count[c - 'a']--; /**err：必须先更新count数组的值，再更新visited数组*/
+            /*第二步：如果c字符已经在栈中了，就不能再添加了，直接跳过*/
+            if (visited[c]) {
+                continue;
+            }
+            /*第三步：维护最小栈的结构！但是有附加条件————栈顶的字符在剩下的字串中还有。也就是说：即使栈顶的字符c1
+             *     可能大于当前的字符c，但是后面再也碰不到字符c1了，此时栈顶的字符c1也不能出栈。因为每一个字符都必须
+             *     出现在结果中，如果此时c1出栈，但是剩下的子串又没有c1了，最后的结果也就不会有c1
+             *     综上：此题严格意义来说时最小栈的思想 ，但是跟最小栈是由区别的*/
+            while (!stack.isEmpty() && count[stack.peekLast() - 'a'] > 0 && c < stack.peekLast()) {
+                visited[stack.pollLast() - 'a'] = false;
+            }
+            stack.offerLast(c);
+            visited[c - 'a'] = true;
+        }
+        /*step3：将栈中的内容从栈底挨个拿出来添加到StringBuilder*/
+        StringBuilder sb = new StringBuilder();
+        for (char c : stack) {
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+
+    /*解法2：记录出现的最晚位置 以及 栈中是不是有某个字符*/
+    public String removeDuplicateLetters_1(String s) {
+        int[] lastIndex = new int[26];
+        boolean[] isExit = new boolean[26];
+        for (int i = 0; i < s.length(); i++) {
+            lastIndex[s.charAt(i)-'a'] = i;
+        }
+
+        LinkedList<Character> stack = new LinkedList<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (isExit[c-'a']){
+                continue;
+            }
+            while (!stack.isEmpty()&&c<stack.peekLast()&&lastIndex[stack.peekLast()-'a']>=i){
+                Character c1 = stack.pollLast();
+                isExit[c1-'a']=false;
+            }
+            stack.offerLast(c);
+            isExit[c-'a'] = true;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(char c:stack){
+            sb.append(c);
+        }
+        return sb.toString();
+    }
 
     /*673. 最长递增子序列的个数
 给定一个未排序的整数数组 nums ， 返回最长递增子序列的个数 。
@@ -575,20 +750,34 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
     /*443
     给你一个字符数组 chars ，请使用下述算法压缩：
-
-从一个空字符串 s 开始。对于 chars 中的每组 连续重复字符 ：
-
-如果这一组长度为 1 ，则将字符追加到 s 中。
-否则，需要向 s 追加字符，后跟这一组的长度。
-压缩后得到的字符串 s 不应该直接返回 ，需要转储到字符数组 chars 中。需要注意的是，如果组长度为 10 或 10 以上，则在 chars 数组中会被拆分为多个字符。
-
-请在 修改完输入数组后 ，返回该数组的新长度。
-
-你必须设计并实现一个只使用常量额外空间的算法来解决此问题。
+    从一个空字符串 s 开始。对于 chars 中的每组 连续重复字符 ：
+    如果这一组长度为 1 ，则将字符追加到 s 中。
+    否则，需要向 s 追加字符，后跟这一组的长度。
+    压缩后得到的字符串 s 不应该直接返回 ，需要转储到字符数组 chars 中。需要注意的是，如果组长度为 10 或 10 以上，则在 chars 数组中会被拆分为多个字符。
+    请在 修改完输入数组后 ，返回该数组的新长度。
+    你必须设计并实现一个只使用常量额外空间的算法来解决此问题。
      */
-//    public int compress(char[] chars) {
-//
-//    }
+    public int compress(char[] chars) {
+        int read = 0;/*一个指针，用于指示遍历到原字符串的什么位置*/
+        int write = 0;/*写入压缩结果的位置*/
+        int n = chars.length;
+        while (read < n) {
+            char currentChar = chars[read];
+            int start = read; /**为了currentChar的数量需要记录一下开始的read位置，【注意】不能使用write位置代替，此时write和read之间可能还有一段位置*/
+            while (read < n && chars[read] == currentChar) {
+                read++;
+            }
+
+            int count = read - start;
+            chars[write++] = currentChar;
+            if (count > 1) {
+                for (char c : String.valueOf(count).toCharArray()) {
+                    chars[write++] = c;
+                }
+            }
+        }
+        return write;
+    }
 
 
     /*134
@@ -648,13 +837,18 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
     /**
      *【关键】使用两个变量。
-     *      low含义：最少可能的未匹配的左括号数量；
-     *      high含义：最多可能的未匹配的左括号数量。
+     *      low含义：最少可能的 未匹配的左括号数量；
+     *      high含义：最大可能的 未匹配的左括号数量。
      *      这个两个变量构成一个区间[low,high],未匹配的左括号数量位于这个区间
      *【具体的思路】在上面关键信息的基础上————
      *      每次碰到'('，则low和high都得+1.因为左括号是确认的，必须要匹配到右括号；
      *      每次碰到')'，则low和high都得-1，因为右括号能明确的匹配左括号；
      *      每次碰到‘*’。如果我们把它当作左括号，则high需要加1；如果我们把它当右括号，则low需要加1
+     *【易错点】整个过程中low和high的最小值都是0———
+     *       ①如果high小于0，直接返回false。（表示最多需要-high个右括号，不可能哇）
+     *       ②如果low小于0，则将low重置为0。low < 0 是无效的逻辑，因为它意味着我们尝试把更多的 * 当成 )，而
+     * 多出来的 ) 在语法上是非法的。为了确保合法，必须在每一步中 low ≥ 0，但你为了写法简洁跳过了
+     * 判断。最后只要 low == 0 才代表所有括号都刚好配对完。
      */
 
     /*解法1：贪心的解法*/
@@ -671,8 +865,9 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                 low--;
                 high++;
             }
-            if (high < 0) return false; /**high只有在碰到右括号才会减1，小于0说明右括号明确的多了，返回false*/
-            if (low < 0) low = 0; /**low小于0的时候置为0，符合实际含义*/
+            /**关键的校验流程，缺一不可！！*/
+            if (high < 0) return false; /**err：high只有在碰到右括号才会减1，小于0说明右括号明确的多了，返回false*/
+            if (low < 0) low = 0; /**err：low小于0的时候置为0，符合实际含义*/
         }
         return low == 0;
     }
@@ -871,6 +1066,361 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         }
         return res;
     }
+
+    /*
+    264. 丑数 II
+    给你一个整数 n ，请你找出并返回第 n 个 丑数 。
+    丑数 就是质因子只包含 2、3 和 5 的正整数。
+     */
+    public int nthUglyNumber(int n) {
+        int[] dp = new int[n];
+        int a=0,b=0,c=0;
+        dp[0]=1;
+        for (int i = 1; i < n; i++) {
+            int n2=dp[a]*2,n3=dp[b]*3,n5=dp[c]*5;
+            dp[i] = Math.min(Math.min(n2,n3),n5);
+            if (dp[i]==n2) a++; /**注意这里的三个都必须写成if，否则会有重复的数，比如：6————因为它是2和3的公倍数*/
+            if (dp[i]==n3) b++;
+            if (dp[i]==n5) c++;
+        }
+        return dp[n-1];
+    }
+
+    /*1004
+    给定一个二进制数组 nums 和一个整数 k，假设最多可以翻转 k 个 0 ，则返回执行操作后 数组中连续 1 的最大个数 。
+     */
+    /**
+     *【解题关键】一句话：滑动窗口解，把握核心————维护窗口内0的数量必须小于等于k
+     */
+    public int longestOnes(int[] nums, int k) {
+        int left = 0, right = 0;
+        int zeroCount = 0, maxLen = 0;
+        while (right<nums.length){
+            if (nums[right]==0) zeroCount++;
+            while (zeroCount>k){
+                if (nums[left++]==0) zeroCount--;
+            }
+            maxLen = Math.max(maxLen,right-left+1);
+            right++;
+        }
+        return maxLen;
+    }
+
+    /*63
+    给定一个 m x n 的整数数组 grid。一个机器人初始位于 左上角（即 grid[0][0]）。机器人尝试移动到 右下角（即 grid[m - 1][n - 1]）。机器人每次只能向下或者向右移动一步。
+
+    网格中的障碍物和空位置分别用 1 和 0 来表示。机器人的移动路径中不能包含 任何 有障碍物的方格。
+
+    返回机器人能够到达右下角的不同路径数量。
+
+    测试用例保证答案小于等于 2 * 109。
+     */
+    /*解法1：二维数组*/
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length,n = obstacleGrid[0].length;
+        int[][] dp = new int[m][n];
+        /*step1：初始条件的赋值dp[0][0]*/
+        dp[0][0] = obstacleGrid[0][0]==0?1:0;
+        /*step2：第一行和第一列的初始化。这里的初始化有点细节————
+        *   条件一：obstacleGrid当前位置是可达的，即obstacleGrid的位置没有障碍物。
+        *   条件二：dp前一个位置是可达的。因为第一行和第一列每一个位置只有一条路径，*/
+        for (int i = 1; i < m; i++) {
+            dp[i][0] = (obstacleGrid[i][0]==0&&dp[i-1][0]==1)?1:0;
+        }
+        for (int i = 1; i < n; i++) {
+            dp[0][i] = (obstacleGrid[0][i]==0&&dp[0][i-1]==1)?1:0;
+        }
+        /*step3：对于普遍位置的研究*/
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j]==0){
+                    dp[i][j] = dp[i-1][j]+dp[i][j-1];
+                }else {
+                    dp[i][j] = 0;
+                }
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+    /*解法2：一维数组的优化*/
+    public int uniquePathsWithObstacles_1dim(int[][] obstacleGrid) {
+        int m = obstacleGrid.length,n = obstacleGrid[0].length;
+        int[] dp = new int[n];
+        dp[0] = obstacleGrid[0][0]==0?1:0;
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (obstacleGrid[i][j]==0){
+                    if (j-1>=0&&obstacleGrid[i][j-1]==0){
+                        dp[j] += dp[j-1];
+                    }
+                }else
+                    dp[j] = 0;
+            }
+        }
+        return dp[n-1];
+    }
+
+
+    /*
+    125. 验证回文串
+    如果在将所有大写字符转换为小写字符、并移除所有非字母数字字符之后，短语正着读和反着读都一样。则可以认为该短语是一个 回文串 。
+    字母和数字都属于字母数字字符。
+
+    给你一个字符串 s，如果它是 回文串 ，返回 true ；否则，返回 false 。
+     */
+    /**
+     *【思路】双指针相向而行。
+     *【关键点】
+     *      1. Character.isLetterOrDigit：判断一个字符是不是字母和数字
+     *      2. Character.toLowerCase：将字母转换为小写字母
+     *      3. while (l<r&&!Character.isLetterOrDigit(s.charAt(l)))：跳过左边的空格，注意是两
+     *  个条件
+     */
+    public boolean isPalindrome(String s) {
+        int l = 0,r = s.length()-1;
+        while (l<r){
+            while (l<r&&!Character.isLetterOrDigit(s.charAt(l))){
+                l++;
+            }
+            while (l<r&&!Character.isLetterOrDigit(s.charAt(r))){
+                r--;
+            }
+            if (Character.toLowerCase(s.charAt(l))!=Character.toLowerCase(s.charAt(r))){
+                return false;
+            }
+            l++;
+            r--;
+        }
+        return true;
+    }
+
+
+    /*
+    71. 简化路径
+    给你一个字符串 path ，表示指向某一文件或目录的 Unix 风格 绝对路径 （以 '/' 开头），请你将其转化为 更加简洁的规范路径。
+
+    在 Unix 风格的文件系统中规则如下：
+
+    一个点 '.' 表示当前目录本身。
+    此外，两个点 '..' 表示将目录切换到上一级（指向父目录）。
+    任意多个连续的斜杠（即，'//' 或 '///'）都被视为单个斜杠 '/'。
+    任何其他格式的点（例如，'...' 或 '....'）均被视为有效的文件/目录名称。
+    返回的 简化路径 必须遵循下述格式：
+
+    始终以斜杠 '/' 开头。
+    两个目录名之间必须只有一个斜杠 '/' 。
+    最后一个目录名（如果存在）不能 以 '/' 结尾。
+    此外，路径仅包含从根目录到目标文件或目录的路径上的目录（即，不含 '.' 或 '..'）。
+    返回简化后得到的 规范路径 。
+     */
+    public String simplifyPath(String path) {
+        LinkedList<String> stack = new LinkedList<>();
+        /*step1：将原字符串以"/"进行分割*/
+        String[] split = path.split("/");
+        /*step2：循环研究每一个分割的子串————
+        *   ①如果是"."或者是""：说明没有实际意义，continue;
+        *       【补充说明】为什么这里会有""的可能性？答：因为我们以'/'进行分割，像"//"、"////"这样的
+        *     部分就会变成""、""！
+        *   ②如果是".."：说明是上一级目录，要从栈中弹出一个
+        *   ③其他的情况需要入栈*/
+        for (int i = 0; i < split.length; i++) {
+            if (split[i].equals("")||split[i].equals(".")){
+                continue;
+            }else if (split[i].equals("..")){
+                if (!stack.isEmpty()){
+                    stack.pollLast(); /**err：不能使用pop()，只能使用pollLast()*/
+                }
+            }else {
+                stack.offerLast(split[i]); /**err：*/
+            }
+        }
+        /*step3：从栈底一次弹出每一个串拼接成答案。【注意】要挨个从栈底弹出*/
+        StringBuilder sb = new StringBuilder();
+        for (String dir : stack) {
+            sb.append("/").append(dir);
+        }
+        return sb.length()==0?"/":sb.toString(); /**err：如果没有东西需要返回"/"*/
+    }
+
+    /**
+     * 下面是使用Stack的写法，目的是为了说明区别
+     */
+    public String simplifyPath_stack(String path) {
+        Stack<String> stack = new Stack<>();
+        String[] split = path.split("/");
+
+        for (int i = 0; i < split.length; i++) {
+            if (split[i].equals("")||split[i].equals(".")){
+                continue;
+            }else if (split[i].equals("..")){
+                if (!stack.isEmpty()){
+                    stack.pop();
+                }
+            }else {
+                stack.push(split[i]);
+            }
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (String dir : stack) {
+            result.append("/").append(dir);  // 因为是栈，从底部拼接
+        }
+        return result.length()==0?"/":result.toString();
+    }
+
+
+    /*97. 交错字符串
+    给定三个字符串 s1、s2、s3，请你帮忙验证 s3 是否是由 s1 和 s2 交错 组成的。
+
+    两个字符串 s 和 t 交错 的定义与过程如下，其中每个字符串都会被分割成若干 非空 子字符串：
+
+    s = s1 + s2 + ... + sn
+    t = t1 + t2 + ... + tm
+    |n - m| <= 1
+    交错 是 s1 + t1 + s2 + t2 + s3 + t3 + ... 或者 t1 + s1 + t2 + s2 + t3 + s3 + ...
+    注意：a + b 意味着字符串 a 和 b 连接。
+    * */
+    /*解法1：网友解法。官方有滚动数组优化的解法*/
+    public boolean isInterleave(String s1, String s2, String s3) {
+        // 获取 s1 和 s2 的长度
+        int m = s1.length(), n = s2.length();
+
+        // 如果 s3 的长度不等于 s1 和 s2 长度之和，直接返回 false
+        if (s3.length() != m + n) return false;
+
+        // 初始化动态规划表 dp，dp[i][j] 表示 s1 的前 i 个字符和 s2 的前 j 个字符是否能组成 s3 的前 i+j 个字符
+        boolean[][] dp = new boolean[m + 1][n + 1];
+
+        // 初始状态：两个空字符串可以组成一个空字符串
+        dp[0][0] = true;
+
+        // 处理 s1 为空的情况，检查 s2 是否能单独组成 s3 的前 j 个字符
+        for (int j = 1; j <= n; j++) {
+            if (s2.charAt(j - 1) == s3.charAt(j - 1)) {
+                dp[0][j] = dp[0][j - 1];
+            } else {
+                break; // 如果字符不匹配，后续也无法匹配，直接退出循环
+            }
+        }
+
+        // 处理 s2 为空的情况，检查 s1 是否能单独组成 s3 的前 i 个字符
+        for (int i = 1; i <= m; i++) {
+            if (s1.charAt(i - 1) == s3.charAt(i - 1)) {
+                dp[i][0] = dp[i - 1][0];
+            } else {
+                break; // 如果字符不匹配，后续也无法匹配，直接退出循环
+            }
+        }
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                // 状态转移方程：
+                // 1. 如果 s1 的第 i 个字符等于 s3 的第 i+j 个字符，则 dp[i][j] 取决于 dp[i-1][j]
+                // 2. 如果 s2 的第 j 个字符等于 s3 的第 i+j 个字符，则 dp[i][j] 取决于 dp[i][j-1]
+                // 只要有一种情况成立，dp[i][j] 就为 true
+                dp[i][j] = (dp[i - 1][j] && s1.charAt(i - 1) == s3.charAt(i + j - 1))
+                        || (dp[i][j - 1] && s2.charAt(j - 1) == s3.charAt(i + j - 1));
+            }
+        }
+
+        // 返回结果，dp[m][n] 表示整个 s1 和 s2 是否能组成 s3
+        return dp[m][n];
+    }
+
+
+    /*230. 二叉搜索树中第 K 小的元素
+     */
+    /**
+     *【思路】二叉树第k小的元素比较简单，就是中序遍历的第k个元素
+     *【注意】官方的解法中，有一些更骚的解法
+     */
+    public int kthSmallest(TreeNode root, int k) {
+        Stack<TreeNode> stack = new Stack<>();
+        while (root!=null||!stack.isEmpty()){
+            if (root!=null){
+                stack.push(root);
+                root = root.left;
+            }else{
+                TreeNode cur = stack.pop();
+                k--;
+                if (k==0){
+                    return cur.val;
+                }
+                root  = cur.right;
+            }
+        }
+        return -1;
+    }
+
+    /*LCR 174. 寻找二叉搜索树中的目标节点
+    某公司组织架构以二叉搜索树形式记录，节点值为处于该职位的员工编号。请返回第 cnt 大的员工编号。
+     */
+    /**
+     *【思路】二叉搜索树中序是递增序列，左-中-右。————因此右-中-左是降序的，此时的第cnt个节点值就是答案了。
+     * */
+    /*解法1：递归*/
+    int resFindTargetNode, cnt;
+    public int findTargetNode(TreeNode root, int cnt) {
+        this.cnt = cnt;
+        dfs(root);
+        return resFindTargetNode;
+    }
+
+    private void dfs(TreeNode root) {
+        if (root==null) return;
+        /**中序遍历是“左-中-右”，这里要改成“右-中-左”*/
+        dfs(root.right); //先是右
+        if (--cnt==0){
+            resFindTargetNode = root.val;
+            return;
+        }
+        dfs(root.left);
+    }
+
+    /*解法2：迭代*/
+    public int findTargetNode_diedai(TreeNode root, int cnt) {
+        Stack<TreeNode> stack = new Stack<>();
+        while (root != null || !stack.isEmpty()) {
+            if (root != null) {
+                stack.push(root);
+                root = root.right; //一直入右孩子。中序遍历这里是一路入左孩子
+            } else {
+                TreeNode cur = stack.pop();
+                if (--cnt == 0) {
+                    return cur.val;
+                }
+                root = cur.left;
+            }
+        }
+        return -1;
+    }
+
+
+    /*395. 至少有 K 个重复字符的最长子串
+    给你一个字符串 s 和一个整数 k ，请你找出 s 中的最长子串， 要求该子串中的每一字符出现次数都不少于 k 。返回这一子串的长度。
+
+如果不存在这样的子字符串，则返回 0。
+     */
+//    public int longestSubstring(String s, int k) {
+//
+//    }
+
+
+    /*329. 矩阵中的最长递增路径
+    给定一个 m x n 整数矩阵 matrix ，找出其中 最长递增路径 的长度。
+
+对于每个单元格，你可以往上，下，左，右四个方向移动。 你 不能 在 对角线 方向上移动或移动到 边界外（即不允许环绕）。
+     */
+//    public int longestIncreasingPath(int[][] matrix) {
+//
+//    }
+
+
+
+
+
 
     /*120
     给定一个三角形 triangle ，找出自顶向下的最小路径和。
