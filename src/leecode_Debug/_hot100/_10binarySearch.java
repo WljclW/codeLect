@@ -314,6 +314,9 @@ public class _10binarySearch {
 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
     * */
     /**
+     * 【说明】解法1和解法2的区别在于比较是使用的值不一样，但是强烈建议使用解法2，即search_2。这个解法才更好的
+     *      体现出了某一个区间有序，然后确定target的范围，81的解法就是在search_2的基础上改进的（具体的说：仅仅
+     *      是多一个情况————如果nums[mid]=nums[left]=nums[right]就l++;r--。）
      * 【33题最关键的是“if (nums[mid] >= nums[0])”或者另外一种写法“nums[mid]>=nums[left]”中，等号不
      *      能省略，否则测试用例“[3,1]”结果是错误的】
      * 【关键】理解二分查找的本质：是能根据一个条件排除一半的区间，每一步我们都知道下一步应该去哪一半查找
@@ -351,7 +354,7 @@ public class _10binarySearch {
         1
         原因：“if (nums[mid] >= nums[0])”说明左边是有序的，不能漏掉等于。
     * */
-    /*写法1*/
+    /*写法1：不推荐*/
     public int search(int[] nums, int target) {
         int l = 0, r = nums.length - 1;
         while (l <= r) {
@@ -384,23 +387,25 @@ public class _10binarySearch {
     }
 
 
-    /*另外的写法：*/
+    /*解法2：比较的时候采用“nums[left]”，而不要使用nums[0]；
+    *         同理，右边有序时比较使用“nums[right]”，而不要使用nums[nums.length-1]。
+    *       ——————这样处理能更好的理解81题官方解法*/
     public int search_2(int[] nums, int target) {
-        int left = 0,right = nums.length-1;
-        while (left<=right){
-            int mid = left+(right-left)/2;
-            if (nums[mid]==target) return mid;
-            if (nums[mid]>=nums[left]){ /**说明左边肯定是有序的*/
-                if (target>=nums[left]&&target<nums[mid]){
-                    right = mid-1;
-                }else{
-                    left = mid+1;
+        int left = 0, right = nums.length - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) return mid;
+            if (nums[mid] >= nums[left]) { /**说明左边肯定是有序的*/
+                if (target >= nums[left] && target < nums[mid]) {
+                    right = mid - 1;
+                } else {
+                    left = mid + 1;
                 }
-            }else { //else说明mid的右半部分是有序的
-                if (target>nums[mid]&&target<=nums[right]){
-                    left = mid+1;
-                }else{
-                    right = mid-1;
+            } else { //else说明mid的右半部分是有序的
+                if (target > nums[mid] && target <= nums[right]) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
                 }
             }
         }
@@ -428,8 +433,8 @@ public class _10binarySearch {
      *      有两种方案。
      *
      * 【推荐解法】解析的话就看官方的
-     *      1. 写法的话推荐解法1。————多使用一个变量，存储遇到过的最小值，这样的写法与"寻找插入位置"题目的代码类似
-     *      2.
+     *      1. 解法1。————多使用一个变量，存储遇到过的最小值，这样的写法与"寻找插入位置"题目的代码类似
+     *      2. 推荐使用解法2
      * */
     /*解法1：建议使用的(因为right和left指针的变化规律与常规一致)。
     *    两种解法最大的区别在于：当找到小于的数时，右边界right更新到哪里的问题！
@@ -458,14 +463,14 @@ public class _10binarySearch {
                 left = mid + 1;
             }
         }
-        return nums[min]; /**▲err：题目要求返回最小值，而不是最小值的位置！！！*/
+        return min; /**▲err：题目要求返回最小值，而不是最小值的位置！！！*/
     }
 
     /*
     解法2：就是当mid数小于最后一个数时,right指针更新为mid，而不是mid-1。
      */
     public int findMin_01(int[] nums) {
-        int left = 0,right = nums.length-1;
+        int left = 0, right = nums.length - 1;
         /*
             1. 这里必须是小于，因为一旦等于的时候就只有一个数了，其实这个数就是最小值。
             2. 如果这里写的是“小于等于”，则对于[5,8,9,10]这个数组，运行时会出现死循环。想象一种场景：l和r都指向某一个
@@ -474,11 +479,11 @@ public class _10binarySearch {
             ————死循环的本质原因在于：最后相等的时候，left指针和right指针是一样的；并且这个数小于nums[nums.length-1]，
          逻辑上需要更新right，但是right更新为mid，因此更新后left==right依旧成立。
         * */
-        while(left<right){
-            int mid = left+(right-left)/2;
-            if (nums[mid]>nums[right]){ /**err：这里最好使用nums[right]，不要使用nums[nums.length-1]，不具备普遍性，见154*/
-                left = mid+1;
-            }else{
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] > nums[right]) { /**err：这里最好使用nums[right]，不要使用nums[nums.length-1]，不具备普遍性，见154*/
+                left = mid + 1;
+            } else {
                 right = mid; /*此时mid位置的值可能就是最小值。并且是闭区间，因此right更新为mid而不是mid-1*/
             }
         }
@@ -523,12 +528,15 @@ public class _10binarySearch {
             实际上，当出现 nums[m]=nums[j] 时，一定有区间 [i,m] 内所有元素相等 或 区间 [m,j] 内所有元素相
      等（或两者皆满足）。对于寻找此类数组的最小值问题，可直接放弃二分查找，而使用线性查找替代————即仅仅是把
      其中right指针--或者left指针++，比如这个题就是right--。
+     【本质】154就是在153题的基础上，进一步拆分“nums[mid]==nums[right]”怎么处理？由于153题没有重复数，因此
+        “nums[mid]≤nums[right]”可以统一处理，其实并不存在等于的情况；但是154题存在等于的情况，此时需要特殊
+        处理等于的情况，只能将区间缩小1，即r--，线性复杂度
      */
     public int findMin_154(int[] nums) {
         int l = 0,r = nums.length-1;
         while (l<r){
             int mid = l+(r-l)/2;
-            if (nums[mid]>nums[r]){
+            if (nums[mid]>nums[r]){ /**err：这里的r不能用nums.length-1代替，否则“[3,1,3]”过不了*/
                 l = mid+1;
             }else if (nums[mid]<nums[r]){
                 r = mid;
@@ -560,14 +568,14 @@ public class _10binarySearch {
      预期结果
         true
      */
-    /*解法1：在33的基础上改进*/
+    /*解法1（与nums[l]进行比较，然后决策）：在33的基础上改进。见33题的解法search_2*/
     public boolean search_81(int[] nums, int target) {
         int l = 0, r = nums.length - 1;
         while (l <= r) {
             int mid = l + (r - l) / 2;
             if (nums[mid] == target) return true;
             /*分为三种情况————
-            *   情况1：
+            *   情况1：nums[l]==nums[mid]==nums[r]时，l++、r--。
             *   情况2、情况3跟33题的一样的原理。唯一需要注意的是：不能和nums[0]比较！！*/
             if(nums[l] == nums[mid] && nums[mid] == nums[r]){
                 l++;
@@ -579,7 +587,7 @@ public class _10binarySearch {
                     l = mid + 1;
                 }
             } else {
-                if (target <= nums[nums.length - 1] && target > nums[mid]) { /**这里的nums[nums.length - 1]换成nums[r]可行*/
+                if (target <= nums[nums.length - 1] && target > nums[mid]) { /**【说明】这里的nums[nums.length - 1]换成nums[r]可行*/
                     l = mid + 1;
                 } else {
                     r = mid - 1;
@@ -589,7 +597,7 @@ public class _10binarySearch {
         return false;
     }
 
-    /*解法2：换新思路
+    /*解法2（与nums[r]进行比较，然后做决策）：换新的思路
     对于给定的中点mid，分为以下几种情况：
         如果nums[mid]=target，直接返回true。
         如果nums[mid]<nums[r]，说明右边[mid,r]是有序的，检查一下target在不在里面，在就收
@@ -603,19 +611,20 @@ public class _10binarySearch {
         while (l <= r) {
             int mid = l + (r - l) / 2;
             if (nums[mid] == target) return true;
+            /*情况1：大于右边界，说明mid左边一定是有序的*/
             if (nums[mid] > nums[r]) {
                 if (target >= nums[l] && target < nums[mid]) {
                     r = mid - 1;
                 } else {
                     l = mid + 1;
                 }
-            } else if (nums[mid]<nums[r]) {
+            } else if (nums[mid] < nums[r]) { /*情况2：小于右边界说明mid右边一定是有序的*/
                 if (target <= nums[r] && target > nums[mid]) {
                     l = mid + 1;
                 } else {
                     r = mid - 1;
                 }
-            }else {
+            } else { /*情况3：等于右边界的时候，哪边有序不知道，只能r--*/
                 r--;
             }
         }
