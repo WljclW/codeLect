@@ -164,6 +164,15 @@ public class _02DoublePoint {
     /*
     * 42.给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
     * */
+
+    /**
+     *【双指针的思路】left从index=0开始向右，right从index=height.length开始向左。过程中分别记录碰到的最大值。每一时刻————
+     *      ①根据left、right的位置更新leftmax、rightMax。二者分别标识left指针、right种子很遍历时遇到的最大值
+     *      ②根据leftMax、rightMax的最小值 更新left位置 或者 right位置 能存的雨水高度。————这里有一个trike，left和right位置
+     *  height元素小的那个，xxxxMax的值也小。比如：height[right]<height[left]，则rightMax<=leftMax，为什么？反证法
+     *      ③将②中计算的值累加到结果res
+     *      ④重复①~③过程，知道所有left==right
+     */
     public int trap(int[] height) {
         int res = 0;
         int left = 0,right = height.length-1;

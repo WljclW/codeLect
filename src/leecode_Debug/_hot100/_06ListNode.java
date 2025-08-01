@@ -223,8 +223,7 @@ public class _06ListNode {
     请你将两个数相加，并以相同形式返回一个表示和的链表。
     你可以假设除了数字 0 之外，这两个数都不会以 0 开头。*/
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        ListNode res = new ListNode(-1);
-        ListNode cur = res; /*需要将结果链表的指针复制一份。其中一个指针res不动代表返回值；一个指针cur移动指向当前位置*/
+        ListNode res = new ListNode(-1),cur = res; /*需要将结果链表的指针复制一份。其中一个指针res不动代表返回值；一个指针cur移动指向当前位置*/
         int carry = 0;
         while (l1 != null || l2 != null || carry != 0) { /**err：设置三个条件*/
             int l1Val = (l1 == null) ? 0 : l1.val;
@@ -277,7 +276,7 @@ public class _06ListNode {
      *      这种写法下fast指针指向slow指针前面的第n+1个节点，因此当fast指针指向null
      *  的时候，slow指针指向要删除节点的前一个节点。举个例子：
      *      比如想删除倒数第二个节点，则fast指针指向null的时候，slow指针指向的是倒数
-     *  第3个节点，想象一下*/
+     *  第3个节点————即后面时刻fast会指向slow节点 前面的第n+1个节点*/
     public ListNode removeNthFromEnd1(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head);
         /**     官方解中，slow指针开始时指向了head节点的前一个；fast指针指向head节点！！解释：这样相当
@@ -324,8 +323,8 @@ public class _06ListNode {
             node1.next = node2.next;
             node2.next = node1;
             /**step3：每一轮结束后cur节点移动到这一组的最后一个节点————其实就相当于等一轮循环开始前，cur节点的位置应该不变类似
-             * 于状态一致（一定要处于前面已经完成的最后一个节点。比如：开始的时候cur指向head的前一个节点；每一轮结束后我们将cur
-             * 指向了node1，而node1节点就是这一轮研究结束时的最后一个节点）*/
+             * 于状态一致（一定要处于前面已经完成交换的最后一个节点。比如：开始的时候cur指向head的前一个节点；每一轮结束后我们将
+             * cur指向了node1，而node1节点就是这一轮研究结束时的最后一个节点）*/
             cur = node1;
         }
         return dummy.next;
