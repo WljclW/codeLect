@@ -238,7 +238,7 @@ public class _14DP {
         int size = 0; //size的含义：tails数组中0~size-1的位置已经放了满足的数字
         /**for循环的完整逻辑：遍历nums数组的每一个数，判断它应该插入到tails数组的什么位置*/
         for (int num : nums) {
-            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置..跟力扣35题的原理是一样的
+            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置..跟力扣35题的原理、代码是一样的
             * 【目的】计算出num应该插入到tails数组的什么位置*/
             int left = 0, right = size - 1; /**err：注意是在已经存放的数中查找应该放的位置，因此右边界是size-1*/
             while (left <= right) {
@@ -307,7 +307,7 @@ public class _14DP {
     public int maxProduct2(int[] nums) {
         int minPre = nums[0],maxPre = nums[0];
         int res = nums[0];
-        for (int i = 1; i < nums.length; i++) {
+        for (int i = 1; i < nums.length; i++) { /**err：i要从1开始，因为res的初始值已经是nums[0]了*/
             int curMin = Math.min(nums[i],Math.min(minPre*nums[i],maxPre*nums[i]));
             int curMax = Math.max(nums[i],Math.max(maxPre*nums[i],maxPre*nums[i]));
             minPre = curMin;
@@ -378,7 +378,7 @@ public class _14DP {
             if (right>left) left = right =0;  /**两次遍历的唯一区别*/
         }
 
-        left = right = 0;
+        left = right = 0; /**err：少不了*/
         for (int i = s.length()-1; i >=0 ; i--) {
             if (s.charAt(i)==')') right++;
             else  left++;

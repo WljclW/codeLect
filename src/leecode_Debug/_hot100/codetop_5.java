@@ -74,14 +74,14 @@ public class codetop_5 {
      * */
     /*官网的解法*/
     public ListNode deleteDuplicates(ListNode head) {
-        ListNode dummy = new ListNode(-1, head),cur = dummy;
-        while (head!=null){
-            if (head.next!=null&&head.val==head.next.val){
-                while(head.next!=null&&head.val==head.next.val){
+        ListNode dummy = new ListNode(-1, head), cur = dummy;
+        while (head != null) {
+            if (head.next != null && head.val == head.next.val) {
+                while (head.next != null && head.val == head.next.val) {
                     head = head.next; //此时head节点其实也不应该存在，因为它和前面的节点值是相同的
                 }
                 cur.next = head.next;
-            }else{
+            } else {
                 cur = cur.next;
             }
         }
@@ -93,18 +93,41 @@ public class codetop_5 {
         if (head==null||head.next==null) return head;
         ListNode dummy = new ListNode(-1, head),cur = dummy;
         while (cur.next!=null&&cur.next.next!=null){
-            int val = cur.next.val;
-            if (cur.next.next.val==val){
+            int val = cur.next.val; /**记录相等的值是多少*/
+            if (cur.next.next.val==val){ /**如果相等，用while循环跳过所有相等的节点*/
                 while (cur.next.next!=null&&cur.next.next.val==val){
                     cur.next = cur.next.next;
                 }
                 cur.next = cur.next.next;
-            }else {
+            }else { /**err：这里的else是精髓！！*/
                 cur = cur.next;
             }
         }
         return dummy.next;
     }
+
+    public ListNode deleteDuplicates_82_1(ListNode head) {
+        ListNode dummy = new ListNode(-1, head);
+        ListNode cur = dummy;
+        while (cur.next!=null&&cur.next.next!=null){
+            int curVal = cur.next.val;
+            if (cur.next.next.val==curVal){
+                ListNode tmp = cur.next.next;
+                while (tmp!=null&&tmp.val==curVal){
+                    tmp = tmp.next;
+                }
+                /**到这里只能说明tmp节点和前面的节点不相等，不能说明tmp和后面的节点值不相等，所以链表需要删除中间
+                 * 重复值的所有节点，但是cur指针不能动！！！！比如“2-2-2-3-3-4-5”，刚开始tmp指针会来到第一个3，
+                 * cur指针其实还是在dummy节点，此时会让cur.next=第一个3，但是cur指针不能后移！！因此下面的代码
+                 * “cur=cur.next”必须写在else块中。————换句话说，只有一个cur.next.val!=cur.next.next.val的时候
+                 * cur指针才能后移*/
+                cur.next = tmp;
+            }else
+                cur = cur.next; /**err：这里必须有else子句*/
+        }
+        return dummy.next;
+    }
+
 
 
 
@@ -154,7 +177,7 @@ public class codetop_5 {
             }
             fast = fast.next; // 无论是否重复，fast 都前进
         }
-        slow.next = null; /**err：如果没有这句话，有测试用例是错的*/
+        slow.next = null; /**err：如果没有这句话，初始的测试用例中，有测试用例是错的*/
 
         return head; /*这个题返回head是没有问题的，因为相同的节点会保留一个，因此head一定是保留的！！*/
     }
@@ -217,7 +240,7 @@ public class codetop_5 {
     public int compareVersion(String version1, String version2) {
         int len1 = version1.length(),len2 = version2.length();
         int cur1 = 0,cur2 = 0;
-        while (cur1 < len1 || cur2 < len2) { /**err：注意这里必须是“||”连接*/
+        while (cur1 < len1 || cur2 < len2) { /**err：注意这里必须是“||”连接，多次错*/
             int val1 = 0;
             for (; cur1 < len1 && version1.charAt(cur1) != '.'; cur1++) {
                 val1 = val1 * 10 + version1.charAt(cur1) - '0';
@@ -483,7 +506,7 @@ public class codetop_5 {
 
         int len1 = num1.length(), len2 = num2.length();
         /**【说明】i位数的整数 和 j位数的整数相乘，结果是“i+j”位数，最少是“i+j-1”位数*/
-        int[] multiRes = new int[len1 + len2];
+        int[] multiRes = new int[len1 + len2]; /**err：【注意】这里的长度是两个数字的长度和，如果写成了[len1+len2+1]，会导致计算结果扩大了10倍，结果总是正确结果的十倍*/
         /*step1：两个数依次倒着相乘。i位置和j位置的相乘结果对应在结果数组第”i+j+1“的位置*/
         for (int i = len1 - 1; i >= 0; i--) {
             int digit1 = num1.charAt(i) - '0';
@@ -554,7 +577,7 @@ public class codetop_5 {
         LinkedList<TreeNode> treeNodes = new LinkedList<>();
         LinkedList<Integer> integers = new LinkedList<>();
         treeNodes.add(root);
-        integers.add(0);
+        integers.add(0); /**root节点对应的值是0、是1都是可以的*/
         /*step2：遍历其中的每一个节点进行研究*/
         while (!treeNodes.isEmpty()){
             int size = treeNodes.size();
@@ -565,7 +588,7 @@ public class codetop_5 {
                 /*2.2：如果索引i来到第一个或者最后一个，需要更新first以及last的值*/
                 if (i==0) first = curVal;
                 if (i==size-1) last = curVal;
-                /*2.3：把不是null的节点及它的编号加进队列*/
+                /*2.3：把不是null的节点及它的编号加进队列。————这一步是层序遍历的常规操作*/
                 if (cur.left!=null){
                     treeNodes.add(cur.left);
                     integers.add(curVal*2);

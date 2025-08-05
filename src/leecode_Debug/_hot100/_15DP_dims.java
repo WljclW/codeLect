@@ -81,7 +81,7 @@ public class _15DP_dims {
         /*step1：对于初始值第一行的dp[0][i]和第一列的dp[i][0]，公共子序列都是0，数组元素
         的默认值就是零值，因此这个题可以省略base case的初始化*/
         /*step2：针对每一个位置分别研究。。。根据i-1和j-1位置的字符是否相等来决定dp[i][j]*/
-        for (int i=1;i<=m;i++){
+        for (int i=1;i<=m;i++){ /**err：二维dp很多都需要多一个长度，因此i和j是能娶到m和n的。如果忘了等于，结果永远是0，因为那个位置的值一直是默认值*/
             char c = text1.charAt(i-1);
             for (int j=1;j<=n;j++){
                 if (text2.charAt(j-1)==c){
@@ -202,7 +202,7 @@ public class _15DP_dims {
                     dp[i][j] = dp[i-1][j-1];
                 }else{
                     /**【说明】相比于编辑距离，这里少了一个可选条件dp[i-1][j-1]+1，这个条件表示的即是更新操作*/
-                    dp[i][j] = Math.min(dp[i-1][j],dp[i][j-1])+1;
+                    dp[i][j] = Math.min(dp[i-1][j],dp[i][j-1])+1; /**err!：注意虽然比较的是“i-1”和“j-1”字符，但是计算出来的是dp[i][j]，如果误写为dp[i-1][j-1]，则结果恒为0*/
                 }
             }
         return dp[word1.length()][word2.length()];

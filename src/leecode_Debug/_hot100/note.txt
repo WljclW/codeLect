@@ -10,7 +10,8 @@
 2. 实现最小栈（需要两个栈，stack、min_stack）
     ①元素入栈时。首先必须进入到stack；其次如果这个元素小于栈顶元素，则需要入栈min_stack；
     ②出栈时。首先必须弹出stack的栈顶；其次如果这个栈顶也是min_stack的栈顶，也需要从min_stack
- 弹出栈顶
+ 弹出栈顶。【注意】这里和最小栈栈顶比较需要使用“equals方法”，因此Integer仅仅缓存了[-127,128]这
+ 些数，其他的比较必须使用equals方法，不能使用==，==是判断引用的
 3. 用队列实现栈。
     {
          一个队列在模拟栈弹出元素的时候只要将队列头部的元素（除了最后一个元素外） 重新添加到
@@ -151,14 +152,14 @@
 3. 二叉树的前、中、后迭代遍历，需要使用"栈"结构；二叉树的层序遍历需要使用"队列"结构。。但是使用时都可以用LinkedList来代替，要注意的就是
     变量需要使用LinkedList声明，即”LinkedList<Node> stack = new LinkedList<>();“、”LinkedList<Node> queue = new LinkedList<>();“
     是可以的，但是如果声明成List或者Deque接口类型是不对的，比如
-            ”Stack<Node> stack = new LinkedList<>();“————错误的原因是LinkedList并不是Stack子类，并且Stack并不是接口；
-            ”Deque<Node> stack = new LinkedList<>();“————错误的原因是Deque只能使用Deque的方法，就不能使用push、pop等方法了。
+            “Stack<Node> stack = new LinkedList<>();”————错误的原因是LinkedList并不是Stack子类，并且Stack并不是接口；
+            “Deque<Node> stack = new LinkedList<>();”————错误的原因是Deque只能使用Deque的方法，就不能使用push、pop等方法了。
     【注意】我们把LinkedList当作什么使用，就使用它的什么方法。比如————
          ①当作栈使用，则使用方法push()、pop()
          ②当作队列使用，则使用offer()、poll()
          ③当作双端队列使用（此时把队列想象成横着放，左边是头，右边是尾），则操作时使用offerFirst()、pollFirst()、offerLast()、pollLast()
          ④当作普通的列表使用，则操作时使用add()、remove()
-4. 更深入的理解”二叉树的题目就是使用遍历方法，对当前研究的节点做一些操作“？比如：
+4. 更深入的理解“二叉树的题目就是使用遍历方法，对当前研究的节点做一些操作”？比如：
       ①翻转二叉树。就是在遍历到每一个节点的时候，交换该节点的左右孩子，然后继续研究其他的节点————注意不要使用中序遍历
       ②
    关于”二叉树层序遍历的使用“。比如：

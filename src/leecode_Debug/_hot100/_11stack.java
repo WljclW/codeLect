@@ -66,7 +66,7 @@ public class _11stack {
                 stack.pop(); /**err：切记验证完后pop出栈顶。。在if条件中写也可以*/
             }
         }
-        return stack.isEmpty();
+        return stack.isEmpty(); /**err：注意返回值。否则“((”这样的字符串结果是错误的*/
     }
 
 
@@ -129,6 +129,7 @@ public class _11stack {
      *          情况2：一个int数据，一个Integer数据。比较时Integer会拆箱成int再比较
      *          情况3：两个Integer类型数据比较。直接比较引用地址是不是相等
      *    4. Integer有一个内部类IntegerCache，其中缓存了[-128,127]的所有Integer
+     *【注意题目说明】pop、top 和 getMin 操作总是在 非空栈 上调用。
      * */
     class MinStack {
         Stack<Integer> allStack;
@@ -143,7 +144,7 @@ public class _11stack {
             /**err：小于等于栈顶的时候，都需要进入最小栈！！不能漏掉等于，否则一个等于minStack栈顶
              * 的时候，到底应不应该出栈呢？就没有标准了。
              * */
-            if (minStack.isEmpty() || val <= minStack.peek()) { /**err：两个条件缺一不可，否则可能空指针*/
+            if (minStack.isEmpty() || val <= minStack.peek()) { /**err：两个条件缺一不可，否则可能测试用例报错“java.util.EmptyStackException”*/
                 minStack.push(val);
             }
         }
@@ -176,6 +177,7 @@ public class _11stack {
     /**
      * 【建议】看K神的题解：https://leetcode.cn/problems/decode-string/solutions/19447/decode-string-fu-zhu-zhan-fa-di-gui-fa-by-jyd/?envType=study-plan-v2&envId=top-100-liked
      *      重要的是看K神题解中的动图，理解整个过程
+     * 【提示】思考一下这个题的过程中创建了多少字符串的问题
      */
     /*
     【注意】计算multi的公式，如果写成了“digit = 10 * digit + digit”，会出错如下：

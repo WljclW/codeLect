@@ -314,6 +314,8 @@ public class _10binarySearch {
 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
     * */
     /**
+     * 【强烈建议！】题解中不要出现nums[0]，nums[nums.length-1]这样的数据，而是用nums[l]、nums[r]代替，见方
+     *      法search_3
      * 【说明】解法1和解法2的区别在于比较是使用的值不一样，但是强烈建议使用解法2，即search_2。这个解法才更好的
      *      体现出了某一个区间有序，然后确定target的范围，81的解法就是在search_2的基础上改进的（具体的说：仅仅
      *      是多一个情况————如果nums[mid]=nums[left]=nums[right]就l++;r--。）
@@ -412,6 +414,28 @@ public class _10binarySearch {
         return -1;
     }
 
+    public int search_3(int[] nums, int target) {
+        int l = 0,r = nums.length-1;
+        while (l<=r){
+            int mid = l+(r-l)/2;
+            if (target==nums[mid]) return mid;
+            if (nums[mid]>=nums[l]){
+                if (target>=nums[l]&&target<nums[mid]){
+                    r = mid-1;
+                }else {
+                    l = mid+1;
+                }
+            }else {
+                if (target>nums[mid]&&target<=nums[r]){
+                    l = mid+1;
+                }else {
+                    r = mid-1;
+                }
+            }
+        }
+        return -1;
+    }
+
 
     /*153....154是这个的拓展（允许有重复元素）
     返回最小元素的值
@@ -434,9 +458,9 @@ public class _10binarySearch {
      *
      * 【推荐解法】解析的话就看官方的
      *      1. 解法1。————多使用一个变量，存储遇到过的最小值，这样的写法与"寻找插入位置"题目的代码类似
-     *      2. 推荐使用解法2
+     *      2. 推荐使用解法2，见方法findMin_01
      * */
-    /*解法1：建议使用的(因为right和left指针的变化规律与常规一致)。
+    /*解法1（不推荐）：建议使用的(因为right和left指针的变化规律与常规一致)。
     *    两种解法最大的区别在于：当找到小于的数时，右边界right更新到哪里的问题！
     *       解法1中会把right更新为mid-1，但是此时可能错过最小值，mid位置可能就是最小值。。因此使用一个变量记录；
     *       解法2中right不会更新为mid-1（防止错过最小值），但是循环的条件就不能带“=”了（带等于会导致死循环）*/

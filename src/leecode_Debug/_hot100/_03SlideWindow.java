@@ -53,7 +53,7 @@ public class _03SlideWindow {
                 map.put(cur,map.get(cur)-1);
                 left++;
             }
-            right++;
+            right++; /**注意药移动当前指针，否则“java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "java.util.HashMap.get(Object)" is null”*/
             res = Math.max(res,right-left); //③保证窗口合法在更新结果
         }
         return res;

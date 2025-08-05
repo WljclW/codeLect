@@ -80,6 +80,7 @@ public class _02DoublePoint {
     * 【】：关键的步骤在于双指针 过程中，如何跳过所有相同的元素。
     * */
     /**
+     * TODO：拿到“while (left<right && nums[left]==nums[++left]);”的字节码看一下
      * 【关键】先排序；然后从左向右遍历位置cur，每到一处位置cur，设置left、right指针，根据当前三个位置数的和
      *      与0的关系，来移动left或者right指针。
      * 【去重】必须去重的地方有两个————
@@ -182,7 +183,7 @@ public class _02DoublePoint {
             rightMax = Math.max(height[right],rightMax);
             if (height[left]<height[right]){
                 res += (leftMax-height[left]);
-                left++;
+                left++; /**这里的left++写在上一行也是可以的，这样的话上一行就变成了“res += (leftMax-height[left++]);”，亲测可行。下面的right--也是一个道理*/
             }else{
                 res += (rightMax-height[right]);
                 right--;

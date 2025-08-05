@@ -27,13 +27,35 @@ public class _07binarytree {
         return Math.max(left, right) + 1;
     }
 
+    /*迭代法：层序遍历的迭代*/
+    public int maxDepth_diedai(TreeNode root) {
+        if (root==null) return 0;
+        int depth = 0;
+        LinkedList<TreeNode> deque = new LinkedList<>();
+        deque.offer(root); /**当作队列使用，因此使用offer方法*/
+        while (!deque.isEmpty()){
+            depth++;
+            int size = deque.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode cur = deque.poll();
+                if (cur.left!=null){
+                    deque.offer(cur.left);
+                }
+                if (cur.right!=null){
+                    deque.offer(cur.right);
+                }
+            }
+        }
+        return depth;
+    }
+
 
     /*
     * 226.给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
      * */
     public TreeNode invertTree(TreeNode root) {
         if (root==null) return root;
-        if (root.left==null&&root.right==null) return root;
+        if (root.left==null&&root.right==null) return root; /*没有这一句也OK*/
         /**
          * err：这里必须使用临时变量记录一下，不能这么写：
          *      root.left = invertTree(root.right);

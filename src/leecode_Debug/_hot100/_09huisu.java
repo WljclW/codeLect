@@ -1,12 +1,9 @@
 package leecode_Debug._hot100;
 
-import leecode_Debug.All_06;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 

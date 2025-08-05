@@ -119,7 +119,7 @@ void put(int key, int value) - 如果键 key 已存在，则变更其值；如�
             }
             stack.offerLast(c);
         }
-        /*step2：剩下的是单调递增的。倒着删除k位*/
+        /*step2：如果k还是大于0。stack中剩下的数字是单调递增的。倒着删除k位*/
         while (k > 0 && !stack.isEmpty()) {
             stack.pollLast();
             k--;
@@ -130,7 +130,7 @@ void put(int key, int value) - 如果键 key 已存在，则变更其值；如�
             if (sb.length() == 0 && c == '0') continue; /*去除前导零的核心逻辑*/
             sb.append(c);
         }
-        return sb.length() == 0 ? "0" : sb.toString();
+        return sb.length() == 0 ? "0" : sb.toString(); /**err：这里需要判断sb是不是没东西，如果没东西需要返回“0”*/
     }
 
     /*下面是自己的写法，自己的写法细节太多了，很容易错*/
@@ -235,6 +235,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         }
         /*step2：经过上面的while循环之后，cur指针会来到最后一个非null的节点————此时需要将cur.next指向head,完成首尾相接*/
         cur.next = head;
+        k %= size; /**err：k需要对size取余*/
         /*step3：从头开始遍历，找到需要断开连接的地方。因为要旋转k位，因此应该是第(size-k)个节点之后断开连接。【注意】但是由于
         * 我们是从head节点开始数的，并且i初始值是0，因此必须要满足i<(size-k-1)*/
         cur = head;
@@ -901,7 +902,10 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     给定两个整数数组 inorder 和 postorder ，其中 inorder 是二叉树的中序遍历， postorder 是同一棵树的后序遍历，请你构造并返回这颗 二叉树 。
      */
     /**
-     *【思路】构造出map存放节点值——>索引的映射；声明全局变量标识在postorder中研究到哪个位置了
+     *【总结】中序-先序还原二叉树、中序-后序还原二叉树是一样的道理。区别就在于前者是每一次从先序中拿出
+     *      第一个数作为当前的根；后者是每一次从后序中拿出最后一个数作为当前子树的根————即思路的第1点。
+     *      除此以外，是一样的操作。
+     *【思路】构造出map存放中序遍历节点值——>索引的映射；声明全局变量标识在postorder中研究到哪个位置了
      *      1.每一次从postorder中拿出最后一个值，就是当前的根节点root。
      *      2.从map中找到这个值在inorder的位置index。（此时index左边的节点就是root的左子树，index右边的节点就是root的右子树）
      *      3.根据2中的备注，递归的调用左、右两部分即可构造出root的左。右子树
@@ -915,7 +919,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         }
         return build(postorder,0,inorder.length-1);
     }
-
     private TreeNode build(int[] postorder, int left, int right) {
         if (left>right || postIndex<0) return null;
         /*step1：拿到当前的根节点的值，并构造出节点*/
@@ -928,6 +931,28 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         *       树，再构造左子树。*/
         root.right = build(postorder,index+1,right); /**err：这里的顺序重要*/
         root.left = build(postorder,left,index-1);
+        return root;
+    }
+
+
+   /*105.
+    * 从前序 和 中序 构造出二叉树*/
+    HashMap<Integer,Integer> inorderMap1 = new HashMap<>();
+    int preorderIndex;
+    public TreeNode buildTree_preorder_inorder(int[] preorder, int[] inorder) {
+        for (int i = 0; i <inorder.length; i++) {
+            inorderMap1.put(inorder[i],i);
+        }
+        return buildTree(preorder,inorder,0,inorder.length-1);
+    }
+
+    private TreeNode buildTree(int[] preorder, int[] inorder, int left, int right) {
+        if (preorderIndex>=inorder.length) return null;
+        int val = preorder[preorderIndex++];
+        Integer index = inorderMap1.get(val);
+        TreeNode root = new TreeNode(val);
+        root.left = buildTree(preorder,inorder,left,index-1);
+        root.right = buildTree(preorder,inorder,index+1,right);
         return root;
     }
 
@@ -1416,6 +1441,35 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 //    public int longestIncreasingPath(int[][] matrix) {
 //
 //    }
+
+
+    //581
+//    public int findUnsortedSubarray(int[] nums) {
+//
+//    }
+
+    //221最大正方形
+    public int max(char[][] matrix){
+        int m = matrix.length,n = matrix[0].length;
+        int[][] dp = new int[m][n];
+        int max = 0;
+        for (int i=0;i<n;i++){
+            dp[0][i] = matrix[0][i]-'0';
+            max = Math.max(max,dp[0][i]);
+        }
+        for (int i=0;i<m;i++){
+            dp[i][0] = matrix[i][0]-'0';
+            max = Math.max(max,dp[i][0]);
+        }
+        for (int i=1;i<m;i++)
+            for (int j=1;j<n;j++){
+                if (matrix[i][j]=='1'){
+                    dp[i][j] = Math.min(Math.min(dp[i-1][j],dp[i][j-1]),dp[i-1][j-1])+1;
+                    max = Math.max(dp[i][j],max);
+                }
+            }
+        return max*max;
+    }
 
 
 

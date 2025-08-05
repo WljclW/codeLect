@@ -72,7 +72,7 @@ public class _03subString {
              *      否则，k=0的时候会出错，此时会出现pre-k=pre，如果先把pre放进去，就导致map.get(pre-k)的
              *  数值比正确的多了*/
             res += map.getOrDefault(pre-k,0);
-            map.put(pre,map.getOrDefault(pre,0)+1); //将前缀和为pre对应的子数组数量加1.
+            map.put(pre,map.getOrDefault(pre,0)+1); /**err：更新了前缀和，不要忘记放进map*/
         }
         return res;
     }

@@ -118,17 +118,20 @@ public class _06ListNode {
      *      2. 反转后半部分，拿到反转后的头结点head2。————注意是翻转链表的后半部分而不是全部翻转
      *      3. 因为后半部分的节点数少，因此“head2!=null”时挨个判断head.val和head.val是不
      *  是相等
+     * 【补充说明】这道题“找中间节点”的做法 和 排序链表中“找中间节点”的做法是有区别的————
+     *      ①这道题找中间节点使用普通的思路，就够了。因为最后在挨个比较节点值的时候，后一半链表的节点会先来到
+     * null，此时就知道结果了。
+     *      ②但是排序链表使用普通的思路，就不对。因为最后会将排完序的两半合并为一个链表，如果前一半链表的最
+     * 后节点next不指向null，就会导致节点重复。所以“排序链表”题目中，实际上是要先找出①方案中的前一个节点，
+     * 再记录该节点的next节点（这是要返回的节点res，其实还是①的返回值），最后将该节点的next置为null，并返回
+     * 记录的next节点，即res。
      * */
     public boolean isPalindrome(ListNode head) {
         /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点。。
         *     根据这个位置可以知道，以slow为头的后半部分的节点数量必然不大于第一部分的节点数量。。但是slow之
         * 前的节点next指针并不会变化。因此下面的while循环判断的时候使用“head2!=null”来判断后半部分的链表是不
         * 是判断结束了*/
-        ListNode slow = head,fast = head;
-        while(fast!=null&&fast.next!=null){
-            slow = slow.next;
-            fast = fast.next.next;
-        }
+        ListNode slow = findMiddle(head);
         /*step2：head2是后半部分反转后的头结点*/
         ListNode head2 = reverseIsPalindrome(slow);
         while(head2!=null){
@@ -139,6 +142,19 @@ public class _06ListNode {
             head = head.next;    /*前半部分的指针移动*/
         }
         return true;
+    }
+
+    /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点。。
+     *     根据这个位置可以知道，以slow为头的后半部分的节点数量必然不大于第一部分的节点数量。。但是slow之
+     * 前的节点next指针并不会变化。因此下面的while循环判断的时候使用“head2!=null”来判断后半部分的链表是不
+     * 是判断结束了*/
+    private ListNode findMiddle(ListNode head) {
+        ListNode slow = head,fast = head;
+        while(fast!=null&&fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
     }
 
     /*完整的反转链表代码————一模一样*/
@@ -526,7 +542,7 @@ public class _06ListNode {
     public ListNode sortList(ListNode head) {
         /*1.特殊情况的考虑————没有节点或者只有一个节点，此时不用排序*/
         if (head==null||head.next==null) return head;
-        /*2.找到中间节点的*/
+        /*2.找到中间节点的后一个节点。但是其中有一个细节————在findMid中必须要先找到中间的第一个节点*/
         ListNode mid = findMid(head);
         /*3.分别排序左、右两半链表*/
         ListNode left = sortList(head);
@@ -554,7 +570,10 @@ public class _06ListNode {
 
     /*找中间节点的代码。与hot100求中间节点不同，区别————
     *       1. 如果是奇数个节点，两种都会得到中间节点；
-    *       2. 如果是偶数个节点，下面的方案会得到中间两个的前一个节点*/
+    *       2. 如果是偶数个节点，下面的方案会先得到中间两个的前一个节点。但是返回值跟常规的中间节点是一样
+    *    的————即中间节点的后一个节点。。只不过排序链表中需要先拿到中间的前一个节点将next置为null，多了这
+    *    一步处理操作。
+    * */
     private ListNode findMid(ListNode head) {
         ListNode slow = head,fast = head.next;
         while (fast!=null && fast.next!=null){
