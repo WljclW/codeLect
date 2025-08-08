@@ -125,6 +125,10 @@ public class _06ListNode {
      * 后节点next不指向null，就会导致节点重复。所以“排序链表”题目中，实际上是要先找出①方案中的前一个节点，
      * 再记录该节点的next节点（这是要返回的节点res，其实还是①的返回值），最后将该节点的next置为null，并返回
      * 记录的next节点，即res。
+     *      综上，其实最本质的区别在于，判断“回文链表”的题目中，找到重点后会翻转后一半链表（并且翻转链表的时候pre
+     * 是null，也就意味着后一半链表必然是以null为结束节点的），因此head2==null就是结束条件。。————没毛病。。。
+     * 但是“排序链表”题目中，如果不人为的将前一半链表的最后一个节点设置为null，最后归并排序完合并就会导致后一半会被
+     * 重复添加。
      * */
     public boolean isPalindrome(ListNode head) {
         /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点。。
@@ -514,7 +518,7 @@ public class _06ListNode {
         /**链表拆分时强烈建议参考328题！！！*/
         Node res = head.next, resCur = res; /*res---复制得到的链表的头；resCur---拼接复制得到的链表指针，用这个resCur指针完成遍历拆分*/
         cur = head; /*cur---拼接原始的链表的指针*/
-        while (resCur.next != null) {
+        while (resCur.next != null) { /**【说明】只要“resCur.next!=null”，则resCur后面至少还有两个节点。。。后面的节点必然是成对出现的*/
             //拼接原始链表，拼接后移动cur指针
             cur.next = cur.next.next;
             cur = cur.next;

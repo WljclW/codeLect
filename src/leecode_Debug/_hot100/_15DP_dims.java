@@ -89,7 +89,7 @@ public class _15DP_dims {
                     如果当前位置的字符相等，也可以写成(结果是一样的)：
                     dp[i][j] = Math.max(Math.max(dp[i - 1][j], dp[i][j - 1]),dp[i - 1][j - 1] + 1);
                     * */
-                    dp[i][j] = dp[i-1][j-1]+1; /**【说明】简化的写法，其实是单中做法的最大值*/
+                    dp[i][j] = dp[i-1][j-1]+1; /**【说明】简化的写法，其实是所有做法中公共长度的最大值*/
                 }else {
                     /*情况2：
                     如果当前字符不一样，dp[i][j]的值取决于dp[i-1][j]和dp[i][j-1]的最大值。
@@ -189,7 +189,8 @@ public class _15DP_dims {
         int[][] dp = new int[word1.length() + 1][word2.length() + 1];
         int m = word1.length(),n = word2.length();
         /**err：最长公共子序列"第一行第一列"不用初始化，因为空串的任何串的公共子序列长度为0。
-         * 但是这里是编辑距离的问题，必须要初始化为非空串的长度*/
+         * 但是这里是编辑距离的问题，必须要初始化为非空串的长度；
+         * 【补充】下面的这种形式的初始化其实放在for循环中（见下面的方法minDistance_583_1），是一样的道理，但是下面的写法更清晰一点*/
         for (int i=0;i<=m;i++){
             dp[i][0] = i;
         }
@@ -203,6 +204,32 @@ public class _15DP_dims {
                 }else{
                     /**【说明】相比于编辑距离，这里少了一个可选条件dp[i-1][j-1]+1，这个条件表示的即是更新操作*/
                     dp[i][j] = Math.min(dp[i-1][j],dp[i][j-1])+1; /**err!：注意虽然比较的是“i-1”和“j-1”字符，但是计算出来的是dp[i][j]，如果误写为dp[i-1][j-1]，则结果恒为0*/
+                }
+            }
+        return dp[word1.length()][word2.length()];
+    }
+
+
+    public int minDistance_583_1(String word1, String word2) {
+        int[][] dp = new int[word1.length() + 1][word2.length() + 1];
+        int m = word1.length(),n = word2.length();
+        /**将下面的初始化过程放在for循环中做..........*/
+//        for (int i=0;i<=m;i++){
+//            dp[i][0] = i;
+//        }
+//        for (int i=0;i<=n;i++){
+//            dp[0][i] = i;
+//        }
+        for (int i=1;i<=word1.length();i++)
+            for (int j=1;j<=word2.length();j++){
+                if(i==0 || j==0){ /**这个if块其实相当于dp数组的初始化*/
+                    dp[i][j] = (i==0)?j:i;
+                    continue;
+                }
+                if (word1.charAt(i-1)==word2.charAt(j-1)){
+                    dp[i][j] = dp[i-1][j-1];
+                }else{
+                    dp[i][j] = Math.min(dp[i-1][j],dp[i][j-1])+1;
                 }
             }
         return dp[word1.length()][word2.length()];

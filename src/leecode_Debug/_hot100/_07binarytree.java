@@ -2,14 +2,28 @@ package leecode_Debug._hot100;
 
 import leecode_Debug.BTree.TreeNode;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 public class _07binarytree {
     /*94中序遍历*/
-//    public List<Integer> inorderTraversal(TreeNode root) {
-//
-//    }
+    public List<Integer> inorderTraversal(TreeNode root) {
+        LinkedList<Integer> res = new LinkedList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        while (root!=null||!stack.isEmpty()){
+            if (root!=null){
+                stack.push(root);
+                root = root.left;
+            }else {
+                TreeNode cur = stack.pop();
+                res.add(cur.val);
+                root = cur.right;
+            }
+        }
+        return res;
+    }
 
 
 
@@ -54,8 +68,10 @@ public class _07binarytree {
     * 226.给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
      * */
     public TreeNode invertTree(TreeNode root) {
+        /*step1：basecase*/
         if (root==null) return root;
         if (root.left==null&&root.right==null) return root; /*没有这一句也OK*/
+        /*step2：完成左右孩子的操作*/
         /**
          * err：这里必须使用临时变量记录一下，不能这么写：
          *      root.left = invertTree(root.right);
@@ -64,6 +80,7 @@ public class _07binarytree {
          */
         TreeNode L = invertTree(root.right);
         TreeNode R = invertTree(root.left);
+        /*step3：当前节点的操作。左孩子作为右孩子、右孩子作为左孩子*/
         root.left = L;
         root.right = R;
         return root;
@@ -87,10 +104,19 @@ public class _07binarytree {
     * 给你一棵二叉树的根节点，返回该树的 直径 。
     二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
     两节点之间路径的 长度 由它们之间边数表示。*/
-//    public int diameterOfBinaryTree(TreeNode root) {
-//
-//    }
+    int maxDiameter = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        dfs(root);
+        return maxDiameter;
+    }
 
+    private int dfs(TreeNode root) {
+        if (root==null) return 0;
+        int left = dfs(root.left);
+        int right = dfs(root.right);
+        maxDiameter = Math.max(left+right+1,maxDiameter);
+        return 1 + Math.max(left,right)+1;
+    }
 
 
     /*102.层序遍历*/
@@ -126,17 +152,57 @@ public class _07binarytree {
     节点的左子树只包含 小于 当前节点的数。
     节点的右子树只包含 大于 当前节点的数。
     所有左子树和右子树自身必须也是二叉搜索树。*/
-//    public boolean isValidBST(TreeNode root) {
-//
-//    }
+    /*方法1：递归的方式来完成*/
+    public boolean isValidBST(TreeNode root) {
+        return isValidBST(root,null,null);
+    }
+
+    public boolean isValidBST(TreeNode root,Integer min,Integer max) { /*min、max分别标识当前的root节点值最小值、最大值分别是多少*/
+        if (root == null) return true;
+        if (min != null && root.val <= min) return false;
+        if (max != null && root.val >= max) return false;
+        return isValidBST(root.left, min, root.val) && isValidBST(root.right, root.val, max);
+    }
+
+    /*方法2：中序迭代来看是不是升序*/
+    public boolean isValidBST_inorder(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        Integer preVal = null;
+        while (root!=null||!stack.isEmpty()){
+            if (root!=null){
+                stack.push(root);
+                root  =root.left;
+            }else {
+                TreeNode cur = stack.pop();
+                if (preVal==null) preVal= cur.val;
+                else {
+                    if (cur.val<=preVal) return false;
+                    preVal = cur.val;
+                }
+                root = cur.right;
+            }
+        }
+        return true;
+    }
 
 
 
     /*230.
     * 给定一个二叉搜索树的根节点 root ，和一个整数 k ，请你设计一个算法查找其中第 k 小的元素（从 1 开始计数）。*/
-//    public int kthSmallest(TreeNode root, int k) {
-//
-//    }
+    public int kthSmallest(TreeNode root, int k) {
+        Stack<TreeNode> stack = new Stack<>();
+        while (root!=null||!stack.isEmpty()){
+            if (root!=null){
+                stack.push(root);
+                root = root.left;
+            }else {
+                TreeNode cur = stack.pop();
+                if (--k==0) return cur.val;
+                root = cur.right;
+            }
+        }
+        return -1;
+    }
 
 
 
@@ -191,9 +257,24 @@ public class _07binarytree {
 
     /*105.
     * 从前序 和 中序 构造出二叉树*/
-//    public TreeNode buildTree(int[] preorder, int[] inorder) {
-//
-//    }
+    HashMap<Integer,Integer> inorderMap = new HashMap<>();
+    int preOrderIndex;
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        for (int i = 0; i < inorder.length; i++) {
+            inorderMap.put(inorder[i],i);
+        }
+        return buildTree(preorder,inorder,0,inorder.length-1);
+    }
+
+    private TreeNode buildTree(int[] preorder, int[] inorder, int l, int r) {
+        if (l>r) return null; /**这里只限制l<r行不行？这个条件能不能包含preOrderIndex不越界的情况*/
+        int curVal = preorder[preOrderIndex++];
+        TreeNode root = new TreeNode(curVal);
+        Integer inorderIndex = inorderMap.get(curVal);
+        root.left = buildTree(preorder,inorder,l,inorderIndex-1);
+        root.right = buildTree(preorder,inorder,inorderIndex+1,r);
+        return root;
+    }
 
     /*437.
     * 给定一个二叉树的根节点 root ，和一个整数 targetSum ，求该二叉树里节点值之和等于 targetSum 的 路径 的数目。
@@ -210,14 +291,14 @@ public class _07binarytree {
      * */
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
         //1. 终止条件：为null，或者等于p，或者等于q
-        if (root==null) return null;
-        if (root==p||root==q) return root;
+        if (root == null) return null;
+        if (root == p || root == q) return root;
         //2. 假设拿到了左右子树的信息
         TreeNode leftNode = lowestCommonAncestor(root.left, p, q);
         TreeNode rightNode = lowestCommonAncestor(root.right, p, q);
         //3. 根据拿到的信息决策出当前节点的返回值————形成闭环！！
-        if (leftNode!=null&&rightNode!=null) return root;
-        return (leftNode==null)?rightNode:leftNode;
+        if (leftNode != null && rightNode != null) return root;
+        return (leftNode == null) ? rightNode : leftNode;
     }
 
 

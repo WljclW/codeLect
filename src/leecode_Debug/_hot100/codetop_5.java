@@ -77,7 +77,7 @@ public class codetop_5 {
         ListNode dummy = new ListNode(-1, head), cur = dummy;
         while (head != null) {
             if (head.next != null && head.val == head.next.val) {
-                while (head.next != null && head.val == head.next.val) {
+                while (head.next != null && head.val == head.next.val) { /**出了这个while循环head会来到相等的所有节点的最后一个，因此在出了while循环有“cur.next=head.next”，跳过这最后一个重复值的节点*/
                     head = head.next; //此时head节点其实也不应该存在，因为它和前面的节点值是相同的
                 }
                 cur.next = head.next;
@@ -263,6 +263,7 @@ public class codetop_5 {
     /*105
     给定两个整数数组 preorder 和 inorder ，其中 preorder 是二叉树的先序遍历， inorder 是同一棵树的中序遍历，请构造二叉树并返回其根节点。
     * */
+    /**见codetop_10*/
 //    public TreeNode buildTree(int[] preorder, int[] inorder) {
 //
 //    }
@@ -304,7 +305,7 @@ public class codetop_5 {
         if (root==null) return 0;
         int sum = 0; //记录答案
         LinkedList<TreeNode> treeNodes = new LinkedList<>(); //存放二叉树的节点
-        LinkedList<Integer> integers = new LinkedList<>(); //存放节点对应的路径和
+        LinkedList<Integer> integers = new LinkedList<>(); //存放节点对应的路径和(即从根节点按照1-->2-->3这样组成的123这种数)
         treeNodes.offer(root);
         integers.offer(root.val);
         while (!treeNodes.isEmpty()){
@@ -316,7 +317,7 @@ public class codetop_5 {
             if (cur.left==null&&cur.right==null){
                 sum += curVal;
             }
-            /*step3：将不是null的节点添加进treeNodes，并且在integers中加入对应的路径和*/
+            /*step3：将不是null的孩子节点添加进treeNodes，并且在integers中加入对应的路径和*/
             if (cur.left!=null){
                 treeNodes.offer(cur.left);
                 integers.offer(curVal *10+cur.left.val); //一个节点到根节点的路径和，就是 父节点路径和的10倍 + 节点自身的值（其实就是1、2、3组装成123的过程）
@@ -375,14 +376,14 @@ public class codetop_5 {
         LinkedList<TreeNode> deque = new LinkedList<>();
         TreeNode cur = root;
 //        int preValent= Integer.MIN_VALUE; /*这里用int类型是错误的！！！用int范围过小了————原因：系欸但的最小值是int的最小值*/
-        long preValent = Long.MIN_VALUE; /**err：注意这里不能使用Integer.MIN_VALUE；并且不能声明为Long类型。*/
-        while (cur!=null || !deque.isEmpty()){
-            if (cur!=null){
+        long preValent = Long.MIN_VALUE; /**err：注意这里不能使用Integer.MIN_VALUE；并且不能声明为Long类型（声明为对象类型使没有int->long的隐式转换的，就会报错）。*/
+        while (cur!=null || !deque.isEmpty()) {
+            if (cur != null) {
                 deque.push(cur);
                 cur = cur.left;
-            }else{  /*修改中序遍历中打印节点的值的过程*/
+            } else {  /*修改中序遍历中打印节点的值的过程*/
                 TreeNode nowNode = deque.pop();
-                if (nowNode.val<=preValent){ /**err：二叉搜索树是严格升序的。相邻值是不行的*/
+                if (nowNode.val <= preValent) { /**err：二叉搜索树是严格升序的。相邻值是不行的*/
                     return false;
                 }
                 preValent = nowNode.val; /*preValent声明为long类型时这里才能隐式转换完成；否则如果声明为Long类型，这里会编译报错*/
@@ -537,8 +538,9 @@ public class codetop_5 {
     * */
     /**
      *【题解的原理】比较中间位置mid的值 和 下一个位置mid+1的值，沿着值大的单个方向一直大去，一定能找到峰值。
-     *      比如：nums[mid]>nums[mid+1]，则r=mid，朝着左边一定能找到峰值。但是如果去左边找，可能会有，但
-     * 是也可能没有峰值。
+     *      比如：nums[mid]>nums[mid+1]，则r=mid，朝着左边一定能找到峰值。但是如果去右边找，可能会有，但
+     * 是也可能没有峰值。————为什么？因为朝着大的一边走，走到最后是-∞，题中说了两边的边界认为是-∞，根据峰值的
+     * 定义可知这一区域必存在峰值。
      *      通俗的理解：中点所在地方，可能是某座山的山峰，山的下坡处，山的上坡处，如果是山峰，最后会二分终
      * 止也会找到，关键是我们的二分方向，并不知道山峰在我们左边还是右边，送你两个字你就明白了，爬山（没错，
      * 就是带你去爬山），如果你往下坡方向走，也许可能遇到新的山峰，但是也许是一个一直下降的坡，最后到边界。
@@ -598,7 +600,7 @@ public class codetop_5 {
                     integers.add(curVal*2+1);
                 }
             }
-            /*2.4：遍历完一层，更新res*/
+            /*2.4：遍历完一层，更新res。。。因为包括first和last两个数，因此需要+1*/
             res = Math.max(last - first + 1, res); /**err：for循环会完成某一层节点的挨个遍历，出了for循环统计该层的节点数比较靠谱*/
         }
         return res;
