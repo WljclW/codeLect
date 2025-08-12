@@ -29,7 +29,9 @@ public class _03subString {
             queue.offerLast(i);
         }
         res[0] = nums[queue.peekFirst()]; /**err：注意要去nums中取值*/
-        /*step2：对于剩下的元素依次进入。【注意】由于窗口的大小固定k，因此要注意判断队列头的元素是不是已经出窗口了*/
+        /*step2：对于剩下的元素依次进入，每次窗口进入一个元素，就需要生成一个位置的信息————i-k+1（比如k位置的
+            元素进入到队列时，就需要生成1位置的最大值信息，因为1~k这样的窗口大小是k，因此对应i-k+1位置的信息）。
+            【注意】由于窗口的大小固定k，因此要注意判断队列头的元素是不是已经出窗口了！！*/
         for (int i = k; i < nums.length; i++) {
             while (!queue.isEmpty() && nums[i] >= nums[queue.peekLast()]) { //①先将当前位置的元素入栈
                 queue.pollLast();
@@ -48,9 +50,166 @@ public class _03subString {
     * 76.给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s
     * 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
     * */
-//    public String minWindow(String s, String t) {
-//
-//    }
+
+    /**
+     *【思路】
+     */
+    public String minWindow(String s, String t) {
+        if (s.length()<t.length()) return "";
+        /*step1：使用need这个map存储每一个字符对应的数量*/
+        HashMap<Character, Integer> need = new HashMap<>();
+        for (char c:t.toCharArray()){
+            need.put(c,need.getOrDefault(c,0)+1);
+        }
+
+        int start = 0;
+        int valid = 0;
+        int left = 0,right = 0;
+        int len = Integer.MAX_VALUE;
+        HashMap<Character, Integer> window = new HashMap<>();
+        /*step2：双指针滑动窗口研究s字符串*/
+        while (right<s.length()){
+            char c = s.charAt(right);
+            /*2.1：只研究t字符串有的字符————等价于need这个map有。
+            *   第一步：如果有的话，则将字符放进window；
+            *   第二步：如果window中字符c的数量 等于 need中字符c的数量，则说明c这个字符通过校验，因此valid++*/
+            if (need.containsKey(c)){
+                window.put(c,window.getOrDefault(c,0)+1);
+                /**err：map.get比较值相等的时候必须使用“.intValue()”方法才可以*/
+                if (window.get(c).intValue()==need.get(c).intValue()){
+                    valid++;
+                }
+            }
+            /*2.2：只要通过校验的字符数量 等于 need的size，就说明s中当前窗口是覆盖字符串t的，
+             因此可以更新答案；并且尝试缩小窗口，直到窗口中的子串不覆盖字符串t为止。
+                    while循环的完整逻辑————
+                        ①现根据窗口的大小判断是不是需要更新start以及len。【注意】这里窗口的大小在计算的时
+                    候会根据right指针更新的时机有所变化。这段代码中right指针更新是在while循环之后，因此这
+                    里right指针对应的字符还是在窗口的，因此窗口的大小是“right-left+1”。
+                          ————再总结一句话，
+                            滑动窗口的题目中，任何时刻窗口一定包含left位置，但是right位置具体包含不包含需
+                            要看right指针更新的时机！！！
+                        ②拿到left位置对应的字符c1；
+                        ③如果need这个map包含c1，则说名window中必然包含，因此需要更新window。。并且还要在
+                    更新后判断window中c1的数量 是不是还 符合need的要求！！如果window中的值小于need.get(c1)，
+                    说明c1字符已经达不到需要的数量，因此valid--。
+                        ④更新left指针，left++。
+            * */
+            while (valid==need.size()){
+                if (right-left+1<len){ //注释①
+                    len = right-left+1;
+                    start = left;
+                }
+                char c1 = s.charAt(left); //注释②
+                if (need.containsKey(c1)){ //注释③
+                    window.put(c1,window.get(c1)-1);
+                    if (window.get(c1)<need.get(c1)){
+                        valid--;
+                    }
+                }
+                left++; //注释④
+            }
+            right++;
+        }
+        return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
+    }
+
+    /*另外一种写法如下。其实没有本质的思想区别。唯一的区别就在于left、right更新时机导致的
+    * 长度计算的区别
+    *    */
+    public String minWindow_(String s, String t) {
+        if (s.length()<t.length()) return "";
+
+        HashMap<Character, Integer> need = new HashMap<>();
+        for (char c:t.toCharArray()){
+            need.put(c,need.getOrDefault(c,0)+1);
+        }
+
+        int left = 0,right = 0;
+        int valid = 0;
+        int start = 0,len = Integer.MAX_VALUE;
+
+        HashMap<Character, Integer> window = new HashMap<>();
+        while (right<s.length()){
+            char c = s.charAt(right);
+            /**区别1：放进去一个字符，就更新right指针。。。上面的方法是每一轮换最后才更新。。造成的区别
+             *    就是这种方法下面的代码中right位置是不包含的，因此计算子串的长度就是“right-left”*/
+            right++;
+            if (need.containsKey(c)){
+                window.put(c,window.getOrDefault(c,0)+1);
+                if (window.get(c).intValue()==need.get(c).intValue()){  /**这里拿到的是Integer，用“==”会不会有问题*/
+                    valid++;
+                }
+            }
+
+            while (valid==need.size()){
+                /**区别2：计算子串的长度时，这种方法是“right-left”。原因：刚放进right位置的字符right就右
+                 *    移动了，因此此时right并不在窗口内，还没研究呢。。就比如：本来窗口是2、3、4；然后4放
+                 *    进map后right更新到5，此时窗口的长度就是5-3，即right-left。*/
+                if (right-left<len){
+                    start = left;
+                    len = right-left;
+                }
+
+                char leftChar = s.charAt(left);
+                left++;
+                if (need.containsKey(leftChar)){
+                    window.put(leftChar,window.get(leftChar)-1);
+                    if (window.get(leftChar)<need.get(leftChar)){
+                        valid--;
+                    }
+                }
+            }
+        }
+        return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
+    }
+
+
+    /*除了上面的两种写法以外，还有下面的方法*/
+    public String minWindow_ano(String s, String t) {
+        if (s.length()<t.length()) return "";
+        HashMap<Character, Integer> need = new HashMap<>();
+        for(char c:t.toCharArray()){
+            need.put(c,need.getOrDefault(c,0)+1);
+        }
+
+        int start = 0;
+        int left = 0,right = 0;
+        int len = Integer.MAX_VALUE;
+        int valid = 0;
+        HashMap<Character, Integer> window = new HashMap<>();
+        while (right<s.length()){
+            char c = s.charAt(right);
+            right++;
+
+            if (need.containsKey(c)){
+                window.put(c,window.getOrDefault(c,0)+1);
+                if (window.get(c).intValue()==need.get(c).intValue()){
+                    valid++;
+                }
+                /**下面代码的位置跟原来方案是不一样的，也是可行的！！即————
+                 *      下面的while循环写在if (need.containsKey(c))里面；
+                 *   或者 写在if (need.containsKey(c))外面都是可以的*/
+                while (valid==need.size()){
+                    if (right-left<len){
+                        len = right-left;
+                        start = left;
+                    }
+                    char c1 = s.charAt(left);
+                    left++;
+                    if (need.containsKey(c1)){
+                        window.put(c1,window.get(c1)-1);
+                        if (window.get(c1)<need.get(c1)) /**【注意】这里必须认真判断一下c1字符的数量是不是不够要求了*/
+                            valid--;
+                    }
+                }
+            }
+        }
+        return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
+    }
+
+
+
 
     /*560.
     * 给你一个整数数组 nums 和一个整数 k ，请你统计并返回 该数组中和为 k 的子数组的个数 。

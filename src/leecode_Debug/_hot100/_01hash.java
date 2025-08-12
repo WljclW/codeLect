@@ -31,6 +31,7 @@ public class _01hash {
      *  to class java.util.List (java.util.HashMap$Values and java.util.List are in module
      *  java.base of loader 'bootstrap')
      * */
+    /*解法1：规规矩矩*/
     public List<List<String>> groupAnagrams(String[] strs) {
         HashMap<String, List<String>> map = new HashMap<>();
         for (String str:strs){
@@ -46,6 +47,25 @@ public class _01hash {
             }
         }
         return new LinkedList<>(map.values()); /**🔺err：返回之前强转类型*/
+    }
+
+    /*解法2：使用gerOrDefault方法*/
+    public List<List<String>> groupAnagrams_1(String[] strs) {
+        LinkedList<List<String>> res = new LinkedList<>();
+        HashMap<String, List<String>> map = new HashMap<>();
+        for (int i = 0; i < strs.length; i++) {
+            char[] chars = strs[i].toCharArray();
+            Arrays.sort(chars);
+            List<String> ele = map.getOrDefault(new String(chars), new LinkedList<String>());
+            ele.add(strs[i]);
+            /*可以使用下面的三行代替上面的两行*/
+//            String s = new String(chars);
+//            List<String> ele = map.getOrDefault(s, new LinkedList<String>());
+//            ele.add(strs[i]);
+            map.put(new String(chars),ele);
+        }
+
+        return new LinkedList<List<String>>(map.values());
     }
 
 

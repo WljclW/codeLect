@@ -99,7 +99,7 @@ public class _15DP_dims {
                 }
             }
         }
-        return dp[m][n];
+        return dp[m][n]; /*这里直接返回右下角的元素值就可以。。当然在每一步求出来dp元素值后使用res记录答案取最大值也可以*/
     }
 
 

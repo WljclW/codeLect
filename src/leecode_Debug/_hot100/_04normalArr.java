@@ -164,7 +164,10 @@ public class _04normalArr {
              * 的数"应该放到哪里————也就意味着swap之后不能变换当前研究的索引cur。
              *      3.一旦出while循环就表示：位置i位置的元素放到了正确的位置，并且所
              * 有换过来的元素也都放到了正确的位置*/
-            /**err：三个条件缺一不可*/
+            /**err：三个条件缺一不可——————
+             *      ①如果缺少“nums[i] > 0 && nums[i] <= nums.length”，会出现越界异常。
+             *      ②如果“nums[nums[i] - 1] != nums[i]”写错了们就会导致提交时“有用例超时”，这个条件的
+             * 解释：nums[i]应该放在nums[i]-1的位置，因此判断这个位置的值是不是等于nums[i]*/
             while (nums[i] > 0 && nums[i] <= nums.length && nums[nums[i] - 1] != nums[i]) { /**err：nums[i]是两个条件，否则会出现".....Index 6 out of bounds for length 5"*/
                 swap(nums, i, nums[i] - 1); /**err：这里用额外的方法来实现！*/
             }

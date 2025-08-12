@@ -69,9 +69,22 @@ public class codetop_5 {
     给定一个已排序的链表的头 head ， 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回 已排序的链表 。
     * */
     /**
-     * 【建议】建议看官方的解法：见方法deleteDuplicates
+     * 【建议】建议看官方的解法：见方法deleteDuplicates.....
+     *          但是练习中发现deleteDuplicates_82解法用的熟
+     * 【常错的点】不论哪种解法，“cur = cur.next;”都要放在else块，这是关键
      * 【与83的区别】由于要删除所有值相等的节点，因此最后链表中可能一个节点都不剩，因此必须借助dummy节点来解题
      * */
+    /**
+     *【易错点】不论哪种解法，“cur = cur.next;”都要放在else块中，这是关键
+     *      如果写错了位置，会出现如下的错：
+     *  输入
+             head =
+            [1,2,3,3,4,4,5]
+     *  输出
+     *      [1,2,4,4,5]
+     *  预期结果
+     *      [1,2,5]
+     */
     /*官网的解法*/
     public ListNode deleteDuplicates(ListNode head) {
         ListNode dummy = new ListNode(-1, head), cur = dummy;
@@ -134,8 +147,11 @@ public class codetop_5 {
 
     /*83*/
     /**
-     * 【建议】建议使用双指针的解法，见方法deleteDuplicates_83
-     * 【注意区分82】这个题会保留一个相同值的节点，82题会删除所有值相等的节点。
+     * 【建议】建议使用双指针的解法，见方法deleteDuplicates_83。。。
+     * 【注意区分82】这个题会保留一个相同值的节点，82题会删除所有值相等的节点。造成的区别：
+     *          83题可以使用双指针 且 不用使用虚拟头节点，因为相同的节点会保留一个，不会说到
+     *      最后一个节点都没有；
+     *          而82题就不一定了，可能到最后一个节点都没有，因此必须要使用一个虚拟头结点！！
      * 【解题思路】不需要使用dummy节点，思考角度————”当前的节点是cur，如果下一个节点的value等于cur。value，就删除下一个节点————即等
      *      价于语句cur.next = cur.next.next，确保不会发生空指针即可“。
      * */
@@ -253,7 +269,7 @@ public class codetop_5 {
             }
             cur2++;
 
-            if (val1 != val2) {
+            if (val1 != val2) { //如果不相等就说明已经比较出两个的大小关系了
                 return val1 > val2 ? 1 : -1;
             }
         }
@@ -291,15 +307,33 @@ public class codetop_5 {
         return dfsSumNumbers(root.left, curSum) + dfsSumNumbers(root.right, curSum);
     }
 
+    /*深度优先遍历的另一种写法....使用全局变量来记录结果*/
+    int maxSumNumbers = 0;
+    public int sumNumbers_(TreeNode root) {
+        dfsSumNumbers1(root,0);
+        return maxSumNumbers;
+    }
+
+    private void dfsSumNumbers1(TreeNode root, int curSum) {
+        if (root==null) return;
+        curSum = curSum*10 + root.val;
+        if (root.left==null&&root.right==null) maxSumNumbers += curSum;
+        dfsSumNumbers(root.left, curSum);
+        dfsSumNumbers(root.right, curSum);
+    }
+
 
 
 
     /*解法2：层序遍历的解法*/
     /**
      *【层序遍历的思路】
-     *      使用两个队列，一个队列用于存放二叉树的节点（与层序遍历原始版本的队列作用相同）；一个用于存放”从root到当前节点的路径和“。然后进
-     *  入while循环研究每一个节点————如果某一个节点的左右孩子都是空，则说明这是一个路径，需要累加到最终的结果sum；否则将不为null的结果添
-     *  加到第一个队列，并且将它对应的路径添加到第二个队列。【注意】孩子的路径和计算：父节点的路径和*10 + 孩子节点的value
+     *      使用两个队列，一个队列用于存放二叉树的节点（与层序遍历原始版本的队列作用相同）；一个用于存放“从root到当
+     * 前节点的路径和”。【具体操作】每次将一个节点放进队列，就对应的把该节点对应的路径和也放进队列！！————这种思想
+     * 和做法其实是层序遍历在具体场景使用时的常规操作！！！要记住
+     *      然后进入while循环研究每一个节点————如果某一个节点的左右孩子都是空，则说明这是一个路径，需要累加到最终的
+     * 结果sum；否则将不为null的结果添加到第一个队列，并且将它对应的路径添加到第二个队列。【注意】孩子的路径和计算：父
+     * 节点的路径和*10 + 孩子节点的value
      */
     public int sumNumbers1(TreeNode root) {
         if (root==null) return 0;
@@ -416,7 +450,7 @@ public class codetop_5 {
      *      综上，不论是奇数节点还是偶数节点(slow会来到中间节点 或者 中间的后一个节点)，只用从slow.next翻转后半部分的链表；然后把slow.next
      *  置为null
      *      其实，这个题之所以能从中间节点的下一位开始翻转的底层细节原理：如果链表的节点数是偶数，则中间的两个节点比如上面的“2——>3”在重排
-     *  链表之后就位于结果的最后面，并且顺序不变，因此翻转3这个节点之后的链表就可以了
+     *  链表之后就位于结果的最后面，并且顺序不变，因此翻转3这个节点之后的链表就可以了！！————本质原因
      * */
     /*第一种写法。*/
     public void reorderList(ListNode head) {
@@ -466,7 +500,7 @@ public class codetop_5 {
         /*step2：翻转后半部分的链表
         * 【说明】下面的方式翻转链表之后，后半部分链表以head2开头，比前一半链表的节点数少一个节点（如果原
         * 来链表的节点数是奇数）或者少两个节点（如果原来链表的节点数是偶数）*/
-        ListNode head2 = reverse(mid.next); /**err：注意是从slow。next，因此严格来说并不是翻转后半部分链表，而是从后半部分的第二个节点开始翻转*/
+        ListNode head2 = reverse(mid.next); /**err：注意是从slow.next，因此严格来说并不是翻转后半部分链表，而是从后半部分的第二个节点开始翻转*/
         mid.next = null; /**err：注意需要将前半部分的最后一个节点置为null，否则会出现环*/
         /*step3：合并反转后的链表*/
         merge(head,head2);
@@ -552,7 +586,7 @@ public class codetop_5 {
         while (l < r) {
             int mid = l + (r - l) / 2;
             if (nums[mid] > nums[mid + 1]) { /**err：这里带等于也是可以的。但是按照原理来讲，最好不带*/
-                r = mid;
+                r = mid;    /**【注】因为mid位置可能就是峰值，因此r不能赋值为mid-1，只能赋值为mid*/
             } else {
                 l = mid + 1;
             }

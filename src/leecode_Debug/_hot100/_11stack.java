@@ -144,7 +144,7 @@ public class _11stack {
             /**err：小于等于栈顶的时候，都需要进入最小栈！！不能漏掉等于，否则一个等于minStack栈顶
              * 的时候，到底应不应该出栈呢？就没有标准了。
              * */
-            if (minStack.isEmpty() || val <= minStack.peek()) { /**err：两个条件缺一不可，否则可能测试用例报错“java.util.EmptyStackException”*/
+            if (minStack.isEmpty() || val <= minStack.peek()) { /**err：两个条件缺一不可 并且 条件的关系是"||"关系，否则可能测试用例报错“java.util.EmptyStackException”*/
                 minStack.push(val);
             }
         }

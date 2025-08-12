@@ -67,6 +67,30 @@ public class _14DP {
         return res;
     }
 
+    /*另外的写法，朴素一点。根据j的位置来分别计算*/
+    public List<List<Integer>> generate_1(int numRows) {
+        LinkedList<List<Integer>> res = new LinkedList<>();
+        res.add(new LinkedList<>(Arrays.asList(1)));
+        if (numRows==1) return res;
+        res.add(new LinkedList<>(Arrays.asList(1,1)));
+        if (numRows==2) return res;
+        for (int i = 3; i <= numRows; i++) {
+            LinkedList<Integer> ele = new LinkedList<>();
+            for (int j = 0; j < i; j++) {
+                if (j==0) ele.add(1);
+                else if (j==i-1) ele.add(1);
+                else{
+                    List<Integer> last = res.getLast();
+                    int val = last.get(j - 1) + last.get(j);
+                    ele.add(val);
+                }
+            }
+            res.add(ele);
+        }
+
+        return res;
+    }
+
 
     /*198
     你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃
@@ -282,7 +306,7 @@ public class _14DP {
      * 仅仅选取最大值则遍历到元素3的时候，会选择单独成一个子数组，这样是不对的。应该到任何一个
      * 位置，都应该记录当前子数组的最大值、最小值...
      *     然后到每一个位置的时候，需要决策出当前位置的最大目标值
-     * 【建议】建议使用maxProduct2，条理清晰
+     * 【建议】建议使用maxProduct2 或者 maxProduct3，条理清晰
      * */
     public int maxProduct(int[] nums) {
         //dp数组的定义：以nums[i-1]结尾的最大子数组的乘积..每一个数可以和前面的数个数合成一个子数组 或者 自己成立一个子数组
@@ -315,19 +339,32 @@ public class _14DP {
         return res;
     }
 
+    /*maxProduct2和maxProduct3是一样的道理，只不过for循环一个是从1开始，一个是从0开始。*/
     public int maxProduct2(int[] nums) {
         int minPre = nums[0],maxPre = nums[0];
         int res = nums[0];
         for (int i = 1; i < nums.length; i++) { /**err：i要从1开始，因为res的初始值已经是nums[0]了*/
             int curMin = Math.min(nums[i],Math.min(minPre*nums[i],maxPre*nums[i]));
             int curMax = Math.max(nums[i],Math.max(maxPre*nums[i],maxPre*nums[i]));
-            minPre = curMin;
+            minPre = curMin; /**err：这里是赋值，而不是取最值*/
             maxPre = curMax;
             res = Math.max(res,maxPre);
         }
         return res;
     }
 
+    public int maxProduct3(int[] nums) {
+        int res = Integer.MIN_VALUE;
+        int minPre = 1,maxPre = 1;
+        for (int i=0;i<nums.length;i++){
+            int curMin = Math.min(Math.min(minPre*nums[i],maxPre*nums[i]),nums[i]);
+            int curMax = Math.max(Math.max(minPre*nums[i],maxPre*nums[i]),nums[i]);
+            minPre = curMin;
+            maxPre = curMax;
+            res = Math.max(res,curMax);
+        }
+        return res;
+    }
 
 
     /*416.
@@ -390,7 +427,7 @@ public class _14DP {
             if (right>left) left = right =0;  /**两次遍历的唯一区别*/
         }
 
-        left = right = 0; /**err：少不了*/
+        left = right = 0; /**err：left和right会出初始值，少不了。。否则出事的测试用例"(()"就返回了错误的结果4*/
         for (int i = s.length()-1; i >=0 ; i--) {
             if (s.charAt(i)==')') right++;
             else  left++;

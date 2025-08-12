@@ -309,9 +309,9 @@ public class _10binarySearch {
 
     /*33.....81是扩展（允许有重复元素）
     整数数组 nums 按升序排列，数组中的值 互不相同 。
-在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。
-给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
-你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
+    在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。
+    给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
+    你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
     * */
     /**
      * 【强烈建议！】题解中不要出现nums[0]，nums[nums.length-1]这样的数据，而是用nums[l]、nums[r]代替，见方
@@ -354,7 +354,7 @@ public class _10binarySearch {
         -1
     预期结果
         1
-        原因：“if (nums[mid] >= nums[0])”说明左边是有序的，不能漏掉等于。
+        原因：“if (nums[mid] >= nums[0])”或者“if (nums[mid] >= nums[l])”————左边是有序的，不能漏掉等于。
     * */
     /*写法1：不推荐*/
     public int search(int[] nums, int target) {
@@ -505,7 +505,7 @@ public class _10binarySearch {
         * */
         while (left < right) {
             int mid = left + (right - left) / 2;
-            if (nums[mid] > nums[right]) { /**err：这里最好使用nums[right]，不要使用nums[nums.length-1]，不具备普遍性，见154*/
+            if (nums[mid] > nums[right]) { /**err：这里最好使用nums[right]，不要使用nums[nums.length-1]，不具备普遍性，见154；同理不存在重复数带不带等于都可以*/
                 left = mid + 1;
             } else {
                 right = mid; /*此时mid位置的值可能就是最小值。并且是闭区间，因此right更新为mid而不是mid-1*/
@@ -520,9 +520,53 @@ public class _10binarySearch {
     给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
 算法的时间复杂度应该为 O(log (m+n)) 。
     * */
-//    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-//
-//    }
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        /*step1：让nums1永远是长度较小的那一个*/
+        if (nums1.length > nums2.length) return findMedianSortedArrays(nums2, nums1);
+        /*step2：定义"闭区间类型"左右边界。【注意】这里的索引是隔板，因此是[0,nums.length]*/
+        int l = 0, r = nums1.length;
+        /*step3：二分查找*/
+        while (l <= r) {
+            /*3.1：注意i和j的对应关系。他们的和是“(nums1.length + nums2.length + 1) / 2”*/
+            int i = l + (r - l) / 2;
+            int j = (nums1.length + nums2.length + 1) / 2 - i;
+            /*3.2：利用i、j隔板可以得到4个数。形如————
+            *       nums1[i-1] ===隔板i=== nums1[i]
+            *       nums2[j-1] ===隔板j=== nums2[j]
+            *     由于隔板i的范围为闭区间[0,nums1.length]，因此计算左右两边的数需要考虑边界情
+            * 况。并且将数组元素nums1[-1]视为Integer.MIN_VALUE；将数组元素nums1[nums1.length]
+            * 的值视为Integer.MAX_VALUE。
+            *     对于nums2[j-1]和nums2[j]元素的计算也是同样的道理！！*/
+            int nums1Left = (i - 1) < 0 ? Integer.MIN_VALUE : nums1[i - 1];
+            int nums1Right = (i == nums1.length) ? Integer.MAX_VALUE : nums1[i];
+            int nums2Left = (j - 1) < 0 ? Integer.MIN_VALUE : nums2[j - 1];
+            int nums2Right = (j == nums2.length) ? Integer.MAX_VALUE : nums2[j];
+            /*3.3：结果可能有三种情况————
+                情况1：if (nums1Left <= nums2Right && nums2Left <= nums1Right)
+                    说明是符合要求的，直接计算结果并返回；
+                情况2：(nums1Left > nums2Right)
+                    说明nums1Left值选的太大了，因此需要尝试将隔板i变小（这样nums1[i-1]才能
+                变小）。因此挪动右边界，即r = i-1。————这样的代码中i相当于之前代码的mid。
+                情况3：其他情况即(nums2Left > nums1Right)
+                    说明nums2Left值选的太大了，因此需要把它变小，就意味着隔板j要变小，因此i
+                要增大，索引挪动左指针，l = i+1。————这样的代码中i相当于之前代码的mid。
+            * */
+            if (nums1Left <= nums2Right && nums2Left <= nums1Right) {
+                if ((nums1.length + nums2.length) % 2 == 0) {
+                    return (Math.max(nums1Left, nums2Left) +
+                            Math.min(nums1Right, nums2Right)) / 2.0;
+                } else {
+                    return Math.max(nums1Left, nums2Left) * 1.0;
+                }
+            } else if (nums1Left > nums2Right) {
+                r = i - 1;
+            } else {
+                l = i + 1;
+            }
+        }
+        return -1; //其实代码走不到这里
+    }
+
 
     public static void main(String[] args) {
         _10binarySearch thisClass = new _10binarySearch();
@@ -585,12 +629,15 @@ public class _10binarySearch {
      * 【与33题的区别】
      区别1：添加一种情况“nums[l] == nums[mid] && nums[mid] == nums[r]”，此时l++，r--，线性操作
      区别2：nums[mid]不能和nums[0]比较，否则下面的测试用例过不了
-     nums =[1,0,1,1,1]
-     target =0
-     输出
-        false
-     预期结果
-        true
+                 nums =[1,0,1,1,1]
+                 target =0
+                 输出
+                    false
+                 预期结果
+                    true
+     */
+    /**
+     *【下面提供了三种写法，但是区别不大，重点就在于nums[mid]==nums[l]或者nums[mid]==nums[r]如何处理？？】
      */
     /*解法1（与nums[l]进行比较，然后决策）：在33的基础上改进。见33题的解法search_2*/
     public boolean search_81(int[] nums, int target) {
@@ -650,6 +697,31 @@ public class _10binarySearch {
                 }
             } else { /*情况3：等于右边界的时候，哪边有序不知道，只能r--*/
                 r--;
+            }
+        }
+        return false;
+    }
+
+    public boolean search_81_3(int[] nums, int target) {
+        int l = 0,r = nums.length-1;
+        while (l<=r){
+            int mid = l+(r-l)/2;
+            if (nums[mid]==target) return true;
+            if (nums[mid]>nums[l]){
+                if (target>=nums[l]&&target<nums[mid]){
+                    r = mid-1;
+                }else {
+                    l = mid+1;
+                }
+            }else if (nums[mid]<nums[r]){
+                if (target>nums[mid]&&target<=nums[r]){
+                    l = mid+1;
+                }else {
+                    r = mid-1;
+                }
+            }else {
+                if (nums[mid]==nums[l]) l++;
+                if (nums[mid]==nums[r]) r--;
             }
         }
         return false;

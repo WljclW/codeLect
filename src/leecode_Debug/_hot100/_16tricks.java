@@ -88,8 +88,25 @@ public class _16tricks {
     /**
      * 【快慢指针（Floyd 判圈法）】把数组中的每一个数看作是链表的next指针。
      */
-//    public int findDuplicate(int[] nums) {
-//    }
+    public int findDuplicate(int[] nums) {
+        int slow = 0,fast = 0;
+        /*step1：类似于环形链表找环。区别————
+        *   区别1：链表通过fast.next.next实现fast一次走两步；数组这里需要通过nums[nums[fast]]实现一次走两步。
+        *   区别2：由于链表可以使用“while(fast!=null&&fast.next!=null)”作为while条件，因此在链表中可以使用
+        * “while(){}”即while循环结构；但是数组这里没有明确的终止条件，因此只能使用“do{}while();”这种循环方式。*/
+        do{ /**do{}while();这样的循环方法，循环体至少会执行一次。因为第一次执行完才会判断while条件*/
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+        }while (slow!=fast);
+
+        slow = 0;
+        while (slow!=fast){
+            slow = nums[slow];
+            fast = nums[fast];
+        }
+        return slow;
+    }
+
 
 
     /*31.下一个排列*/
@@ -214,7 +231,7 @@ public class _16tricks {
      *      while结束时循环变量就来到第一个满足的位置
      */
     public void nextPermutation_myMethod(int[] nums) {
-        int flag = nums.length;
+        int flag = nums.length; /**【注意】这里尽量不要取Integer.MAX_VALUE!!!*/
         /*step1：从后面开始找到第一个降序的位置，即nums[i]<nums[i+1]*/
         for (int i=nums.length-2;i>=0;i--){
             if (nums[i]<nums[i+1]){
@@ -222,9 +239,10 @@ public class _16tricks {
                 break;  /**err：找到第一个就返回*/
             }
         }
-
+        /*如果数组整体是倒序的，即flag的值没有得到更新*/
         if (flag==nums.length){ //flag没有更新说明原来的排列就是最大的排列，需要整体逆序
             reverse1(nums,0,nums.length-1);
+//            return;  //【注】如果flag初始值取得是Integer.MAX_VALUE，则这里必须加return。
         }
 
         /*step2：倒着找第一个大于升序位置数nums[flag]的数nums[i]，并交换；交换后把flag（不包含
@@ -248,6 +266,49 @@ public class _16tricks {
             nums[r] = tmp;
             l++;
             r--;
+        }
+    }
+
+
+    /**下一个排列易忽视的点
+     * */
+    public void nextPermutation_note(int[] nums) {
+        int flag = Integer.MAX_VALUE;
+        for (int i = nums.length-2; i >=0 ; i--) {
+            if (nums[i]<nums[i+1]){
+                flag = i;
+                break;
+            }
+        }
+        if (flag == Integer.MAX_VALUE){
+            rever(nums,0,nums.length-1);
+            /*因为flag的初始值是Integer.MAX_VALUE，因此这里必须加return语句。如果不加后果就是————
+            *       下面的for循环不会执行，因为"i >=flag"是不成立的；
+            *       但是“rever(nums,flag+1,nums.length-1);”就有问题了，flag的初始值是“Integer.MAX_VALUE”，
+            *   但是“flag+1”就变成了Integer.MIN_VALUE，因此导致索引变成了负数。
+            *       综上，如果flag初始值是Integer.MAX_VALUE，这里就必须加return；如果初始值是nums.length，这
+            *   里不用加return就可以。*/
+            return;
+        }
+
+        for (int i = nums.length-1; i >=flag ; i--) {
+            if (nums[i]>nums[flag]){
+                int tmp = nums[i];
+                nums[i] = nums[flag];
+                nums[flag] = tmp;
+                break;
+            }
+        }
+        rever(nums,flag+1,nums.length-1);
+    }
+
+    private void rever(int[] nums, int l, int r) {
+        while (l<r){
+            int tmp  =nums[l];
+            nums[l] = nums[r];
+            nums[r] = tmp;
+            r--;
+            l++;
         }
     }
 

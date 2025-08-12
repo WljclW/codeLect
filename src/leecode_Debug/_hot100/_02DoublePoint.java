@@ -95,6 +95,36 @@ public class _02DoublePoint {
      *      综上，这两个地方必须要去重。剩下的>0、<0的情况下去重不去重都是可以的（此时去重仅仅是把排除
      *  操作提前了，本质上在于他们并不会影响结果）。
      * */
+    /**
+     *【注意】找到一组解时，要去重，写法是"while (left<right && nums[left]==nums[++left]);"。如果写
+     *      成了"while (left<right && nums[++left]==nums[left]);"是错误的，初始的测试用例就过不了。
+     *      错误的用例如下：
+                     输入
+                     nums =
+                     [-1,0,1,2,-1,-4]
+                     输出
+                     [[-1,-1,2]]
+                     预期结果
+                     [[-1,-1,2],[-1,0,1]]
+            二者的区别————
+            1. while (left < right && nums[left] == nums[++left]);
+             执行顺序：
+                ①先判断 left < right。
+                ②++left 会让 left 先加 1，然后用新值去取数组元素。因此比较的是 旧位置的值 和 新位置的值。
+                如果相等，继续循环（重复 1、2）。
+             特点：
+                 每次比较的两个元素是 相邻的（前一个和当前自增后的那个）。
+                 不会出现用同一个索引取值再比较的情况。
+                 常用于跳过重复元素（例如 nums[left] 连续相等时，left 往右移）。
+            2. while (left<right && nums[++left]==nums[left])
+             执行顺序：
+                ①先判断 left < right。
+                ②++left 先让 left 加 1，然后比较 nums[left] == nums[left]。
+             问题：
+                    这永远是 同一个位置和自己比较，所以一定为 true（除非数组里有 NaN 这种不相等的特殊情
+                 况，但 Java 的 int/long 等不会这样）。
+                    如果没有别的 break 条件，会死循环，直到 left >= right 才会退出。
+     */
     //写法1
     public List<List<Integer>> threeSum(int[] nums) {
         LinkedList<List<Integer>> res = new LinkedList<>();
@@ -177,18 +207,51 @@ public class _02DoublePoint {
         int res = 0;
         int left = 0,right = height.length-1;
         int leftMax = 0,rightMax = 0;
-        while (left<right){
+        while (left<right){ /*这里带等于也是可以的，为什么呢？答案见下面的扩展解析即方法trap_kuozhan注释*/
             leftMax = Math.max(height[left],leftMax);
             rightMax = Math.max(height[right],rightMax);
             if (height[left]<height[right]){
                 res += (leftMax-height[left]);
-                left++; /**这里的left++写在上一行也是可以的，这样的话上一行就变成了“res += (leftMax-height[left++]);”，亲测可行。下面的right--也是一个道理*/
+                left++; /**这里的left++写在上一行也是可以的，这样的话if块就只有一句话，即“res += (leftMax-height[left++]);”，亲测可行。下面的right--也是一个道理*/
             }else{
                 res += (rightMax-height[right]);
                 right--;
             }
         }
         return res;
+    }
+
+    /**
+     * 【接雨水问题的扩展】
+     *1. 下面的代码本质上最后在出while循环的时候l是等于r的，此时他们指向的是从左边开始遇到的第一个最大值
+     *  位置，举个例子，比如："4,2,0,9,8,7,8,3,9,2,5"，则最后l==r，都是3，因为数组中最大的数是9，并且
+     *  第一个9对应的索引是3.
+     *2. 基于1就可以发现为什么在42题中，使用"while(l<=r)"是可行的。因为不论哪一个指针更新到这里，都是最
+     *  大的，因此发现更新后的xMax和height[index]是相等的，导致"res += (rMax-height[r])"或者"res += (lMax-height[l]);"其实
+     *  加了个寂寞，加的值是0，因此带等于的条件判断是可以的
+     *3. 同理，如果代码中的while循环变为下面的代码：
+     *          while (l<r){
+     *             if (height[l]<height[r]){
+     *                 l++;
+     *             }else {
+     *                 r--;
+     *             }
+     *         }
+     *   则出了while循环l和r指向的是：从右边开始向左遍历的过程中，遇到的第一个最大值对应的索引
+     *4. 基于上述的扩展，同样也可以在数组中查找出不同方向遍历过程中，遇到的第一个最小值对应的位置。
+     */
+    public int trap_kuozhan(int[] height) {
+        int l = 0,r = height.length-1;
+        int lMax = 0,rMax = 0;
+        int res = 0;
+        while (l<r){
+            if (height[l]<height[r]){
+                l++;
+            }else {
+                r--;
+            }
+        }
+        return l;
     }
 
 

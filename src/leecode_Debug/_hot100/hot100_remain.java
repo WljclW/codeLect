@@ -10,18 +10,8 @@ import java.util.*;
  */
 public class hot100_remain {
     /*108.升序数组转换为平衡二叉搜索树*/
-    public TreeNode sortedArrayToBST(int[] nums) {
-        return build(nums,0,nums.length-1);
-    }
-
-    private TreeNode build(int[] nums, int l, int r) {
-        if (l<r) return null;
-        int mid = l+(r-l)/2;
-        TreeNode root = new TreeNode(mid);
-        root.left = build(nums,l,mid-1);
-        root.right = build(nums,mid+1,r);
-        return root;
-    }
+//    public TreeNode sortedArrayToBST(int[] nums) {
+//    }
 
 
     /*73.
@@ -45,8 +35,8 @@ public class hot100_remain {
             }
         }
 
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
                 if (matrix[i][j]==0){
                     matrix[i][0] = 0;
                     matrix[0][j] = 0;
@@ -54,8 +44,8 @@ public class hot100_remain {
             }
         }
 
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
                 if (matrix[i][0]==0||matrix[0][j]==0)
                     matrix[i][j] = 0;
             }
@@ -77,47 +67,16 @@ public class hot100_remain {
      * 76.给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s
      * 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
      * */
-    public String minWindow(String s, String t) {
-        if (s.length()<t.length()) return "";
+//    public String minWindow(String s, String t) {
+//
+//    }
 
-        HashMap<Character, Integer> need = new HashMap<>();
-        for (char c:t.toCharArray()){
-            need.put(c,need.getOrDefault(c,0)+1);
-        }
 
-        int left = 0,right = 0;
-        int valid = 0;
-        int start = 0,len = Integer.MAX_VALUE;
 
-        HashMap<Character, Integer> window = new HashMap<>();
-        while (right<s.length()){
-            char c = s.charAt(right);
-            right++;
-            if (need.containsKey(c)){
-                window.put(c,window.getOrDefault(c,0)+1);
-                if (window.get(c)==need.get(c)){  /**这里拿到的是Integer，用“==”会不会有问题*/
-                    valid++;
-                }
-            }
 
-            while (valid==t.length()){
-                if (right-left<len){
-                    start = left;
-                    len = right-left;
-                }
 
-                char leftChar = s.charAt(left);
-                left++;
-                if (need.containsKey(leftChar)){
-                    window.put(leftChar,window.get(leftChar)-1);
-                    if (window.get(leftChar)<need.get(leftChar)){
-                        valid--;
-                    }
-                }
-            }
-        }
-        return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
-    }
+
+
 
     /**
      * 体会下面的两个题都必须额外的使用一个方法来深度优先遍历二叉树的原因。
@@ -126,19 +85,10 @@ public class hot100_remain {
     * 给你一棵二叉树的根节点，返回该树的 直径 。
     二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
     两节点之间路径的 长度 由它们之间边数表示。*/
-    int maxDiameter = 0;
-    public int diameterOfBinaryTree(TreeNode root) {
-        dfs(root);
-        return maxDiameter;
-    }
+//    public int diameterOfBinaryTree(TreeNode root) {
+//
+//    }
 
-    private int dfs(TreeNode root) {
-        if (root==null) return 0;
-        int lDepth = dfs(root.left);
-        int rDepth = dfs(root.right);
-        maxDiameter = Math.max(lDepth+rDepth,maxDiameter);
-        return Math.max(lDepth,rDepth)+1;
-    }
 
     /*124
     * 二叉树中的 路径 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列中 至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。
@@ -153,22 +103,10 @@ public class hot100_remain {
      * 3. 1是题目需要求解的信息，2是题目中我们期望左右孩子节点返回的信息————但这两者很明显是不一样的，这种区别就造成了必须使用额外的
      *      方法来完成遍历二叉树，并在这个过程中更新结果。
      * */
-    int resMaxPathSum = Integer.MIN_VALUE; /**【注】：这里初始化为0应该是不行的*/
-    public int maxPathSum(TreeNode root) {
-        if (root==null) return 0;
-        dfsMaxPathSum(root);
-        return resMaxPathSum;
-    }
+//    public int maxPathSum(TreeNode root) {
+//
+//    }
 
-    private int dfsMaxPathSum(TreeNode root) {
-        if (root==null) return 0;
-        int lSum = dfsMaxPathSum(root.left);
-        int rSum = dfsMaxPathSum(root.right);
-        lSum = Math.max(lSum,0);
-        rSum = Math.max(rSum,0);
-        resMaxPathSum = Math.max(lSum+rSum+root.val,resMaxPathSum);
-        return root.val+Math.max(lSum,rSum);
-    }
 
 
      /*287.
@@ -194,7 +132,9 @@ public class hot100_remain {
     }
 
     /**chatgpt给出的是下面的这种形式，有什么区别？
-     * 疑问？最开始slow和fast的初始值，是不是必须和阶段2中slow的重置值一样，如果不一样是不是就错了
+     * 疑问？最开始slow和fast的初始值，是不是必须和阶段2中slow的重置值一样，如果不一样是不
+     *      是就错了.
+     *      答：对，确实是这样的。为什么？？
      * */
     public int findDuplicate_chatgpt(int[] nums) {
         // 阶段 1：快慢指针找相遇点
@@ -236,7 +176,7 @@ public class hot100_remain {
             return findMedianSortedArrays(nums2, nums1);
         int len1 = nums1.length, len2 = nums2.length;
         int l = 0, r = nums1.length;
-        while (l < r) {  /**如果这里不带=，是不是下面计算中位数的过程就需要放在while循环之外进行了*/
+        while (l <= r) {  /**如果这里不带=，是不是下面计算中位数的过程就需要放在while循环之外进行了*/
             int i = l + (r - l) / 2;
             int j = (len1 + len2 + 1) / 2 - i;
 

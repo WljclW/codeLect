@@ -7,7 +7,30 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 /**142、23（优先级队列解法）、19、、、
- * 没做过：148、23（分治解法）、24、92(反转中间的某一段链表)、*/
+ * 没做过：148、23（分治解法）、24、92(反转中间的某一段链表)*/
+
+/**
+ *【技巧1】找中间节点。
+ *     1. 找到常规的中间节点，即常规的方法就可以。
+ *          场景：适用于不需要将链表前后两半断开连接的时候。
+ *          比如：234
+ *     2. 找到链表中间的前一个结点，即：常规的方法使用时"fast"指针的初始值需要变为"head.next"，其他不变。
+ *          场景：适用于需要将链表前后两半断开连接
+ *          比如：排序链表、重排链表
+ *          具体的代码如下：
+                private ListNode findMid(ListNode head) {
+                     ListNode slow = head,fast = head.next; //fast的初始值是head.next
+                     while (fast!=null && fast.next!=null){
+                     slow = slow.next;
+                     fast = fast.next.next;
+                     }
+                     //如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个
+                     ListNode res = slow.next;
+                    //将原始链表的前后两部分断开（如果偶数节点则断开后两部分节点数相等，如果是奇数节点则前一半多一个）
+                     slow.next = null;
+                     return res;
+                }
+ */
 public class _06ListNode {
 
     public static void main(String[] args) {
@@ -110,31 +133,34 @@ public class _06ListNode {
     /**
      * 【思路】
      *      1. 正常找出链表的 中点（1，4，7会来到4） 或者 中间的后一个节点（1，4，6，7会
-     *  来到6）。。。此时后半部分的节点数必然不大于前半部分的节点数。其实此时的链表是两个
-     *      ①如果是奇数节点：1——>4——>null；7——>4——>null.此时的循环终止条件head2!=null
-     *      ②如果是偶数节点：1——>4———>6———>null；7——>6——>null.此时循环的终止条件head2！=null
+     *  来到6）。。。此时后半部分的节点数必然少于前半部分的节点数（根本原因是前一半链表并没有
+     *  和后一半断开连接）。其实此时的链表是两个
+     *      ①如果是奇数节点：1——>4——>7——>null；7——>4——>null.此时的循环终止条件head2!=null
+     *      ②如果是偶数节点：1——>4———>6————>7———>null；7——>6——>null.此时循环的终止条件head2！=null
      *      综上，奇数偶数节点的判断终止条件都是head2!=null即可。并且从中间节点 或者 中间节点
-     *  的后一个进行翻转（常规的翻转链表代码）
+     *  的后一个进行翻转（也就是说，使用常规的翻转链表代码就可以。。根"排序链表"是有很大区别的）
      *      2. 反转后半部分，拿到反转后的头结点head2。————注意是翻转链表的后半部分而不是全部翻转
-     *      3. 因为后半部分的节点数少，因此“head2!=null”时挨个判断head.val和head.val是不
-     *  是相等
+     *      3. 因为前半链表没有断开连接，所以后半部分的节点数少，因此“head2!=null”时挨个判
+     * 断head.val和head.val是不是相等
      * 【补充说明】这道题“找中间节点”的做法 和 排序链表中“找中间节点”的做法是有区别的————
      *      ①这道题找中间节点使用普通的思路，就够了。因为最后在挨个比较节点值的时候，后一半链表的节点会先来到
      * null，此时就知道结果了。
-     *      ②但是排序链表使用普通的思路，就不对。因为最后会将排完序的两半合并为一个链表，如果前一半链表的最
+     *      ②但是排序链表使用普通的思路，就不对。因为最后需要将排完序的两半合并为一个链表，如果前一半链表的最
      * 后节点next不指向null，就会导致节点重复。所以“排序链表”题目中，实际上是要先找出①方案中的前一个节点，
      * 再记录该节点的next节点（这是要返回的节点res，其实还是①的返回值），最后将该节点的next置为null，并返回
      * 记录的next节点，即res。
      *      综上，其实最本质的区别在于，判断“回文链表”的题目中，找到重点后会翻转后一半链表（并且翻转链表的时候pre
-     * 是null，也就意味着后一半链表必然是以null为结束节点的），因此head2==null就是结束条件。。————没毛病。。。
+     * 是null，也就意味着后一半链表必然是以null为结束节点的），因此head2==null就是结束条件。。前一半链表即使没有
+     * 断开连接没关系，因为使用第二半链表就会结束判断————没毛病。。。
      * 但是“排序链表”题目中，如果不人为的将前一半链表的最后一个节点设置为null，最后归并排序完合并就会导致后一半会被
      * 重复添加。
      * */
     public boolean isPalindrome(ListNode head) {
         /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点。。
-        *     根据这个位置可以知道，以slow为头的后半部分的节点数量必然不大于第一部分的节点数量。。但是slow之
-        * 前的节点next指针并不会变化。因此下面的while循环判断的时候使用“head2!=null”来判断后半部分的链表是不
-        * 是判断结束了*/
+        *     根据这个位置可以知道，以slow为头的后半部分的节点数量必然不少于第一部分的节点数量。。但是前一半链表的
+        * 最后节点next并不是null————即不像"排序链表"那样断开连接，因此使用head2!=null就是可以的，并且也必须这样判
+        * 断，不能用"head!=null"作为结束条件，因此这种情况下以head为头的链表仍然是整个链表
+        * */
         ListNode slow = findMiddle(head);
         /*step2：head2是后半部分反转后的头结点*/
         ListNode head2 = reverseIsPalindrome(slow);
@@ -411,6 +437,7 @@ public class _06ListNode {
 
     /*138*/
     /**
+     * 【强烈建议】使用解法copyRandomList1，尤其是最后一步拆分链表的操作
      * 【分解步骤】：
      *      1. 从头到尾遍历：给原始链表每一个节点后面添加一个与之val相等的新节点
      *      2. 从头到尾遍历：如果一个节点的random指针不是null，给它的下一个节点(即它的副本节点
@@ -418,7 +445,7 @@ public class _06ListNode {
      *      3. 从头到尾遍历拆分原始链表，和copy的链表。【注意】每一个节点都要对，且原始链表不能
      *  改变！！否则会报错，信息类似于："Next pointer of node with label 7 from the original
      *  list was modified."
-     *  【出错步骤】第三步的代码难写，建议看下面的方法copyRandomList1
+     * 【出错步骤】第三步的代码难写，建议看下面的方法copyRandomList1
      * */
     public Node copyRandomList(Node head) {
         if(head==null) return null; /**err：特例的判断*/
@@ -633,6 +660,13 @@ public class _06ListNode {
     * 时间复杂度：第一轮合并k/2组链表，每一组的时间代价是O（2n）;第二轮合并k/4组链表，每一组的时间
     *     复杂度是O(4n)....因此整体的时间复杂度是O(kn*logk)
     * 空间复杂度：O（logk）
+    * */
+    /*
+    【易错点】初始方法中需要进行判断："if (lists == null || lists.length == 0) return null;"，两个条件
+         缺一不可。如果没有"lists.length == 0"，会出错：
+            java.lang.ArrayIndexOutOfBoundsException: Index 0 out of bounds for length 0。
+         如果没有这个前置校验，就需要在方法merge(ListNode[] lists, int l, int r)中添加：
+            if(l<r) return null;
     * */
     public ListNode mergeKLists_01(ListNode[] lists) {
         if (lists == null || lists.length == 0) return null; /**err：注意这里if条件需要添加"lists.length == 0"*/
