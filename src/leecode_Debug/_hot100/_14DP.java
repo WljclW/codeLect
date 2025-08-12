@@ -140,6 +140,7 @@ public class _14DP {
     计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
     * 金额，返回 -1 。
     你可以认为每种硬币的数量是无限的。*/
+    /**详细的解析和实现见leecode_Debug._hot100._01completeBag的coinChange方法*/
     public int coinChange(int[] coins, int amount) {
         return coinChange(coins,0,amount);
     }
@@ -332,7 +333,7 @@ public class _14DP {
     /*416.
     * 给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两
     * 个子集，使得两个子集的元素和相等。*/
-    /**见leecode_Debug._hot100._01bag*/
+    /**题解和解析 见leecode_Debug._hot100._01bag的canPartition方法*/
 //    public boolean canPartition(int[] nums) {
 //
 //    }

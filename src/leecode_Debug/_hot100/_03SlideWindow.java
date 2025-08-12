@@ -1,8 +1,6 @@
 package leecode_Debug._hot100;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**滑动窗口的实质还是双指针*/
 public class _03SlideWindow {
@@ -99,7 +97,80 @@ public class _03SlideWindow {
     /*
     * 438.给定一个字符串 s 和一个非空字符串 p，找到 s 中所有是 p 的字母异位词的子串，返回这些子串的起始索引。
     * */
-//    public List<Integer> findAnagrams(String s, String p) {
-//
-//    }
+    public List<Integer> findAnagrams(String s, String p) {
+        LinkedList<Integer> res = new LinkedList<>();
+        if (s.length()<p.length()) return res;
+        int[] countS = new int[26];
+        int[] countP = new int[26];
+        for (char c:p.toCharArray()){
+            countP[c-'a']++;
+        }
+
+        for (int i = 0; i < p.length(); i++) {
+            countS[p.charAt(i)-'a']++;
+        }
+        if (Arrays.equals(countS,countP)) res.add(0);
+
+        for (int i = p.length(); i < s.length(); i++) {
+            char right = s.charAt(i);
+            char left = s.charAt(i - p.length());
+            countS[left-'a']--;
+            countS[right-'a']++;
+            if (Arrays.equals(countS,countP)) res.add(i-p.length());
+        }
+
+        return res;
+    }
+
+
+    /**下面是github的diamagnetic，目测也是对的。。。。。
+     举例（s="cbaebabacd", p="abc"）
+     初始化 count：a:1 b:1 c:1 其余:0
+
+     初始化 match：26 - 3 = 23（因为有 3 个非零，其它 23 个是 0）
+
+     i=0, in='c'：--count[c] 由 1->0 → match=24
+
+     i=1, in='b'：--count[b] 由 1->0 → match=25
+
+     i=2, in='a'：--count[a] 由 1->0 → match=26 → 此时 i - pLen + 1 = 0 加入结果
+     （窗口为 "cba" 与 "abc" 异位词）
+
+     之后继续滑动，移除、加入字符并维护 match，找到下一个起点 6。
+     */
+    public List<Integer> findAnagrams_github(String s, String p) {
+        List<Integer> res = new ArrayList<>();
+        int sLen = s.length(), pLen = p.length();
+        if (sLen < pLen) return res;
+
+        int[] count = new int[26];
+        for (char c : p.toCharArray()) count[c - 'a']++;
+
+        // 关键：初始化 match 为 count 中等于 0 的条目数
+        int match = 0;
+        for (int v : count) if (v == 0) match++;
+
+        for (int i = 0; i < sLen; i++) {
+            // 新字符进入窗口：先 -- 操作，再判断是否刚好变为 0
+            int in = s.charAt(i) - 'a';
+            if (--count[in] == 0) {
+                match++; // 从非0变为0，表示该字符目前在窗口中的频率与 p 中一致
+            }
+
+            // 窗口超出长度时，移除最左侧字符
+            if (i >= pLen) {
+                int out = s.charAt(i - pLen) - 'a';
+                if (count[out]++ == 0) {
+                    match--; // 移除使得该字符不再与 p 中匹配
+                }
+            }
+
+            // 当所有 26 个字符的 count 都为 0，说明当前窗口是 p 的异位词
+            if (match == 26) {
+                res.add(i - pLen + 1);
+            }
+        }
+        return res;
+    }
+
 }

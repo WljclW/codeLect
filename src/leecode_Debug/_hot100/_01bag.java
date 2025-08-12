@@ -1,5 +1,36 @@
 package leecode_Debug._hot100;
 
+/**
+ *【0-1背包和完全背包的区别】
+ *      1. 概念上的区别：0-1背包每一个物品只能被选一次；完全背包可以选择多次；
+ *      2. 2.1 二维实现时，状态转移的区别：
+                （1）0-1背包每一个物品只能被选一次，因此当前位置的状态依赖上一行的状态————
+                       dp[i][j] = Math.max(dp[i - 1][j], //不选取物品i，背包最大价值
+                            dp[i-1][j-nums[i]]+nums[i]); //选取物品i，此时背包需要留出nums[i]的空间
+                （2）完全背包问题中每一个物品可以被选择多次，因此当前位置的状态会依赖到同一行之
+                前的位置————
+                         dp[i][j] = Math.max(dp[i - 1][j], //不选物品i时，背包的最大价值
+                            dp[i][j-coins[i]] + coins[i]); //选物品i时，背包的最大价值
+                （3）综上，可以发现，二维dp时唯一的区别就在于状态转移取最值的时候。
+            2.2 二维实现时，遍历方向的区别：
+                 遍历方向没有区别，都是先初始化、然后一行从左到右遍历、整体从上到下遍历所有行。。且整个过程不存
+                在某个元素被覆盖的情况
+        3. 3.1 一维实现时，状态转移的区别：
+                 由于1维的时候只有一行，因此“二维中状态从上一行转移、从当前行转移”这样的描述，在一维
+                都体现为从当前行的转移。。
+           3.2 一维实现时，遍历方向的区别：
+                 “二维的时候，两种题型的遍历方式是没有区别的”，因为有两个维度，不存在值被覆盖的情况（注意——其
+                实本质上来说这才是一维二维区别的根本原因）。
+                  【但是】二维中取最值的逻辑中————0-1要跟上一行元素比；完全背包要跟本行元素比。这里在一维中就要
+                改变了。。。。因为一维中只有一行，因此假设当前第m行研究完了，这时dp中其实就是原来二维中第m行的数
+                据，是一模一样的！！！这句话很重要。基于前面那句话的理解，可以发现：
+                    ①如果当前位置的元素依赖于上一行某个位置，则需要从后向前计算。（否则，如果从前向后计算，则前
+                面本来是上一行的值，结果直接被覆盖了，就错了）；
+                    ②如果当前位置的元素依赖于上一行某个位置，则需要从后向前计算。（这样的话前面会先更新为最新一
+                行所对应的数据，后面的数据再计算时使用的就是它本行的数据）。
+                    综上，“0-1问题和完全背包问题”在二维dp时状态转移依赖哪一行的问题，在一维dp中依靠遍历研究的方
+                向来解决（从前往后计算 OR 从后往前计算？？）
+ */
 public class _01bag {
     /*
     416. 分割等和子集
@@ -7,7 +38,7 @@ public class _01bag {
     个子集，使得两个子集的元素和相等。
     * */
     /**
-     * 【关键】问题等价于求解：target的背包能放下物品的最大价值是不是target
+     * 【关键】问题等价于求解：target的背包能放下物品的最大价值是不是target（其中target就是数组元素和的一半）
      * 【实质】实质是一道0-1背包问题。。。转化为0-1背包问题：
      *      每一个物品的重量是nums[i]，价值是nums[i]，背包容量是target，能否放下target
      *  价值的物品（其中target=sum/2）.
@@ -19,15 +50,15 @@ public class _01bag {
         for (int num : nums) {
             target += num;
         }
-        if (target % 2 != 0) return false; //不能平均分两半直接返回false
+        if (target % 2 != 0) return false; //不能平均分两半直接返回false。。除以2这个事可以用“&1”来快速的判断
         target /= 2;
         /*step2：0-1背包的核心逻辑*/
         int[] dp = new int[target + 1];
         /*0-1背包一维数组形式的核心逻辑————
-         *   ①一维的写法中遍历的顺序不能颠倒（先遍历背包容量再遍历数组元素也即物品————外层for循环是遍历物品）；
+         *   ①一维的写法中遍历的顺序不能颠倒（外层for循环是遍历物品；内层循环遍历背包容量）；
          *   ②一维的写法中背包容量必须从大到小遍历；*/
         for (int i = 0; i < nums.length; i++)
-            for (int j = target; j >= nums[i]; j--) {  /**err：还是双重循环，但是内循环需要“倒着遍历求值”*/
+            for (int j = target; j >= nums[i]; j--) {  /**err：还是双重循环，但是内循环需要“倒着遍历背包容量”————这一步是所有0-1背包的问题的关键*/
                 dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i]);
             }
         return dp[target] == target;
@@ -109,18 +140,18 @@ public class _01bag {
     * */
     /**？？？
      * 【关键】1.题目的转换；2.求的是方法数，不是最大价值了
-     *      1.题目转换：
+     *      1.题目转换（假设前面是“+”的所有数之和是x，则前面是“-”的所有数之和就是sum-x）：
      *          x-(sum-x)=target--->x=(target+sum)/2;
      *         即背包的容量是x，问装下x价值的物品有多少种方案？
      * */
     public int findTargetSumWays(int[] nums, int target) {
         int sum = 0;
-        for (int num:nums){
+        for (int num : nums) {
             sum += num;
         }
-        if ((sum+target)%2!=0) return 0;
-        if (Math.abs(target)>sum) return 0;
-        int remain = (sum+target)/2;
+        if ((sum + target) % 2 != 0) return 0;
+        if (Math.abs(target) > sum) return 0;
+        int remain = (sum + target) / 2;
         // dp[i][j]：遍历到数组第i个数时， remain为j时的能装满背包的方法总数
         int[][] dp = new int[nums.length][remain + 1];
 
@@ -136,8 +167,8 @@ public class _01bag {
          当从nums数组的索引0到i的部分有n个0时（n > 0)，每个0可以取+/-，因此有2的n次方中可以取到j = 0的方案
          n = 0说明当前遍历到的数组部分没有0全为正数，因此只有一种方案可以取到j = 0（就是所有数都不取）*/
         int numZeros = 0;
-        for(int i = 0; i < nums.length; i++) {
-            if(nums[i] == 0) {
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) {
                 numZeros++;
             }
             dp[i][0] = (int) Math.pow(2, numZeros);
@@ -150,16 +181,39 @@ public class _01bag {
            当nums[i] > j时，这时候nums[i]一定不能取，所以是dp[i - 1][j]种方案数
            nums[i] <= j时，num[i]可取可不取，因此方案数是dp[i - 1][j] + dp[i - 1][j - nums[i]]
          由递推公式可知，先遍历i或j都可*/
-        for (int i=1;i<nums.length;i++){
-            for (int j=1;j<=remain;j++){
-                if (j>=nums[i]){
-                    dp[i][j] = dp[i-1][j] + dp[i-1][j-nums[i]];
-                }else{
-                    dp[i][j] = dp[i-1][j];
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = 1; j <= remain; j++) {
+                if (j >= nums[i]) {
+                    dp[i][j] = dp[i - 1][j] + dp[i - 1][j - nums[i]];
+                } else {
+                    dp[i][j] = dp[i - 1][j];
                 }
             }
         }
-        return dp[nums.length-1][remain];
+        return dp[nums.length - 1][remain];
+    }
+
+
+
+    /**github给出下面的版本，测试是否可行？？*/
+    public int findTargetSumWays_github(int[] nums, int target) {
+        int sum = 0;
+        for (int num : nums) sum += num;
+
+        // 如果无法分割，返回0
+        if ((sum + target) % 2 != 0 || Math.abs(target) > sum) return 0;
+
+        int P = (sum + target) / 2;
+
+        int[] dp = new int[P + 1];
+        dp[0] = 1; // 和为0有1种方法（不选任何数）
+
+        for (int num : nums) {
+            for (int j = P; j >= num; j--) {
+                dp[j] += dp[j - num];
+            }
+        }
+        return dp[P];
     }
 
     public static void main(String[] args) {

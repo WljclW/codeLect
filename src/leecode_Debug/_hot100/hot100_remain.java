@@ -2,8 +2,7 @@ package leecode_Debug._hot100;
 
 import leecode_Debug.top100.TreeNode;
 
-import java.util.HashMap;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * @author mini-zch
@@ -310,6 +309,141 @@ public class hot100_remain {
             }
                 return small.peek();
         }
+    }
+
+    /**
+     * =============================================================================================================
+     * */
+
+    /*279.
+        给你一个整数 n ，返回 和为 n 的完全平方数的最少数量 。
+       完全平方数 是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数
+       自乘的积。例如，1、4、9 和 16 都是完全平方数，而 3 和 11 不是。*/
+    /*最快的算法其实是数学定理，但原理过于复杂*/
+    public int numSquares(int n) {
+        int[] dp = new int[n + 1];
+        Arrays.fill(dp,n);
+        dp[0] = 0;
+        for (int i = 1; i <=n; i++) {
+            for (int j = 1; j*j<=i; j++) { /**这里j不能从0开始？*/
+                dp[i] = Math.min(dp[i],dp[i-j*j]+1);
+            }
+        }
+        return dp[n];
+    }
+
+
+    /*416.
+     * 给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两
+     * 个子集，使得两个子集的元素和相等。*/
+    /**见leecode_Debug._hot100._01bag*/
+    public boolean canPartition_dims(int[] nums) {
+        int sum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+        }
+        if (sum%2!=0) return false;
+        sum /= 2;
+
+        int[][] dp = new int[nums.length][sum + 1];
+        for (int i = 0; i < sum + 1; i++) {
+            if (i>=nums[0])
+                dp[0][i] = nums[0];
+        }
+
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = 1; j < sum + 1; j++) {
+                if (j>=nums[i]){
+                    dp[i][j] = Math.max(dp[i-1][j-nums[i]]+nums[i],dp[i][j]);
+                }else
+                    dp[i][j] = dp[i-1][j];
+            }
+        }
+        return dp[nums.length-1][sum]==sum;
+    }
+
+
+    public boolean canPartition(int[] nums) {
+        int sum = Arrays.stream(nums).sum();
+        if ((sum&1)==1) return false; /**这里可以用“与运算”来快速判断是不是偶数*/
+        sum /= 2;
+
+        int[] dp = new int[sum + 1];
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = sum; j >=nums[i]; j--) {
+                dp[j] = Math.max(dp[i],dp[j-nums[i]]+nums[i]);
+            }
+        }
+        return dp[sum]==sum;
+    }
+
+
+    /**chatgpt给出的优化版本，需要测试准确性*/
+    public boolean canPartition_chatgpt(int[] nums) {
+        int sum = 0;
+        for (int num : nums) sum += num;
+        if ((sum & 1) == 1) return false; // 总和为奇数，不可能平分
+        int target = sum / 2;
+
+        BitSet bits = new BitSet(target + 1);
+        bits.set(0); // 初始状态：和为0可行
+
+        for (int num : nums) {
+            // 从 target-num 往下移位，避免覆盖未处理的位
+            for (int i = target - num; i >= 0; i--) {
+                if (bits.get(i)) {
+                    bits.set(i + num);
+                }
+            }
+        }
+        return bits.get(target);
+    }
+
+
+    /*322.
+    * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
+    计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
+    * 金额，返回 -1 。
+    你可以认为每种硬币的数量是无限的。*/
+    public int coinChange_dims(int[] coins, int amount) {
+        int[][] dp = new int[coins.length][amount + 1];
+        Arrays.fill(dp,Integer.MAX_VALUE);
+        for (int i = 0; i < amount + 1; i++) {
+            if (amount%coins[0]==0) dp[0][i] = i/coins[0];
+        }
+        for (int i = 0; i < coins.length; i++) {
+            dp[i][0] = 0;
+        }
+
+        for (int i = 1; i < coins.length; i++) {
+            for (int j = 1; j < amount + 1; j++) {
+                if (j>=coins[i]&&dp[i][j-coins[i]]!=Integer.MAX_VALUE){
+                    dp[i][j] = Math.min(dp[i][j-coins[i]]+1,dp[i][j]); /**【说明】与0-1背包最大的区别所在，物品能重复选择，因此从本行转移而来*/
+                }else {
+                    dp[i][j] = dp[i-1][j];
+                }
+            }
+        }
+        return dp[coins.length-1][amount]==Integer.MAX_VALUE?-1:dp[coins.length-1][amount];
+    }
+
+    /*验证一下下面的写法是不是可以？？可以将dp的初始化省略，集成到双层for循环中*/
+    public int coinChange(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp,Integer.MAX_VALUE);
+        dp[0] = 0;
+        for (int i = 0; i < amount + 1; i++) {
+            if (i%coins[0]==0){
+                dp[i] = i/coins[0];
+            }
+        }
+        for (int i = 1; i < coins.length; i++) {
+            for (int j = 1; j < amount + 1; j++) {
+                if (j>=coins[i]&&dp[j-coins[i]]!=Integer.MAX_VALUE)
+                    dp[j] = Math.min(dp[j-coins[i]]+1,dp[j]);
+            }
+        }
+        return dp[amount]==Integer.MAX_VALUE?-1:dp[amount];
     }
 
 }
