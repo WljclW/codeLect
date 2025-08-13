@@ -520,6 +520,18 @@ public class _10binarySearch {
     给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
 算法的时间复杂度应该为 O(log (m+n)) 。
     * */
+    /**
+     *【建议的解法】使用下面的findMedianSortedArrays就可以，逻辑清晰。。。。官方解的写法有区别但不大
+     *【思路】1. 想象在nums1中的每一个间隙都能插入隔板，这个隔板的索引从[0,nums1.length].因此隔板的索引值就指出了这个隔板之前一共有
+     *      多少个数。。。。
+     *       2. 已知两个数组，一半有多少个数呢？(len1+len2+1)/2........这样的计算方法包含了奇数和偶数的情况————
+     *          如果总共有偶数个数，则左右两半数的数量是相等的；
+     *          如果总共有奇数哥数，则左边的数比右边的数多1个。
+     *          这种数据的分布就定了到最后求解中位数怎么求。
+     *              如果是奇数，需要取隔板左边两数的最大值————即Math.max(nums1[i-1],nums2[j-1])
+     *              如果是偶数，需要取（i、j隔板左边两数的最大值 + i、j隔板右边两数的最小值）/2.0
+     *【求解过程】
+     */
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
         /*step1：让nums1永远是长度较小的那一个*/
         if (nums1.length > nums2.length) return findMedianSortedArrays(nums2, nums1);
@@ -527,7 +539,9 @@ public class _10binarySearch {
         int l = 0, r = nums1.length;
         /*step3：二分查找*/
         while (l <= r) {
-            /*3.1：注意i和j的对应关系。他们的和是“(nums1.length + nums2.length + 1) / 2”*/
+            /*3.1：注意i和j的对应关系。他们的和是“(nums1.length + nums2.length + 1) / 2”
+            *   如何理解i/j？
+            *       其中i就是插在nums1中的隔板，i的值就表明它之前有*/
             int i = l + (r - l) / 2;
             int j = (nums1.length + nums2.length + 1) / 2 - i;
             /*3.2：利用i、j隔板可以得到4个数。形如————
@@ -537,13 +551,13 @@ public class _10binarySearch {
             * 况。并且将数组元素nums1[-1]视为Integer.MIN_VALUE；将数组元素nums1[nums1.length]
             * 的值视为Integer.MAX_VALUE。
             *     对于nums2[j-1]和nums2[j]元素的计算也是同样的道理！！*/
-            int nums1Left = (i - 1) < 0 ? Integer.MIN_VALUE : nums1[i - 1];
-            int nums1Right = (i == nums1.length) ? Integer.MAX_VALUE : nums1[i];
+            int nums1Left = (i - 1) < 0 ? Integer.MIN_VALUE : nums1[i - 1]; /**挡板在的位置i代表左边有i个元素，因此左边的元素是索引为“i-1”的元素*/
+            int nums1Right = (i == nums1.length) ? Integer.MAX_VALUE : nums1[i]; /**挡板右边的第一个元素是第i+1个元素，即索引为i的元素————nums1[i]*/
             int nums2Left = (j - 1) < 0 ? Integer.MIN_VALUE : nums2[j - 1];
             int nums2Right = (j == nums2.length) ? Integer.MAX_VALUE : nums2[j];
             /*3.3：结果可能有三种情况————
                 情况1：if (nums1Left <= nums2Right && nums2Left <= nums1Right)
-                    说明是符合要求的，直接计算结果并返回；
+                    说明是符合要求的，直接计算中位数并返回；
                 情况2：(nums1Left > nums2Right)
                     说明nums1Left值选的太大了，因此需要尝试将隔板i变小（这样nums1[i-1]才能
                 变小）。因此挪动右边界，即r = i-1。————这样的代码中i相当于之前代码的mid。
@@ -703,25 +717,25 @@ public class _10binarySearch {
     }
 
     public boolean search_81_3(int[] nums, int target) {
-        int l = 0,r = nums.length-1;
-        while (l<=r){
-            int mid = l+(r-l)/2;
-            if (nums[mid]==target) return true;
-            if (nums[mid]>nums[l]){
-                if (target>=nums[l]&&target<nums[mid]){
-                    r = mid-1;
-                }else {
-                    l = mid+1;
+        int l = 0, r = nums.length - 1;
+        while (l <= r) {
+            int mid = l + (r - l) / 2;
+            if (nums[mid] == target) return true;
+            if (nums[mid] > nums[l]) {
+                if (target >= nums[l] && target < nums[mid]) {
+                    r = mid - 1;
+                } else {
+                    l = mid + 1;
                 }
-            }else if (nums[mid]<nums[r]){
-                if (target>nums[mid]&&target<=nums[r]){
-                    l = mid+1;
-                }else {
-                    r = mid-1;
+            } else if (nums[mid] < nums[r]) {
+                if (target > nums[mid] && target <= nums[r]) {
+                    l = mid + 1;
+                } else {
+                    r = mid - 1;
                 }
-            }else {
-                if (nums[mid]==nums[l]) l++;
-                if (nums[mid]==nums[r]) r--;
+            } else {
+                if (nums[mid] == nums[l]) l++;
+                if (nums[mid] == nums[r]) r--;
             }
         }
         return false;

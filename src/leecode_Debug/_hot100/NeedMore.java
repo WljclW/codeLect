@@ -1,6 +1,8 @@
 package leecode_Debug._hot100;
 
-import leecode_Debug.top100.ListNode; /**
+import leecode_Debug.top100.ListNode;
+/**
+ * 【need copy when use】
  * @author: Zhou
  * @date: 2025/6/21 16:23
  *  * 41. 缺失的第一个正数

@@ -19,47 +19,7 @@ public class hot100_remain {
      * 列的所有元素都设为 0 。请使用 原地 算法。
      * */
     public void setZeroes(int[][] matrix) {
-        int m = matrix.length,n = matrix[0].length;
-        boolean firRow = false,firCol = false;
-        for (int i = 0; i < m; i++) {
-            if (matrix[i][0]==0){
-                firCol = true;
-                break;
-            }
-        }
 
-        for (int i = 0; i < n; i++) {
-            if (matrix[0][i]==0){
-                firRow = true;
-                break;
-            }
-        }
-
-        for (int i = 1; i < m; i++) {
-            for (int j = 1; j < n; j++) {
-                if (matrix[i][j]==0){
-                    matrix[i][0] = 0;
-                    matrix[0][j] = 0;
-                }
-            }
-        }
-
-        for (int i = 1; i < m; i++) {
-            for (int j = 1; j < n; j++) {
-                if (matrix[i][0]==0||matrix[0][j]==0)
-                    matrix[i][j] = 0;
-            }
-        }
-
-        for (int i = 0; i < m; i++) {
-            if (firCol)
-                matrix[i][0] = 0;
-        }
-
-        for (int i = 0; i < n; i++) {
-            if (firRow)
-                matrix[0][i] = 0;
-        }
     }
 
 
@@ -116,43 +76,9 @@ public class hot100_remain {
     你设计的解决方案必须 不修改 数组 nums 且只用常量级 O(1) 的额外空间。
     * */
     /*方法1：链表找环原理*/
-    public int findDuplicate(int[] nums) {
-        int slow =0,fast =0;
-        do {
-            slow = nums[slow];
-            fast = nums[nums[fast]];
-        }while (slow!=fast);
-
-        slow = 0;
-        while (slow!=fast){
-            slow = nums[slow];
-            fast = nums[fast];
-        }
-        return slow;
-    }
-
-    /**chatgpt给出的是下面的这种形式，有什么区别？
-     * 疑问？最开始slow和fast的初始值，是不是必须和阶段2中slow的重置值一样，如果不一样是不
-     *      是就错了.
-     *      答：对，确实是这样的。为什么？？
-     * */
-    public int findDuplicate_chatgpt(int[] nums) {
-        // 阶段 1：快慢指针找相遇点
-        int slow = nums[0];
-        int fast = nums[0];
-        do {
-            slow = nums[slow];
-            fast = nums[nums[fast]];
-        } while (slow != fast);
-
-        // 阶段 2：找到入口点（重复数）
-        slow = nums[0];
-        while (slow != fast) {
-            slow = nums[slow];
-            fast = nums[fast];
-        }
-        return slow;
-    }
+//    public int findDuplicate(int[] nums) {
+//
+//    }
 
     /*方法2：二分查找*/
 
@@ -162,44 +88,9 @@ public class hot100_remain {
     给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
 算法的时间复杂度应该为 O(log (m+n)) 。
     * */
-
-    /**
-     *【思路】1. 想象在nums1中的每一个间隙都能插入隔板，这个隔板的索引从[0,nums1.length].因此隔板的索引值就指出了这个隔板之前一共有
-     *      多少个数。。。。
-     *       2. 已知两个数组，一半有多少个数呢？(len1+len2+1)/2........这样的计算方法包含了技术和偶数的情况————
-     *          如果总共有偶数个数，则左右两半数的数量是相等的；
-     *          如果总共有奇数哥数，则左边的数比右边的数多1个。
-     *【求解过程】
-     */
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        if (nums1.length > nums2.length)
-            return findMedianSortedArrays(nums2, nums1);
-        int len1 = nums1.length, len2 = nums2.length;
-        int l = 0, r = nums1.length;
-        while (l <= r) {  /**如果这里不带=，是不是下面计算中位数的过程就需要放在while循环之外进行了*/
-            int i = l + (r - l) / 2;
-            int j = (len1 + len2 + 1) / 2 - i;
-
-            int nums1Left = (i - 1) < 0 ? Integer.MIN_VALUE : nums1[i - 1]; /**挡板在的位置i代表左边有i个元素，因此左边的元素是索引为“i-1”的元素*/
-            int nums1Right = (i == len1) ? Integer.MAX_VALUE : nums1[i];/**挡板右边的第一个元素是第i+1个元素，即索引为i的元素————nums1[i]*/
-            int nums2Left = (j - 1) < 0 ? Integer.MIN_VALUE : nums2[j - 1];
-            int nums2Right = (j == len2) ? Integer.MAX_VALUE : nums2[j];
-
-            if (nums1Left <= nums2Right && nums2Left <= nums1Right) {
-                if ((len1 + len2) % 2 == 0) {
-                    return (Math.max(nums1Left, nums2Left) +
-                            Math.min(nums2Right, nums1Right)) / 2.0;
-                } else {
-                    return Math.max(nums1Left, nums2Left) * 1.0;
-                }
-            } else if (nums1Left > nums2Right) { /**说明nums1挑选出的数太大了，这个数需要变小*/
-                r = i - 1;
-            } else { /**说明nums1选出来的数太小了，导致从nums2中挑选”总数一半的数“后得到的最大值比nums1剩下的最小值还大。。。需要把nums1变大，因此挪左指针*/
-                l = i + 1;
-            }
-        }
-        return -1;
-    }
+//    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+//
+//    }
 
 
     /*347.

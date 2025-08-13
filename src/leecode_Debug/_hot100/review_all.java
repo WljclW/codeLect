@@ -6,6 +6,7 @@ import leecode_Debug.top100.TreeNode;
 import java.util.*;
 
 /**
+ * 【need copy when use】
  * 25. K 个一组翻转链表
  * 23. 合并 K 个升序链表
  * 155. 最小栈

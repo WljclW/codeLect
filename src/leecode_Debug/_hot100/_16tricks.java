@@ -85,20 +85,24 @@ public class _16tricks {
     /**
      * 【注意】这个题要求不能修改数组
      * */
-    /**
-     * 【快慢指针（Floyd 判圈法）】把数组中的每一个数看作是链表的next指针。
+    /*
+      解法1：快慢指针的解法
+     *【快慢指针（Floyd 判圈法）】把数组中的每一个数看作是链表的next指针。
      */
     public int findDuplicate(int[] nums) {
         int slow = 0,fast = 0;
         /*step1：类似于环形链表找环。区别————
         *   区别1：链表通过fast.next.next实现fast一次走两步；数组这里需要通过nums[nums[fast]]实现一次走两步。
         *   区别2：由于链表可以使用“while(fast!=null&&fast.next!=null)”作为while条件，因此在链表中可以使用
-        * “while(){}”即while循环结构；但是数组这里没有明确的终止条件，因此只能使用“do{}while();”这种循环方式。*/
+        * “while(){}”即while循环结构；但是数组这里没有明确的终止条件，因此只能使用“do{}while();”这种循环方式。
+        *   共同点：链表中的while是slow、fast先走才判断是不是相等；数组这里do{}while()会保证循环体至少执行一次
+        * 才进行判断，因此虽然使用的结构不一样，但是本质内容是一样的。————其实这种现象的本质原因是因为“slow、fast指
+        * 针开始的位置是一样的”，如果不先走直接判断就错了。*/
         do{ /**do{}while();这样的循环方法，循环体至少会执行一次。因为第一次执行完才会判断while条件*/
             slow = nums[slow];
             fast = nums[nums[fast]];
         }while (slow!=fast);
-
+        /*step2：跟链表一样，重置其中的一个指针为初始位置。然后每个指针每一步都只走一步，slow、fast相等时即为所求*/
         slow = 0;
         while (slow!=fast){
             slow = nums[slow];
@@ -106,6 +110,74 @@ public class _16tricks {
         }
         return slow;
     }
+
+
+    /* chatgpt给出的是下面的这种形式，有什么区别？
+     * 疑问？最开始slow和fast的初始值，是不是必须和阶段2中slow的重置值一样，如果不一样是不
+     *      是就错了.
+     *      答：对，确实是这样的。为什么？？
+     * */
+    public int findDuplicate_chatgpt(int[] nums) {
+        // 阶段 1：快慢指针找相遇点
+        int slow = nums[0];
+        int fast = nums[0];
+        do {
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+        } while (slow != fast);
+
+        // 阶段 2：找到入口点（重复数）
+        slow = nums[0];
+        while (slow != fast) {
+            slow = nums[slow];
+            fast = nums[fast];
+        }
+        return slow;
+    }
+
+
+    /*解法2：二分法。但有几点需要说明
+    *   1. 特殊之处：二分法分的是值域，而不是索引位置
+    *   2. 思路解析：我们不是对数组下标/元素位置二分，而是对取值范围 [1, n] 二分。
+                定义谓词（判断条件）：
+                    P(x) := 数组中 ≤ x 的元素个数 > x
+                直觉：如果 ≤ x 的数比“理论最多”还多，那重复的数一定落在 [1, x]（抽屉原理）。若 count(≤x) > x，说明多出
+             来的那一次来自某个 ≤x 的重复数。所以我们是在找使得 P(x) 为真的最小的 x（lower bound）。这就是重复数。
+        3.
+    */
+    public int findDuplicate_erfen_02(int[] nums) {
+        int left = 1, right = nums.length - 1; // [1, n]
+        int ans = -1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+
+            int count = 0;              // 统计 ≤ mid 的个数
+            for (int v : nums) if (v <= mid) count++;
+
+            if (count > mid) {          // P(mid) 为真 → 重复数在 [left, mid]
+                ans = mid;              // 记录当前满足的位置
+                right = mid - 1;        // 缩到左半边，继续找“第一个为真”
+            } else {                    // P(mid) 为假 → 在右半边
+                left = mid + 1;
+            }
+        }
+        return ans; // 最后 ans 就是最小使 P(x) 为真的 x，也就是重复值 d
+    }
+
+    public int findDuplicate_erfen_01(int[] nums) {
+        int l = 1, r = nums.length - 1;     // [1, n]
+        while (l < r) {
+            int mid = l + (r - l) / 2;
+            int cnt = 0;
+            for (int v : nums) if (v <= mid) cnt++;
+            if (cnt > mid) r = mid;         // P(mid) 真，答案在 [l, mid]
+            else l = mid + 1;               // 假，在 [mid+1, r]
+        }
+        return l;                           // l==r 即为最小使 P(x) 为真的点
+    }
+
+
 
 
 
