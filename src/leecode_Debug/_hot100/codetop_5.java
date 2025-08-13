@@ -71,19 +71,20 @@ public class codetop_5 {
     /**
      * 【建议】建议看官方的解法：见方法deleteDuplicates.....
      *          但是练习中发现deleteDuplicates_82解法用的熟
-     * 【常错的点】不论哪种解法，“cur = cur.next;”都要放在else块，这是关键
+     * 【常错的点】（1）不论哪种解法，“cur = cur.next;”都要放在else块，这是关键！！
+     *             （2）不论哪一种解法，cur指针不是指向dummy，就是指向结果链表中的最后一个节点
      * 【与83的区别】由于要删除所有值相等的节点，因此最后链表中可能一个节点都不剩，因此必须借助dummy节点来解题
      * */
     /**
-     *【易错点】不论哪种解法，“cur = cur.next;”都要放在else块中，这是关键
+     *【易错点】不论哪种解法，“cur = cur.next;”都必须要放在else块中，这是关键
      *      如果写错了位置，会出现如下的错：
-     *  输入
-             head =
-            [1,2,3,3,4,4,5]
-     *  输出
-     *      [1,2,4,4,5]
-     *  预期结果
-     *      [1,2,5]
+                 输入
+                 head =
+                 [1,2,3,3,4,4,5]
+                输出
+                [1,2,4,4,5]
+                预期结果
+                [1,2,5]
      */
     /*官网的解法*/
     public ListNode deleteDuplicates(ListNode head) {
@@ -112,7 +113,7 @@ public class codetop_5 {
                     cur.next = cur.next.next;
                 }
                 cur.next = cur.next.next;
-            }else { /**err：这里的else是精髓！！*/
+            }else { /**err：这里的else块是精髓！！*/
                 cur = cur.next;
             }
         }
@@ -129,7 +130,7 @@ public class codetop_5 {
                 while (tmp!=null&&tmp.val==curVal){
                     tmp = tmp.next;
                 }
-                /**到这里只能说明tmp节点和前面的节点不相等，不能说明tmp和后面的节点值不相等，所以链表需要删除中间
+                /**到这里只能说明tmp节点和前面的节点不相等，不能说明tmp和后面的节点值不相等，链表需要删除中间
                  * 重复值的所有节点，但是cur指针不能动！！！！比如“2-2-2-3-3-4-5”，刚开始tmp指针会来到第一个3，
                  * cur指针其实还是在dummy节点，此时会让cur.next=第一个3，但是cur指针不能后移！！因此下面的代码
                  * “cur=cur.next”必须写在else块中。————换句话说，只有一个cur.next.val!=cur.next.next.val的时候
@@ -280,9 +281,24 @@ public class codetop_5 {
     给定两个整数数组 preorder 和 inorder ，其中 preorder 是二叉树的先序遍历， inorder 是同一棵树的中序遍历，请构造二叉树并返回其根节点。
     * */
     /**见codetop_10*/
-//    public TreeNode buildTree(int[] preorder, int[] inorder) {
-//
-//    }
+    HashMap<Integer,Integer> inorderMap = new HashMap<>();
+    int preOrderIndex;
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        for (int i = 0; i < inorder.length; i++) {
+            inorderMap.put(inorder[i],i);
+        }
+        return buildTree(preorder,inorder,0,inorder.length-1);
+    }
+
+    private TreeNode buildTree(int[] preorder, int[] inorder, int l, int r) {
+        if (l>r) return null;
+        int rootVal = preorder[preOrderIndex++];
+        TreeNode root = new TreeNode(rootVal);
+        Integer index = inorderMap.get(rootVal);
+        root.left = buildTree(preorder,inorder,l,index-1);
+        root.right = buildTree(preorder,inorder,index+1,r);
+        return root;
+    }
 
 
     /*129
@@ -351,7 +367,7 @@ public class codetop_5 {
             if (cur.left==null&&cur.right==null){
                 sum += curVal;
             }
-            /*step3：将不是null的孩子节点添加进treeNodes，并且在integers中加入对应的路径和*/
+            /*step3：将不是null的孩子节点添加进treeNodes，并且在integers中加入孩子节点对应的路径和*/
             if (cur.left!=null){
                 treeNodes.offer(cur.left);
                 integers.offer(curVal *10+cur.left.val); //一个节点到根节点的路径和，就是 父节点路径和的10倍 + 节点自身的值（其实就是1、2、3组装成123的过程）
@@ -586,7 +602,7 @@ public class codetop_5 {
         while (l < r) {
             int mid = l + (r - l) / 2;
             if (nums[mid] > nums[mid + 1]) { /**err：这里带等于也是可以的。但是按照原理来讲，最好不带*/
-                r = mid;    /**【注】因为mid位置可能就是峰值，因此r不能赋值为mid-1，只能赋值为mid*/
+                r = mid;    /**【注】因为mid位置可能就是峰值 且 使用的搜索区间是闭区间，因此r不能赋值为mid-1，只能赋值为mid*/
             } else {
                 l = mid + 1;
             }
@@ -744,14 +760,14 @@ public class codetop_5 {
     }
 
     private int depth(TreeNode root) { /*新创建函数，返回以root为根节点树的高度*/
-        if (root==null) return 0;
+        if (root == null) return 0;
         /*step1：分别计算出这个节点的左子树、右子树的高度*/
         int left = depth(root.left);
         int right = depth(root.right);
         /*step2：求出这个节点作为根的子树的直径————该节点左子树、右子树的高度和*/
-        maxDiameterOfBinaryTree = Math.max(maxDiameterOfBinaryTree,left+right);
+        maxDiameterOfBinaryTree = Math.max(maxDiameterOfBinaryTree, left + right);
         /*step3：返回以这个节点为根的子树的高度————该节点的左子树、右子树的最大高度 + 1*/
-        return Math.max(left,right)+1;
+        return Math.max(left, right) + 1;
     }
 
 

@@ -243,7 +243,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         /*step3：从头开始遍历，找到需要断开连接的地方。因为要旋转k位，因此应该是第(size-k)个节点之后断开连接。【注意】但是由于
         * 我们是从head节点开始数的，并且i初始值是0，因此必须要满足i<(size-k-1)*/
         cur = head;
-        for (int i = 0; i < size - k - 1; i++) {
+        for (int i = 0; i < size - k - 1; i++) { /**err：注意每隔节点向右移动k，要从前往后数size-k个节点，而不是数k个节点*/
             cur = cur.next;
         }
         /*step4：先记录下cur.next，这是要返回的头；然后cur.next=null————断开cur节点和后面节点的连接*/
@@ -403,9 +403,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*145
     给你一棵二叉树的根节点 root ，返回其节点值的 后序遍历 。
     * */
-    /**
-     *
-     */
     public List<Integer> postorderTraversal(TreeNode root) {
         LinkedList<Integer> res = new LinkedList<>();
         /**这个LinkedList要充当栈的作用，因此建议直接将变量名改为stack；并且使用方法时注意：
@@ -987,7 +984,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         int res = 0;
         for (int row = 0; row < matrix.length; row++) { /*研究每一行*/
             for (int col = 0; col < matrix[0].length; col++) { /*在第row行中，计算每一个柱状图的高度*/
-                if (matrix[row][col] == '1')
+                if (matrix[row][col] == '1') /**err：是和字符比较！！如果误写成“matrix[row][col] == 1”也不会报错，但是发现得到的结果永远都是0！！*/
                     heights[col]++;
                 else
                     heights[col] = 0; /**每次碰到一个0，heights数组对应位置的值归零*/
@@ -1498,5 +1495,32 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 //                res.add(j);
 //            }
 //        }
+//    }
+
+
+    /*210 课程表Ⅱ
+    现在你总共有 numCourses 门课需要选，记为 0 到 numCourses - 1。给你一个数组 prerequisites ，其中 prerequisites[i] = [ai, bi] ，表示在选修课程 ai 前 必须 先选修 bi 。
+
+例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示：[0,1] 。
+返回你为了学完所有课程所安排的学习顺序。可能会有多个正确的顺序，你只要返回 任意一种 就可以了。如果不可能完成所有课程，返回 一个空数组 。
+     */
+
+
+
+    /*96. 不同的二叉搜索树
+    给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。
+     */
+//    public int numTrees(int n) {
+//
+//    }
+
+
+    /*516. 最长回文子序列
+    给你一个字符串 s ，找出其中最长的回文子序列，并返回该序列的长度。
+
+子序列定义为：不改变剩余字符顺序的情况下，删除某些字符或者不删除任何字符形成的一个序列。
+     */
+//    public int longestPalindromeSubseq(String s) {
+//
 //    }
 }

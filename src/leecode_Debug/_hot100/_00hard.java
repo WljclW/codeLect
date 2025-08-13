@@ -1,10 +1,8 @@
 package leecode_Debug._hot100;
 
 import leecode_Debug.linkList.ListNode;
-import leecode_Debug.linkList.reverse;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class _00hard {
     /*

@@ -582,7 +582,16 @@ public class _06ListNode {
         return merge(left,right);
     }
 
-    /*合并两个有序链表的原始代码，不动！！*/
+    /*合并两个有序链表的原始代码，不动！！
+    * 【注】出了while循环，记得拼接上不是null的部分，否则初始用例会出现如下的错误————
+            输入
+            head =
+            [4,2,1,3]
+            输出
+            [1]
+            预期结果
+            [1,2,3,4]
+    */
     private ListNode merge(ListNode left, ListNode right) {
         ListNode dummy = new ListNode(-1),cur = dummy;
         while (left!=null&&right!=null){

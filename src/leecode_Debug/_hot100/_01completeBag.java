@@ -159,7 +159,7 @@ public class _01completeBag {
         return dp[coins.length-1][amount]==Integer.MAX_VALUE?-1:dp[coins.length-1][amount];
     }
 
-
+    /*一维dp*/
     public int coinChange_1dim(int[] coins, int amount) {
             int[] dp = new int[amount + 1];
             dp[0] = 0;
@@ -173,11 +173,30 @@ public class _01completeBag {
                     //只有dp[j-coins[i]]不是初始最大值时，该位才有选择的必要
                     if (dp[j - coins[i]] != Integer.MAX_VALUE) {
                         //选择硬币数目最小的情况
-                        dp[j] = Math.min(dp[j], dp[j - coins[i]] + 1);
+                        dp[j] = Math.min(dp[j], dp[j - coins[i]] + 1); /**【注】由于这个题求解的是硬币数量，因此这里加1，而不是加硬币面值coin[i]*/
                     }
                 }
             }
             return dp[amount] == Integer.MAX_VALUE ? -1 : dp[amount];
+    }
+
+    /*一维dp自己的写法*/
+    public int coinChange_(int[] coins, int amount){
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp,Integer.MAX_VALUE);
+        dp[0] = 0;
+        for (int i=coins[0];i<=amount;i++){
+            if (i%coins[i]==0)
+                dp[i] = i/coins[0];
+        }
+        for (int i = 1; i < coins.length; i++) {
+            for (int j = 1; j < amount+1; j++) {
+                if (j>=coins[i]&&dp[j-coins[i]]!=Integer.MAX_VALUE){
+                    dp[j] = Math.min(dp[j],dp[j-coins[i]]+1); /**因为题目求解的是组成amount的硬币数量，因此这里加的是1；否则的话这里应该加硬币的面值*/
+                }
+            }
+        }
+        return dp[amount]==Integer.MAX_VALUE?-1:dp[amount];
     }
 
 

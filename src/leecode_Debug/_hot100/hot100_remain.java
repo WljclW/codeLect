@@ -153,11 +153,11 @@ public class hot100_remain {
     /*最快的算法其实是数学定理，但原理过于复杂*/
     public int numSquares(int n) {
         int[] dp = new int[n + 1];
-        Arrays.fill(dp,n);
+        Arrays.fill(dp, n);
         dp[0] = 0;
-        for (int i = 1; i <=n; i++) {
-            for (int j = 1; j*j<=i; j++) { /**这里j不能从0开始？*/
-                dp[i] = Math.min(dp[i],dp[i-j*j]+1);
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j * j <= i; j++) { /**这里j不能从0开始？i从0开始运行结果也是对的*/
+                dp[i] = Math.min(dp[i], dp[i - j * j] + 1); /**err：关键是这里记得取最小值，而不要直接赋值，直接赋值就错了*/
             }
         }
         return dp[n];
