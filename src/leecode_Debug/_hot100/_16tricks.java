@@ -150,7 +150,7 @@ public class _16tricks {
              来的那一次来自某个 ≤x 的重复数。所以我们是在找使得 P(x) 为真的最小的 x（lower bound）。这就是重复数。
         3.
     */
-    public int findDuplicate_erfen_02(int[] nums) {
+    public int findDuplicate_erfen_01(int[] nums) {
         int left = 1, right = nums.length - 1; // [1, n]
         int ans = -1;
 
@@ -170,7 +170,7 @@ public class _16tricks {
         return ans; // 最后 ans 就是最小使 P(x) 为真的 x，也就是重复值 d
     }
 
-    public int findDuplicate_erfen_01(int[] nums) {
+    public int findDuplicate_erfen_02(int[] nums) {
         int l = 1, r = nums.length - 1;     // [1, n]
         while (l < r) {
             int mid = l + (r - l) / 2;

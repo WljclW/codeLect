@@ -737,6 +737,34 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         return sb.toString();
     }
 
+    /*解法3：只记录每一个字符最后出现的位置*/
+    public String removeDuplicateLetters_03(String s) {
+        int[] flags = new int[26];  /**官方这里还会使用一个布尔数组记录栈或队列出现的字符，不使用也能判断，但是时间复杂度高*/
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            flags[c-'a'] = i;
+        }
+
+        LinkedList<Character> deque = new LinkedList<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (!deque.contains(c)){
+                while (c<deque.peekLast()&&flags[deque.peekLast()-'a']>i){
+                    deque.pollLast();
+                }
+                deque.offerLast(c);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (char c:deque){
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+
+
     /*673. 最长递增子序列的个数
 给定一个未排序的整数数组 nums ， 返回最长递增子序列的个数 。
 
@@ -1115,6 +1143,12 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
     /**
      *【解题关键】一句话：滑动窗口解，把握核心————维护窗口内0的数量必须小于等于k
+     *【说明】
+     *    1. 下面两个方法的区别主要是由于right更新的时机不同，导致计算最大连续1的长度计算时
+     *也不相同。去别的根本原因：长度算不算right位置本身！！————这个问题只要涉及“双指针”、“滑
+     * 动窗口”、“最小栈”等问题都会涉及。
+     *    2.  不论right更新的时机怎样，right位置可能包含在区间，也可能不被包含在区间；但是left
+     *位置永远是包含在区间内的！
      */
     public int longestOnes(int[] nums, int k) {
         int left = 0, right = 0;
@@ -1128,6 +1162,25 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             right++;
         }
         return maxLen;
+    }
+
+    public int longestOnes_01(int[] nums, int k) {
+        int left = 0,right = 0;
+        int zeroCount = 0;
+        int res =0;
+        while (right<nums.length){
+            if (nums[right++]==0){ /**right指针更新的位置*/
+                zeroCount++;
+            }
+            while (zeroCount>k){
+                int leftNum = nums[left++];
+                if (leftNum==0){
+                    zeroCount--;
+                }
+            }
+            res = Math.max(res,right-left); /**【注】由于right在开始就更新了，因此长度计算使用“right-left”*/
+        }
+        return res;
     }
 
     /*63
@@ -1445,9 +1498,25 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
 
     //581
-//    public int findUnsortedSubarray(int[] nums) {
-//
-//    }
+    public int findUnsortedSubarray(int[] nums) {
+        int start = -1, end = -2;
+        int maxNum = nums[0], minNum = nums[nums.length - 1];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] < maxNum) {
+                end = i;
+            }
+            maxNum = Math.max(maxNum, nums[i]);
+        }
+
+        for (int i = nums.length - 2; i >= 0; i--) {
+            if (nums[i] > minNum) {
+                start = i;
+            }
+            minNum = Math.min(minNum, nums[i]);
+        }
+        return end - start + 1; /**【注】start、end的初始值就包含了“原数组就完整有序”的情况。*/
+    }
+
 
     //221最大正方形
     public int max(char[][] matrix){
@@ -1507,9 +1576,32 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*96. 不同的二叉搜索树
     给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。
      */
-//    public int numTrees(int n) {
-//
-//    }
+    /**
+     【建议看讲解】https://leetcode.cn/problems/unique-binary-search-trees/solutions/6693/hua-jie-suan-fa-96-bu-tong-de-er-cha-sou-suo-shu-b/
+     * */
+    public int numTrees(int n) {
+        int[] dp = new int[n + 1];
+        dp[0] = 1; /*代表：0个节点的二叉搜索树有1种*/
+        dp[1] = 1; /*代表：1个节点的二叉搜索树有1种*/
+        /**几个重要问题=====
+         * 1. 双层for循环的目的：求解dp[i]————即i个节点构成多少种二叉搜索树。
+         * 2. 如何计算呢？计算dp[i]时，我们分别假设以j为根节点，因此有：
+         *      方案1：如果是第一个节点为根节点，则左子树有0个节点，右子树有i-1个节点，此时有dp[0]*dp[i-1]种
+         *  二叉搜索树；
+         *      方案2：如果是第二个节点为根节点，则左子树有1个节点，右子树有i-2个节点，此时有dp[1]*dp[i-2]种
+         * 二叉搜索树；
+         *      ……………………
+         *      方案j：如果是第j个节点为根节点，则左子树有j-1个节点，右子树有i-j个节点，此时有dp[j-1]*dp[i-j]种
+         * 二叉搜索树；
+         *      综上，上述的所有方案加和即为总数。
+         */
+        for (int i = 2; i < n+1; i++) { /*求解：i个节点组成的二叉搜索树有多少种*/
+            for (int j = 1; j <= n; j++) { /*求解方式：分别以第j个节点为根的搜索树有多少种，加和就是dp[i]。*/
+                dp[i] = dp[j-1]*dp[i-j]; /*以j为根的二叉搜索树有多少种？左边就是j-1个节点；右边就是i-j个节点。（左右子树一共i-1个节点正确）*/
+            }
+        }
+        return dp[n];
+    }
 
 
     /*516. 最长回文子序列

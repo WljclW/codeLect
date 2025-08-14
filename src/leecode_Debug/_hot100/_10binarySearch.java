@@ -1,5 +1,12 @@
 package leecode_Debug._hot100;
 
+/**
+ * 关于二分法同样是闭区间，什么时候带等于，什么时候不带等于？可以参考：
+ *      _16tricks#findDuplicate_erfen_01(int[])
+ *   以及
+ *      _16tricks#findDuplicate_erfen_02(int[])
+ *   这样的技巧其实还用在了“求解旋转排序数组的最小值”
+ */
 public class _10binarySearch {
     /*35.
     给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
