@@ -14,7 +14,7 @@ public class _02DoublePoint {
     *    研究到的位置
     * */
     /**
-     * 【建议】使用解法moveZeroes1
+     * 【建议】使用解法moveZeroes1、moveZeroes2。直接采用交换的方式，这样就不用对cur后面的位置再赋值了
      * */
     public void moveZeroes(int[] nums) {
         int left = 0;
@@ -45,6 +45,22 @@ public class _02DoublePoint {
         int tmp  =nums[left];
         nums[left] = nums[right];
         nums[right] =tmp;
+    }
+
+    public void moveZeroes2(int[] nums) {
+        int left = 0,cur = 0;
+        while (cur<nums.length){
+            if (nums[cur]!=0){
+                swap1(nums,left++,cur);
+            }
+            cur++;
+        }
+    }
+
+    private void swap1(int[] nums, int l, int r) {
+        int tmp  =nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
     }
 
 
@@ -153,7 +169,7 @@ public class _02DoublePoint {
                 }else {
                     res.add(new ArrayList<>(Arrays.asList(nums[i],nums[left],nums[right]))); /**err：使用这个添加list方便*/
                     while (left<right && nums[left]==nums[++left]); /**【注意】其实保证left<right就能保证l和r都不越界*/
-                    while (left<right && nums[right]==nums[--right]);
+                    while (left<right && nums[right]==nums[--right]); /**并且这两的“++left”和“--right”必须放在后面。补充：如果放在前面就是先移动指针，再判断的时候就会发现永远是相等的*/
                 }
             }
         }

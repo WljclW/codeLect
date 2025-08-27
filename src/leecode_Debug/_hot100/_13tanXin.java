@@ -78,10 +78,14 @@ public class _13tanXin {
     返回到达 nums[n - 1] 的最小跳跃次数。生成的测试用例可以到达 nums[n - 1]。
     * */
     /**
-     * 【🔺注意】题目中说了，生成的用例可以到nums[n-1]，即肯定能到达最后一个元素，也就是说当i==nums.length-1的时候，
+     * 【🔺注意】
+     *    1. 这个题的for循环很特殊，i范围[0,nums.length-2]！！为什么？？
+     *      题目中说了，生成的用例可以到nums[n-1]，即肯定能到达最后一个元素，也就是说当i==nums.length-1的时候，
      *      maxPostion也一定是nums.length-1，满足for循环中的if条件，因此要注意i<nums.length-1。否则进入到if后，
      *      step就多加了1.
      * 【关键】关键在于搞清楚什么时候让步数+1————即搞清楚bound、maxPosition的含义是什么
+     *      参数bound：表示当前这一步能到达的最远距离；
+     *      参数maxPoaition：表示目前实际上能到达的最远距离————业绩下一次bound将要更新的目标值
      * */
     public int jump(int[] nums) {
         int step = 0; //到当前的位置跳了多少步
@@ -90,7 +94,7 @@ public class _13tanXin {
 
         /*遍历所有位置，每到一个位置先更新一下最远能到的位置；如果i来到了边界，就更新边界为maxPosition，就是
         * 下一跳的边界，此时就需要增加一步*/
-        for (int i=0;i<nums.length-1;i++){ /**err：注意这里只能遍历到nums.length-1，否则得出的结果会多1。因为跳到最后一个位置就不用再跳了*/
+        for (int i=0;i<nums.length-1;i++){ /**err：注意这里只能遍历到nums.length-2，否则得出的结果会多1。因为跳到最后一个位置就不用再跳了*/
             maxPosition = Math.max(maxPosition,i+nums[i]); //每到一个位置，根据"从这个位置跳，最远能到哪里"更新最远的可达边界
             if (i==bound){ //一旦来到边界，step++ 并且 更新下一次能到的最远距离
                 step++;

@@ -93,7 +93,8 @@ public class _09huisu {
 
     private void permuteTrace(int[] nums, List<Integer> path, boolean[] used) {
         if (path.size()==nums.length){
-            permuteRes.add(new LinkedList<>(path));
+            //java是值传递，这里必须要新创建一份使用
+            permuteRes.add(new LinkedList<>(path)); /**err：必须使用“new LinkedList<>(path)”，如果写path就错了*/
             return;
         }
         for (int i=0;i<nums.length;i++){
@@ -112,6 +113,9 @@ public class _09huisu {
     给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
     解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
     * */
+    /**
+     *【思路讲解】https://leetcode.cn/problems/subsets/solutions/2059409/hui-su-bu-hui-xie-tao-lu-zai-ci-pythonja-8tkl/
+     */
     List<List<Integer>> resSubSets;
     List<Integer> pathSubsets;
     public List<List<Integer>> subsets(int[] nums) {
@@ -122,9 +126,10 @@ public class _09huisu {
     }
 
     private void subsetsBack(int[] nums, int index) {
+        /**【注意】回溯问题在给res中添加结果时，必须使用new的方法新创建一个，不能直接使用path的引用！！*/
         resSubSets.add(new LinkedList<>(pathSubsets)); /**err：子集问题每次添加到结果集不用return，因为要研究树所有的节点*/
         /**    【说明】进入到for循环后循环的变量是i，研究的是i位置的数，因此往path中添加等操作都是针
-         * 对index=i的那个数*/
+         * 对索引为i的那个数*/
         for (int i = index; i < nums.length; i++) {
             pathSubsets.add(nums[i]); /**🔺err：【注意，反复错】循环中的循环变量已经是i了!!!*/
             subsetsBack(nums, i + 1); /**err：循环中的循环变量已经是i了*/
@@ -138,6 +143,17 @@ public class _09huisu {
     给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
 给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
     * */
+    /**
+     *【时间复杂度分析】
+     *      时间复杂度：O(3^m×4^n),其中 m 是输入中对应 3 个字母的数字个数（包括数字 2、3、4、5、6、8），n
+     * 是输入中对应 4 个字母的数字个数（包括数字 7、9），m+n 是输入数字的总个数。当输入包含 m 个对应 3 个字
+     * 母的数字和 n 个对应 4 个字母的数字时，不同的字母组合一共有3^m×4^n种，需要遍历每一种字母组合。
+     *
+     *【空间复杂度分析】
+     *      空间复杂度：O(m+n)，其中 m 是输入中对应 3 个字母的数字个数，n 是输入中对应 4 个字母的数字个
+     * 数，m+n 是输入数字的总个数。除了返回值以外，空间复杂度主要取决于哈希表以及回溯过程中的递归调用层数，
+     * 哈希表的大小与输入无关，可以看成常数，递归调用层数最大为 m+n。
+     */
     List<String> resLetterCombinations;
     Map<Character,String> map;
     StringBuilder sb = new StringBuilder();
@@ -227,15 +243,20 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             combinationSumRes.add(new LinkedList<>(path));
             return;
         }
-        if (target<0){
+        if (target<0){ /**err：必须有，否则会StackOverflow！！*/
             return;
         }
         for (int i=index;i<candidates.length;i++){
             target -= candidates[i];
             path.add(candidates[i]);
-            /**err：递归的时候要从i开始而不是index...*/
+            /**err：递归的时候要从i开始而不是index!
+             *     【疑问】为什么递归时依然是从i开始，而不是从i+1开始？？
+             *          答：因为题中说了每一个数可以无限次被选取。也正因为下一次递归依然从i开始，因
+             *     此必须要有"if(target<0) return;"这句逻辑，否则就会出现StackOverflow！！————即这
+             *     个题使用递归达到重复选择每一个数的目的！！
+             * */
 //            combinationSumTrace(candidates,index,target,path);
-            combinationSumTrace(candidates,i,target,path);
+            combinationSumTrace(candidates,i,target,path); /**递归时需要从i开始，而不是i+1，更不是index*/
             target += candidates[i];
             path.removeLast();
         }
@@ -251,6 +272,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     /*解法1：官方解回溯法*/
     public List<String> generateParenthesis_offical(int n) {
         List<String> ans = new ArrayList<String>();
+//        StringBuilder sb = new StringBuilder(); /**在这里new跟直接在传参的时候new有什么区别？？运行都是正确的*/
         backtrack(ans, new StringBuilder(), 0, 0, n);
         return ans;
     }

@@ -106,6 +106,7 @@ void put(int key, int value) - 如果键 key 已存在，则变更其值；如�
      *   把LinkedList当作双端队列使用；
      *      从前向后遍历的时候、以及最后需要从双端队列头开始挨个获取元素，都建议使用”for (char c : xxxxx)“的方法，可以知道这种方
      *   法就是从头开始拿取元素的
+     *【说明】这个题可以入栈字符，代码会简化很多。。因为题目中不会用到索引 或者 间距 等类似的信息……
      */
     public String removeKdigits(String num, int k) {
         LinkedList<Character> stack = new LinkedList<>();
@@ -230,7 +231,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         if (head == null || head.next == null || k == 0) return head; //特殊情况的判断。”head==null“的判断是必不可少的，其他的可以省
         /*step1：计算出链表的节点数量。
         【难点】size的初始值需要设置为1；并且while的循环条件应该是”cur.next!=null“
-               原因：因为size的初始值是1，因此head已经计数过了；如果cur.next不是null的时候才能更新size*/
+               原因：size的初始值是1，因为head已经计数过了；如果cur.next不是null的时候才能更新size*/
         int size = 1;
         ListNode cur = head;
         while (cur.next!=null){
@@ -240,8 +241,13 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         /*step2：经过上面的while循环之后，cur指针会来到最后一个非null的节点————此时需要将cur.next指向head,完成首尾相接*/
         cur.next = head;
         k %= size; /**err：k需要对size取余*/
-        /*step3：从头开始遍历，找到需要断开连接的地方。因为要旋转k位，因此应该是第(size-k)个节点之后断开连接。【注意】但是由于
-        * 我们是从head节点开始数的，并且i初始值是0，因此必须要满足i<(size-k-1)*/
+        /*step3：从头开始遍历，找到需要断开连接的地方。因为要旋转k位，因此应该是在第(size-k)个节点之后断开连接。
+                【注意】但是由于我们是从head节点开始数的，意味着还需要移动（可以理解为操作）"size-k-1"次。循环
+             变量i是0开始，还需要移动"size-k-1"次，因此循环条件"i<size-k-1"————此时循环变量i的范围[0,size-k-2]，
+             因此整个循环会进行“size-k-1”次，也就是cur移动了“size-k-1”次。
+                 【结论】循环变量i从0开始的话————
+                        （1）如果循环条件是“i<M”，则整个循环体会执行M次。因为i的范围是[0,M-1]，共M个可取值。
+                        （2）如果循环条件是“i>-M”，则整个循环体会执行M次。因为i的范围是[-(M-1)，0]，共M个可选值*/
         cur = head;
         for (int i = 0; i < size - k - 1; i++) { /**err：注意每个节点向右移动k，因此要从前往后数size-k个节点，而不是数k个节点！！之所以是“ i < size - k - 1”，是因为开始就在head，但是计数是0*/
             cur = cur.next;
@@ -326,7 +332,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *      和是多少？而不是求有多少种，因此比"15三数之和"题目简单
      */
     public int threeSumClosest(int[] nums, int target) {
-        int res = 0,max = Integer.MAX_VALUE;
+        int res = 0,max = Integer.MAX_VALUE; /*res记录最接近的三数和；max记录最接近的差值绝对值是多少，max的初始化很重要，要初始化为最大值*/
         Arrays.sort(nums);
         for (int i=0;i<nums.length-2;i++){
             int l = i+1,r = nums.length-1;
@@ -403,6 +409,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     /*145
     给你一棵二叉树的根节点 root ，返回其节点值的 后序遍历 。
     * */
+    /*解法1：非递归方法*/
     public List<Integer> postorderTraversal(TreeNode root) {
         LinkedList<Integer> res = new LinkedList<>();
         /**这个LinkedList要充当栈的作用，因此建议直接将变量名改为stack；并且使用方法时注意：
@@ -436,6 +443,20 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         return res;
     }
 
+    /*解法2：递归方法*/
+    public List<Integer> postorderTraversal_digui(TreeNode root) {
+        LinkedList<Integer> res = new LinkedList<>();
+        dfsPostorder(root,res);
+        return res;
+    }
+
+    private void dfsPostorder(TreeNode root, LinkedList<Integer> res) {
+        if (root==null) return;
+        dfsPostorder(root.left,res);
+        dfsPostorder(root.right,res);
+        res.add(root.val);
+    }
+
 
     /*572
     给你两棵二叉树 root 和 subRoot 。检验 root 中是否包含和 subRoot 具有相同结构和节点值的子树。如果存在，返回 true ；否则，返回 false 。
@@ -454,7 +475,8 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     你必须在 O(1) 的额外空间复杂度和 O(n) 的时间复杂度下解决这个问题。
      */
     /**
-     *【思路】奇数位置、偶数位置使用不同的头节点
+     *【思路】奇数位置、偶数位置使用不同的头节点；出了while循环需要把奇数链表的头结点拼接到偶数节点
+     *      的后面（偶数节点的最后一个就是出了while循环时odd的值）
      */
     public ListNode oddEvenList(ListNode head) {
         if (head==null||head.next==null||head.next.next==null) return head;
@@ -473,9 +495,18 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
     /*另一种写法，区别就在于while循环中*/
     public ListNode oddEvenList_(ListNode head) {
+        /*step1：特殊情况的判断————因为下一步需要取head.next，因此第一部必须先保证head不是null*/
         if (head == null || head.next == null) return head;
+        /*step2：取三个指针————①偶数节点的头节点，不动值；②偶数节点的指针，变化值，用于整个过程中
+        *   移动拼接偶数节点链表；③奇数节点的指针，变化值，用于整个过程中移动拼接奇数节点链表*/
         ListNode evenHead = head.next, even = evenHead;
         ListNode odd = head;
+        /*step3：循环拼接链表。
+                【注】两个条件缺一不可，跟“复制随机链表”不一样，原因————
+                “复制随机链表”题目中"even.next!=null"就注定了后面至少还有一对节点（因此even!=null这个
+            条件可以省略）；但是这个题就不一样了，在while循环内部"even=even.next"之后even是可能是null
+            的，因此在while条件中必须判断是不是even是null。
+        */
         while (even != null && even.next != null) { /**注意，while循环内会使用到”even.next.next“，因此while条件需要保证”even.next!=null“*/
             odd.next = odd.next.next;
             odd = odd.next;
@@ -483,6 +514,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             even.next = even.next.next;
             even = even.next;
         }
+        /*step4：将奇数节点的链表拼到偶数链表的后面*/
         odd.next = evenHead;
         return head;
     }
@@ -552,7 +584,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                 flags[i] = Math.max(flags[i+1]+1,flags[i]);
             }
         }
-        /*step3：计算需要的糖果数*/
+        /*step3：计算需要的糖果……数组元素求和可使用“Arrays.stream(res).sum();”*/
         int sum = 0;
         for (int num:flags){
             sum += num;
@@ -658,6 +690,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     给你一个字符串 s ，请你去除字符串中重复的字母，使得每个字母只出现一次。需保证 返回结果的字典序最小（要求不能打乱其他字符的相对位置）。
      */
     /**
+     *【说明】这个题的最小栈中，如果放Character就方便很多，如果放的是索引，效果差了很多！！见removeDuplicateLetters_04
      *【思路】
      *      1. 一个int [25]————统计每一个字符出现的次数；（也可以用出现的最晚位置代替）
      *         一个boolean [26]————统计栈里面是不是有某个字符
@@ -763,6 +796,38 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         return sb.toString();
     }
 
+    /*补充解法，最小栈中存的是索引。。。
+            此时的写法复杂很多！！一方面如果是数组的话直接通过下标就可以拿；但是换成字符串后必须使用方
+        法“s.charAt()”*/
+    public String removeDuplicateLetters_04(String s) {
+        int[] flags = new int[26];
+        boolean[] used = new boolean[26];
+        for (int i = 0; i < s.length(); i++) {
+            flags[s.charAt(i)-'a'] = i;
+        }
+
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (!used[c-'a']){
+                while (!stack.isEmpty()&&flags[s.charAt(stack.peek())-'a']>i&&c<s.charAt(stack.peek())){
+                    Integer index = stack.pop();
+                    used[s.charAt(index)-'a'] = false;
+                }
+                used[c-'a'] = true;
+                stack.push(i);
+            }
+        }
+
+        StringBuilder res = new StringBuilder();
+        for (int index:stack){
+            res.append(s.charAt(index));
+        }
+        return res.toString();
+    }
+
+
+
 
 
     /*673. 最长递增子序列的个数
@@ -815,12 +880,13 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
     /**
      * 【注意】这个必须用两个sum————
-     *      ①一个curSum表示当前的总剩余油量。每当它小于0，就重新置0，并更新res为i+1。暗示从下一个位置开始”才有可能!!!“能转一圈
+     *      ①一个curSum表示当前的总剩余油量。每当它小于0，就重新置0，并更新res为i+1。暗示从下一个位置开
+     *始"才有可能!!!"能转一圈。【重要】说明了0~i任何位置开始都不可能走一圈。
      *      ②一个totalSum表示总的gas-总的cost。如果这个值小于0，说明从哪里开始都不行。因为转一圈能得到的油 少于 转一圈需要花费
      *  的油
      */
     public int canCompleteCircuit(int[] gas, int[] cost) {
-        int totalSum = 0 /*记录总体的gas-cost*/, curSum = 0 /*记录当前遍历的gas-cost*/;
+        int totalSum = 0 /*记录总体的gas-cost*/, curSum = 0 /*记录当前所有已遍历位置的gas-cost*/;
         int res = 0; /**err：存在一种特殊情况，curSum最小值为0，此时不会进入for循环中的if，因此res初始值为-1不合适*/
         for (int i = 0; i < gas.length; i++) {
             totalSum += (gas[i] - cost[i]);
@@ -871,12 +937,11 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *【具体的思路】在上面关键信息的基础上————
      *      每次碰到'('，则low和high都得+1.因为左括号是确认的，必须要匹配到右括号；
      *      每次碰到')'，则low和high都得-1，因为右括号能明确的匹配左括号；
-     *      每次碰到‘*’。如果我们把它当作左括号，则high需要加1；如果我们把它当右括号，则low需要加1
+     *      每次碰到‘*’。如果我们把它当作左括号，则high需要加1；如果我们把它当右括号，则low需要减1
      *【易错点】整个过程中low和high的最小值都是0———
-     *       ①如果high小于0，直接返回false。（表示最多需要-high个右括号，不可能哇）
+     *       ①如果high小于0，直接返回false。（表示最多未匹配的左括号是-high个，不可能哇）
      *       ②如果low小于0，则将low重置为0。low < 0 是无效的逻辑，因为它意味着我们尝试把更多的 * 当成 )，而
-     * 多出来的 ) 在语法上是非法的。为了确保合法，必须在每一步中 low ≥ 0，但你为了写法简洁跳过了
-     * 判断。最后只要 low == 0 才代表所有括号都刚好配对完。
+     * 多出来的 ) 在语法上是非法的。为了确保合法，必须在每一步中 low ≥ 0
      */
 
     /*解法1：贪心的解法*/
@@ -947,7 +1012,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         return build(postorder,0,inorder.length-1);
     }
     private TreeNode build(int[] postorder, int left, int right) {
-        if (left>right || postIndex<0) return null;
+        if (left>right) return null; //条件也可以写成"if (left>right || postIndex<0)"
         /*step1：拿到当前的根节点的值，并构造出节点*/
         int rootVal = postorder[postIndex--];
         TreeNode root = new TreeNode(rootVal);
@@ -955,7 +1020,21 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         Integer index = inorderMap.get(rootVal);
         /*step3：递归index左右两部分完成root.left、root.right的构造
         * 【出错点】是从后往前遍历（postIndex--），顺序是：根 -> 右子树 -> 左子树，所以在构造时必须先构造右子
-        *       树，再构造左子树。*/
+        *       树，再构造左子树。
+        * 【注意】
+        *       切记在"后序-中序"构造二叉树时必须先构造右子树，再构造出左子树。否则会出现如下的报错——————
+        *       java.lang.ArrayIndexOutOfBoundsException: Index -1 out of bounds for length 5
+                  at line 30, Solution.buildTree
+                  at line 34, Solution.buildTree
+                  at line 33, Solution.buildTree
+                  at line 33, Solution.buildTree
+                  at line 33, Solution.buildTree
+                  at line 33, Solution.buildTree
+                  at line 25, Solution.buildTree
+                  at line 56, __DriverSolution__.__helper__
+                  at line 89, __Driver__.main
+                 看着错误像是索引越界的问题，其实是因为这里写错了。如果先构造左子树就会出现这样的报错
+        */
         root.right = build(postorder,index+1,right); /**err：这里的顺序重要*/
         root.left = build(postorder,left,index-1);
         return root;
@@ -968,7 +1047,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     int preorderIndex;
     public TreeNode buildTree_preorder_inorder(int[] preorder, int[] inorder) {
         for (int i = 0; i <inorder.length; i++) {
-            inorderMap1.put(inorder[i],i);
+            inorderMap1.put(inorder[i],i); /**【注】因为构造的过程中要根据一个数，找到它在中序inorder的位置，因此时nums[i]->i的映射*/
         }
         return buildTree(preorder,inorder,0,inorder.length-1);
     }
@@ -1072,6 +1151,8 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *【思路】规律：1位数共有1*9*1位；2位数共有10*9*2位；3位数共有100*9*3位
      *     1. 根据规律，利用while循环每一次过掉所有的m位数
      *     2. 最后如果n对应的是i位数，则start就是10^(i-1)次方————即i位数中最小的那个数
+     *【关键！！！】这个题最大的关键是最后确定在哪一个数字使用"num = start + (n-1)/digit",必须使用"n-1"去
+     *     除！！！！
      * */
     public int findNthDigit(int n) {
         int digit = 1; //当前研究的轮次是几位数。1位数、2位数、3位数....
@@ -1085,6 +1166,11 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             count = digit*start*9;
         }
         /*step2：看第n个数位对应的是哪一个整数*/
+        /**
+         如果直接用 n/digit，相当于从 1 开始计数，这样在整数除法下会“过早跳到下一个数字”。
+         用 (n-1)/digit，相当于把计数从 0 开始，这样能正确定位在当前数字内部。
+         这是一种典型的 从 0 起始索引 的处理方式，就像数组下标一样。
+         * */
         long num = start + (n-1)/digit; /**🔺err：n-1的原因是索引是从0开始的，这里必须进行n-1，否则后面的操作太复杂了，还要加额外的判断*/
         /*step3：将对应的数转换为字符串，并取出对应位置的字符*/
         String s = String.valueOf(num);
@@ -1274,6 +1360,28 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     }
 
 
+    /*另一种解法。自己的写法*/
+    public boolean isPalindrome_own(String s) {
+        int l=0,r=s.length()-1;
+        while (l<r){
+            char c1 = s.charAt(l);
+            char c2 = s.charAt(r);
+            if (!Character.isLetterOrDigit(c1)){
+                l++;
+            }else if (!Character.isLetterOrDigit(c2)){
+                r--;
+            }else if (Character.toLowerCase(c1)!=Character.toLowerCase(c2)){
+                return false;
+            }else {
+                l++;
+                r--;
+            }
+        }
+        return true;
+    }
+
+
+
     /*
     71. 简化路径
     给你一个字符串 path ，表示指向某一文件或目录的 Unix 风格 绝对路径 （以 '/' 开头），请你将其转化为 更加简洁的规范路径。
@@ -1322,7 +1430,8 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     }
 
     /**
-     * 下面是使用Stack的写法，目的是为了说明区别
+     * 下面是使用Stack的写法，目的是为了说明区别“LinkedList也可以当作栈”使用。。使用LinkedList或
+     *      者ArrayDeque代替栈使用时，入栈、出栈操作使用"offerLast"、"pollLast"代替！！
      */
     public String simplifyPath_stack(String path) {
         Stack<String> stack = new Stack<>();
@@ -1596,7 +1705,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         dp[1] = 1; /*代表：1个节点的二叉搜索树有1种*/
         /**关于双重for循环的几个重要问题=====
          * 1. 双层for循环的目的：求解dp[i]————即i个节点构成多少种二叉搜索树。
-         * 2. 如何计算呢？计算dp[i]时，我们分别假设以j为根节点，因此有：
+         * 2. 如何计算呢？计算dp[i]时，我们分别假设以j为根节点，因此dp[i]是以下所有方案的结果和：
          *      方案1：如果是第一个节点为根节点，则左子树有0个节点，右子树有i-1个节点，此时有dp[0]*dp[i-1]种
          *  二叉搜索树；
          *      方案2：如果是第二个节点为根节点，则左子树有1个节点，右子树有i-2个节点，此时有dp[1]*dp[i-2]种
@@ -1609,6 +1718,8 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         for (int i = 2; i < n+1; i++) { /*求解：i个节点组成的二叉搜索树有多少种*/
             for (int j = 1; j <= n; j++) { /*求解方式：分别以第j个节点为根的搜索树有多少种，加和就是dp[i]。。。【补充说明】如果这里j从0开始，则范围j<n，就不能带等于了*/
                 dp[i] = dp[j-1]*dp[i-j]; /*以j为根的二叉搜索树有多少种？左边就是j-1个节点；右边就是i-j个节点。（左右子树一共i-1个节点正确）*/
+//            for (int j = 1; j <= n; j++) { /*求解方式：分别求出以第j个节点为根的搜索树有多少种，加和就是dp[i]*/
+//                dp[i] += dp[j-1]*dp[i-j]; /*求出以j（第j个节点）为根的二叉搜索树有多少种？左边就是j-1个节点；右边就是i-j个节点。（左右子树一共i个节点正确）*/
             }
         }
         return dp[n];

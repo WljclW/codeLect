@@ -10,6 +10,7 @@ import java.util.*;
  * 25. K 个一组翻转链表
  * 23. 合并 K 个升序链表
  * 155. 最小栈
+ * 143.
  * 287. 寻找重复数
  * 300. 最长递增子序列
  * 41. 缺失的第一个正数
@@ -19,6 +20,7 @@ import java.util.*;
  * 101
  * 300. 最长递增子序列
  * 416
+ * 112、113、437、（路经总和问题）
  * 82. 删除排序链表中的重复元素 II
  * 143. 重排链表
  * 328
@@ -50,7 +52,7 @@ public class review_all {
 //
 //    }
 
-    //78.颜色分类
+    //75.颜色分类
 //    public void sortColors(int[] nums) {
 //
 //    }
@@ -392,22 +394,11 @@ public class review_all {
 //    }
 
     //33
-
-    /**
-     * 这里的实现中已经全部换成了nums[l]、nums[r]；而不是以前的nums[0],nums[nums.length-1]。注意一下是否可行
-     * @param nums
-     * @param target
-     * @return
-     */
 //    public int search(int[] nums, int target) {
 //
 //    }
 
     //153
-    /**
-     * 这里的实现中已经全部换成了nums[l]、nums[r]；而不是以前的nums[0],nums[nums.length-1]。注意一下是否可行
-     * @param nums
-     */
 //    public int findMin(int[] nums) {
 //
 //    }

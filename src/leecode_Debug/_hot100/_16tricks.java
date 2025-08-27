@@ -347,6 +347,40 @@ public class _16tricks {
     }
 
 
+    /*下一个排列的写法，flag初始化为-1，兼顾了整个数组翻转的情况*/
+    public void nextPermutation_2(int[] nums) {
+        int flag = -1;
+        for (int i = nums.length-2; i >=0 ; i--) {
+            if (nums[i]<nums[i+1]){
+                flag = i;
+                break;
+            }
+        }
+
+        if (flag>=0){      /**【说明】这里添加一个if判断flag的值，优化代码的逻辑，即使需要直接执行最后一行也不用写一段特殊逻辑*/
+            for (int i = nums.length-1;i>flag; i--) {
+                if (nums[i]>nums[flag]){
+                    int tmp = nums[i];
+                    nums[i] = nums[flag];
+                    nums[flag] = tmp;
+                    break;
+                }
+            }
+        }
+        reverse2(nums,flag+1,nums.length-1); /**【说】如果整个数组是完整的降序，则falg就是初始值-1，从flag+1开始翻转数组；如果有找到flag，则从flag的下一步开始翻转也没错*/
+    }
+
+    private void reverse2(int[] nums, int l, int r) {
+        while (l<r){
+            int tmp = nums[l];
+            nums[l] = nums[r];
+            nums[r] = tmp;
+            l++;
+            r--;
+        }
+    }
+
+
     /**下一个排列易忽视的点
      * */
     public void nextPermutation_note(int[] nums) {

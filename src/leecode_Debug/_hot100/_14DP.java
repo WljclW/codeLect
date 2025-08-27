@@ -204,7 +204,7 @@ public class _14DP {
                 2. ”set.contains(s.substring(j,i))“中i是能取到s.length()的，但是substring函数是左闭右开的区间，因此实
                     际上获取子串时不会去拿s.length()的子串，不会导致越界异常。
                     */
-                if (dp[j] && set.contains(s.substring(j, i))) {
+                if (dp[j] && set.contains(s.substring(j, i))) { /**【说明】根据双层for的条件，i的最大值s.length()，j<i因此j的最大值是s.length()-1,因此subString是不会越界的*/
                     dp[i] = true;
                     break; //这里加break会继续研究s串的下一个位置，不加也没啥问题
                 }
@@ -426,7 +426,7 @@ public class _14DP {
             if (s.charAt(i)=='(') left++;
             else right++;
             if (left==right) res = Math.max(res,2*right);
-            if (right>left) left = right =0;  /**两次遍历的唯一区别*/
+            if (right>left) left = right =0;  /**两次遍历的唯一区别————从左往右遍历时如果右括号多了，则左右括号重置为0*/
         }
 
         left = right = 0; /**err：left和right会出初始值，少不了。。否则出事的测试用例"(()"就返回了错误的结果4*/

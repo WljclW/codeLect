@@ -67,6 +67,7 @@ public class _07binarytree {
     /*
     * 226.给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
      * */
+    /*解法1：递归的写法*/
     public TreeNode invertTree(TreeNode root) {
         /*step1：basecase*/
         if (root==null) return root;
@@ -86,19 +87,88 @@ public class _07binarytree {
         return root;
     }
 
-
-    /*101.给你一个二叉树的根节点 root ， 检查它是否轴对称。*/
-    public boolean isSymmetric(TreeNode root) {
-        if(root==null) return true;
-        if(root.left==null&&root.right==null) return true;
-        if (root.left==null || root.right==null) return false;
-        return isSymmetric(root.left,root.right);
+    /*解法2：层序遍历的写法*/
+    /**
+     *【说明】这个题的目的仅仅是翻转二叉树，因此孩子的遍历顺序没有关系。。。体现在代码中就是：
+     *      ①~③的顺序不重要；只要保证②和③相邻即可。比如：①②③、①③②、②③①、③②①这样的顺序都是可以的
+     * @param root
+     * @return
+     */
+    public TreeNode invertTree_cengxu(TreeNode root) {
+        if (root==null) return root;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode cur = queue.poll();
+                swap(cur); //①
+                if (cur.left!=null) queue.offer(cur.left);//②
+                if (cur.right!=null)queue.offer(cur.right);//③
+            }
+        }
+        return root;
     }
 
-    public boolean isSymmetric(TreeNode l,TreeNode r){
-        if (l==null&&r==null) return true;
-        if (l==null||r==null) return false;
-        return l.val==r.val&&isSymmetric(l.right,r.left)&&isSymmetric(l.left,r.right);
+    private void swap(TreeNode cur) {
+        TreeNode tmp = cur.left;
+        cur.left =  cur.right;
+        cur.right = tmp;
+    }
+
+
+    /*101.给你一个二叉树的根节点 root ， 检查它是否轴对称。*/
+    /*解法1：递归法。*/
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) return true; //因为递归的方法需要使用到“root.”，因此必须先判空
+        return isSymmetric(root.left, root.right);
+    }
+
+    public boolean isSymmetric(TreeNode l, TreeNode r) {
+        /*
+        base case：（1）如果两个都是空，返回true；
+                   （2）如果有且仅有一个是空，返回false
+         */
+        if (l == null && r == null) return true;
+        if (l == null || r == null) return false;
+        return l.val == r.val &&
+                isSymmetric(l.right, r.left) &&
+                isSymmetric(l.left, r.right);
+    }
+
+
+    /*解法2：迭代法
+    *【说明】
+    *       1. 由于入栈的永远都是TreeNode，而不涉及到值。因此使用一个队列就可以，保证每一次入栈的时候成对就可以（这两
+    * 个成对的要求是对称的两个节点）。出栈的时候也是每一次同时弹出两个
+    *       2. 碰到null的时候需要正常入栈。【注】PriorityQueue.offer的参数不能是null，是null的话会报空指针异常，但是
+    * LinkedList、Queue的offer方法是可以是null，因此碰到null直接加进去没问题。
+    * */
+    public boolean isSymmetric_diedai(TreeNode root) {
+        if (root==null) return true;
+        return isSymmetric1(root,root);
+    }
+
+    private boolean isSymmetric1(TreeNode root, TreeNode root1) {
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        queue.offer(root1);
+        while (!queue.isEmpty()){
+            TreeNode node1 = queue.poll();
+            TreeNode node2 = queue.poll();
+            /*step1：判断是不是符合条件*/
+            if (node1==null&&node2==null)
+                continue; /**err：都是null，说明当前步骤是对称的，没问题，需要继续判断。。不能直接返回true！！因为其他的节点还没判断，结束判断的标准就是确定不对称直接返回false，或者队列为空返回true*/
+            if ((node1==null||node2==null)||node1.val!=node2.val)
+                return false; /*“两个节点有且仅有一个是null”或者“两个节点的value不一样”，就需要直接返回false。说明压根不对称*/
+            /*step2：分别将node1、node2节点对称的孩子节点相继入队列*/
+            queue.offer(node1.left);
+            queue.offer(node2.right);
+
+            queue.offer(node1.right);
+            queue.offer(node2.left);
+        }
+        return true;
     }
 
     /*543.
@@ -110,7 +180,7 @@ public class _07binarytree {
      *    543中每个节点返回给父节点的信息是以它为根的子树高度，但是每个节点的决策信息是左右子树高度的最大
      *值+1。因此需要使用额外的函数来改变返回值信息，同时在这个过程中更新结果。
      *    ①我们期望节点的返回信息：每个节点的返回信息是它最大的贡献值，左右子树只能选一；
-     *    ②每一个节点的决策信息：每个结点的决策值，是左边的贡献，右边的贡献，再加节点的值
+     *    ②每一个节点的决策信息：每个结点的决策值，是左边的贡献，右边的贡献，再加节点
      *    这两者之间的差异，再加上原方法要求返回整个树的最大路径，也不是节点的最大贡献。因此必须使用两个方
      *法，新建一个方法返回值是节点的最大贡献，并在决策中更新结果——即要求的直径
      */
@@ -124,8 +194,8 @@ public class _07binarytree {
         if (root==null) return 0;
         int left = dfs(root.left);
         int right = dfs(root.right);
-        maxDiameter = Math.max(left+right,maxDiameter);
-        return 1 + Math.max(left,right);
+        maxDiameter = Math.max(left+right,maxDiameter); /*决策信息：到每一个节点后，对于题目所求信息的决策*/
+        return 1 + Math.max(left,right); /*返回值信息：每一个节点返回给父节点的信息*/
     }
 
 
@@ -136,7 +206,7 @@ public class _07binarytree {
         if (root==null) return res;
         deque.offer(root);
         while (!deque.isEmpty()){
-            int size = deque.size();
+            int size = deque.size(); /**每一轮循环之前需要记录一下size，这样才知道这一层有多少节点。不然弹出节点总会添加左右孩子，一直不会是空*/
             LinkedList<Integer> ele = new LinkedList<>();
             for (int i=0;i<size;i++){
                 TreeNode poll = deque.poll();
@@ -168,7 +238,7 @@ public class _07binarytree {
 
     private TreeNode build(int[] nums, int l, int r) {
         if (l>r) return null; /**err："l>r"不要写错了，如果写错了发现最后的返回值永远是空，啥也没有*/
-        int mid = l+(r-l)/2;
+        int mid = l+(r-l)/2; /**err：错误的写法“mid = l+(r-l)>>1”，原因：>>运算符优先级低于+*/
         TreeNode root = new TreeNode(mid);
         root.left = build(nums,l,mid-1);
         root.right = build(nums,mid+1,r);
@@ -356,6 +426,13 @@ public class _07binarytree {
      * 返回什么？希望它返回朝着右子树下去的最大路径和 以及 朝着左子树路径下去的最大路径和 中的最大值。————很
      * 明显，这两个信息是不一样的，这种差别就注定了必须使用额外的方法。如果写在原函数的话，就无法协调了到底返
      * 回什么信息.......
+     *
+     *      * 1.实际上更新结果的时候是左右两边都能走的
+     *      * 2. 对于每一个节点，我们希望左右子树返回什么信息？
+     *      *      比如，左子树，我们希望它返回以他为根的数的最大路径和（注意和题目提到的路径是有区别的，这里的路径不能既包括左子树又包括右
+     *      *  子树。只能包括左右子树中的一边！！）
+     *      * 3. 1是题目需要求解的信息，2是题目中我们期望左右孩子节点返回的信息————但这两者很明显是不一样的，这种区别就造成了必须使用额外的
+     *      *      方法来完成遍历二叉树，并在这个过程中更新结果。
      */
     int resMaxPathSum = Integer.MIN_VALUE; /**err：注意初始化为0是不行的，因为可能所有的节点值都小于0，因此最大路径必小于0*/
     public int maxPathSum(TreeNode root) {
@@ -367,7 +444,7 @@ public class _07binarytree {
 
     private int dfsMaxPathSum(TreeNode root) {
         if (root==null) return 0;
-        int lSum = Math.max(dfsMaxPathSum(root.left),0); /**err：在这里就必须将返回值和0取较大值*/
+        int lSum = Math.max(dfsMaxPathSum(root.left),0); /**err：在这里就必须将返回值和0取较大值！！宁可决策中不含小于的子树，也不能让小于的子树起副作用*/
         int rSum = Math.max(dfsMaxPathSum(root.right),0);
         int curSum = lSum+rSum+root.val;
         resMaxPathSum = Math.max(curSum,resMaxPathSum);

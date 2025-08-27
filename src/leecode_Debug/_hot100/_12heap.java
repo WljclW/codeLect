@@ -1,5 +1,6 @@
 package leecode_Debug._hot100;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -34,33 +35,47 @@ public class _12heap {
     * 前 k 高的元素。你可以按 任意顺序 返回答案。
     * */
     /**
-     * 【解题步骤】
-     *     step1：统计nums中每一个数出现的次数；
-     *     step2：根据map的entry，将"数字->出现的次数"这样的数组添加进优先级队
-     * 列，按照出现的次数升序(同时添加的时候保证优先级队列只有k个元素)
-     *     step3：从优先级队列依次弹出每个元素（数组形式），将数字添加进结果数组
+     *【提示】这个题官方的测试用例有问题！！！
+     *【说明】求解“数组的第K个最大元素”时最优做法是快速排序，但是这个题的最优做法就是下面
+     *   的方法————map统计次数，再使用优先级队列求结果！！
+     *      造成这种区别的一种因素是：“数组的第K个最大元素”时并不用了解整个数组的每个元素
+     *   的结果，并不一定所有元素都搞好；但是这个题要比较次数，因此每一个元素都必须统计好
+     *【解题步骤】
+     *     step1：统计nums中每一个数出现的次数；（使用map统计）
+     *     step2：根据map的entry，将"数字->出现的次数"这样的键值对创建数组添加进优先级队
+     * 列，指定排序规则————按照出现的次数升序(同时添加的时候保证优先级队列只有k个元素。方
+     * 法是：不管三七二十一，先加进去，如果加进去发现queue.size()大于k了，就弹出堆顶，因
+     * 为堆顶是出现次数最少的)
+     *     step3：从优先级队列依次弹出每个元素（数组形式），将数字（即数组的第0维）添加进
+     * 结果数组
      * @author: Zhou
      * @date: 2025/6/1 15:35
      */
     public int[] topKFrequent(int[] nums, int k) {
+        /*step1：统计数组每一个元素出现的次数*/
         HashMap<Integer, Integer> map = new HashMap<>();
         for (int num:nums){
             map.put(num,map.getOrDefault(num,0)+1);
         }
-
+        /*step2：声明优先级队列，并指定按照次数（即map的value，也即一维数组的第1维）升序*/
         PriorityQueue<int[]> queue = new PriorityQueue<>((O1,O2)->{
             return O1[1]-O2[1];
         });
+        /**上面的排序规则可以使用下面的来代替，原理是什么？？*/
+//        PriorityQueue<int[]> queue = new PriorityQueue<>(Comparator.comparingInt(o -> o[1]));
+        /*step3：（1）遍历map，根据键值对创建一维int数组，放进优先级队列；
+        *       （2）整个过程保证优先级队列的size不大于k
+        * */
         for (Map.Entry<Integer,Integer> entry:map.entrySet()){
             int[] cur = new int[2];
             cur[0] = entry.getKey();
             cur[1] = entry.getValue();
             queue.add(cur);
-            if (queue.size()>k){
+            if (queue.size()>k){ //如果优先级队列size大了，就弹出一个
                 queue.poll();
             }
         }
-
+        /*step4：声明存结果的数组，将优先级队列中数组的第0维拿出来*/
         int[] res = new int[k];
         int i=0;
         while(!queue.isEmpty()){

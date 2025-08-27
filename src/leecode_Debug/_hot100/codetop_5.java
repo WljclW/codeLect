@@ -7,6 +7,7 @@ import javax.sound.sampled.Line;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 快排
@@ -103,6 +104,8 @@ public class codetop_5 {
     }
 
     /*自己的写法。建议看官方的写法，比较清晰*/
+    /**cur指向的是已经拼接到结果链表中的最后一个节点（即cur及之前的位置一定是在结果链表中（除了dummy），即保证不会有重复值的节点）；
+     * cur.next指向的是第一个没有研究的节点————即目前还不确定它是不是应该留下来*/
     public ListNode deleteDuplicates_82(ListNode head) {
         if (head==null||head.next==null) return head;
         ListNode dummy = new ListNode(-1, head),cur = dummy;
@@ -309,6 +312,13 @@ public class codetop_5 {
     计算从根节点到叶节点生成的 所有数字之和 。
     叶节点 是指没有子节点的节点。
     * */
+
+    /**
+     *【解法】关于深度优先的解析看：https://leetcode.cn/problems/sum-root-to-leaf-numbers/solutions/2730644/jian-ji-xie-fa-pythonjavacgojsrust-by-en-gbu9/
+     *      深度优先的 有返回值版本 和 无返回值版本需要搞清楚
+     * @param root
+     * @return
+     */
     /*解法1：深度优先遍历写法*/
     public int sumNumbers(TreeNode root) {
         return dfsSumNumbers(root, 0);
@@ -610,6 +620,26 @@ public class codetop_5 {
         return l;
     }
 
+    /**chatgpt给出的while循环条件带等于的写法，没懂？？但是是正确的*/
+    public int findPeakElement_chatgpt(int[] nums) {
+        int l = 0, r = nums.length - 1;
+        while (l <= r) {
+            int mid = l + (r - l) / 2;
+            // 特判边界，避免 nums[mid+1] 越界
+            if ((mid == 0 || nums[mid] > nums[mid - 1]) &&
+                    (mid == nums.length - 1 || nums[mid] > nums[mid + 1])) {
+                return mid; // mid 就是峰值
+            }
+            if (mid < nums.length - 1 && nums[mid] < nums[mid + 1]) {
+                l = mid + 1; // 峰值在右边
+            } else {
+                r = mid - 1; // 峰值在左边
+            }
+        }
+        return -1; // 理论上不会走到这里
+    }
+
+
 
     /*662
     给你一棵二叉树的根节点 root ，返回树的 最大宽度 。树的 最大宽度 是所有层中最大的 宽度 。
@@ -617,6 +647,9 @@ public class codetop_5 {
     相同，两端点间会出现一些延伸到这一层的 null 节点，这些 null 节点也计入长度。
     题目数据保证答案将会在  32 位 带符号整数范围内。
     * */
+    /*写法1：宽度优先遍历……
+            两个队列（一个放节点，一个放节点对应的编号），也可以使用一个队
+       列（队列中存放Pair<TreeNode,Integer>）。两种做法其实本质是一样的。*/
     public int widthOfBinaryTree(TreeNode root) {
         if (root==null) return 0;
         int res = 0;
@@ -626,28 +659,28 @@ public class codetop_5 {
         *   3. 放入根节点 以及 根节点的编号
         */
         int first = 0,last = 0;
-        LinkedList<TreeNode> treeNodes = new LinkedList<>();
-        LinkedList<Integer> integers = new LinkedList<>();
-        treeNodes.add(root);
-        integers.add(0); /**root节点对应的值是0、是1都是可以的*/
+        LinkedList<TreeNode> nodeQueue = new LinkedList<>(); //存放每一个节点
+        LinkedList<Integer> valQueue = new LinkedList<>(); //存放该节点对应的编号
+        nodeQueue.add(root);
+        valQueue.add(0); /**root节点对应的值是0、是1都是可以的*/
         /*step2：遍历其中的每一个节点进行研究*/
-        while (!treeNodes.isEmpty()){
-            int size = treeNodes.size();
+        while (!nodeQueue.isEmpty()){
+            int size = nodeQueue.size();
             for (int i = 0; i < size; i++) {
                 /*2.1：弹出一个节点，以及该节点的编号*/
-                TreeNode cur = treeNodes.poll();
-                Integer curVal = integers.poll();
+                TreeNode cur = nodeQueue.poll();
+                Integer curVal = valQueue.poll();
                 /*2.2：如果索引i来到第一个或者最后一个，需要更新first以及last的值*/
                 if (i==0) first = curVal;
                 if (i==size-1) last = curVal;
                 /*2.3：把不是null的节点及它的编号加进队列。————这一步是层序遍历的常规操作*/
                 if (cur.left!=null){
-                    treeNodes.add(cur.left);
-                    integers.add(curVal*2);
+                    nodeQueue.add(cur.left);
+                    valQueue.add(curVal*2);
                 }
                 if (cur.right!=null){
-                    treeNodes.add(cur.right);
-                    integers.add(curVal*2+1);
+                    nodeQueue.add(cur.right);
+                    valQueue.add(curVal*2+1);
                 }
             }
             /*2.4：遍历完一层，更新res。。。因为包括first和last两个数，因此需要+1*/
@@ -656,14 +689,38 @@ public class codetop_5 {
         return res;
     }
 
+    /*解法2：递归写法*/
+    int maxWidth = 0;
+    Map<Integer, Long> leftMostMap = new HashMap<>();
+
+    public int widthOfBinaryTree_digui(TreeNode root) {
+        dfs(root, 0, 1L); // 从层0，编号1开始
+        return maxWidth;
+    }
+
+    private void dfs(TreeNode node, int depth, long index) {
+        if (node == null) return;
+
+        // 记录该层最左边节点的编号
+        leftMostMap.putIfAbsent(depth, index);
+
+        // 当前层宽度 = 当前节点编号 - 该层最左编号 + 1
+        int curWidth = (int)(index - leftMostMap.get(depth) + 1);
+        maxWidth = Math.max(maxWidth, curWidth);
+
+        // 递归左右子树
+        dfs(node.left, depth + 1, index * 2);
+        dfs(node.right, depth + 1, index * 2 + 1);
+    }
+
 
     /*113
     给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
     叶子节点 是指没有子节点的节点。
     * */
+    /*写法1：递归的写法*/
     LinkedList<List<Integer>> resPathSum;
     LinkedList<Integer> pathPathSum;
-
     public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
         resPathSum = new LinkedList<>();
         pathPathSum = new LinkedList<>();
@@ -679,6 +736,7 @@ public class codetop_5 {
         /*step2：判断当前的路径是不是符合条件的解*/
         if (targetSum == 0 && root.left == null && root.right == null) {
             resPathSum.offer(new LinkedList<>(pathPathSum));
+            /**err：不能在这里return。如果这里return就错了！！*/
         }
         /*step3：递归的研究root的左右子树*/
         pathSumBack(root.left, targetSum);
@@ -686,6 +744,38 @@ public class codetop_5 {
         /*step4：撤销选择*/
         pathPathSum.removeLast();
         targetSum += root.val;
+    }
+
+    /*下面是另一种写法*/
+    List<List<Integer>> resPathSum_2;
+    public List<List<Integer>> pathSum_2(TreeNode root, int targetSum) {
+        resPathSum_2 = new LinkedList<>();
+        LinkedList<Integer> path = new LinkedList<>();
+        dfs(root,targetSum,path);
+        return resPathSum_2;
+    }
+
+    private void dfs(TreeNode root, int targetSum, LinkedList<Integer> path) {
+        if (root==null) return;
+        path.add(root.val);
+        if (root.left==null&&root.right==null&&targetSum==root.val){
+            resPathSum_2.add(new LinkedList<>(path));
+            /**
+             *这里直接return是错误的，原因在于没有回溯状态
+             * 原因 1：缺少回溯
+                    你的 dfs 是一个「先加入当前节点到 path → 深入递归 → 回溯删除」的标准写法。
+              如果你在这里直接 return，就会跳过后面的 path.removeLast()。结果就是，当前节点值
+              没有被移除，path 状态被污染，回溯失败，导致上层递归时 path 中残留了错误的节点。
+
+              原因 2：不是所有 return 都能提前结束
+                    在找到一条符合要求的路径后，我们确实可以“终止这一条递归路径”，但必须先回溯干
+              净，保证 path 状态正确，才能 return。如果直接 return，就破坏了递归的对称性
+             */
+//            return;  /**err：这里return是错误的*/
+        }
+        dfs(root.left,targetSum-root.val,path);
+        dfs(root.right,targetSum-root.val,path);
+        path.removeLast();
     }
 
 
@@ -783,6 +873,23 @@ public class codetop_5 {
     路径上所有节点值相加等于目标和 targetSum 。如果存在，返回 true ；否则，返回 false 。叶子节点 是指没有子节
     点的节点。
     */
+    /**
+     *【注意】
+     *      1. 题中的判断条件必须是“root.left==null&&root.right==null”，不能使用root==null！！！原因：前面
+     *  的条件能确定当前的节点一定是叶子节点，但是后面的节点就不一定了。比如：
+     *                      5
+     *                    /
+     *                   4
+     *                  /  \
+     *                null  6
+     *           如果此时求解targetSum==9存不存在，实际上是不存在的，但是到节点4的左孩子时发现root==null并且
+     *   targetSum==0，就会认为存在，只是错误的，因为null不是叶子节点 并且 它的父节点4也不是叶子节点。
+     *
+     * @param root
+     * @param targetSum
+     * @return
+     */
+    /*写法1：迭代的写法*/
     public boolean hasPathSum(TreeNode root, int targetSum) {
         if (root==null)
             return false;
@@ -790,6 +897,51 @@ public class codetop_5 {
             return targetSum==root.val;
         return hasPathSum(root.left,targetSum-root.val)||
                 hasPathSum(root.right,targetSum-root.val);
+    }
+
+    /*错误的写法，解释见上面的注释*/
+//    public boolean hasPathSum(TreeNode root, int targetSum){
+//        if (root==null) return false;
+//        return dfs(root,targetSum);
+//
+//    }
+//    boolean dfs(TreeNode root, int targetSum){
+//        if (root==null&&targetSum==0) return true; /**【err】这里是错误的!!!!!!*/
+//        if(root==null) return false;
+//        return dfs(root.left,targetSum-root.val)||
+//                dfs(root.right,targetSum-root.val);
+//    }
+
+    /*写法2：非递归的写法，使用层序遍历*/
+    public boolean hasPathSum_cengxu(TreeNode root, int targetSum) {
+        if (root == null) return false;
+        LinkedList<TreeNode> nodesQueue = new LinkedList<>();
+        LinkedList<Integer> valQueue = new LinkedList<>();
+        nodesQueue.offer(root);
+        valQueue.offer(targetSum);
+        while (!nodesQueue.isEmpty()) {
+            /**
+             *这种就是借助层序遍历来完成节点的处理，因此并不要求每一层的节点清晰区分，体现在代码中就是每一层
+             * 的研究并不需要先获取“size”，及下面的两行代码可以省略————
+             *        int size = nodesQueue.size();   //正规层序遍历时，需要获取size，知道这一层有多少个节点
+             *        for (int i = 0; i < size; i++) {}
+             */
+            TreeNode curNode = nodesQueue.poll();
+            Integer curVal = valQueue.poll();
+            if (curNode.left == null && curNode.right == null && curVal == curNode.val) {
+                return true;
+            }
+            if (curNode.left != null) {
+                nodesQueue.offer(curNode.left);
+                valQueue.offer(curVal - curNode.val);
+            }
+            if (curNode.right != null) {
+                nodesQueue.offer(curNode.right);
+                valQueue.offer(curVal - curNode.val);
+            }
+
+        }
+        return false;
     }
 
 
@@ -800,7 +952,11 @@ public class codetop_5 {
     /**
      * 【思路】用一个map存放前缀和，此时前缀和的含义：从根节点到这个节点的路径和。。。灭一次存放之前先看map中有没有
      *      符合条件的前缀和，即map.get(curSum-targetSum)的值
+     *【关于思路的解析 以及 多个疑问，参看（灵茶山艾府）：
+     *      https://leetcode.cn/problems/path-sum-iii/solutions/2784856/zuo-fa-he-560-ti-shi-yi-yang-de-pythonja-fmzo/
+     *】
      * */
+    /*写法1：有返回值的写法*/
     public int pathSum_437(TreeNode root, int targetSum) {
         HashMap<Long, Integer> perfixMap = new HashMap<>();
         perfixMap.put(0L,1);
@@ -808,15 +964,39 @@ public class codetop_5 {
     }
 
     private int dfs(TreeNode root, long curSum, HashMap<Long, Integer> perfixMap, int targetSum) {
-        if (root==null) return 0;
+        if (root == null) return 0;
 
         int res = 0;
         curSum += root.val;
-        res += perfixMap.getOrDefault(curSum-targetSum,0);
-        perfixMap.put(curSum,perfixMap.getOrDefault(curSum,0)+1);
-        res += dfs(root.left,curSum,perfixMap,targetSum);
-        res += dfs(root.right,curSum,perfixMap,targetSum);
-        perfixMap.put(curSum,perfixMap.get(curSum)-1);
+        res += perfixMap.getOrDefault(curSum - targetSum, 0);
+        perfixMap.put(curSum, perfixMap.getOrDefault(curSum, 0) + 1);
+        res += dfs(root.left, curSum, perfixMap, targetSum);
+        res += dfs(root.right, curSum, perfixMap, targetSum);
+        perfixMap.put(curSum, perfixMap.get(curSum) - 1);
         return res;
+    }
+
+    /*写法2：无返回值的写法*/
+    /**
+     *【技巧】更新map中key的值，可以使用merge操作，见下面注释的代码————cnt.merge(i,-1,Integer::sum);
+     */
+    private int ans;
+    public int pathSum_437_1(TreeNode root, int targetSum) {
+        Map<Long, Integer> cnt = new HashMap<>();
+        cnt.put(0L, 1);
+        dfs(root, 0, targetSum, cnt);
+        return ans;
+    }
+
+    private void dfs(TreeNode root, long i, int targetSum, Map<Long, Integer> cnt) {
+        if (root==null) return;
+        i += root.val;
+        ans += cnt.getOrDefault(i-targetSum,0);
+        cnt.put(i,cnt.getOrDefault(i,0)+1);
+//        cnt.merge(i,1,Integer::sum); /*这种写法跟上一行是同样的效果*/
+        dfs(root.left,i,targetSum,cnt);
+        dfs(root.right,i,targetSum,cnt);
+//        cnt.merge(i,-1,Integer::sum);
+        cnt.put(i,cnt.getOrDefault(i,0)-1); /*这种写法跟下一行是同样的效果*/
     }
 }

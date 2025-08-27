@@ -51,7 +51,7 @@ public class _03SlideWindow {
                 map.put(cur,map.get(cur)-1);
                 left++;
             }
-            right++; /**注意药移动当前指针，否则“java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "java.util.HashMap.get(Object)" is null”*/
+            right++; /**注意要移动当前指针，否则“java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "java.util.HashMap.get(Object)" is null”*/
             res = Math.max(res,right-left); //③保证窗口合法在更新结果
         }
         return res;
@@ -86,7 +86,7 @@ public class _03SlideWindow {
                 map.put(cLeft,map.get(cLeft)-1);
             }
             res = Math.max(res,cur-left+1);
-            cur++; /**这句话如果是在上一句话的上面，就不用使用”cur-left+1“了，不需要+1。比如方法 lengthOfLongestSubstring 就是这样*/
+            cur++; /**这句话如果是在上一句话之前，就不用使用”cur-left+1“了，不需要+1。比如方法 lengthOfLongestSubstring 就是这样*/
         }
         return res;
     }

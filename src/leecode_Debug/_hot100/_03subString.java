@@ -75,7 +75,10 @@ public class _03subString {
             *   第二步：如果window中字符c的数量 等于 need中字符c的数量，则说明c这个字符通过校验，因此valid++*/
             if (need.containsKey(c)){
                 window.put(c,window.getOrDefault(c,0)+1);
-                /**err：map.get比较值相等的时候必须使用“.intValue()”方法才可以*/
+                /**err：map.get比较值相等的时候必须使用“.intValue()”方法才可以，跟“最小栈”题目是类似的
+                 * 道理。。
+                 *      这里如果不使用“.intValue()”会导致倒数第二个测试用例过不了！！，因为数太大了，超过
+                 * 了Integer缓存的整数范围。*/
                 if (window.get(c).intValue()==need.get(c).intValue()){
                     valid++;
                 }
@@ -229,7 +232,7 @@ public class _03subString {
             /**err：下面两行交换就错了！！
              *      必须是先更新res，然后再将pre放进map。
              *      否则，k=0的时候会出错，此时会出现pre-k=pre，如果先把pre放进去，就导致map.get(pre-k)的
-             *  数值比正确的多了*/
+             *  数值比正确的多了。——————比如：放进去之前get的结果是m，放进去之后再获取结果就是m+1了！！*/
             res += map.getOrDefault(pre-k,0);
             map.put(pre,map.getOrDefault(pre,0)+1); /**err：更新了前缀和，不要忘记放进map*/
         }

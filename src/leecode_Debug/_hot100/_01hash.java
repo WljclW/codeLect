@@ -46,7 +46,7 @@ public class _01hash {
                 map.put(s,ele);
             }
         }
-        return new LinkedList<>(map.values()); /**🔺err：返回之前强转类型*/
+        return new LinkedList<>(map.values()); /**🔺err：返回之前强转类型。。。注意的是强转类型不能像平时的那样，要使用new的方式*/
     }
 
     /*解法2：使用gerOrDefault方法*/

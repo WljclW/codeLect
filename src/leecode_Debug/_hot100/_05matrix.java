@@ -31,7 +31,7 @@ public class _05matrix {
     public void setZeroes(int[][] matrix) {
         boolean firRow = false,firCol = false;
         int m = matrix.length,n = matrix[0].length;
-        /*step1：遍历第一行以及第一列，如果碰到0修改对应的标志变量*/
+        /*step1：遍历第一行以及第一列，如果碰到0修改（第一行、第一列）对应的标志变量*/
         for (int i = 0; i < m; i++) {
             if (matrix[i][0]==0){
                 firCol=true;

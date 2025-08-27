@@ -129,6 +129,7 @@ public class _01completeBag {
     /**
      * 【问题本质】求解需要凑出amount金额的最少硬币数量。
      * */
+    /*二维dp的写法*/
     public int coinChange(int[] coins, int amount) {
         int[][] dp = new int[coins.length][amount + 1];
         for (int i=0;i<coins.length;i++){
@@ -159,17 +160,17 @@ public class _01completeBag {
         return dp[coins.length-1][amount]==Integer.MAX_VALUE?-1:dp[coins.length-1][amount];
     }
 
-    /*一维dp*/
+    /*一维dp的写法*/
     public int coinChange_1dim(int[] coins, int amount) {
             int[] dp = new int[amount + 1];
-            dp[0] = 0;
+            dp[0] = 0; //表示凑够0元的总价值，需要的硬币数是0
             //初始化dp数组为最大值
             for (int j = 1; j < dp.length; j++) {
                 dp[j] = Integer.MAX_VALUE;
             }
             for (int i = 0; i < coins.length; i++) {
                 //正序遍历：完全背包每个硬币可以选择多次
-                for (int j = coins[i]; j <= amount; j++) {
+                for (int j = coins[i]; j <= amount; j++) { /**区别：完全背包问题的以为解法中，背包容量也要从小到大遍历*/
                     //只有dp[j-coins[i]]不是初始最大值时，该位才有选择的必要
                     if (dp[j - coins[i]] != Integer.MAX_VALUE) {
                         //选择硬币数目最小的情况

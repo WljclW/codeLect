@@ -10,6 +10,12 @@ import java.util.PriorityQueue;
  * 没做过：148、23（分治解法）、24、92(反转中间的某一段链表)*/
 
 /**
+ *【链表的常见问题】
+ *      1. “超出时间限制”、“超出内存限制”类似的报错通常是因为：循环操作的时候，忘记了"cur=cur.next"类似的代
+ *  码，导致cur指针一直未动，因此情况如下————
+ *          （1）如果是计算任务，会长时间得不到结果，这种情况是最多的；
+ *          （2）如果涉及到创建节点，每一次操作都会创建节点，就会导致节点无限的被创建，因此最终在idea中应该会
+ *      报"StackOverflow"；在力扣的网页展示的是“超出内存限制”。
  *【技巧1】找中间节点。
  *     1. 找到常规的中间节点，即常规的方法就可以。
  *          场景：适用于不需要将链表前后两半断开连接的时候。
@@ -279,7 +285,7 @@ public class _06ListNode {
             sum %= 10; //当前位置的数值
             cur.next = new ListNode(sum); //给结果串 拼接数值为cur的节点
             cur = cur.next;
-            l1 = (l1 == null) ? l1 : l1.next; /**err：这里如果没有移动指针，会报错“超出内存限制”*/
+            l1 = (l1 == null) ? l1 : l1.next; /**🔺err：这里如果没有移动指针，会报错“超出内存限制”*/
             l2 = (l2 == null) ? l2 : l2.next;
         }
         return res.next;
@@ -368,7 +374,7 @@ public class _06ListNode {
             cur.next = node2;
             node1.next = node2.next;
             node2.next = node1;
-            /**step3：每一轮结束后cur节点移动到这一组的最后一个节点————其实就相当于等一轮循环开始前，cur节点的位置应该不变类似
+            /**step3：每一轮结束后cur节点移动到这一组的最后一个节点————其实就相当于任何一轮循环开始前，cur节点的位置应该不变类似
              * 于状态一致（一定要处于前面已经完成交换的最后一个节点。比如：开始的时候cur指向head的前一个节点；每一轮结束后我们将
              * cur指向了node1，而node1节点就是这一轮研究结束时的最后一个节点）*/
             cur = node1;
@@ -410,6 +416,7 @@ public class _06ListNode {
             ListNode curStart = pre.next; //当前这一组的第一个节点
             ListNode nextStart = end.next; //下一组的第一个节点
             /*step3：几个节点之间调整连接关系*/
+            /**err：用nextStart记录下end.next以后，务必将end.next置为null*/
             end.next = null; //当前这一组节点的最后一个节点的next置为null，便于翻转链表
             pre.next = reverse(curStart); //reverse返回的是 这一组翻转 之后的开始节点，要拼在前一组后面————即赋给pre.next。
             curStart.next = nextStart; //这一组翻转完成后，start变成了这一组的最后一个节点。。因此将start.next赋值为nextStart(其中nextStart为下一组的第一个节点)————这一步就将当前组和下一组连起来了
@@ -573,7 +580,8 @@ public class _06ListNode {
     public ListNode sortList(ListNode head) {
         /*1.特殊情况的考虑————没有节点或者只有一个节点，此时不用排序*/
         if (head==null||head.next==null) return head;
-        /*2.找到中间节点的后一个节点。但是其中有一个细节————在findMid中必须要先找到中间的第一个节点*/
+        /*2.找到中间节点的后一个节点（奇数得到中间，偶数得到中间的后一个）。
+        但是其中有一个细节————在findMid中必须要先找到中间的第一个节点*/
         ListNode mid = findMid(head);
         /*3.分别排序左、右两半链表*/
         ListNode left = sortList(head);
@@ -608,19 +616,22 @@ public class _06ListNode {
         return dummy.next;
     }
 
-    /*找中间节点的代码。与hot100求中间节点不同，区别————
+    /*【重要🔺】找中间节点的代码。与hot100求中间节点不同，区别————
     *       1. 如果是奇数个节点，两种都会得到中间节点；
     *       2. 如果是偶数个节点，下面的方案会先得到中间两个的前一个节点。但是返回值跟常规的中间节点是一样
     *    的————即中间节点的后一个节点。。只不过排序链表中需要先拿到中间的前一个节点将next置为null，多了这
     *    一步处理操作。
+    *【注】“排序链表”找中间节点时虽然返回的是常规意义的中间节点————即奇数返回中间节点，偶数返回中间节点的后一个。但
+    *   是方法内的逻辑：让偶数节点的时候slow来到中间两个节点的第一个，奇数节点不变————目的是让偶数节点的时候需要将
+    *   前一半链表最后节点的next置null。
     * */
     private ListNode findMid(ListNode head) {
-        ListNode slow = head,fast = head.next;
+        ListNode slow = head,fast = head.next; /**与“找中间节点”的区别，fast的初始位置是在head.next而不是head*/
         while (fast!=null && fast.next!=null){
             slow = slow.next;
             fast = fast.next.next;
         }
-        //如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个
+        //如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个；奇数节点时值得就是中间节点
         ListNode res = slow.next;
         slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”，我们是用null作为链表结束的标志*/
         return res;

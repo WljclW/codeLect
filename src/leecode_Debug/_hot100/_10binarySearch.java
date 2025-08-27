@@ -322,7 +322,7 @@ public class _10binarySearch {
     * */
     /**
      * 【强烈建议！】题解中不要出现nums[0]，nums[nums.length-1]这样的数据，而是用nums[l]、nums[r]代替，见方
-     *      法search_3
+     *      法search_3。。使用"nums[l]、nums[r]"更具有普适性！
      * 【说明】解法1和解法2的区别在于比较是使用的值不一样，但是强烈建议使用解法2，即search_2。这个解法才更好的
      *      体现出了某一个区间有序，然后确定target的范围，81的解法就是在search_2的基础上改进的（具体的说：仅仅
      *      是多一个情况————如果nums[mid]=nums[left]=nums[right]就l++;r--。）
@@ -533,7 +533,7 @@ public class _10binarySearch {
      *      多少个数。。。。
      *       2. 已知两个数组，一半有多少个数呢？(len1+len2+1)/2........这样的计算方法包含了奇数和偶数的情况————
      *          如果总共有偶数个数，则左右两半数的数量是相等的；
-     *          如果总共有奇数哥数，则左边的数比右边的数多1个。
+     *          如果总共有奇数个数，则左边的数比右边的数多1个。
      *          这种数据的分布就定了到最后求解中位数怎么求。
      *              如果是奇数，需要取隔板左边两数的最大值————即Math.max(nums1[i-1],nums2[j-1])
      *              如果是偶数，需要取（i、j隔板左边两数的最大值 + i、j隔板右边两数的最小值）/2.0
@@ -544,7 +544,7 @@ public class _10binarySearch {
         if (nums1.length > nums2.length) return findMedianSortedArrays(nums2, nums1);
         /*step2：定义"闭区间类型"左右边界。【注意】这里的索引是隔板，因此是[0,nums.length]*/
         int l = 0, r = nums1.length;
-        /*step3：二分查找*/
+        /*step3：二分法 枚举nums1挡板出现的位置。（一旦他确定了位置，nums2中挡板的位置也就确定了）*/
         while (l <= r) {
             /*3.1：注意i和j的对应关系。他们的和是“(nums1.length + nums2.length + 1) / 2”
             *   如何理解i/j？

@@ -48,7 +48,7 @@ public class _00hard {
         LinkedList<Integer> queue = new LinkedList<>();
         /*第一步：先将窗口的大小扩大为k*/
         for (int i = 0; i < k; i++) {
-            //队列内要求单调减
+            //队列内要求单调减。因此只要不小于队列尾就要弹出队列尾部元素
             while (!queue.isEmpty() && nums[i] >= nums[queue.peekLast()]) { /**等于的时候队尾也要出队，比如"7,7"前面的7永远不会成为窗口内的最大值了*/
                 queue.pollLast();
             }
