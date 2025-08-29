@@ -1,14 +1,14 @@
 package leecode_Debug._hot100;
 
 import leecode_Debug.top100.ListNode;
+import leecode_Debug.top100.TreeNode;
 
 import java.util.*;
 
 /**
- * @author mini-zch
- * @date 2025/8/22 10:44
+ *记录topcode中不熟练的
  */
-public class review0822 {
+public class codetop_unskilled {
 
     /*
      * 438.给定一个字符串 s 和一个非空字符串 p，找到 s 中所有是 p 的字母异位词的子串，返回这些子串的起始索引。
@@ -106,9 +106,9 @@ public class review0822 {
     /*5
     给你一个字符串 s，找到 s 中最长的 回文 子串。
      */
-    //    public String longestPalindrome(String s) {
-    //
-    //    }
+//    public String longestPalindrome(String s) {
+//
+//    }
 
 
 
@@ -237,9 +237,12 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 叶子节点 是指没有子节点的节点。
      */
-//    public boolean hasPathSum(TreeNode root, int targetSum) {
-//
-//    }
+    public boolean hasPathSum(TreeNode root, int targetSum) {
+        if (root==null) return false;
+        if (root.left==null&&root.right==null&&root.val==targetSum) return true;
+        return hasPathSum(root.left,targetSum-root.val)||
+                hasPathSum(root.right,targetSum-root.val);
+    }
 
     /*113
     给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
@@ -273,8 +276,143 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 如果不存在公共前缀，返回空字符串 ""。
      */
-//    public String longestCommonPrefix(String[] strs) {
-//
-//    }
+
+    /**
+     * 时间复杂度————O(n×m)
+     *    其中:n = 字符串个数;m = '最短'字符串的长度（因为碰到最短的就一定知道答案了）
+     *空间复杂度————O(1)
+     * @param strs
+     * @return
+     */
+    public String longestCommonPrefix(String[] strs) {
+        if (strs==null||strs.length==0) return "";
+        if (strs.length==1) return strs[0];
+        String first = strs[0];
+        for (int i = 0; i < first.length(); i++) {
+            char c = first.charAt(i);
+            for (int j = 1; j < strs.length; j++) {
+                if (strs[j]==null||i>=strs[j].length()||strs[j].charAt(i)!=c){
+                    return first.substring(0,i);
+                }
+            }
+        }
+        return ""; /**这一行是错误的*/
+    }
+
+
+    /**
+     * ==========================================================================================================
+     * ==========================================================================================================
+     * ==========================================================================================================
+     * ==========================================================================================================
+     */
+    //958
+    public boolean isCompleteTree(TreeNode root) {
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        boolean hasNull = false;
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            TreeNode cur = queue.poll();
+            if (cur==null){
+                hasNull = true;
+            }else {
+                if (hasNull) return false;
+                queue.offer(cur.left);
+                queue.offer(cur.right);
+            }
+        }
+        return true;
+    }
+    
+    
+    //5
+    /**
+     * 马拉车算法 可以实现将时间复杂度降为O(N)，但是空间复杂度高于“中心扩散法”，空间复杂度为O(N)。
+     * @param s
+     * @return
+     */
+    public String longestPalindrome(String s) {
+        /*step1：特殊情况的考虑*/
+        if (s==null||s.length()==0) return "";
+        /*step2：StringBuilder预处理字符串并构造出新字符串。做法————给原字符串所有的间隔（包括开始位置和结束位置）都加“#”*/
+        StringBuilder sb = new StringBuilder("#");
+        for (char c:s.toCharArray()){
+            sb.append(c).append("#");
+        }
+        String str = sb.toString();
+        int n = str.length();
+
+        int[] p = new int[n];
+        int center = 0,right = 0;
+        int start = 0,maxLen = 0;
+        /*step3：for循环依次研究每一个位置*/
+        for (int i = 0; i < n; i++) {
+            /*3.1 这一步就是“马拉车算法”最重要的优化。。具体的做法如下————
+                      （1）计算出i位置关于“目前回文中心”center的对称位置。
+                      （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]*/
+            int mirror = 2*center-i;
+            if (i<right){
+                p[i] = Math.min(right-i,p[mirror]);
+            }
+
+            /*3.2   否则的话从该位置向两边扩。理论上“否则”字眼是需要if-else的，但是这里没有————因为：一旦某位置进
+                入3.1的if（此时p[i]就不是0了，其实就是p[i]真实的结果），就一定不会进入3.2中的while循环。
+                    那什么情况会进入到下面的while循环呢？？答：一定是i>=right的情况,此时p[i]的值就是数组元素的默
+                认值0。
+                    这一步具体的做法呢，如下————
+                        ①声明两个指针l,r分别为i位置的左右；
+                        ②只要l和r不越界 并且 l和r位置的字符相等，就“增加p[i]”、移动l和r指针*/
+            int l = i-p[i]-1,r = i+p[i]+1;
+            while (l>=0&&r<n&&str.charAt(l)==str.charAt(r)){
+                p[i]++;
+                l--;
+                r++;
+            }
+            /*3.3 更新“最远回文右边界”。
+            *   “最远回文右边界”right 和 “当前的回文中心”center 是成对起作用的，因此更新right的时候就要更新center。
+            *   为什么说是“成对起作用”的呢？？因为right和i比较能加速p[i]计算；center用于计算位置i关于回文中心的对称位置*/
+            if (i+p[i]>right){
+                center = i;
+                right = i+p[i];
+            }
+            /*3.4 更新最长回文子串。
+            *   “最长回文子串”maxLen 和 “回文子串的开始位置”start也是成对出现的，因此更新maxLen的时候呀需要更新start。*/
+            if (p[i]>maxLen){
+                maxLen = p[i];
+                start = (i-maxLen)/2;
+            }
+        }
+        return s.substring(start,start+maxLen);
+    }
+
+
+
+    //92
+    public ListNode reverseBetween(ListNode head, int left, int right) {
+        ListNode dummy = new ListNode(-1, head),cur = dummy,end = dummy;
+        for (int i = 0; i < right; i++) {
+            end = end.next;
+        }
+        for (int i = 0; i < left - 1; i++) {
+            cur = cur.next;
+        }
+        ListNode start = cur.next;
+        ListNode nextStart = end.next;
+        end.next = null;
+        cur.next = reverse(start);
+        start.next = nextStart;
+        return dummy.next;
+    }
+
+    private ListNode reverse(ListNode start) {
+        ListNode pre =null,cur = start;
+        while (cur!=null){
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
 
 }

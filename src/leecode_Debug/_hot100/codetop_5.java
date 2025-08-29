@@ -4,10 +4,7 @@ import leecode_Debug.linkList.ListNode;
 import leecode_Debug.top100.TreeNode;
 
 import javax.sound.sampled.Line;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 快排
@@ -73,7 +70,7 @@ public class codetop_5 {
      * 【建议】建议看官方的解法：见方法deleteDuplicates.....
      *          但是练习中发现deleteDuplicates_82解法用的熟
      * 【常错的点】（1）不论哪种解法，“cur = cur.next;”都要放在else块，这是关键！！
-     *             （2）不论哪一种解法，cur指针不是指向dummy，就是指向结果链表中的最后一个节点
+     *            （2）不论哪一种解法，cur指针不是指向dummy，就是指向结果链表中的最后一个节点
      * 【与83的区别】由于要删除所有值相等的节点，因此最后链表中可能一个节点都不剩，因此必须借助dummy节点来解题
      * */
     /**
@@ -126,9 +123,16 @@ public class codetop_5 {
     public ListNode deleteDuplicates_82_1(ListNode head) {
         ListNode dummy = new ListNode(-1, head);
         ListNode cur = dummy;
+        /**解释这里while的循环条件
+         * 1. 明白一点：任何一个时刻cur指针要么指向dummy(初始情况)、要么指向结果链表中的最后一个节点(即确保该节点在结果中并且是
+         *      目前已知的最后一个，后面的结果还没有研究)
+         * 2. while的循环条件"cur.next!=null&&cur.next.next!=null"就是保证后面至少还有两个节点。为什么这样做？？因为至少
+         *      有两个节点的时候，才能讨论是不是有相同数值的节点。。。。。cur及之前的节点研究过了，肯定没有重复，因为后面要求至少
+         *      还有两个节点才继续研究，否则如果只有一个节点那必然没有与它值相同的节点了
+         * */
         while (cur.next!=null&&cur.next.next!=null){
-            int curVal = cur.next.val;
-            if (cur.next.next.val==curVal){
+            int curVal = cur.next.val; //step1：先记录一下cur.next的值（cur.next就是第一个还没有研究的节点）
+            if (cur.next.next.val==curVal){ //step2:如果cur后面两个节点的值相等，则进入if将这些相等值的节点全部删除
                 ListNode tmp = cur.next.next;
                 while (tmp!=null&&tmp.val==curVal){
                     tmp = tmp.next;
@@ -139,7 +143,7 @@ public class codetop_5 {
                  * “cur=cur.next”必须写在else块中。————换句话说，只有一个cur.next.val!=cur.next.next.val的时候
                  * cur指针才能后移*/
                 cur.next = tmp;
-            }else
+            }else //step3：如果cur.next的值和cur.next.next的值不相等，则需要将cur.next拼接到cur的后面————表示cur.next需要在结果链表中
                 cur = cur.next; /**err：这里必须有else子句*/
         }
         return dummy.next;
@@ -193,7 +197,7 @@ public class codetop_5 {
         while (fast != null) {
             if (fast.val != slow.val) { /*说明这个节点应该在结果的链表中，因此拼接到slow的后面*/
                 slow.next = fast;
-                slow = slow.next;  // 更新 slow
+                slow = slow.next;  // 只有“当新的节点添加到结果链中”时，才更新 slow
             }
             fast = fast.next; // 无论是否重复，fast 都前进
         }
@@ -233,7 +237,8 @@ public class codetop_5 {
         /*step1：特殊情况的考虑*/
         if (root==null) return 0;
         /*step2：计算左、右孩子节点的贡献————即左子树上包含左孩子节点的最大路径和，右子树上包含右孩子节点的
-        *   最大路径和*/
+        *   最大路径和。
+        *   【注】要求贡献的最小值时0。原因：求解的是最大路径和，因此如果小于0，则它带来负收益，大不了那个分支不走呗！*/
         int left = Math.max(maxGain(root.left), 0);
         int right = Math.max(maxGain(root.right), 0);
         /*step3：更新答案*/
@@ -253,7 +258,7 @@ public class codetop_5 {
     除此之外返回 0。
     * */
     /**
-     *【思路】就是从左往右一次判断。
+     *【思路】双指针，从左往右一次判断。
      *【关键】while循环条件的“||”暗含着两个版本号长度不一致的情况。出现版本号长度不一样的适合，版本号短的那一个
      *      后面的值就是0.
      * */
@@ -279,6 +284,22 @@ public class codetop_5 {
         }
         return 0;
     }
+
+    /*写法2：分割字符串*/
+    public int compareVersion2(String version1, String version2) {
+        String[] v1 = version1.split("\\.");
+        String[] v2 = version2.split("\\.");
+        int n = Math.max(v1.length, v2.length);
+        for (int i = 0; i < n; i++) {
+            int num1 = i < v1.length ? Integer.parseInt(v1[i]) : 0;
+            int num2 = i < v2.length ? Integer.parseInt(v2[i]) : 0;
+            if (num1 != num2) {
+                return num1 > num2 ? 1 : -1;
+            }
+        }
+        return 0;
+    }
+
 
     /*105
     给定两个整数数组 preorder 和 inorder ，其中 preorder 是二叉树的先序遍历， inorder 是同一棵树的中序遍历，请构造二叉树并返回其根节点。
@@ -333,7 +354,7 @@ public class codetop_5 {
         return dfsSumNumbers(root.left, curSum) + dfsSumNumbers(root.right, curSum);
     }
 
-    /*深度优先遍历的另一种写法....使用全局变量来记录结果*/
+    /*写法2：深度优先遍历的另一种写法....使用全局变量来记录结果*/
     int maxSumNumbers = 0;
     public int sumNumbers_(TreeNode root) {
         dfsSumNumbers1(root,0);
@@ -400,19 +421,13 @@ public class codetop_5 {
     节点的右子树只包含 大于 当前节点的数。
     所有左子树和右子树自身必须也是二叉搜索树。
     * */
-
-    /**
-     *
-     * @param root
-     * @return
-     */
     /*递归判断*/
     public boolean isValidBST(TreeNode root) {
         return isValidBST(root, null, null);
     }
 
     /* 方法参数含义：限定以 root 为根的子树节点必须满足 max.val > root.val > min.val */
-    boolean isValidBST(TreeNode root, TreeNode min, TreeNode max) {
+    boolean isValidBST(TreeNode root, TreeNode min/*当前节点的最小值*/, TreeNode max/*当前节点的最大值*/) {
         // step1：base case
         if (root == null) return true;
         /*step2：检查root.val是不是满足最值要求。。注意：不包含等于*/
@@ -597,7 +612,7 @@ public class codetop_5 {
     你必须实现时间复杂度为 O(log n) 的算法来解决此问题。
     * */
     /**
-     *【题解的原理】比较中间位置mid的值 和 下一个位置mid+1的值，沿着值大的单个方向一直大去，一定能找到峰值。
+     *【题解的原理】比较中间位置mid的值 和 下一个位置mid+1的值，沿着值大的单个方向一直下去，一定能找到峰值。
      *      比如：nums[mid]>nums[mid+1]，则r=mid，朝着左边一定能找到峰值。但是如果去右边找，可能会有，但
      * 是也可能没有峰值。————为什么？因为朝着大的一边走，走到最后是-∞，题中说了两边的边界认为是-∞，根据峰值的
      * 定义可知这一区域必存在峰值。
@@ -889,7 +904,7 @@ public class codetop_5 {
      * @param targetSum
      * @return
      */
-    /*写法1：迭代的写法*/
+    /*写法1：DFS递归方法*/
     public boolean hasPathSum(TreeNode root, int targetSum) {
         if (root==null)
             return false;
@@ -912,7 +927,41 @@ public class codetop_5 {
 //                dfs(root.right,targetSum-root.val);
 //    }
 
-    /*写法2：非递归的写法，使用层序遍历*/
+    /**写法2：DFS的得带写法
+     *      做法：用栈模拟递归，每个元素存 (node, 当前路径和)。
+     * */
+    public boolean hasPathSum2(TreeNode root, int targetSum) {
+        if (root == null) return false;
+        Stack<TreeNode> stackNode = new Stack<>();
+        Stack<Integer> stackSum = new Stack<>();
+        stackNode.push(root);
+        stackSum.push(root.val);
+
+        while (!stackNode.isEmpty()) {
+            TreeNode node = stackNode.pop();
+            int curSum = stackSum.pop();
+
+            // 如果是叶子节点，判断路径和
+            if (node.left == null && node.right == null) {
+                if (curSum == targetSum) return true;
+            }
+
+            if (node.right != null) {
+                stackNode.push(node.right);
+                stackSum.push(curSum + node.right.val);
+            }
+
+            if (node.left != null) {
+                stackNode.push(node.left);
+                stackSum.push(curSum + node.left.val);
+            }
+        }
+        return false;
+    }
+
+    /**写法3：非递归的写法，使用层序遍历
+     *      做法：层序遍历，每个节点带上「从根到该节点的路径和」————言外之意需要多一个队列记录每个节点的时候记录它对应的信息。
+     */
     public boolean hasPathSum_cengxu(TreeNode root, int targetSum) {
         if (root == null) return false;
         LinkedList<TreeNode> nodesQueue = new LinkedList<>();

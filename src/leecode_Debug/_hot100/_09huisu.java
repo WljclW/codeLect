@@ -82,6 +82,10 @@ public class _09huisu {
     }
 
     /*全排列的另一种写法：形参数量变多*/
+    /**
+     * 比较上面的代码和下面的代码，会发现：仅仅是把变量pathPermute、usedPermute放在了形参的位置。其他的代码
+     * 都没有变——————体会回溯这里 全局变量和形参变量的区别
+     */
     List<List<Integer>> permuteRes;
     public List<List<Integer>> permute1(int[] nums) {
         permuteRes = new LinkedList<>();
@@ -134,6 +138,29 @@ public class _09huisu {
             pathSubsets.add(nums[i]); /**🔺err：【注意，反复错】循环中的循环变量已经是i了!!!*/
             subsetsBack(nums, i + 1); /**err：循环中的循环变量已经是i了*/
             pathSubsets.remove(pathSubsets.size() - 1);
+        }
+    }
+
+
+    /**
+     * 另外一种写法——————
+     *      上面的代码和下面的代码唯一的区别是pathSubsets放在了形参的位置，其他的diamond都是一样的。这两种都没问题
+     */
+    List<List<Integer>> resSubSets1;
+    public List<List<Integer>> subsets1(int[] nums) {
+        resSubSets1 = new LinkedList<>();
+        List<Integer> pathSubsets = new LinkedList<>();
+        subsetsBack(nums,0,pathSubsets);
+        return resSubSets1;
+    }
+
+    private void subsetsBack(int[] nums, int index,List<Integer> pathSubsets) {
+        resSubSets1.add(new LinkedList<>(pathSubsets));
+        if (index==nums.length) return;
+        for (int i = index; i < nums.length; i++) {
+            pathSubsets.add(nums[i]);
+            subsetsBack(nums,i+1,pathSubsets);
+            pathSubsets.remove(pathSubsets.size()-1);
         }
     }
 

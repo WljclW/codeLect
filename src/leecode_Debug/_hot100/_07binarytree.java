@@ -357,6 +357,17 @@ public class _07binarytree {
 
     /*105.
     * 从前序 和 中序 构造出二叉树*/
+    /**
+     * 对于任何一颗树，前序的第一个节点一定是树的根；中序遍历中这个根节点的左边就是左子树，右边就是右子树
+     *【思路】
+     *      1. 从先序遍历中拿到第一个节点，是当前树的根节点————构造出TreeNode root；
+     *      2. 在中序遍历中找到该节点所在的位置————利用左边的节点构造root.left、利用右边的节点构造出
+     *          root.right
+     *      3. 返回root
+     *[补充说明]
+     *      1. 为了从中序遍历快速得到某个数据所在的位置，通常使用map来优化
+     *      2. “先序-后序”来构建的时候有区别
+     */
     HashMap<Integer,Integer> inorderMap = new HashMap<>();
     int preOrderIndex;
     public TreeNode buildTree(int[] preorder, int[] inorder) {
