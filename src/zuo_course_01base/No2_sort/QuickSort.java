@@ -10,7 +10,7 @@ import java.util.Random;
 public class QuickSort {
     public static void main(String[] args) {
         int[] arr = {9, 2, 5, 6, 7, 4, 9, 10, 1};
-        quickSort(arr, 0, arr.length - 1);
+        quickSort2(arr, 0, arr.length - 1);
         System.out.println(Arrays.toString(arr));
     }
 
@@ -72,14 +72,22 @@ public class QuickSort {
      *chatgpt给出的版本
      */
     public void quickSort1(int[] nums, int left, int right) {
+        /*step1：base-case的考虑*/
         if (left >= right) return;
 
-        // 随机选择一个 索引位置，并交换到末尾
+        /*step2：随机选择一个数，并且交换到“要排序子数组”的末尾*/
+        /**
+         "new Random().nextInt(right - left + 1)"会产生一个[0,r-l+1)的整数。
+         比如：l = 3,r = 7。
+              我们的需求是产生3、4、5、6、7这几个整数，可以转换为l加一个数，这个数的取值范围是0、1、2、3、4，因
+            此这些数的取值范围是[0,4]，但是"new Random().nextInt(right - left)"即“new Random().nextInt(4)”只能
+            产生0、1、2、3，因此要使用“right-left+1”~
+         */
         int pivotIndex = left + new Random().nextInt(right - left + 1);
         swap1(nums, pivotIndex, right);
-
+        /*step3：把step2选择的那个数放在正确的位置*/
         int partitionIndex = partition1(nums, left, right);
-
+        /*step4：对选择数的左右两半递归排序*/
         quickSort(nums, left, partitionIndex - 1);
         quickSort(nums, partitionIndex + 1, right);
     }
@@ -90,17 +98,23 @@ public class QuickSort {
         nums[right] = tmp;
     }
 
+    /**
+     *【重要】快排中有partition方法，这个方法的目的：将right位置（右边界那个数）的那个数放在这段子数组的正确位置！！
+     *      同时，由于进入partition之前已经把主程序中随机选择的那个数放在了最后位置，因此到这个方法执行结束，做了的
+     *      事就是：①在主程序中随机选择一个数；②把随机选择的数放在子数组的末尾；③调用partition方法把随机选择的数
+     *      放在正确的位置......最后在主程序中递归的排序“放好随机数”的位置的左右两半。
+     */
     private int partition1(int[] nums, int left, int right) {
         int pivot = nums[right]; //最后一个元素作为pivot
-        int i = left; //指向下一个应该放“≤pivot”元素的位置————如果碰到≤pivot的元素，应该放在位置i
+        int flag = left; //指向下一个应该放“≤pivot”元素的位置————如果碰到≤pivot的元素，应该放在位置flag
         for (int j = left; j < right; j++) {
             /**不加等于会怎么样？？*/
             if (nums[j]<=pivot){  //如果nums[j]应该放在左边
-                swap(nums,i++,j);
+                swap(nums,flag++,j);
             }
         }
-        swap(nums,i,right); //把分界值pivot放在位置i。因为i之前都是小于等于的，i位置及之后都是大于的
-        return i;
+        swap(nums,flag,right); //把分界值pivot放在位置i。因为flag之前都是小于等于的，i位置及之后都是大于的
+        return flag;
     }
 
     //关于partition方法，有如下不同的写法
@@ -118,5 +132,46 @@ public class QuickSort {
             else i++;
         }
         return new int[]{lt, gt};
+    }
+
+
+    /**
+     * =======================================================================================================
+     * =======================================================================================================
+     * =======================================================================================================
+     * =======================================================================================================
+     * =======================================================================================================
+     * 自己，review代码
+     */
+    public static void quickSort2(int[] arr,int l,int r) {
+        if (l>=r) return;
+        int pivotIndex = l + new Random().nextInt(r-l+1);
+        swap2(arr,pivotIndex,r);
+        int index = partion(arr,l,r);
+        quickSort2(arr,l,index-1);
+        quickSort2(arr,index+1,r);
+    }
+
+    private static int partion(int[] arr, int l, int r) {
+        /**下面的代码是方法内部把l改了，其实如果像上面的for循环，这里应该再增加一个变量，初始值也是l。
+         *      cur表示遍历研究到的位置；l表示“碰到下一个小于等于基准值”的元素应该放的位置。
+         *      因此最后结束后需要把基准值放在位置l————同时返回l。(之所以要返回l是因为：在主程序中
+         *   还要继续对基准值所有两边的数进行排序)
+         *  */
+        int cur = l;
+        while (cur<r){
+            if (arr[cur]<=arr[r]){
+                swap2(arr,l++,cur);
+            }
+            cur++;
+        }
+        swap2(arr,l,r); //把基准值放在正确的位置
+        return l; //返回l
+    }
+
+    private static void swap2(int[] arr, int l, int r) {
+        int tmp = arr[l];
+        arr[l] = arr[r];
+        arr[r] = tmp;
     }
 }

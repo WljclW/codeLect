@@ -5,6 +5,7 @@ import leecode_Debug.top100.TreeNode;
 
 import java.lang.management.MonitorInfo;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *记录topcode中不熟练的
@@ -419,8 +420,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      * ==================================================================================================================
      * ==================================================================================================================
      * 9.1
-     * @param s
-     * @return
      */
     /*
     方法1：调用Arrays.sort()进行完整的排序。时间复杂度——O(n log n)，空间复杂度O(1).
@@ -430,6 +429,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     方法3：快排思想的排序。
      */
     //215
+    /*解法1：借助优先级队列。保证优先级队列中只有k个元素，最后弹出即可*/
     public int findKthLargest(int[] nums, int k) {
         /**
          *优先级队列，默认就是升序排序的
@@ -442,6 +442,66 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             }
         }
         return queue.poll();
+    }
+
+    /*解法2：快排的思路。
+    *   快排是每一轮会把一个数放在正确的位置，如果某一轮结束某个数被放在n-k的位置，说明这个数就是答案。
+    * 为什么最优？这个题求解的是第K个最大数，其他的数并不要求有序！
+    *   此时的复杂度分析：
+    *       时间复杂度：O(N)
+    *       空间复杂度：O(1)（原地操作，递归栈深度 O(log n)）。
+    * */
+    public int findKthLargest_quickSort(int[] nums, int k) {
+        int n = nums.length;
+        return quickSort(nums,0,n-1,n-k);
+    }
+
+    private int quickSort(int[] nums, int l, int r, int index) {
+        if (l==r) return nums[l];
+        int pivotIndex = l + new Random().nextInt(r - l + 1);
+        swap(nums,pivotIndex,r);
+
+        pivotIndex = partion(nums,l,r);
+        if (pivotIndex==index){
+            return nums[pivotIndex];
+        }else if (pivotIndex<index){
+            return quickSort(nums,pivotIndex+1,r,index);
+        }else {
+            return quickSort(nums,l,pivotIndex-1,index);
+        }
+    }
+
+    private int partion(int[] nums, int l, int r) {
+        for (int i = l; i < r; i++) {
+            if (nums[i]<nums[r]){
+                swap(nums,l++,i);
+            }
+        }
+        swap(nums,l,r);
+        return l;
+    }
+
+    /**chatgpt给出的partion，与上面的写法相比：多了一个变量的声明*/
+//    private int partition(int[] nums, int left, int right, int pivotIndex) {
+//        int pivot = nums[pivotIndex];
+//        swap(nums, pivotIndex, right); // 把 pivot 放到末尾
+//        int storeIndex = left;
+//
+//        for (int i = left; i < right; i++) {
+//            if (nums[i] < pivot) {
+//                swap(nums, storeIndex, i);
+//                storeIndex++;
+//            }
+//        }
+//
+//        swap(nums, storeIndex, right); // 把 pivot 放到正确位置
+//        return storeIndex;
+//    }
+
+    private void swap(int[] nums, int l, int r) {
+        int tmp  =nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
     }
 
 
@@ -481,6 +541,11 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                 flags[i]++;
                 left--;
                 right++;
+            }
+
+            if (i+flags[i]>p){
+                center = i;
+                p = i+flags[i];
             }
 
             if (flags[i]>maxLen){

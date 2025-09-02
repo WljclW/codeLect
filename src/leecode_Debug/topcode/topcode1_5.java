@@ -1806,6 +1806,11 @@ public class topcode1_5 {
 
 
     //14
+    /**
+     * 不建议使用下面的写法，比较乱
+     * @param strs
+     * @return
+     */
     public String longestCommonPrefix(String[] strs) {
         String flag = strs[0];
         int len = -1;
