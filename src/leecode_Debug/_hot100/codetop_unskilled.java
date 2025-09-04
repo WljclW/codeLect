@@ -937,13 +937,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                     return str.substring(0,i);
             }
         }
-        /**
-         *到了这里有两种情况————
-         *      情况1：压根就没进入双重for循环，表示strs只有一个字符串，因此返回strs[0]；
-         *      情况2：进入到双重for循环了，但是for循环完整执行结束。。。表示所有的字符串都研究了，strs[0]中有的
-         *          字符其他的字符串对应都有，因此返回strs[0]。
-         *      综上，虽然是两种情况，但是返回值是统一的。
-         */
         return str;
     }
 
@@ -1021,6 +1014,10 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     //47
+    /**
+     * 在_06huisu文件中补充这个题目的多种实现
+     */
+    /*写法1：使用used数组进行去重*/
     List<List<Integer>> resPermuteUnique;
     boolean[] used;
     public List<List<Integer>> permuteUnique(int[] nums) {
@@ -1039,7 +1036,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
         for (int i = 0; i < nums.length; i++) {
             if (!used[i]){
-                if (i>0&&nums[i]==nums[i-1]&&!used[i-1]) continue;
+                if (i>0&&nums[i]==nums[i-1]&&!used[i-1]) continue; /**说明：有重复数字全排列问题的去重关键步骤。相当于在同一树层去重*/
                 used[i] = true;
                 path.add(nums[i]);
                 dfs(nums,path);
@@ -1047,5 +1044,206 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                 path.removeLast();
             }
         }
+    }
+
+
+    /*写法2：使用set+swap方法来实现*/
+    public List<List<Integer>> permuteUnique_set(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        Arrays.sort(nums); // 排序，方便剪枝
+        backtrack(nums, 0, res);
+        return res;
+    }
+
+    private void backtrack(int[] nums, int start, List<List<Integer>> res) {
+        if (start == nums.length) {
+            List<Integer> perm = new ArrayList<>();
+            for (int num : nums) perm.add(num);
+            res.add(perm);
+            return;
+        }
+
+        Set<Integer> seen = new HashSet<>();
+        for (int i = start; i < nums.length; i++) {
+            // 剪枝：避免同一层重复选择相同的数
+            if (seen.contains(nums[i])) continue;
+            seen.add(nums[i]);
+
+            swap1(nums, start, i);
+            backtrack(nums, start + 1, res);
+            swap1(nums, start, i); // 回溯
+        }
+    }
+
+    private void swap1(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+
+
+
+    //数组中的逆序对
+    /**
+        逆序对：满足 i < j 且 nums[i] > nums[j] 的数对。在归并时，左半部分 [left..mid] 和右半部
+     分 [mid+1..right] 都已经是有序的。统计逆序对的关键就在 合并过程中。
+     */
+    public int reversePairs(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        int[] temp = new int[nums.length];
+        return mergeSortAndCount(nums, 0, nums.length - 1, temp);
+    }
+
+    private int mergeSortAndCount(int[] nums, int left, int right, int[] temp) {
+        if (left>=right) return 0; /**base case：只有一个数，说明逆序数就是0，直接返回*/
+        int mid = left+(right-left)/2;
+        int count = 0;
+        int leftCount = mergeSortAndCount(nums, left, mid, temp);
+        int rightCount = mergeSortAndCount(nums, mid + 1, right, temp);
+        int betweenCount = mergeAndCount(nums,left,mid,right,temp);
+
+        count = leftCount+rightCount+betweenCount;
+        return count;
+    }
+
+    /*下面的方法就等价于“归并排序中 合并左右两半数组”的方法*/
+    private int mergeAndCount(int[] nums, int left, int mid, int right, int[] temp) {
+        int p1 = left,p2 = mid+1;
+        int cur = left;
+        int curCount = 0;
+        while (p1<=mid&&p2<=right){
+            if (nums[p1]<nums[p2]){
+                temp[cur++] = nums[p1++];
+            }else {
+                /**
+                 *    只有右边的数比左边的数小的时候才会更新count!!举个例子：
+                 *    假设当前左边的指针位置在p1，右边的指针位置在p2。并且nums[p1]>nums[p2]，因此前面的数
+                 * 比后面的数打了，产生逆序对。产生多少呢？？
+                 *    答：nums[p1]>nums[p2]，并且左边排好序了，因此[left,mid]这个闭区间内p1位置之后的数
+                 * 也都大于nums[p2]，那一共有多少个数呢？由于包含p1位置，包含mid位置，因此产生逆序对“mid-p1+1”
+                 */
+                temp[cur++]  =nums[p2++];
+                curCount += (mid-p1+1); /**这里是关键！！！理解这里是怎么计算的*/
+            }
+        }
+        while (p1<=mid){
+            temp[cur++]=nums[p1++];
+            /**这里不需要更新curCount，为什么？？？
+                当执行 while(p1<=mid) 时，说明 右半部分 [mid+1..right] 已经全部合并进去了。
+             这意味着右边所有元素都比左边剩下的元素小或等于，因此逆序对该算的已经在之前算过了；
+             左边剩下的元素只能直接放到 temp 里，不会再产生新的逆序对。所以这里 不能再加 curCount，
+             否则就重复计数了。
+             * */
+//            curCount += (right-mid);
+        }
+        while (p2<=right) temp[cur++]=nums[p2++];
+
+        for (int p = left; p <= right; p++) {
+            nums[p] = temp[p];
+        }
+
+        return curCount;
+    }
+
+
+    //958
+    /*写法2：不使用if-else*/
+    public boolean isCompleteTree1(TreeNode root) {
+        if (root==null) return true;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        boolean hasNull = false;
+        while (!queue.isEmpty()){
+            TreeNode cur = queue.poll();
+            if (cur==null){
+                hasNull = true;
+                continue;
+            }
+            if (hasNull){
+                return false;
+            }
+            queue.offer(cur.left);
+            queue.offer(cur.right);
+        }
+        return true;
+    }
+
+
+    //572
+    /**
+     *解法1：递归。
+     *      复杂度：时间复杂度O(mn)，空间复杂度O(h)。。。。其中m，n分别是root、subRoot的节点数；h是递归的深度
+     *解法2：最优的解法应该是序列化出来(对于null节点也需要记录)，转换成求解子串存在与否的问题，使用KMP算法求解。
+     *      复杂度：时间复杂度O(m+n)，空间复杂度O(m+n)————空间复杂度主要体现在存储序列化结果
+     */
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if (root==null) return false;
+        if (isSameTree(root,subRoot)) return true;
+        return isSameTree(root.left,subRoot) || isSameTree(root.right,subRoot);
+    }
+
+    private boolean isSameTree(TreeNode root, TreeNode subRoot) {
+        if (root==null&&subRoot==null) return true;
+        if (root==null||subRoot==null) return false;
+        if (root.val!=subRoot.val) return false;
+        return isSameTree(root.left,subRoot.left)&&isSameTree(root.right,subRoot.right);
+    }
+
+
+    //59
+    public int[][] generateMatrix(int n) {
+        int[][] res = new int[n][n];
+        int num = 1;
+        int top = 0, bottom = n - 1;
+        int left = 0, right = n - 1;
+        while (num<=n*n){
+            for (int i = left; i <= right; i++) {
+                res[top][i] = num++;
+            }
+            top++;
+
+            for (int i = top; i <=bottom; i++) {
+                res[i][right] = num++;
+            }
+            right--;
+
+            for (int i = right; i >=left; i++) {
+                res[bottom][i] = num++;
+            }
+            bottom--;
+
+            for (int i = bottom; i >=top; i++) {
+                res[i][left] = num++;
+            }
+            left++;
+        }
+        return res;
+    }
+
+
+    //91
+    public int numDecodings(String s) {
+        if (s==null||s.length()==0) return 0;
+        int n = s.length();
+        int[] dp = new int[n + 1];
+        /*base case：需要初始化两个。其中dp[0]作为启动的参数、dp[1]是判断第一个字符是不是0(如果第一个字
+            符是0，说白了这个字符串是不能被解码的。因为0不能解码并且它前面也没有字符不能组成“10”、“20”的样
+            子)*/
+        dp[0] = 1;
+        dp[1] = s.charAt(0)=='0'?1:0;
+        for (int i = 2; i <= n; i++) {
+            char cur = s.charAt(i-1);
+            char curPrev = s.charAt(i-2);
+            /*
+             根据1位数进行解码 和 2位数解码，更新dp[i].
+                   方案1：和前面的数合起来进行解码。前提条件————是不是能和前面的数组成[10,26]中的一个数，不在这个范围就不行
+                   方案2：当前字符(即index=i-1的字符)单独及逆行解码。前提条件————当前的这一位数位于区间(0,9]，如果不在这个
+                        区间，则不行
+             */
+            int twoDigit = (curPrev-'0')*10+cur-'0';
+            if (twoDigit>=10&&twoDigit<=26) dp[i] += dp[i-2]; //方案1
+            if (cur!='0') dp[i] += dp[i-1]; //方案2
+        }
+        return dp[n];
     }
 }

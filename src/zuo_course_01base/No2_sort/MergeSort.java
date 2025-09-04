@@ -12,7 +12,8 @@ public class MergeSort {
         int[] arr = GetRandom.getInts(20);
         System.out.println(Arrays.toString(arr));
 
-        mergeSort(arr,0,arr.length-1);
+        mergeSort1(arr,0,arr.length-1);
+//        mergeSort(arr,0,arr.length-1);
         for (int i : arr) {
             System.out.print(i + " ");
         }
@@ -21,9 +22,13 @@ public class MergeSort {
     }
 
     /**
-     *   step1:先指出递归终止的条件————l==r，直接return
+     *【具体步骤】
+     *   step1:先指出递归终止的条件————l==r，直接return。（也可以跟“快排版本”的相同，统一写成“if(l>=r) return;”）
      *   step2:归并排序左半部分，归并排序右半部分
      *   step3:合并左右两半归并后的子数组
+     *【补充说明】
+     *      “mergeSort”是不需要返回值的。最后合并的时候，只需要三个索引就可以“l,mid,r”，表明我们希望合并的两个子数组
+     *   的索引范围为：[l,mid]、[mid+1,r]。因此使用两个指针依次合并即可(类似于合并两个有序链表)
      * */
     public static void mergeSort(int[] arr,int l,int r){
         /*step1：递归终止条件*/
@@ -43,7 +48,7 @@ public class MergeSort {
         /*step1：辅助空间存放两个子问题排序后的合并后的数组*/
         int[] help = new int[r - l + 1];
         int i = 0;
-        int p1 = l, p2 = mid + 1;
+        int p1 = l, p2 = mid + 1; /*两个指针分别指向两个子数组的第一个数*/
         /*
          * step2：p1和p2分别指向两个数组，如果没有都没有越界，依次将小的那个数挪到help数组（挪之后需要更新指针）
          * */
@@ -63,6 +68,42 @@ public class MergeSort {
          */
         for (int j = 0; j < help.length; j++) { //把help中的内容copy到原数组
             arr[l + j] = help[j]; /*辅助数组的i位置 应该复制到源数组的 l+i位置————辅助数组对应源数组索引为[l,r]的这一段*/
+        }
+    }
+
+
+    /**
+     *======================================================================================================
+     *======================================================================================================
+     *======================================================================================================
+     *======================================================================================================
+     *======================================================================================================
+     *======================================================================================================
+     * 自己review的版本
+     */
+    public static void mergeSort1(int[] arr,int l,int r){
+        if (l==r) return;
+        int mid = l+(r-l)/2;
+        mergeSort1(arr,l,mid);
+        mergeSort1(arr,mid+1,r);
+        mergeTwo(arr,l,mid,r);
+    }
+
+    private static void mergeTwo(int[] arr, int l, int mid, int r) {
+        int[] nums = new int[r - l + 1];
+        int cur = 0;
+        int p1 = l,p2 = mid+1;
+        while (p1<=mid&&p2<=r){
+            nums[cur++] = arr[p1]<arr[p2]?arr[p1++]:arr[p2++];
+        }
+        while (p1<=mid){
+            nums[cur++] = arr[p1++];
+        }
+        while (p2<=r){
+            nums[cur++] = arr[p2++];
+        }
+        for (int i = 0; i < nums.length; i++) {
+            arr[l+i] = nums[i];
         }
     }
 

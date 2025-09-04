@@ -1,5 +1,7 @@
 package zuo_course_01base.No2_sort;
 
+import zuo_course_01base.No01_sort.GetRandom;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -8,9 +10,23 @@ import java.util.Random;
  *    思路：每一次随机选择一个数，将其他的数按照这个数分为三部分。
  * */
 public class QuickSort {
+    /**
+     * =======================================================================================================
+     * =======================================================================================================
+     * =======================================================================================================
+     * =======================================================================================================
+     * =======================================================================================================
+     * =======================================================================================================
+     * =======================================================================================================
+     *  左神的解法
+     * @param args
+     */
     public static void main(String[] args) {
-        int[] arr = {9, 2, 5, 6, 7, 4, 9, 10, 1};
-        quickSort2(arr, 0, arr.length - 1);
+        int[] arr = GetRandom.getInts(20);
+        System.out.println(Arrays.toString(arr));
+
+//        quickSort2(arr, 0, arr.length - 1);
+        quickSort3(arr, 0, arr.length - 1);
         System.out.println(Arrays.toString(arr));
     }
 
@@ -58,11 +74,6 @@ public class QuickSort {
 
 
 
-
-
-
-
-
     /**
      * =======================================================================================================
      * =======================================================================================================
@@ -75,7 +86,7 @@ public class QuickSort {
         /*step1：base-case的考虑*/
         if (left >= right) return;
 
-        /*step2：随机选择一个数，并且交换到“要排序子数组”的末尾*/
+        /*step2：随机选择一个数，并且交换到“要排序的子数组”的末尾即交换到arr[r]*/
         /**
          "new Random().nextInt(right - left + 1)"会产生一个[0,r-l+1)的整数。
          比如：l = 3,r = 7。
@@ -143,15 +154,48 @@ public class QuickSort {
      * =======================================================================================================
      * 自己，review代码
      */
-    public static void quickSort2(int[] arr,int l,int r) {
-        if (l>=r) return;
-        int pivotIndex = l + new Random().nextInt(r-l+1);
-        swap2(arr,pivotIndex,r);
-        int index = partion(arr,l,r);
-        quickSort2(arr,l,index-1);
-        quickSort2(arr,index+1,r);
+    public static void quickSort3(int[] arr,int l,int r){
+        /*step1：base-case的考虑*/
+        if (l>=r) return; /**err：如果写成“if (l==r) return;”，是错误的，必须是“>=”。。。说明某些时候l不存在等于r的时候，直接来到了l>r*/
+        /*step2：产生一个索引；并将这个数交换到索引为r的位置*/
+        int pivotIndex = l + new Random().nextInt(r - l + 1);
+        swap3(arr,pivotIndex,r);
+        /**/
+        pivotIndex = partion3(arr,l,r);
+        quickSort3(arr,l,pivotIndex-1);
+        quickSort3(arr,pivotIndex+1,r);
     }
 
+    /**
+     *partion方法的作用：①使用for循环将小于arr[r]的数移动到flag位置的左边；②将arr[r]放在[l,r]区间正确的位置flag；
+     *      ③返回flag。。。。。然后后面的步骤我们递归的对flag索引左右两边分别排序
+     *      如果一句话概括作用，就是：将arr[r]放在正确的位置；且左边的小于(小于等于也可)它，右边的大于等于(大于也可)它；最后返回位置
+     *【补充说明】：其中③中把arr[r]换到了flag的位置，flag就是第一个不小于arr[r]的位置，因此①②③结束以后有结论：
+     *      1. arr[flag]左边的数都是小于它的，右边的数都是大于它的。
+     *      2. arr[flag]这个数就在正确的位置
+     */
+    private static int partion3(int[] arr, int l, int r) {
+        int flag = l;
+        for (int i = l; i < r; i++) {
+            if (arr[i]<arr[r]){
+                swap(arr,flag++,i);
+            }
+        }
+        swap3(arr,flag,r);
+        return flag;
+    }
+
+    private static void swap3(int[] arr, int pivotIndex, int r) {
+        int tmp = arr[pivotIndex];
+        arr[pivotIndex] = arr[r];
+        arr[r] = tmp;
+    }
+
+
+
+
+    /*partion方法的另一种写法。。。
+    * 但是这种写法逻辑清晰，尽量使用上面的partion3即for循环的方式*/
     private static int partion(int[] arr, int l, int r) {
         /**下面的代码是方法内部把l改了，其实如果像上面的for循环，这里应该再增加一个变量，初始值也是l。
          *      cur表示遍历研究到的位置；l表示“碰到下一个小于等于基准值”的元素应该放的位置。
@@ -161,17 +205,11 @@ public class QuickSort {
         int cur = l;
         while (cur<r){
             if (arr[cur]<=arr[r]){
-                swap2(arr,l++,cur);
+                swap(arr,l++,cur);
             }
             cur++;
         }
-        swap2(arr,l,r); //把基准值放在正确的位置
+        swap(arr,l,r); //把基准值放在正确的位置
         return l; //返回l
-    }
-
-    private static void swap2(int[] arr, int l, int r) {
-        int tmp = arr[l];
-        arr[l] = arr[r];
-        arr[r] = tmp;
     }
 }

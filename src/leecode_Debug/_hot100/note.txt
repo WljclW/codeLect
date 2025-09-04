@@ -107,7 +107,13 @@
     Collection（List/Set）
         大部分 List（如 ArrayList、LinkedList）都允许存放 null。
         Set 里情况不同：HashSet 可以放一个 null，但 TreeSet（基于排序）不能放 null，因为一旦要比较就会抛异常。
-
+    引用数组的元素是否可以为null？
+        普遍情况下（如果不涉及对数组元素排序）是可以的。但是如果要使用“Arrays.sort()”对引用数组排序，如果存在
+        null元素就需要在自定义的比较器中对null元素如何比较做处理。。。。如果没做处理“比如：使用字符串的“comparaTo()”方
+        法就会导致空指针异常”。
+        因此在数组中能不能添加null，取决于是否要对数组元素进行排序————
+            如果不涉及对数组元素排序，则没有问题；
+            如果涉及对数组元素，且比较器中没有特殊处理null，则大概率会空指针异常
     Map
         HashMap：允许 null 键（最多一个）和 null 值（多个）。
         Hashtable：不允许 null 键和 null 值。

@@ -1,5 +1,8 @@
 package zuo_course_01base.No2_sort;
 
+/**
+ * 递归的方法，求解数组的最大值~
+ */
 public class getMax {
     public static void main(String[] args) {
         int[] arr = {3, 2, 5, 6, 7, 4};

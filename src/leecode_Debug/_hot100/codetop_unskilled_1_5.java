@@ -305,15 +305,24 @@ public class codetop_unskilled_1_5 {
     //14
     public String longestCommonPrefix(String[] strs) {
         if (strs==null||strs.length==0) return "";
+        /*step1：使用第一个字符串作为基准*/
         String str = strs[0];
-        for (int i = 0; i < str.length(); i++) {
+        /*step2：依次拿出str每一个位置的字符，遍历所有的字符串看看对应的位置字符是不是相等；如果不相等立即返回*/
+        for (int i = 0; i < str.length(); i++) { /*依次拿出第一个字符串0、1、2....位置的字符*/
             char c = str.charAt(i);
-            for (int j = 1; j < strs.length; j++) {
+            for (int j = 1; j < strs.length; j++) { /*从第二个字符串开始，依次研究每一个字符串位置i的字符，看看是不是等于c*/
                 if (i>=strs[j].length()||c!=strs[j].charAt(i)){
                     return str.substring(0,i);
                 }
             }
         }
+        /**
+         *到了这里有两种情况————
+         *      情况1：压根就没进入双重for循环，表示strs只有一个字符串，因此返回strs[0]；
+         *      情况2：进入到双重for循环了，但是for循环完整执行结束。。。表示所有的字符串都研究了，strs[0]中有的
+         *          字符其他的字符串对应都有，因此返回strs[0]。
+         *      综上，虽然是两种情况，但是返回值是统一的。
+         */
         return str;
     }
 }
