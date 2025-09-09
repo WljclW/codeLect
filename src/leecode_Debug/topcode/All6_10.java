@@ -10,6 +10,13 @@ import java.util.*;
  * @author mini-zch
  * @date 2025/9/8 14:26
  */
+
+/**
+ * err：138、59、213
+ * undo：手撕堆排序、297、207、224、460、47、40、123、498、LCR 170；
+ *      LCR 155、7、518、LCR 143、91、572、50、440、LCR 159
+ *      329、450、10、328、208、225    LCR 216、LCR 127、LCR 161
+ */
 public class All6_10 {
     /*739.
     给定一个整数数组 temperatures ，表示每天的温度，返回一个数组 answer ，其中 answer[i] 是指对于第
@@ -229,6 +236,7 @@ public class All6_10 {
 
         while (k>0&&!stack.isEmpty()){ /**【验证！！】应该是从末尾删除？？*/
             stack.pop();
+            k--;
         }
 
         StringBuilder res = new StringBuilder();
@@ -236,7 +244,7 @@ public class All6_10 {
             if (res.length()==0&&c=='0') continue;
             res.append(c);
         }
-        return res.toString();
+        return res.length()==0?"0":res.toString();
     }
 
 
@@ -339,13 +347,14 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                 int curVal = nums[i]+nums[left]+nums[right];
                 if (Math.abs(curVal-target)<flag){
                     res = curVal;
+                    flag = Math.abs(curVal-target);
                 }
                 if (curVal<target){
                     left++;
                 }else if (curVal>target){
                     right--;
                 }else {
-                    return 0;
+                    return curVal;
                 }
             }
         }
@@ -684,7 +693,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         while (cur<=right){
             if (nums[cur]==0){
                 swap1(nums,left++,cur++);
-            }else if (cur==2){
+            }else if (nums[cur]==2){
                 swap1(nums,cur,right--);
             }else
                 cur++;
@@ -790,7 +799,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         for (int i = 0; i < nums.length; i++) {
             int cur = Math.abs(nums[i]);
             if (nums[cur-1]<0){
-                res.add(cur+1);
+                res.add(cur);
             }else {
                 nums[cur-1] *= -1;
             }
@@ -844,7 +853,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             map.put(num,map.getOrDefault(num,0)+1);
         }
 
-        PriorityQueue<int[]> queue = new PriorityQueue<>((a,b)->a[0]-b[0]);
+        PriorityQueue<int[]> queue = new PriorityQueue<>((a,b)->a[1]-b[1]); /**err：要按照频率排序，因此应该是a[1]-b[1]*/
         for (Map.Entry<Integer,Integer> entry: map.entrySet()){
             Integer key = entry.getKey();
             Integer value = entry.getValue();
@@ -1009,7 +1018,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
     private int rob(int[] nums, int left, int right) {
         int first = nums[left];
-        int second = nums[left+1];
+        int second = Math.max(nums[left],nums[left+1]); /**err：第二个元素要取前两个的最大值*/
         for (int i = left+2; i <=right; i++) {
             int cur = Math.max(first+nums[i],second);
             first = second;
