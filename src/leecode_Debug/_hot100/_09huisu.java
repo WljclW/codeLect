@@ -757,6 +757,44 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     }
 
 
+    /*另外的写法*/
+    List<List<Integer>> resPermuteUnique;
+    boolean[] usedPermuteUnique;
+
+    public List<List<Integer>> permuteUnique1(int[] nums) {
+        resPermuteUnique = new LinkedList<>();
+        Arrays.sort(nums); // 排序，方便去重
+        usedPermuteUnique = new boolean[nums.length];
+        LinkedList<Integer> path = new LinkedList<>();
+        backtrack(nums, path);
+        return resPermuteUnique;
+    }
+
+    private void backtrack(int[] nums, LinkedList<Integer> path) {
+        if (path.size() == nums.length) {
+            resPermuteUnique.add(new LinkedList<>(path));
+            return;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if (usedPermuteUnique[i]) continue; /**这个不能忘*/
+
+            // 去重：相邻元素相等时，必须保证前一个已被用过
+            if (i > 0 && nums[i] == nums[i - 1] && !usedPermuteUnique[i - 1]) continue;
+
+            // 选择
+            usedPermuteUnique[i] = true;
+            path.add(nums[i]);
+
+            // 递归
+            backtrack(nums, path);
+
+            // 撤销选择
+            usedPermuteUnique[i] = false;
+            path.removeLast();
+        }
+    }
+
+
     /*93. 复原 IP 地址
     有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
 例如："0.1.2.201" 和 "192.168.1.1" 是 有效 IP 地址，但是 "0.011.255.245"、"192.168.1.312" 和

@@ -1,6 +1,6 @@
 package leecode_Debug._hot100;
 
-import leecode_Debug.linkList.ListNode;
+import leecode_Debug.top100.ListNode;
 
 import java.util.LinkedList;
 
@@ -176,7 +176,8 @@ public class _00hard {
     32. 最长有效括号
     * */
     /**
-     * 【关键】dp[i]表示以index=i位置的括号结尾的最长有效括号长度。。。暗含着一条信息：
+     *【建议的解法】建议使用左右两边各遍历一次的方法来完成
+     *【关键】dp[i]表示以index=i位置的括号结尾的最长有效括号长度。。。暗含着一条信息：
      *       如果s.charAt(i) = '('，则dp[i]必然是0，没有任何的括号串是以左括号结尾的；因此
      *  整个过程只需要关注(或研究)当前位置是')'的时候
      *【解题步骤】整个的大前提是在s.charAt(i) = ')'这个大前提下。。

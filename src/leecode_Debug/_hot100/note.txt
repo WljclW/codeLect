@@ -249,3 +249,7 @@
         JOIN recent_orders r ON r.customer_id = c.id
         ORDER BY r.total DESC;
     }
+=================================================================Deque接口========================================
+ 【Deque接口】继承于Queue的双端队列接口。ArrayDeque、LinkedList、BlockingDeque都是它的实现类。
+       接口中的offer()其实是”offerLast()“、poll()方法其实是“pollFirst()”————即从尾部添加进队
+       列，从队首弹出元素。

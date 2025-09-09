@@ -646,7 +646,7 @@ public class _06ListNode {
      *      2. 需要熟悉一下"分治合并"————跟归并排序的思路是一样的，区别就是在merge的时候时两个链表的合并。
      *      关于"分治"的代码可以参考：https://leetcode.cn/problems/merge-k-sorted-lists/solutions/3787/leetcode-23-he-bing-kge-pai-xu-lian-biao-by-powcai/?envType=study-plan-v2&envId=top-100-liked
      * */
-    /*解法1：借助优先级队列。假设lists中有k个队列
+    /*解法1：借助优先级队列。假设lists中有k个队列，每一个队列有n个节点
     * 时间复杂度：元素数量k*n,每一个元素进队列出队列一次，复杂度logK，因此总体时间复杂度O(kn*logk)
     * 空间复杂度：O（K），优先级队列的耗费
     * */
@@ -676,11 +676,19 @@ public class _06ListNode {
         return demmy.next;
     }
 
-    /*解法2：分治思想
-    * 时间复杂度：第一轮合并k/2组链表，每一组的时间代价是O（2n）;第二轮合并k/4组链表，每一组的时间
-    *     复杂度是O(4n)....因此整体的时间复杂度是O(kn*logk)
+    /*解法2：分治思想(假设一共K个链表；一共有N个节点)
     * 空间复杂度：O（logk）
-    * */
+    * 时间复杂度的理解————
+          思路 1：递归层数
+            每次把 K 条链表一分为二，递归深度是 O(log K)。
+          思路 2：每一层的合并工作量
+            第一层：K 条链表，两两合并，最终得到 K/2 条链表，总共处理 N 个节点 → O(N)。
+            第二层：K/2 条链表，两两合并，最终得到 K/4 条链表，总共处理 N 个节点 → O(N)。
+            …
+            最后一层：合并两条链表，仍然要扫一遍所有节点 → O(N)。
+          所以综上可知，每一层的合并代价是 O(N)，一共有 O(log K) 层。时间复杂度：O(NlogK)
+     如果K很大，优先考虑优先级队列的方法！！
+    */
     /*
     【易错点】初始方法中需要进行判断："if (lists == null || lists.length == 0) return null;"，两个条件
          缺一不可。如果没有"lists.length == 0"，会出错：
@@ -768,10 +776,10 @@ public class _06ListNode {
             }
         }
 
-        int capacity;
-        int size;
-        DouListNode head;
-        DouListNode tail;
+        int capacity; /*LRU链表的容量*/
+        int size; /*LRU当前的大小*/
+        DouListNode head; /*LRU链表的头节点*/
+        DouListNode tail; /*LRU链表的尾节点*/
         HashMap<Integer, DouListNode> map = new HashMap<Integer, DouListNode>();
 
         /*
@@ -838,7 +846,8 @@ public class _06ListNode {
             map.remove(tailReal.key);
         }
 
-        /*删除一个节点：*/
+        /*删除一个节点：
+            ①拿到node的前驱节点 以及 node的后继节点；②将前驱节点 和 后继节点连在一起*/
         private void removeNode(DouListNode node) {
             DouListNode pre = node.pre;
             DouListNode next = node.next;

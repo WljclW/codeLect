@@ -3,6 +3,7 @@ package leecode_Debug._hot100;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**45.763*/
 public class _13tanXin {
@@ -83,6 +84,8 @@ public class _13tanXin {
      *      题目中说了，生成的用例可以到nums[n-1]，即肯定能到达最后一个元素，也就是说当i==nums.length-1的时候，
      *      maxPostion也一定是nums.length-1，满足for循环中的if条件，因此要注意i<nums.length-1。否则进入到if后，
      *      step就多加了1.
+     *      【补充】其实i的范围也能向平时一样写成”for (int i=0;i<nums.length;i++)“。具体的实现可以参
+     *          考：https://programmercarl.com/0045.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8FII.html#%E6%80%9D%E8%B7%AF
      * 【关键】关键在于搞清楚什么时候让步数+1————即搞清楚bound、maxPosition的含义是什么
      *      参数bound：表示当前这一步能到达的最远距离；
      *      参数maxPoaition：表示目前实际上能到达的最远距离————业绩下一次bound将要更新的目标值

@@ -1,6 +1,6 @@
 package leecode_Debug._hot100;
 
-import leecode_Debug.linkList.ListNode;
+import leecode_Debug.top100.ListNode;
 import leecode_Debug.top100.TreeNode;
 
 import javax.sound.sampled.Line;
@@ -70,7 +70,7 @@ public class codetop_5 {
      * 【建议】建议看官方的解法：见方法deleteDuplicates.....
      *          但是练习中发现deleteDuplicates_82解法用的熟
      * 【常错的点】（1）不论哪种解法，“cur = cur.next;”都要放在else块，这是关键！！
-     *            （2）不论哪一种解法，cur指针不是指向dummy，就是指向结果链表中的最后一个节点
+     *            （2）不论哪一种解法，cur指针不是指向dummy，就是指向结果链表中的最后一个节点(即保证这个节点一定是在结果中)
      * 【与83的区别】由于要删除所有值相等的节点，因此最后链表中可能一个节点都不剩，因此必须借助dummy节点来解题
      * */
     /**
@@ -106,6 +106,13 @@ public class codetop_5 {
     public ListNode deleteDuplicates_82(ListNode head) {
         if (head==null||head.next==null) return head;
         ListNode dummy = new ListNode(-1, head),cur = dummy;
+        /**解释这里while的循环条件
+         * 1. 明白一点：任何一个时刻cur指针要么指向dummy(初始情况)、要么指向结果链表中的最后一个节点(即确保该节点在结果中并且是
+         *      目前已知的最后一个，后面的结果还没有研究)
+         * 2. while的循环条件"cur.next!=null&&cur.next.next!=null"就是保证后面至少还有两个节点。为什么这样做？？因为至少
+         *      有两个节点的时候，才能讨论是不是有相同数值的节点。。。。。cur及之前(包括cur)的节点研究过了，肯定没有重复，因此
+         *      后面要求至少还有两个节点才继续研究，否则如果只有一个节点那必然没有与它值相同的节点了
+         * */
         while (cur.next!=null&&cur.next.next!=null){
             int val = cur.next.val; /**记录相等的值是多少*/
             if (cur.next.next.val==val){ /**如果相等，用while循环跳过所有相等的节点*/
@@ -127,8 +134,8 @@ public class codetop_5 {
          * 1. 明白一点：任何一个时刻cur指针要么指向dummy(初始情况)、要么指向结果链表中的最后一个节点(即确保该节点在结果中并且是
          *      目前已知的最后一个，后面的结果还没有研究)
          * 2. while的循环条件"cur.next!=null&&cur.next.next!=null"就是保证后面至少还有两个节点。为什么这样做？？因为至少
-         *      有两个节点的时候，才能讨论是不是有相同数值的节点。。。。。cur及之前的节点研究过了，肯定没有重复，因为后面要求至少
-         *      还有两个节点才继续研究，否则如果只有一个节点那必然没有与它值相同的节点了
+         *      有两个节点的时候，才能讨论是不是有相同数值的节点。。。。。cur及之前(包括cur)的节点研究过了，肯定没有重复，因此
+         *      后面要求至少还有两个节点才继续研究，否则如果只有一个节点那必然没有与它值相同的节点了
          * */
         while (cur.next!=null&&cur.next.next!=null){
             int curVal = cur.next.val; //step1：先记录一下cur.next的值（cur.next就是第一个还没有研究的节点）
@@ -195,11 +202,11 @@ public class codetop_5 {
         ListNode slow = head,fast = head.next;
 
         while (fast != null) {
-            if (fast.val != slow.val) { /*说明这个节点应该在结果的链表中，因此拼接到slow的后面*/
+            if (fast.val != slow.val) { /*slow和fast的值不相等：说明这个节点应该在结果的链表中，因此拼接到slow的后面*/
                 slow.next = fast;
                 slow = slow.next;  // 只有“当新的节点添加到结果链中”时，才更新 slow
             }
-            fast = fast.next; // 无论是否重复，fast 都前进
+            fast = fast.next; /*无论slow和fast的值是否重复，fast 都前进*/
         }
         slow.next = null; /**err：如果没有这句话，初始的测试用例中，有测试用例是错的*/
 
@@ -214,31 +221,35 @@ public class codetop_5 {
     * */
     /**
      *【启发】通过这个题，结合543题。。感受一下：决策信息 跟 返回信息不一样的情况。两个题都是借助一
-     *   个额外的函数来完成信息的处理和决策，但是其实参数与原题参数是一样的
-     *      决策信息是该节点的最大路径和，即"left+right+root.val"；但是返回的信息是该节点的贡
-     *  献值，即"Math.max(left,right)+root.val"
+     *   个额外的函数来完成信息的处理和决策，但是其实参数与原题参数是一样的。。。就是这种两信息的不
+     *   一致，导致必须额外的使用另一个方法来完成dfs，并在这个过程中做决策、更新结果，最后返回结果。
+     *      比如，这个题来说：决策信息是该节点的最大路径和，即"left+right+root.val"(就是当前
+     *   的节点，可以去右子树、可以去左子树，能得到的路径最大值)；但是返回的信息是该节点的贡献值，
+     *   即"Math.max(left,right)+root.val"(任何一个节点的贡献值，只能选择一个分支去计算，因此
+     *   只能走左子树 或者 右子树，这个贡献值是给它的父节点使用的)
      *【为什么需要使用额外的方法，并且看起来都只有一个参数区别不大？？总结】
      *    1. 124二叉树的最大路径和。为什么需要两个方法，原因就在于决策的表达式（即代表最终返回值的
      * 计算），与每个结点应该返回给父节点的信息是不一样的！！每个节点的返回信息是它最大的贡献值，左
-     * 右子树只能选一；每个结点的决策值，是左边的贡献，右边的贡献，再加节点的值这两者之间的差异，再
+     * 右子树只能选一；每个结点的决策值，是左边的贡献，右边的贡献，再加节点的值。这两者之间的差异，再
      * 加上原方法要求返回整个树的最大路径，也不是节点的最大贡献。因此必须使用两个方法，新建一个方法
      * 返回值是节点的最大贡献，并在决策中更新结果——即要求的最大路径
      *    2. 124与543有类似的道理。543中每个节点返回给父节点的信息是以它为根的子树高度（即它的左右
      * 子树高度的最大值+1），但是每个节点的决策信息是左右子树高度之和。因此需要使用额外的函数来改变
-     * 返回值信息，同时在这个过程中更新结果
+     * 返回值信息，同时在这个过程中更新结果。
      * */
     int maxSum = Integer.MIN_VALUE;
-    public int maxPathSum(TreeNode root) {
+    public int maxPathSum(TreeNode root) { /*方法作用：返回“以root为根的树 的最大路径和”*/
         maxGain(root);
         return maxSum;
     }
 
-    private int maxGain(TreeNode root) {
+    private int maxGain(TreeNode root) { /*方法作用：返回以root为根的树 的高度*/
         /*step1：特殊情况的考虑*/
         if (root==null) return 0;
         /*step2：计算左、右孩子节点的贡献————即左子树上包含左孩子节点的最大路径和，右子树上包含右孩子节点的
         *   最大路径和。
-        *   【注】要求贡献的最小值时0。原因：求解的是最大路径和，因此如果小于0，则它带来负收益，大不了那个分支不走呗！*/
+        *   【注】要求贡献的最小值时0。原因：求解的是最大路径和，因此如果小于0，则它带来负收益，大不了那个分
+        * 支不走呗！也不能说就这样带来负收益~~~*/
         int left = Math.max(maxGain(root.left), 0);
         int right = Math.max(maxGain(root.right), 0);
         /*step3：更新答案*/
@@ -258,14 +269,15 @@ public class codetop_5 {
     除此之外返回 0。
     * */
     /**
-     *【思路】双指针，从左往右一次判断。
-     *【关键】while循环条件的“||”暗含着两个版本号长度不一致的情况。出现版本号长度不一样的适合，版本号短的那一个
+     *【思路】双指针，从左往右依次判断。
+     *【关键】while循环条件的“||”暗含着两个版本号长度不一致的情况。出现版本号长度不一样的时候，版本号短的那一个
      *      后面的值就是0.
      * */
     public int compareVersion(String version1, String version2) {
         int len1 = version1.length(),len2 = version2.length();
         int cur1 = 0,cur2 = 0;
-        while (cur1 < len1 || cur2 < len2) { /**err：注意这里必须是“||”连接，多次错*/
+        while (cur1 < len1 || cur2 < len2) { /**err：注意这里必须是“||”连接，多次错。。。跟“链表两数相加”类似，只要有一个还没到头就继续*/
+            /*step1：分别初始化两个val1和val2，计算两个'.'之间的数；并且保证如果没有数也是初始值0*/
             int val1 = 0;
             for (; cur1 < len1 && version1.charAt(cur1) != '.'; cur1++) {
                 val1 = val1 * 10 + version1.charAt(cur1) - '0';
@@ -278,7 +290,8 @@ public class codetop_5 {
             }
             cur2++;
 
-            if (val1 != val2) { //如果不相等就说明已经比较出两个的大小关系了
+            /*step2：如果不相等就说明已经比较出两个的大小关系了*/
+            if (val1 != val2) {
                 return val1 > val2 ? 1 : -1;
             }
         }
@@ -315,7 +328,7 @@ public class codetop_5 {
     }
 
     private TreeNode buildTree(int[] preorder, int[] inorder, int l, int r) {
-        if (l>r) return null;
+        if (l>r) return null; /**err：这个条件不能少，否则会导致不断递归的时候“preOrderIndex越界”*/
         int rootVal = preorder[preOrderIndex++];
         TreeNode root = new TreeNode(rootVal);
         Integer index = inorderMap.get(rootVal);
@@ -337,20 +350,22 @@ public class codetop_5 {
     /**
      *【解法】关于深度优先的解析看：https://leetcode.cn/problems/sum-root-to-leaf-numbers/solutions/2730644/jian-ji-xie-fa-pythonjavacgojsrust-by-en-gbu9/
      *      深度优先的 有返回值版本 和 无返回值版本需要搞清楚
-     * @param root
-     * @return
+     *【补充】从下面的两个解法中，理解 深度优先“有返回值”和“无返回值而是用全局变量记录结果”的区别
      */
     /*解法1：深度优先遍历写法*/
     public int sumNumbers(TreeNode root) {
         return dfsSumNumbers(root, 0);
     }
 
-    private int dfsSumNumbers(TreeNode root, int curSum) {
+    private int dfsSumNumbers(TreeNode root, int curSum /*从根节点到root父节点的路径和*/) {
         if (root == null) return 0;
+        /*step1：更新curSum*/
         curSum = curSum * 10 + root.val;
+        /*step2：如果当前的节点是叶子节点，则更新答案*/
         if (root.left == null && root.right == null) {
             return curSum;
         }
+        /*step3：递归它的左右孩子*/
         return dfsSumNumbers(root.left, curSum) + dfsSumNumbers(root.right, curSum);
     }
 
@@ -376,11 +391,15 @@ public class codetop_5 {
     /**
      *【层序遍历的思路】
      *      使用两个队列，一个队列用于存放二叉树的节点（与层序遍历原始版本的队列作用相同）；一个用于存放“从root到当
-     * 前节点的路径和”。【具体操作】每次将一个节点放进队列，就对应的把该节点对应的路径和也放进队列！！————这种思想
-     * 和做法其实是层序遍历在具体场景使用时的常规操作！！！要记住
+     * 前节点的路径和”。【具体操作】每次将一个节点放进队列，就对应的把该节点对应的路径和也放进队列！！————这种“使用两
+     * 个队列并行操作”的思想和做法其实是层序遍历在具体场景使用时的常规操作！！！要记住。
      *      然后进入while循环研究每一个节点————如果某一个节点的左右孩子都是空，则说明这是一个路径，需要累加到最终的
      * 结果sum；否则将不为null的结果添加到第一个队列，并且将它对应的路径添加到第二个队列。【注意】孩子的路径和计算：父
      * 节点的路径和*10 + 孩子节点的value
+     *【补充说明】
+     *      ”并行操作“的含义就是说：其中一个队列用于存放二叉树的节点；另一个队列用于存放节点所对应的信息(比如：编号信
+     * 息、路径和信息...)。然后每一次节点入队1时它对应的信息也入队2、节点出队1的时候它对应的信息也出队2，并在出队入队
+     * 时根据”题目要求“进行处理
      */
     public int sumNumbers1(TreeNode root) {
         if (root==null) return 0;
@@ -427,15 +446,16 @@ public class codetop_5 {
     }
 
     /* 方法参数含义：限定以 root 为根的子树节点必须满足 max.val > root.val > min.val */
-    boolean isValidBST(TreeNode root, TreeNode min/*当前节点的最小值*/, TreeNode max/*当前节点的最大值*/) {
+    boolean isValidBST(TreeNode root, TreeNode min/*当前节点左子树的最小值*/, TreeNode max/*当前节点的最大值*/) {
         // step1：base case
         if (root == null) return true;
         /*step2：检查root.val是不是满足最值要求。。注意：不包含等于*/
-        if (min != null && root.val <= min.val) return false;
+        if (min != null && root.val <= min.val) return false; /**搜索二叉树要求”严格单调“，相等是不对的*/
         if (max != null && root.val >= max.val) return false;
-        // 限定左子树的最大值是 root.val，右子树的最小值是 root.val
-        return isValidBST(root.left, min, root) //左子树的max是root.val
-                && isValidBST(root.right, root, max); //右子树的最小值是root.val
+        /*step3：返回”左子树“和”右子树“的判断结果
+            限定左子树的最大值是 root.val，右子树的最小值是 root.val*/
+        return isValidBST(root.left, min, root) //root节点左子树的max是root.val
+                && isValidBST(root.right, root, max); //root节点右子树的最小值是root.val
     }
 
 
@@ -570,16 +590,17 @@ public class codetop_5 {
     * */
     /**
      *【说明】
-     *      1. i位数的整数 和 j位数的整数相乘，结果是“i+j”位数，最少是“i+j-1”位数。
+     *      1. i位数的整数 和 j位数的整数相乘，结果最多是“i+j”位数，最少是“i+j-1”位数。
      *      2. 第一个数第i位的数 和 第二个数第j位的数 相乘，结果对应的是第”i+j+1“位置
-     *      3. 【注意】在计算过程中，结果位置的数是直接赋值，赋值给res[i+j+1]；但是进位信息是附加的，需要将计算出来的进位
-     *  信息，加到res[i+j]。
+     *      3. 【注意】在计算过程中，结果位置的数是直接赋值，赋值给res[i+j+1]；但是进位信息是加和的，需要将计算出来的进位
+     *   信息，加到res[i+j]。。。。为什么？因为计算的时候已经加了res[i+j+1]位置的值，因此计算出来的就是结果；但是进位信息
+     *   是当前计算新带来的，因此要加到以前的进位信息res[i+j]上
      *【解题思路】声明一个len1+len2长度的数组，来存放计算出来的每一位。第一个数index=i的数和第二个数index=j的
      *      数相乘后的结果应该放在结果中的i+j+1的位置。
      */
     public String multiply(String num1, String num2) {
         if ("0".equals(num1) || "0".equals(num2)) return "0"; /**err：没有不行。没有的话，如果结果是0，会输出""，两个数相乘再怎么也得有个数*/
-
+        /*前提：声明len1+len2长度的数组暂存计算的结果*/
         int len1 = num1.length(), len2 = num2.length();
         /**【说明】i位数的整数 和 j位数的整数相乘，结果是“i+j”位数，最少是“i+j-1”位数*/
         int[] multiRes = new int[len1 + len2]; /**err：【注意】这里的长度是两个数字的长度和，如果写成了[len1+len2+1]，会导致计算结果扩大了10倍，结果总是正确结果的十倍*/
@@ -670,14 +691,14 @@ public class codetop_5 {
         int res = 0;
         /*step1：声明变量 及 队列的初始化————
         *   1. 记录每一层第一个节点编号first、最后一个节点的编号last
-        *   2. 声明一个队列treeNodes存放每一层的节点，声明一个队列integers存放每一层节点对应的编号
-        *   3. 放入根节点 以及 根节点的编号
+        *   2. 声明一个队列treeNodes存放每一层的节点；声明一个队列integers存放每一个节点对应的编号
+        *   3. 放入根节点 以及 根节点对应的编号
         */
         int first = 0,last = 0;
         LinkedList<TreeNode> nodeQueue = new LinkedList<>(); //存放每一个节点
         LinkedList<Integer> valQueue = new LinkedList<>(); //存放该节点对应的编号
         nodeQueue.add(root);
-        valQueue.add(0); /**root节点对应的值是0、是1都是可以的*/
+        valQueue.add(0); /**【说明】root节点对应的值是0、是1都是可以的*/
         /*step2：遍历其中的每一个节点进行研究*/
         while (!nodeQueue.isEmpty()){
             int size = nodeQueue.size();
@@ -685,7 +706,7 @@ public class codetop_5 {
                 /*2.1：弹出一个节点，以及该节点的编号*/
                 TreeNode cur = nodeQueue.poll();
                 Integer curVal = valQueue.poll();
-                /*2.2：如果索引i来到第一个或者最后一个，需要更新first以及last的值*/
+                /*2.2：如果索引i来到某层的第一个或者最后一个，需要更新first以及last的值*/
                 if (i==0) first = curVal;
                 if (i==size-1) last = curVal;
                 /*2.3：把不是null的节点及它的编号加进队列。————这一步是层序遍历的常规操作*/
@@ -699,7 +720,7 @@ public class codetop_5 {
                 }
             }
             /*2.4：遍历完一层，更新res。。。因为包括first和last两个数，因此需要+1*/
-            res = Math.max(last - first + 1, res); /**err：for循环会完成某一层节点的挨个遍历，出了for循环统计该层的节点数比较靠谱*/
+            res = Math.max(last - first + 1, res); /**err：for循环会完成某一层节点的挨个遍历，出了for循环统计该层的宽度*/
         }
         return res;
     }
@@ -801,7 +822,7 @@ public class codetop_5 {
     * */
     /**
      *【题解思路】研究每一个数，放进窗口，更新窗口内的和sum；只要这个和不小于target，就更新res 并且 尝试缩小
-     *      窗口的长度（即更新left的值）；研究完每一个数之后返回res
+     *      窗口的长度（即更新left的值）；研究完所有数之后返回res
      */
     public int minSubArrayLen(int target, int[] nums) {
         int left = 0, cur = 0; //窗口的左、右边界
@@ -810,7 +831,7 @@ public class codetop_5 {
         while (cur < nums.length) {
             /*step1：不管三七二十一，都先放进窗口*/
             sum += nums[cur];
-            /*step2：满足条件时，不断的缩小窗口*/
+            /*step2：满足条件时（只要窗口内的和大于等于target），不断的缩小窗口*/
             while (sum >= target) {
                 res = Math.min(res, cur - left + 1); /**err：窗口必须是满足条件的时候才能更新窗口的大小，因此这个题必须是在while循环里面更新答案res*/
                 sum -= nums[left++];
@@ -898,7 +919,8 @@ public class codetop_5 {
      *                  /  \
      *                null  6
      *           如果此时求解targetSum==9存不存在，实际上是不存在的，但是到节点4的左孩子时发现root==null并且
-     *   targetSum==0，就会认为存在，只是错误的，因为null不是叶子节点 并且 它的父节点4也不是叶子节点。
+     *   targetSum==0，就会认为存在，这是错误的，因为null不是叶子节点 并且 它的父节点4也不是叶子节点。
+     *          因此，必须保证是”叶子节点“的时候决定是不是更新答案
      *
      * @param root
      * @param targetSum
@@ -927,7 +949,7 @@ public class codetop_5 {
 //                dfs(root.right,targetSum-root.val);
 //    }
 
-    /**写法2：DFS的得带写法
+    /**写法2：DFS的迭代写法
      *      做法：用栈模拟递归，每个元素存 (node, 当前路径和)。
      * */
     public boolean hasPathSum2(TreeNode root, int targetSum) {
@@ -999,7 +1021,7 @@ public class codetop_5 {
     路径 不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
     * */
     /**
-     * 【思路】用一个map存放前缀和，此时前缀和的含义：从根节点到这个节点的路径和。。。灭一次存放之前先看map中有没有
+     * 【思路】用一个map存放前缀和，此时前缀和的含义：从根节点到这个节点的路径和。。。每一次存放之前先看map中有没有
      *      符合条件的前缀和，即map.get(curSum-targetSum)的值
      *【关于思路的解析 以及 多个疑问，参看（灵茶山艾府）：
      *      https://leetcode.cn/problems/path-sum-iii/solutions/2784856/zuo-fa-he-560-ti-shi-yi-yang-de-pythonja-fmzo/

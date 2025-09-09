@@ -1,6 +1,6 @@
 package leecode_Debug._hot100;
 
-import leecode_Debug.linkList.ListNode;
+import leecode_Debug.top100.ListNode;
 import leecode_Debug.top100.TreeNode;
 
 import javax.sound.sampled.Line;
@@ -680,17 +680,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     }
 
 
-
-    /*395
-    给你一个字符串 s 和一个整数 k ，请你找出 s 中的最长子串， 要求该子串中的每一字符出现次数都不少于 k 。返回这一子串的长度。
-
-如果不存在这样的子字符串，则返回 0。
-     */
-//    public int longestSubstring(String s, int k) {
-//
-//    }
-
-
     /*316
     给你一个字符串 s ，请你去除字符串中重复的字母，使得每个字母只出现一次。需保证 返回结果的字典序最小（要求不能打乱其他字符的相对位置）。
      */
@@ -1215,19 +1204,35 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     给你一个整数 n ，请你找出并返回第 n 个 丑数 。
     丑数 就是质因子只包含 2、3 和 5 的正整数。
      */
-    public int nthUglyNumber(int n) {
+    /**
+     【关键】①第一个丑数是1。②后面的任何一个丑数，都”一定“是由前面的某一个丑数”乘以2 或者 乘以3 或
+          者 乘以5“得到的。——————这很关键！！
+     【思路要点（核心直观解释）】
+          丑数集合是闭合的：若 x 是丑数，则 2x, 3x, 5x 也都是丑数。
+          如果按从小到大生成丑数序列 dp[0]=1, dp[1]=2, dp[2]=3, ...，每个后续丑数一定是之前某
+       个丑数乘以 2、3 或 5 得到的最小未被使用的值。
+          用三个指针 p2, p3, p5 分别指向当前可以乘以 2,3,5 的最小位置（即下一个可能产生新丑
+       数的位置）。
+          每一步取 candidate = min(dp[p2]*2, dp[p3]*3, dp[p5]*5) 作为下一个丑数，并相应
+       地移动等于 candidate 的每个指针（可能同时移动多个，以避免重复）。
+     */
+    public int nthUglyNumber1(int n) {
         int[] dp = new int[n];
-        int a=0,b=0,c=0;
-        dp[0]=1;
+        dp[0] = 1; /**dp[i]理解为”第i+1个丑数“*/
+        int p2 = 0,p3 = 0,p5 = 0;
         for (int i = 1; i < n; i++) {
-            int n2=dp[a]*2,n3=dp[b]*3,n5=dp[c]*5;
-            dp[i] = Math.min(Math.min(n2,n3),n5);
-            if (dp[i]==n2) a++; /**注意这里的三个都必须写成if，否则会有重复的数，比如：6————因为它是2和3的公倍数*/
-            if (dp[i]==n3) b++;
-            if (dp[i]==n5) c++;
+            int val2 = dp[p2]*2;
+            int val3 = dp[p3]*3;
+            int val5 = dp[p5]*5;
+            dp[i] = Math.min(Math.min(val2,val3),val5);
+            if (dp[i]==val2) p2++; /**注意这里的三个都必须写成if，否则会有重复的数，比如：6————因为它是2和3的公倍数*/
+            if (dp[i]==val3) p3++;
+            if (dp[i]==val5) p5++;
         }
         return dp[n-1];
     }
+
+
 
     /*1004
     给定一个二进制数组 nums 和一个整数 k，假设最多可以翻转 k 个 0 ，则返回执行操作后 数组中连续 1 的最大个数 。
@@ -1343,21 +1348,32 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *【关键点】
      *      1. Character.isLetterOrDigit：判断一个字符是不是字母和数字
      *      2. Character.toLowerCase：将字母转换为小写字母
-     *      3. while (l<r&&!Character.isLetterOrDigit(s.charAt(l)))：跳过左边的空格，注意是两
-     *  个条件
+     *      3. while (l<r&&!Character.isLetterOrDigit(s.charAt(l))) l++：从l开
+     *  始向右，跳过所有的不是字母和数字的字符
      */
     public boolean isPalindrome(String s) {
         int l = 0,r = s.length()-1;
         while (l<r){
+            /*step1：从left开始，跳过所有的不是”字母、数字“的字符。。
+                这种写法类似于”三树之和“跳过相同值的写法，while循环中”l<r“这个条件不可少*/
             while (l<r&&!Character.isLetterOrDigit(s.charAt(l))){
                 l++;
             }
+            /*step2：从right开始，向左跳过所有不是”字母、数字“的字符。。*/
             while (l<r&&!Character.isLetterOrDigit(s.charAt(r))){
                 r--;
             }
+            /*step3：比较两个位置的字符是不是相等，如果不相等就直接返回false。
+                【注意】到了这一步包含很多情况，但是这样的写法这些情况都包含了。可能的情况如下————
+                    ①l和r是相等。此时下面的if一定是false，因此返回true。。。但是此时其实包含了
+                 s没有一个字母数字，导致取出后就是空串，此时s是回文的；也可能l==r时就是唯一的合规
+                 的字符，由于只有一个字符，因此s也是回文的。
+                    ②l和r不相等，这就是一般情况。
+            */
             if (Character.toLowerCase(s.charAt(l))!=Character.toLowerCase(s.charAt(r))){
                 return false;
             }
+            /*step4：经过上一步的判断以后，需要更新指针*/
             l++;
             r--;
         }
@@ -1366,6 +1382,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
 
     /*另一种解法。自己的写法*/
+    /**下面的写法应该有问题吧？？？？*/
     public boolean isPalindrome_own(String s) {
         int l=0,r=s.length()-1;
         while (l<r){

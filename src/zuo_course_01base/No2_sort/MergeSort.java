@@ -53,7 +53,8 @@ public class MergeSort {
          * step2：p1和p2分别指向两个数组，如果没有都没有越界，依次将小的那个数挪到help数组（挪之后需要更新指针）
          * */
         while (p1 <= mid && p2 <= r) { //p1和p2两个指针分别指向两个子数组，将小的那个数copy到help中并移动指针
-            help[i++] = arr[p1] < arr[p2] ? arr[p1++] : arr[p2++]; /**copy后需要移动对应的指针*/
+            help[i++] = arr[p1] < arr[p2] ? arr[p1++] : arr[p2++]; /**copy后需要移动对应的指针....这样的写法可以，但不是稳定排序*/
+//            help[i++] = arr[p1] <= arr[p2] ? arr[p1++] : arr[p2++]; /**这样写的话就是稳定排序，因为左右两边的数相等的时候，我们保证会将nums[p1]即左边的数先放到help*/
         }
         /*
          * step3：拼接两个数组中剩下的部分
