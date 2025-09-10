@@ -88,10 +88,11 @@ public class _05matrix {
     /*54.
     * 给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
     * */
-    /**【】：四个变量标记边界，每一次打印一行(或者一列)，打印后需要更新top边界或者bottom边
-     * 界(或者right或者left边界)，同时需要判断打印后是不是不满足条件了。
+    /**【思路】：四个变量标记边界，每一次打印一行(或者一列)，打印后需要更新top边界或者bottom边
+     *      界(或者right或者left边界)，同时需要判断打印后是不是不满足条件了。
      * 【注意！！】每一次for循环打印一行或者一列后，都要判断边界是不是合规，如果不合规需要
-     * 终止*/
+     *      终止
+     */
     public List<Integer> spiralOrder(int[][] matrix) {
         ArrayList<Integer> res = new ArrayList<>();
         int top = 0;
@@ -99,10 +100,10 @@ public class _05matrix {
         int left = 0;
         int right = matrix[0].length - 1;
         while (res.size() < matrix.length * matrix[0].length) {
-            for (int i = left; i <= right; i++) {
+            for (int i = left; i <= right; i++) { /**可以添加判断的位置2：也可以给整体的for循环外添加if条件判断*/
                 res.add(matrix[top][i]);
             }
-            if(++top>bottom) break; /**在下一行或者下一列打印时，先判断是不是还有能打印的*/
+            if(++top>bottom) break; /**可以判断的位置1：在下一行或者下一列打印时，先判断是不是还有能打印的*/
             for (int i = top; i <= bottom; i++) {
                 res.add(matrix[i][right]);
             }
