@@ -333,6 +333,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     16. 最接近的三数之和
      */
     /**
+     *【注意】题目要求返回的是“和”，而不是差值的绝对值。
      *【说明】这个题甚至不用跳过相同的组合，因为相同的组合不影响结果，结果只是求最接近target的三数之
      *      和是多少？而不是求有多少种，因此比"15三数之和"题目简单
      */
@@ -346,7 +347,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                 if (Math.abs(curSum-target)<max){ /**如果curSum和target更接近则更新res*/
                     max = Math.abs(curSum-target);
                     res = curSum;
-                    if (res==target) return res;
+                    if (res==target) return res; /**如果找到等于target的组合，就直接返回，这就是最接近的答案了*/
                 }
                 if (curSum>target){
                     r--;
@@ -357,6 +358,33 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         }
         return res;
     }
+
+    /*另外的写法*/
+    public int threeSumClosest1(int[] nums, int target) {
+        int res = Integer.MAX_VALUE;
+        int flag = Integer.MAX_VALUE;
+        Arrays.sort(nums);
+        for (int i = 0; i < nums.length - 2; i++) {
+            int left = i+1,right = nums.length-1;
+            while (left<right){
+                int curVal = nums[i]+nums[left]+nums[right];
+                if (Math.abs(curVal-target)<flag){
+                    res = curVal;
+                    flag = Math.abs(curVal-target); /**err：注意更新flag*/
+                }
+                if (curVal<target){
+                    left++;
+                }else if (curVal>target){
+                    right--;
+                }else {
+                    return curVal; /**err：要返回的是三数之和，而不是和target的差值*/
+                }
+            }
+        }
+        return res;
+    }
+
+
 
     /*LCR 143. 子结构判断
     给定两棵二叉树 tree1 和 tree2，判断 tree2 是否以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
@@ -930,7 +958,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *      这个两个变量构成一个区间[low,high],未匹配的左括号数量位于这个区间
      *【具体的思路】在上面关键信息的基础上————
      *      每次碰到'('，则low和high都得+1.因为左括号是确认的，必须要匹配到右括号；
-     *      每次碰到')'，则low和high都得-1，因为右括号能明确的匹配左括号；
+     *      每次碰到')'，则low和high都得-1，因为右括号必须明确的匹配左括号；
      *      每次碰到‘*’。如果我们把它当作左括号，则high需要加1；如果我们把它当右括号，则low需要减1
      *【易错点】整个过程中low和high的最小值都是0———
      *       ①如果high小于0，直接返回false。（表示最多未匹配的左括号是-high个，不可能哇）
