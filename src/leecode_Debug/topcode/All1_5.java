@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.*;
 
 /**codetop 1~5的全量——————=========1~5使用这个文件
- * err：5、20、215、92、105、234、283、、
+ * err：5、20、215、92、105、234、283、
  * undo：46的最优解、88、415、72题优化空间、1143空间优化的最优解、93、69、8、151、468、718
  * 模糊：54
  */
@@ -424,6 +424,48 @@ public class All1_5 {
 
 注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。*/
 
+    /**
+     *【关键】倒序合并————两个指针p1、p2，一个指着cur。。。p1、p2从nums1、nums2最后一个数倒着研究，将比
+     *   较大的数放到nums1的cur位置(即末尾)
+     *      原因：nums1中的数存在前面的m个位置，所以如果从开始合并的话，nums1中的数可能会被污染，此时就要
+     *   借助额外的数组空间暂存结果。。。比如：nums2[0]<nums1[0] 并且 nums2[0]<nums1[0]，此时nums2
+     *   最开始的两个数需要copy到nums1，那nums1原来的数应该存到哪里去？？综上，最好使用倒序合并
+     */
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int p1 = m-1,p2 = n-1;
+        int cur = m+n-1;
+        while (p1>=0&&p2>=0){
+            nums1[cur--] = nums1[p1]>nums2[p2]?nums1[p1--]:nums2[p2--];
+        }
+
+        while (p2>=0){
+            nums1[cur--] = nums2[p2--];
+        }
+    }
+
+    /*如果写的清晰一些，就是下面的写法*/
+    public void merge_1(int[] nums1, int m, int[] nums2, int n) {
+        int p1 = m - 1;
+        int p2 = n - 1;
+        int tail = m + n - 1;
+
+        /*step1：p1和p2倒序研究nums1和nums2的每一个数；将比较大的那个数放在nums1[cur]对应的位置*/
+        while (p1 >= 0 && p2 >= 0) {
+            if (nums1[p1] > nums2[p2]) {
+                nums1[tail--] = nums1[p1--];
+            } else {
+                nums1[tail--] = nums2[p2--];
+            }
+        }
+
+        /*step2：如果 nums2 还有剩余，直接拷贝到nums1。（说明：如果nums1还有剩余，不用管，因为他本来
+               就在nums1中，并且是排序好的，因此不动直接结束就好）
+         */
+        while (p2 >= 0) {
+            nums1[tail--] = nums2[p2--];
+        }
+    }
+
 
      /*20.
     * 给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是
@@ -532,7 +574,12 @@ public class All1_5 {
      * 个节点！由于我们需要特殊处理第right个节点 以及 记录第right+1个节点，所以这里“i<right”。
      */
     public ListNode reverseBetween(ListNode head, int left, int right) {
-        /**err：因此计数是从0开始，因此两个指针 都从 dummy开始数！！第几个节点则走多少步*/
+        /**err：计数是从0开始，因此两个指针 都从 dummy开始数！！第几个节点则走多少步。。
+                比如：如果for循环的条件是”...i<5..“，则i会来到dummy后面的第5个节点，由于dummy是head的前
+            一个节点，因此”dummy后面的第5个节点“就是原始链表的第5个节点。
+                明白上面的计数，然后回到这个题，①我们想让slow指向“left前面的节点”，也就是想来到”第left-1个
+            节点“，因此第一个for循环”i<letf-1“；②我们想让fast指向“right节点”，也就是想来到”第right个节点“，
+            因此第二个for循环条件是”i<right“.*/
         ListNode dummy = new ListNode(-1, head),slow = dummy,fast = dummy;
         for (int i = 0; i < left - 1; i++) { /**err：slow要来到left的前一个节点，因此满足“i<left-1”*/
             slow = slow.next;
@@ -583,6 +630,14 @@ public class All1_5 {
         int m = matrix.length,n = matrix[0].length;
         int top = 0,bottom = m-1,left =0,right = n-1;
         while (res.size()<m*n){
+            /**
+             *【每一段的完整逻辑说明】比如：打印某一行————
+                if (top<=bottom){ //①先保证还有行/列，即边界符合条件
+                    for (int i = left; i <=right; i++) { //②for循环列举每一个列位置i，位置i的范围是闭区间[left，right]
+                        res.add(matrix[top][i]);
+                    }
+                }
+             */
             if (top<=bottom){ /**小于等于号，两个符号的顺序有没有关系？？？*/
                 for (int i = left; i <=right; i++) {
                     res.add(matrix[top][i]);
@@ -725,10 +780,49 @@ public class All1_5 {
 你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。*/
     /**
      * 【注】是字符串不是链表
+     *【说明】跟”两数相加“其实代码是一样的。
+     *      ”两数相加“题目中：
+     *          什么时候结束循环？两个链表都来到最后 并且 进位信息carry是0
+     *          位置如何更新？？由于这个题两个数本身就是倒序存在链表的（即数的高位在链表的末尾）。因
+     *       此顺序相加，指针后移
+     *      这个题中：
+     *          什么时候结束？两个指针都无效 并且 carry也是0(carry==0说明最高位无进位了)
+     *          位置如何更新？？由于两个字符串就是本来的数（即数的高位是在字符串的开始）。两数相加必须
+     *       从地位开始依次相加，因此应该倒着依次相加，并将两个指针向前移动。
      */
-//    public String addStrings(String num1, String num2) {
-//
-//    }
+    /*写法1：下面的写法中，最后更新i和j变量，可能会忘记，因此可以考虑使用写法2*/
+    public String addStrings(String num1, String num2) {
+        int len1 = num1.length(),len2 = num2.length();
+        int i = len1-1,j = len2-1;
+        int carry = 0;
+        StringBuilder res = new StringBuilder();
+        while (i>=0||j>=0||carry!=0){
+            int val1 = i<0?0:num1.charAt(i)-'0';
+            int val2 = j<0?0:num2.charAt(j)-'0';
+            int curval = val1+val2+carry;
+            res.append(curval%10);
+            carry = curval/10;
+        }
+        return res.reverse().toString();
+    }
+
+    /*更好的写法。*/
+    public String addStrings1(String num1, String num2) {
+        StringBuilder sb = new StringBuilder();
+        int i = num1.length() - 1;
+        int j = num2.length() - 1;
+        int carry = 0;
+
+        while (i >= 0 || j >= 0 || carry > 0) {
+            int x = (i >= 0) ? num1.charAt(i--) - '0' : 0; /**把”取某位置的字符“和”更新索引位置“结合，避免忘记。。（前提是后续不会使用这个变量，比如：计算长度等，就需要及逆行矫正了）*/
+            int y = (j >= 0) ? num2.charAt(j--) - '0' : 0;
+            int sum = x + y + carry;
+            sb.append(sum % 10);   // 当前位
+            carry = sum / 10;      // 更新进位
+        }
+
+        return sb.reverse().toString();
+    }
 
 
     /*56.
@@ -793,6 +887,7 @@ public class All1_5 {
     插入一个字符
     删除一个字符
     替换一个字符*/
+    /*二维dp的写法*/
     public int minDistance(String word1, String word2) {
         int len1 = word1.length(),len2 = word2.length();
         int[][] dp = new int[len1 + 1][len2 + 1];
@@ -810,6 +905,47 @@ public class All1_5 {
             }
         }
         return dp[len1][len2];
+    }
+
+    /*一维dp的写法
+        复杂度分析：时间复杂度：O(m·n)（还是要遍历整个表）；空间复杂度：O(min(m, n))（只保留一行）
+    */
+    /**
+     *【解释】根据二维dp可以发现，每一个位置依赖于它的”左上角的三个位置“，这样的局面有问题！
+     *     情况1：dp[i][j]依赖于dp[i-1][j]、dp[i][j-1]。此时每一行从左往右计算就可以；
+     *     情况2：dp[i][j]依赖于dp[i-1][j]、dp[i][j-1]、dp[i-1][j-1]。此时从前往后计
+     *  算就不对，必须借助额外的变量存储dp[i-1][j-1]的信息
+     */
+    public int minDistance_1dim(String word1, String word2) {
+        /*setep1：保证空间复杂度为O(min(m,n))————即把短的字符串放在二维表中列的位置*/
+        int m = word1.length(), n = word2.length();
+        if (m < n) {
+            return minDistance_1dim(word2, word1);
+        }
+        /*step2：创建数组 并且 初始化。
+            【说明】此时初始化相当于”二维dp“时初始化第一行的操作，即把word1当作是空串。
+        * */
+        int[] dp = new int[n + 1];
+        for (int i = 0; i < n + 1; i++) {
+            dp[i] = i; /**word1是空串的时候，word2的长度就是最小的操作次数*/
+        }
+        /*step3：遍历研究其余位置*/
+        /**err：研究的过程中，更新任何一个dp[i]之前，都必须先记录原始的值，它在二维中的地位就是dp[i-1][j-1]*/
+        for (int i = 1; i < m + 1; i++) {
+            /**【注】此时的dp[0]并不单单是dp[0]，而是二维表中第i行的第0列————即取word1的前i个字符，word2的0个字符*/
+            int prev = dp[0];
+            dp[0] = i;
+            for (int j = 1; j < n + 1; j++) {
+                int tmp = dp[j]; /**err：这里必须用一个新的变量来暂时存储dp值*/
+                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[j] = prev;
+                } else {
+                    dp[j] = Math.min(Math.min(dp[j - 1], dp[j]), prev) + 1;
+                }
+                prev = tmp;
+            }
+        }
+        return dp[n];
     }
 
 
@@ -837,15 +973,54 @@ public class All1_5 {
 
 
     /*1143. 最长公共子序列
-给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。
+    给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。
 
-一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。
+    一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。
 
-例如，"ace" 是 "abcde" 的子序列，但 "aec" 不是 "abcde" 的子序列。
-两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。*/
-//    public int longestCommonSubsequence(String text1, String text2) {
-//
-//    }
+    例如，"ace" 是 "abcde" 的子序列，但 "aec" 不是 "abcde" 的子序列。
+    两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。*/
+    public int longestCommonSubsequence(String text1, String text2) {
+        int m = text1.length(),n = text2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <=n; j++) {
+                if (text1.charAt(i-1)==text2.charAt(j-1)){
+                    dp[i][j] = dp[i-1][j-1]+1;
+                }else{
+                    dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    /*空间优化到一维版本*/
+    /**
+     *【总结】代码中的①②③和72题一维优化的形式是一样的。根本原因在于：1143和72题中二维dp任何一个位
+     *    置(i,j)需要依赖到位置(i-1,j)、(i,j-1)、(i-1,j-1)，而优化到一维版本的时候(i-1,j-1)位置
+     *    的值必须使用额外的变量来记录原始值，否则原始值就被污染了
+     */
+    public int longestCommonSubsequence1(String text1, String text2) {
+        int m = text1.length(),n = text2.length();
+        if (m<n){
+            return longestCommonSubsequence1(text2,text1);
+        }
+
+        int[] dp = new int[n + 1];
+        for (int i = 1; i < m+1; i++) {
+            int prev = 0; /**①记录dp[0]的值，1143题dp[0]固定是0————dp[0]等价于二维中的第i行第0列，即长度为i的text1和长度为0的text2子串公共子序列必然是0*/
+            for (int j = 1; j < n+1; j++) {
+                int tmp = dp[j]; /**②计算之前先记录dp[i]*/
+                if (text1.charAt(i-1)==text2.charAt(j-1)){
+                    dp[j] = prev + 1;
+                }else {
+                    dp[j] = Math.max(dp[j-1],dp[j]);
+                }
+                prev = tmp; /**③dp[i]流程结束前将tmp更新到prev*/
+            }
+        }
+        return dp[n];
+    }
 
 
 
@@ -856,9 +1031,38 @@ public class All1_5 {
 给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过
     在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
     * */
-//    public List<String> restoreIpAddresses(String s) {
-//
-//    }
+    /**
+     *下面的代码问题比较大~~~~
+     */
+    List<String> resRestoreIpAddresses;
+    public List<String> restoreIpAddresses(String s) {
+        resRestoreIpAddresses = new LinkedList<>();
+        StringBuilder path = new StringBuilder(s);
+        restoreIpAddresses(s,0,path,0);
+        return resRestoreIpAddresses;
+    }
+
+    private void restoreIpAddresses(String s, int index, StringBuilder path,int pointNum) {
+        if (pointNum==3&&isValidIP(s.substring(index))){
+            resRestoreIpAddresses.add(new String(path));
+            return;
+        }
+        if (pointNum>=3) return;
+        for (int i = index+1; i <= s.length(); i++) {
+            if (isValidIP(s.substring(index,i))){
+                path.insert(i+pointNum,'.');
+                restoreIpAddresses(s,i,path,pointNum+1);
+                path.deleteCharAt(i+pointNum); /**err：这里的索引已经不能这么计算了，因此*/
+            }
+        }
+    }
+
+    private boolean isValidIP(String substring) {
+        if (substring.length()==1) return true;
+        else if (substring.length()==2&&substring.charAt(0)!='0') return true;
+        else if (substring.length()==3&&Integer.valueOf(substring)>=100&&Integer.valueOf(substring)<=255) return true;
+        else return false;
+    }
 
 
     /*
@@ -1223,29 +1427,91 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 
 
     /*69. x 的平方根
-给你一个非负整数 x ，计算并返回 x 的 算术平方根 。
+    给你一个非负整数 x ，计算并返回 x 的 算术平方根 。
+    由于返回类型是整数，结果只保留 整数部分 ，小数部分将被 舍去 。
+    注意：不允许使用任何内置指数函数和算符，例如 pow(x, 0.5) 或者 x ** 0.5 。*/
+    public int mySqrt(int x) {
+        int left = 0,right = x; /**如果不优化的话，这里右边界应该是x，因为0和1的平方根就是本身，因此右边界要声明为x*/
+        while (left<=right){
+            int mid = left+(right-left)/2;
+            /**mid*mid可能会发生整型溢出，需不需要考虑这个情况？？？chatgpt给的优化建议：long square = (long) mid * mid;*/
+            if (mid*mid>x){
+                right = mid-1;
+            }else if (mid*mid<x){
+                left = mid+1;
+            }else {
+                return mid;
+            }
+        }
+        return right; /*由于现在的写法是求解”平方小于等于x的右边界“那个数，因此应该返回right*/
+    }
 
-由于返回类型是整数，结果只保留 整数部分 ，小数部分将被 舍去 。
+    /**
+     *【解的本质】查找”某数的平方“小于等于x的右边界，即”最大的 满足平方小于等于x“的数..
+     *      基于这句话的本质，是不是同样也可以理解成”求解平方大于x的左边界“的那个数-1？？？（应该是可以的）
+     *【优化】0和1的平方根的特殊考虑；右边界初始化为x/2。
+     *     下面的方法采用的是记录值的形式，而不是返回指针；类似于”35求插入位置“的两种做法————
+     *          做法1：除了while循环直接返回指针
+     *          做法2：使用额外的变量来标记最近的一次符合要求的位置
+     *     但是这个题和35题是有区别的，区别如下————
+     *          35求解的是插入位置，本质上求的是”第一个大于等于“target的数所在的位置；
+     *          这个题求解的是平方根，并且要向下取整。。。因此本质上求的是”最后一个满足
+     *      自身平方小于等于x的数所在的位置“ 或者表述为 ”第一个满足自身平方大于x的位置-1“.
+     *      详细的解释一下这两个表述，比如求解8的平方根，可选的数据为”0、1、2、3、4....“，
+     *      ”第一个自身平方大于8的位置“是4对应3这个数，因此应该返回前一个位置的2；”最后一个
+     *      自身平方小于等于8的位置“是3对应2这个数，因此返回的也是2.
+     *     综上，两个题目是有区别的。这种区别直接导致两种写法的区别————
+     *          35题返回边界的做法中应该返回left边界值; 记录最小值位置的做法中在大于等于的时候才
+     *       记录；
+     *          这个题返回边界的做法中应该返回right边界值; 记录最小值位置的做法中在小于的时候才
+     *       记录位置(如果等于的时候就直接返回了)；
+     *
+     */
+    public int mySqrt1(int x) {
+        if (x < 2) return x; // 0 和 1 特殊处理
 
-注意：不允许使用任何内置指数函数和算符，例如 pow(x, 0.5) 或者 x ** 0.5 。*/
-//    public int mySqrt(int x) {
-//
-//    }
+        int left = 1, right = x / 2, ans = 0;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            long square = (long) mid * mid; // 防止溢出
+
+            if (square == x) {
+                return mid; //如果是等于的话直接返回
+            } else if (square < x) {
+                ans = mid;      /*记录上一次平方小于x的解*/
+                left = mid + 1; // 去右边找更大的
+            } else {
+                right = mid - 1; // 去左边找
+            }
+        }
+        return ans;
+    }
 
 
     /*8. 字符串转换整数 (atoi)
-请你来实现一个 myAtoi(string s) 函数，使其能将字符串转换成一个 32 位有符号整数。
-
-函数 myAtoi(string s) 的算法如下：
-
-空格：读入字符串并丢弃无用的前导空格（" "）
-符号：检查下一个字符（假设还未到字符末尾）为 '-' 还是 '+'。如果两者都不存在，则假定结果为正。
-转换：通过跳过前置零来读取该整数，直到遇到非数字字符或到达字符串的结尾。如果没有读取数字，则结果为0。
-舍入：如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231 的整数应该被舍入为 −231 ，大于 231 − 1 的整数应该被舍入为 231 − 1 。
-返回整数作为最终结果。*/
-//    public int myAtoi(String s) {
-//
-//    }
+    请你来实现一个 myAtoi(string s) 函数，使其能将字符串转换成一个 32 位有符号整数。
+    函数 myAtoi(string s) 的算法如下：
+    空格：读入字符串并丢弃无用的前导空格（" "）
+    符号：检查下一个字符（假设还未到字符末尾）为 '-' 还是 '+'。如果两者都不存在，则假定结果为正。
+    转换：通过跳过前置零来读取该整数，直到遇到非数字字符或到达字符串的结尾。如果没有读取数字，则结果为0。
+    舍入：如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231 的整数应该被舍入为 −231 ，大于 231 − 1 的整数应该被舍入为 231 − 1 。
+    返回整数作为最终结果。*/
+    /**
+     * 下面的写法为什么是错误的？？？
+     */
+    public int myAtoi(String s) {
+        String trim = s.trim();
+        if (trim.length()==0) return 0;
+        int flag = trim.charAt(0)=='-'?-1:1;
+        int curVal = 0;
+        for (char c:trim.toCharArray()){
+            if (!Character.isDigit(c)) continue;
+            if (curVal==0&&c=='0') continue;
+            curVal = curVal*10 + c-'0';
+            if (curVal>Integer.MAX_VALUE/10) break;
+        }
+        return flag*curVal;
+    }
 
 
     /*32.最长有效括号
@@ -1441,7 +1707,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     }
 
     private TreeNode buildTree(int[] preorder, int[] inorder, int l, int r) {
-        if (l>r) return null; /**err：这里的条件判断不能缺失！！！*/
+        if (l>r) return null; /**err：这里的条件判断不能缺失！！！等于的时候不用考虑，因为l==r的时候，根节点可以构造成功，但是构造左右子树时由于”l>r“因此得到的都是null*/
         int rootVal = preorder[preorderIndex++];
         TreeNode root = new TreeNode(rootVal);
         Integer index = inorderMap.get(rootVal);
@@ -1452,16 +1718,44 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 
 
     /*151. 反转字符串中的单词
-给你一个字符串 s ，请你反转字符串中 单词 的顺序。
-
-单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
-
-返回 单词 顺序颠倒且 单词 之间用单个空格连接的结果字符串。
-
-注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。*/
-//    public String reverseWords(String s) {
-//
-//    }
+    给你一个字符串 s ，请你反转字符串中 单词 的顺序。
+    单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
+    返回 单词 顺序颠倒且 单词 之间用单个空格连接的结果字符串。
+    注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。*/
+    /**
+     *【注】题目要求是仅仅倒序单词的顺序，并不要求单词内字母的顺序
+     *【最优解法的思路】从右向左一次遍历，用StringBuilder来收集结果
+     */
+    public String reverseWords(String s) {
+        /*step1：去除字符串首尾的空格*/
+        s = s.trim();
+        /*step2：声明几个标志变量*/
+        StringBuilder res = new StringBuilder();
+        int i = s.length()-1,j = i;
+        /*stp3：while循环依次研究每一个位置*/
+        while (i>=0){
+            /*①找到最后一个单词的开头。————只要索引合法 并且 i位置的字符不是空格，就继续向左。
+              此步结束后，要么i不合法了，要么来到了空格！！
+              【注】由于第一步就已经去除了首尾的空格，因此while循环倒着遍历的时候不可能一开始就是
+           空格！！同时也意味这i<0即i不合法的时候，不可能i+1位置的字符不合法(i不合法时i+1是0，但
+           是trim()已经去除了首尾的空格，因此0位置的字符必然是合法的字符)
+             */
+            while (i>=0&&s.charAt(i)!=' ') i--;
+            /*②将(i+1,j+1)的子串拼接到res。————
+                    经过①可知i位置的字符是不合法的，并且j位置是合法的位置。因此子串的拼接应该
+               是(i+1,j+1)。
+             */
+            res.append(s.substring(i+1,j+1)).append(' ');
+            /*③经过①可知i位置是不合法的，从i位置开始向前找到第一个字符。————
+                即只要i位置合法 并且 i位置的字符是空格，就继续向前，直到i位置的字符不是空格。----所
+             以从这里可以知道i位置就是单词的最后一个位置，下一步将值给j。因此j就是下一个单词的最后一个
+             位置。
+             */
+            while (i>=0&&s.charAt(i)==' ') i--;
+            j = i;
+        }
+        return res.toString().trim();
+    }
 
 
     /*78. 子集
@@ -1825,7 +2119,8 @@ int getMin() 获取堆栈中的最小元素。*/
         return pre;
     }
 
-    /**“回文链表”题目中找中间节点的时候，就走常规的逻辑没问题，甚至前一半链表最后一个节点的next域不置null也没问题*/
+    /**“回文链表”题目中找中间节点的时候，就走常规的逻辑没问题————即偶数时找到中间偏后的节点，甚至前一半链表最
+           后一个节点的next域不置null也没问题(不置为null反而简化了流程的处理)*/
     private ListNode findMid2(ListNode head) {
         ListNode slow = head,fast = head;
         while (fast!=null&&fast.next!=null){
@@ -1839,11 +2134,11 @@ int getMin() 获取堆栈中的最小元素。*/
     /*98 验证二叉搜索树
         给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。
 
-有效 二叉搜索树定义如下：
+    有效 二叉搜索树定义如下：
 
-节点的左子树只包含 严格小于 当前节点的数。
-节点的右子树只包含 严格大于 当前节点的数。
-所有左子树和右子树自身必须也是二叉搜索树。
+    节点的左子树只包含 严格小于 当前节点的数。
+    节点的右子树只包含 严格大于 当前节点的数。
+    所有左子树和右子树自身必须也是二叉搜索树。
      */
     public boolean isValidBST(TreeNode root) {
         if (root==null) return true;
@@ -2244,7 +2539,7 @@ int getMin() 获取堆栈中的最小元素。*/
 
 
     /*718. 最长重复子数组
-给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 。
+    给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 。
      */
 //    public int findLength(int[] nums1, int[] nums2) {
 //
@@ -2271,15 +2566,33 @@ int getMin() 获取堆栈中的最小元素。*/
 
 
     /*283. 移动零
-给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
-请注意 ，必须在不复制数组的情况下原地对数组进行操作。
+    给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+    请注意 ，必须在不复制数组的情况下原地对数组进行操作。
      */
     public void moveZeroes(int[] nums) {
         if (nums.length<=1) return;
         int left = 0;
         for (int i = 0; i < nums.length; i++) {
-            while (nums[i]!=0){
+            while (nums[i]!=0){ /**下面的写法是错误的！会导致死循环。。。。。这里需要使用if，不能用while*/
                 swap5(nums,left++,i);
+            }
+        }
+    }
+
+    /*主方法可以写成下面的形式*/
+    public void moveZeroes1(int[] nums) {
+        if (nums.length<=1) return;
+        int left = 0;
+        int cur = 0;
+        while (cur<nums.length){
+            /*
+                情况1：nums[cur]的值不是0，因此交换 并且 移动left和cur指针
+                情况2：nums[cur]的值是0，则仅仅移动cur指针
+             */
+            if (nums[cur]!=0){
+                swap5(nums,left++,cur++);
+            }else {
+                cur++;
             }
         }
     }
@@ -2293,20 +2606,58 @@ int getMin() 获取堆栈中的最小元素。*/
 
 
     /*468. 验证IP地址
-给定一个字符串 queryIP。如果是有效的 IPv4 地址，返回 "IPv4" ；如果是有效的 IPv6 地址，返回 "IPv6" ；如果不是上述类型的 IP 地址，返回 "Neither" 。
-
-有效的IPv4地址 是 “x1.x2.x3.x4” 形式的IP地址。 其中 0 <= xi <= 255 且 xi 不能包含 前导零。例如: “192.168.1.1” 、 “192.168.1.0” 为有效IPv4地址， “192.168.01.1” 为无效IPv4地址; “192.168.1.00” 、 “192.168@1.1” 为无效IPv4地址。
-
-一个有效的IPv6地址 是一个格式为“x1:x2:x3:x4:x5:x6:x7:x8” 的IP地址，其中:
-
-1 <= xi.length <= 4
-xi 是一个 十六进制字符串 ，可以包含数字、小写英文字母( 'a' 到 'f' )和大写英文字母( 'A' 到 'F' )。
-在 xi 中允许前导零。
-例如 "2001:0db8:85a3:0000:0000:8a2e:0370:7334" 和 "2001:db8:85a3:0:0:8A2E:0370:7334" 是有效的 IPv6 地址，而 "2001:0db8:85a3::8A2E:037j:7334" 和 "02001:0db8:85a3:0000:0000:8a2e:0370:7334" 是无效的 IPv6 地址。
+    给定一个字符串 queryIP。如果是有效的 IPv4 地址，返回 "IPv4" ；如果是有效的 IPv6 地址，返回 "IPv6" ；如果不是上述类型的 IP 地址，返回 "Neither" 。
+    有效的IPv4地址 是 “x1.x2.x3.x4” 形式的IP地址。 其中 0 <= xi <= 255 且 xi 不能包含 前导零。例如: “192.168.1.1” 、 “192.168.1.0” 为有效IPv4地址， “192.168.01.1” 为无效IPv4地址; “192.168.1.00” 、 “192.168@1.1” 为无效IPv4地址。
+    一个有效的IPv6地址 是一个格式为“x1:x2:x3:x4:x5:x6:x7:x8” 的IP地址，其中:
+    1 <= xi.length <= 4
+    xi 是一个 十六进制字符串 ，可以包含数字、小写英文字母( 'a' 到 'f' )和大写英文字母( 'A' 到 'F' )。
+    在 xi 中允许前导零。
+    例如 "2001:0db8:85a3:0000:0000:8a2e:0370:7334" 和 "2001:db8:85a3:0:0:8A2E:0370:7334" 是有效的 IPv6 地址，而 "2001:0db8:85a3::8A2E:037j:7334" 和 "02001:0db8:85a3:0000:0000:8a2e:0370:7334" 是无效的 IPv6 地址。
      */
-//    public String validIPAddress(String queryIP) {
-//
-//    }
+    /**
+     *什么是合法的IP地址？
+     *     IPV4（三个条件缺一不可）：必须是4段；每一段不能有前导零；每一段不能超过255；
+     *     IPV6：
+     *【完整步骤】
+     *
+     */
+    public String validIPAddress(String queryIP) {
+        /*step1：先根据包括"."还是":"来决定校验IPV4还是IPV6*/
+        if (queryIP.chars().filter(ch->ch=='.').count()==3){
+            return isIPV4(queryIP)?"IPv4":"Neither";
+        }
+        if (queryIP.chars().filter(ch->ch==':').count()==7){
+            return isIPV6(queryIP)?"IPv6":"Neither";
+        }
+        return "Neither";
+    }
+
+    private boolean isIPV6(String queryIP) {
+        String[] split = queryIP.split(":", -1);
+        if (split.length!=8) return false;
+        String hexDigits = "0123456789ABCDEF";
+        for (String part:split){
+            if (part.length()==0||part.length()>4) return false;
+            for (char c:part.toCharArray()){
+                if (hexDigits.indexOf(c)==-1){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isIPV4(String queryIP) {
+        String[] split = queryIP.split(".", -1);
+        if (split.length!=4) return false;
+        for (String part:split) {
+            if (part.length()>3) return false;
+            if (part.length()==0 || (part.length()>1&&part.charAt(0)=='0')) return false;
+            Integer intVal = Integer.valueOf(part);
+            if (intVal<0||intVal>255) return false;
+        }
+        return true;
+    }
 
 
 }

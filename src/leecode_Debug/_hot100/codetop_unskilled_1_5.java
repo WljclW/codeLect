@@ -68,46 +68,63 @@ public class codetop_unskilled_1_5 {
 
 
     //5
+    /**
+     * 马拉车算法 可以实现将时间复杂度降为O(N)，但是空间复杂度高于“中心扩散法”，空间复杂度为O(N)。
+     *
+     * @param s
+     * @return
+     */
     public String longestPalindrome(String s) {
-        if (s==null||s.length()==0) return "";
+        /*step1：特殊情况的考虑*/
+        if (s == null || s.length() == 0) return "";
+        /*step2：StringBuilder预处理字符串并构造出新字符串。做法————给原字符串所有的间隔（包括开始位置和结束位置）都加“#”*/
         StringBuilder sb = new StringBuilder("#");
-        for (char c:s.toCharArray()) {
+        for (char c : s.toCharArray()) {
             sb.append(c).append("#");
         }
         String str = sb.toString();
-        int len = str.length();
+        int n = str.length();
 
-        int[] flags = new int[len];
-        int center = 0,rightBound = 0;
-        int start = 0,maxLen = 0;
-        for (int i = 0; i < len; i++) {
-            int mirror = 2*center-i;
-            if (i<rightBound){
-                flags[i] = Math.min(rightBound-i,flags[mirror]);
+        int[] p = new int[n]; //声明int数组用于存放每一个位置的回文半径
+        int center = 0, right = 0; /*center表示当前的回文中心；right表示当前最远的回文半径。*/
+        int start = 0, maxLen = 0; /*这是返回结果的关键信息。start表示“最长回文子串”的开始位置，maxLen表示“最长回文子串”的长度*/
+        /*step3：for循环依次研究每一个位置*/
+        for (int i = 0; i < n; i++) {
+            /*3.1 这一步就是“马拉车算法”的核心精髓。。具体的做法如下————
+                      （1）计算出i位置关于“目前回文中心”center的对称位置。
+                      （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
+            int mirror = 2 * center - i;
+            if (i < right) {
+                p[i] = Math.min(right - i, p[mirror]);
             }
 
-            int left = i-flags[i]-1,right = i+flags[i]+1;
-            while (left>=0&&right<len&&str.charAt(left)==str.charAt(right)){
-                flags[i]++;
-                left--;
-                right++;
+            /*3.2   尝试向两边继续扩展，看看位置i是否能得到更长的回文子串。
+                    这一步具体的做法呢，如下————
+                        ①声明两个指针l,r分别为i位置的左右；
+                        ②只要l和r不越界 并且 l和r位置的字符相等，就“增加p[i]”、移动l和r指针*/
+            int l = i - p[i] - 1, r = i + p[i] + 1;
+            while (l >= 0 && r < n && str.charAt(l) == str.charAt(r)) {
+                p[i]++;
+                l--;
+                r++;
             }
-
-            if (i+flags[i]>rightBound){
+            /*3.3 更新“最远回文右边界”。
+             *   “最远回文右边界”right 和 “当前的回文中心”center 是成对起作用的，因此更新right的时候就要更新center。
+             *   为什么说是“成对起作用”的呢？？因为right和i比较能加速p[i]计算；center用于计算位置i关于回文中心的对称位置*/
+            if (i + p[i] > right) {
                 center = i;
-                rightBound = i+flags[i];
+                right = i + p[i];
             }
-            if (flags[i]>maxLen){
-                maxLen = flags[i];
-                start = (i-flags[i])/2;
+            /*3.4 更新最长回文子串。
+             *   “最长回文子串”maxLen 和 “回文子串的开始位置”start也是成对出现的，因此更新maxLen的时候呀需要更新start。*/
+            if (p[i] > maxLen) {
+                maxLen = p[i]; /**回文半径就是最长的长度*/
+                start = (i - maxLen) / 2; /**？？？*/
             }
         }
-
-        return s.substring(start,start+maxLen);
+        return s.substring(start, start + maxLen);
     }
 
-
-    //5
 
     /**
      * 中心扩散法的复杂度分析：
