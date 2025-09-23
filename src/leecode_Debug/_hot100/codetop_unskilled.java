@@ -1438,6 +1438,24 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
         shuffle() —— 返回数组随机打乱后的结果
      */
+
+    /**
+         这是典型的 Fisher–Yates 洗牌算法（又叫 Knuth Shuffle）：如果直接 Collections.shuffle 会占用额外空间。
+     Fisher–Yates 可以原地 O(n) 打乱并且保证所有排列等概率。
+     【算法详述（打乱时）】
+        方案1：
+            ①从index=0开始。
+            ②对于下标 i=0..n-1：从区间 [i,n-1] 中随机选一个 j，交换 arr[i] 和 arr[j]。————即从i及后面的数随机随机选择一个
+        索引，交换 这个随机索引 和 i位置 对应的数。
+        方案2：
+            ①从index=n-1开始。
+            ②对于任意的下标 i=n-1、n-2.....1、0，从区间 [0,i]中随机选择一个j，交换arr[i] 和 arr[j]。————即从i及前面的数随
+        机选择一个索引，交换 这个随机索引 和 i位置 对应的数。
+
+            综上，【打乱顺序的关键】
+            如果是从前往后遍历数组，对于任意的位置i,需要从[i,n-1]随机选择一个索引比如记为k，则需要交换i位置 和  k位置的值。
+            反之，类似
+     */
     class Solution {
         int[] origin;
         int[] array;
@@ -1456,7 +1474,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
         public int[] shuffle() {
             for (int i = 0; i < array.length; i++) {
-                int j = random.nextInt(origin.length);
+                int j = random.nextInt(origin.length); /**err：这样的写法应该是错误的，不能从所有的数里面选*/
                 swap2(array, i, j);
             }
             return array;
@@ -1480,6 +1498,15 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 //            return array;
 //        }
 
+        //或者下面的写法也可以？？？
+//        public int[] shuffle() {
+//            for (int i = 0; i < array.length; i++) {
+//                int j = i + rand.nextInt(array.length - i); // [i, n-1]
+//                swap(array, i, j);
+//            }
+//            return array;
+//        }
+
         private void swap2(int[] array, int i, int j) {
             int tmp = array[i];
             array[i] = array[j];
@@ -1489,7 +1516,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     //120
-
     /**
      * 可以将空间优化到O(N),时间复杂度为O(n^2)
      * 【关键】需要从最后一行倒着遍历。最后返回dp[0]。原因解释————
