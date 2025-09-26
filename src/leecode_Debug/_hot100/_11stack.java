@@ -13,7 +13,9 @@ public class _11stack {
     左括号必须用相同类型的右括号闭合。
     左括号必须以正确的顺序闭合。
     每个右括号都有一个对应的相同类型的左括号。*/
-    /**推荐使用写法：isValid_01*/
+    /**推荐使用写法：isValid_01（栈的做法）
+     *              isValid_count（count计数的做法）
+     */
     public boolean isValid(String s) {
         LinkedList<Character> stack = new LinkedList<>();
         for (char c:s.toCharArray()){
@@ -66,6 +68,20 @@ public class _11stack {
             }
         }
         return stack.isEmpty(); /**err：注意返回值。否则“((”这样的字符串结果是错误的*/
+    }
+
+    /**使用一个变量，一遍遍历*/
+    public boolean isValid_count(String s) {
+        int count = 0;
+        for (char c:s.toCharArray()){
+            if (c=='('){
+                count++;
+            }else {
+                count--;
+            }
+            if (count<0) return false;
+        }
+        return count==0;
     }
 
 

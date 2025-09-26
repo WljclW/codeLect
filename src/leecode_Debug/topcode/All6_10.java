@@ -18,6 +18,8 @@ import java.util.*;
  *      329”、450“、10”、328、208、225    LCR 216“、LCR 127”
  *      295、516、LCR 187"、9、384“、120”、44“、887”、679“、97”、210“
  *      395”、349、51“、264、253”、673、344、
+ *
+ * 498、123、440、LCR 159、329、450、187、120、887、679、97、210、395
  */
 public class All6_10 {
     /*739.
@@ -28,9 +30,9 @@ public class All6_10 {
         int[] res = new int[temperatures.length];
         Stack<Integer> stack = new Stack<>();
         for (int i = 0; i < temperatures.length; i++) {
-            while (!stack.isEmpty()&&temperatures[i]>temperatures[stack.peek()]){
+            while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {
                 Integer cur = stack.pop();
-                res[cur] = i-cur;
+                res[cur] = i - cur;
             }
             stack.push(i);
         }
@@ -414,18 +416,43 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
 在一棵 完全二叉树 中，除了最后一层外，所有层都被完全填满，并且最后一层中的所有节点都尽可能靠左。最后一层（第 h 层）中可以包含 1 到 2h 个节点。
      */
+//    public boolean isCompleteTree(TreeNode root) {
+//        if (root==null) return true;
+//        boolean hasNull = false;
+//        LinkedList<TreeNode> queue = new LinkedList<>();
+//        queue.offer(root);
+//        while (!queue.isEmpty()){
+//
+//            TreeNode cur = queue.poll();
+//            if (cur==null) hasNull = true;
+//            if (hasNull&&cur!=null) return false;
+//            queue.offer(cur.left);   /**err：这里是错误的，可能导致空指针*/
+//            queue.offer(cur.right);
+//        }
+//        return true;
+//    }
+
+
+    /*958
+给你一棵二叉树的根节点 root ，请你判断这棵树是否是一棵 完全二叉树 。
+
+在一棵 完全二叉树 中，除了最后一层外，所有层都被完全填满，并且最后一层中的所有节点都尽可能靠左。最后一层（第 h 层）中可以包含 1 到 2h 个节点。
+ */
     public boolean isCompleteTree(TreeNode root) {
         if (root==null) return true;
-        boolean hasNull = false;
         LinkedList<TreeNode> queue = new LinkedList<>();
         queue.offer(root);
+        boolean hasNull = false;
         while (!queue.isEmpty()){
             /**这种类型的题目并不需要关注某一层有多少节点，只要queue不是空就进行循环即可*/
             TreeNode cur = queue.poll();
-            if (cur==null) hasNull = true;
-            if (hasNull&&cur!=null) return false;
-            queue.offer(cur.left);
-            queue.offer(cur.right);
+            if (cur==null){
+                hasNull = true;
+            }else {
+                if (hasNull) return false;
+                queue.offer(cur.left);
+                queue.offer(cur.right);
+            }
         }
         return true;
     }
