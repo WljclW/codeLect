@@ -462,18 +462,9 @@ public class review06 {
     * 给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续 子数组（该子数组中至
     * 少包含一个数字），并返回该子数组所对应的乘积。
     测试用例的答案是一个 32-位 整数。*/
-    public int maxProduct(int[] nums) {
-        int minPre = nums[0],maxPre = nums[0];
-        int res = nums[0];
-        for (int i = 1; i < nums.length; i++) {
-            int curMin = Math.min(nums[i],Math.min(minPre*nums[i],maxPre*nums[i]));
-            int curMax = Math.max(nums[i],Math.max(maxPre*nums[i],maxPre*nums[i]));
-            minPre = curMin;
-            maxPre = curMax;
-            res = Math.max(res,maxPre);
-        }
-        return res;
-    }
+//    public int maxProduct(int[] nums) {
+//
+//    }
 
 
     /*49.

@@ -73,25 +73,56 @@ public class codetop_unskilled_6_10 {
      */
     class Codec {
 
+        /**
+         【层序遍历的序列化】
+             1. 正常的层序遍历，分情况————
+                ①如果碰到了null节点，则添加“null,”；
+                ②如果碰到的不是null，则需要添加“cur.val,”。同时由于cur并不是null，因此需要将它的左右孩子添加到queue.
+             2. 其他说明：
+                ①需要判断是不是root就是null，如果root就是null，就直接返回了
+                ②并不需要严格的区分每一层，因此实际上并不需要像“正规层序遍历”那样，研究每一层之前使用“queue.size()”记
+              录队列的大小。这里并不需要严格的区分每一层~~~
+         */
         // Encodes a tree to a single string.
         public String serialize(TreeNode root) {
             if (root==null) return "null";
-            StringBuilder res = new StringBuilder();
-            Stack<TreeNode> stack = new Stack<>();
-            stack.push(root);
-            while (!stack.isEmpty()){
-                TreeNode cur = stack.pop();
-                if (cur==null)
-                    res.append("null,");
-                else {
-                    res.append(root.val).append(",");
-                    stack.push(cur.right);
-                    stack.push(cur.left);
+            StringBuilder sb = new StringBuilder();
+            LinkedList<TreeNode> queue = new LinkedList<>();
+            queue.offer(root);
+            while (!queue.isEmpty()){
+                TreeNode cur = queue.poll();
+                if (cur==null){
+                    sb.append("null,");
+                }else {
+                    sb.append(cur.val).append(",");
+                    queue.offer(cur.left);
+                    queue.offer(cur.right);
                 }
             }
-            return res.toString();
+            /**chatgpt的建议是去除最后一个“,”，需要测试一下如果不去除对吗？不去除的话会走到Integer解析“”，需要看看这个会不会报错应该*/
+//            if (sb.length()>0) sb.setLength(sb.length()-1);  //去除最后一个逗号的代码，其实就是设置了StringBuilder的长度
+            return sb.toString();
         }
 
+        /**
+         【层序遍历的反序列化】
+            总体的流程————
+                step1：如果序列化的结果data就是“null”，说明根节点就是null，因此直接返回null。
+                step2：将序列化的结果data根据“,”进行划分成数组strs。
+                step3：先根据第一个串解析出root节点的值，创建节点。记录root节点 并且 入队列。
+                step4：记录index。因为后面需要不断的依次从strs中拿每个字符串进行解析，因此需要使
+            用index记录当前拿到哪一个位置。
+                step5：使用while循环完成节点的左右孩子的拼接。详细如下————
+                    ①先从queue弹出一个节点，表示父节点；
+                    ②拿到index位置的字符串————
+                      如果不是null，则创建节点给cur的left孩子，并且将这个节点入队列；这个操作是
+                    第一个if块完成
+                      如果index位置的字符串就是null，则由于指针的默认值就是null，因此不用额外的
+                    操作。
+                       更新index，即index++;
+                    ③拿到index位置的字符串————
+                      跟②是类似的操作，只不过这里针对的是right孩子
+         */
         // Decodes your encoded data to tree.
         public TreeNode deserialize(String data) {
             if (data.equals("null")) return null;
@@ -102,13 +133,13 @@ public class codetop_unskilled_6_10 {
             int index = 1;
             while (!queue.isEmpty()){
                 TreeNode cur = queue.poll();
-                if (!strs[index].equals("null")){
+                if (!strs[index].equals("null")){ /**chatgpt：需要判断index是不是超出了strs的长度，不校验应该是有问题的*/
                     TreeNode node = new TreeNode(Integer.valueOf(strs[index]));
                     cur.left = node;
                     queue.offer(node);
                 }
                 index++;
-                if (!strs[index].equals("null")){
+                if (!strs[index].equals("null")){ /**chatgpt：需要判断index是不是超出了strs的长度，不校验应该是有问题的*/
                     TreeNode node = new TreeNode(Integer.valueOf(strs[index]));
                     cur.right = node;
                     queue.offer(node);
@@ -387,6 +418,34 @@ public class codetop_unskilled_6_10 {
             }
         }
     }
+    
+    /*47 全排列Ⅱ
+            见回溯795行的写法
+     */
+    List<List<Integer>> res = new ArrayList<>();
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        Arrays.sort(nums);
+        boolean[] used = new boolean[nums.length];
+        backtrack(nums, used, new ArrayList<>());
+        return res;
+    }
+
+    private void backtrack(int[] nums, boolean[] used, ArrayList<Integer> path) {
+        if(path.size()==nums.length){
+            res.add(new LinkedList<>(path));
+            return;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if (!used[i]){
+                if (i>0&&nums[i-1]==nums[i]&&!used[i-1]) continue;
+                used[i] = true;
+                path.add(nums[i]);
+                backtrack(nums,used,path);
+                used[i] = false;
+                path.remove(path.size()-1);
+            }
+        }
+    }
 
     /*7
         给定一个 32 位有符号整数 x，返回将其数字部分反转后的结果。如果反转后超出了 32 位有符号整数的范围 [-2^31, 2^31 - 1]，则返回 0
@@ -413,7 +472,7 @@ public class codetop_unskilled_6_10 {
                   如果res正好等于”Integer.MAX_VALUE/10“，由于还要加digit，因此要确保digit小于7.
                 ②如果res已经小于”Integer.MIN_VALUE/10“，由于还要加digit，因此必然越界；
                   如果res正好等于”Integer.MIN_VALUE/10“，因此要确保digit<-8*/
-            if (res>Integer.MAX_VALUE/10||
+            if (res>Integer.MAX_VALUE/10||            /**err：这里需要对res进行校验，而不是校验x!!!!*/
                     (res==Integer.MAX_VALUE/10 &&digit>7))
                 return 0;
             if (res<Integer.MIN_VALUE/10||
@@ -426,16 +485,161 @@ public class codetop_unskilled_6_10 {
     }
 
 
+    /*LCR 155. 将二叉搜索树转化为排序的双向链表
+将一个 二叉搜索树 就地转化为一个 已排序的双向循环链表 。
+对于双向循环列表，你可以将左右孩子指针作为双向循环链表的前驱和后继指针，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
+特别地，我们希望可以 就地 完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中最小元素的指针。
+ */
+    class NodeNode {
+        public int val;
+        public NodeNode left;
+        public NodeNode right;
 
-    /*518.。。。322求解的是最少的硬币数，518求解所有的方案数
-    给定不同面额的硬币 coins 和一个总金额 amount，计算并返回可以凑成总金额的硬币组合数。硬币可以无限次使用，顺序不同的组合
+        public NodeNode() {}
+
+        public NodeNode(int _val) {
+            val = _val;
+        }
+
+        public NodeNode(int _val, NodeNode _left, NodeNode _right) {
+            val = _val;
+            left = _left;
+            right = _right;
+        }
+    }
+
+    /**
+     * 自己写的代码是有问题的
+     */
+//    public Node treeToDoublyList(Node root) {
+//        if (root==null) return root;
+//        Stack<Node> stack = new Stack<>();
+//        Node prev = null;
+//        Node head = null;
+//        while (root!=null||!stack.isEmpty()){
+//            if (root!=null){
+//                stack.push(root);
+//                root = root.left;
+//            }else {
+//                Node cur = stack.pop();
+//                if (prev==null) prev = cur; //错误1：没有记录链表头，导致最后返回prev时其实仅仅返回了最后一个节点
+//                else{
+//                    prev.right = cur;
+//                    prev.left = null; //错误2：不能把prev.left置为null，会导致前向链断开
+//                    prev = prev.right;
+//                }
+//                root = cur.right;
+//            }
+//        }
+//        return prev;
+//    }
+
+    /*自己重新写的一版代码*/
+    public NodeNode treeToDoublyList_review(NodeNode root) {
+        NodeNode prev = null,head = null;
+        if (root==null) return root;
+        Stack<NodeNode> stack = new Stack<>();
+        while (root!=null||!stack.isEmpty()){
+            if (root!=null){
+                stack.push(root);
+                root = root.left;
+            }else {
+                NodeNode cur = stack.pop();
+                if (head==null) {
+                    head = cur;
+                    prev = head; /**这里head已经是cur了，因此可以写成”prev=cur“*/
+                } else {
+                    prev.right = cur;
+                    cur.left = prev;
+                    prev = prev.right; /**这里prev.right已经是cur了，因此可以写成”prev=cur“*/
+                }
+                /**由于if-else中都会有”prev=cur“，因此可以把”prev=cur“写到这里，就不用在if-else重复写了*/
+                root = cur.right;
+            }
+        }
+        /**err：记得首尾相连*/
+        head.left = prev;
+        prev.right = head;
+        return head;
+    }
+
+
+    /*非递归的写法
+        你在第一次弹栈时用 if (head==null) head=cur; 记录了头结点。
+        每次访问节点时把 prev 和 cur 互相链接：prev.right = cur; cur.left = prev;
+        每轮结束后 prev = cur。
+        遍历完后再首尾相连：head.left = prev; prev.right = head;
+        返回 head。
+     */
+    public NodeNode treeToDoublyList(NodeNode root) {
+        if (root == null) return root;
+        Stack<NodeNode> stack = new Stack<>();
+        NodeNode prev = null; /**prev记录的是已经连接部分的链表的最后一个节点*/
+        NodeNode head = null; /**head仅仅是记录头节点*/
+        while (root != null || !stack.isEmpty()) {
+            if (root != null) {
+                stack.push(root);
+                root = root.left;
+            } else {
+                NodeNode cur = stack.pop();
+                if (prev == null) head = cur; /**err：这里是记录头节点，其实就是中序遍历的最小值节点*/
+                else {
+                    prev.right = cur;
+                    cur.left = prev; /**err：真正要做的是“把当前节点的left指针指向prev节点，而不是修改prev节点的左指针”*/
+                }
+                prev = cur;
+                root = cur.right;
+            }
+        }
+
+        head.left = prev;
+        prev.right = head;
+        return prev;
+    }
+
+
+    /*递归形式的写法*/
+    NodeNode prev = null,head = null;
+    public NodeNode treeToDoublyList_digui(NodeNode root) {
+        if (root==null) return null;
+        dfs(root);
+
+        head.left = prev;
+        prev.right = head;
+        return head;
+    }
+
+    private void dfs(NodeNode root) {
+        if (root==null) return;
+        /*step1：先去遍历它的左子树*/
+        dfs(root.left);
+        /*step2：访问当前节点。
+        【二叉树题目的本质】四种遍历方式中，在访问节点的时候做一定的逻辑处理*/
+        if (head==null){
+            head = root;
+        }else {
+            prev.right = root;
+            root.left = null; //这里为什么是root.left=null
+        }
+        prev = root;
+        /*step3：访问它的右子树*/
+        dfs(root.right);
+    }
+
+
+    /*518.。。。322求解的是最少的硬币数，518求解所有的方案数。。。
+        给定不同面额的硬币 coins 和一个总金额 amount，计算并返回可以凑成总金额的硬币组合数。硬币可以无限次使用，顺序不同的组合
     视为同一种（只要硬币种类和个数一样就算同一组合）。
+     */
+
+    /**
+      【说明】322和518的区别最终就体现在了dp[i]的求解————即区别集中体现在了每一个位置的决策过程
      */
     public int change(int amount, int[] coins) {
         int[] dp = new int[amount + 1];
         for (int i = 0; i < coins.length; i++) {
             for (int j = coins[i]; j <=amount; j++) {
-                dp[j] = dp[j] + dp[i-coins[i]];
+                dp[j] = dp[j] + dp[i-coins[i]]; /**【注意区别】方案数的话就是对应位置的方案加上去；类似518的话就要通过“Math.min”计算较小值*/
             }
         }
         return dp[amount];
@@ -451,7 +655,7 @@ public class codetop_unskilled_6_10 {
      */
     /*方法1：DFS递归的写法*/
     public boolean isSubStructure(TreeNode A, TreeNode B) {
-        if (A==null&&B==null) return true;
+        if (A==null&&B==null) return true; /**【注】chatgpt说不要这一句就可以，空树不是任何树的子树*/
         if (A==null||B==null) return false;
         return match(A,B)||
                 isSubStructure(A.left,B)||
@@ -514,6 +718,24 @@ public class codetop_unskilled_6_10 {
         return true;
     }
 
+    /**
+     *需要判断一下下面的代码有没有问题？？？？
+     */
+//    public boolean isSubStructure1(TreeNode A, TreeNode B) {
+//        if (A==null&&B==null) return true;
+//        if (A==null) return false;
+//        return isMatch1(A,B)||
+//                isSubStructure1(A.left,B)||
+//                isSubStructure1(A.right,B);
+//    }
+//
+//    private boolean isMatch1(TreeNode a, TreeNode b) {
+//        if (a==null&&b==null) return true;
+//        if (b==null) return true;
+//        return a.val==b.val&&
+//                isMatch1(a.left,b.left)&&
+//                isMatch1(a.right,b.right);
+//    }
 
 
     /*572
@@ -575,6 +797,25 @@ public class codetop_unskilled_6_10 {
         return true;
     }
 
+    /**
+     *下面的代码需要提交一下看对不对
+     */
+//    public boolean isSubtree1(TreeNode root, TreeNode subRoot) {
+//        if (root==null&&subRoot==null) return true;
+//        if (root==null) return false;
+//        return isMatch1(root,subRoot)||
+//                isSubtree1(root.left,subRoot)||
+//                isSubtree1(root.right,subRoot);
+//    }
+//
+//    private boolean isMatch1(TreeNode root, TreeNode subRoot) {
+//        if (root==null&&subRoot==null) return true;
+//        if (root==null||subRoot==null) return false;
+//        return root.val==subRoot.val&&
+//                isMatch1(root.left,subRoot.left)&&
+//                isMatch1(root.right,subRoot.right);
+//    }
+
 
 
 
@@ -620,6 +861,24 @@ public class codetop_unskilled_6_10 {
          看最后两位组成字母的情况：如果 10 <= s[i-2..i-1] <= 26，那么 dp[i] += dp[i-2]。
      【优化】
         根据方法numDecodings中备注的①、②，可以发现可以将1维的动态规划优化到“常数空间”的动态规划
+     【dp问题初始化的注意】
+        我们定义 dp[i] 表示 前 i 个字符（s[0..i-1]）的解码方法数。如果 i=0，表示“没有字符”（空串），那
+     么解码方法有多少呢？
+        如果你要拼接结果，空串本身只有一种“空解码”：什么都不做。这并不是一种实际的编码方式，而是 递推的基底。
+        动态规划常常这样定义：
+     “有一个空集/空字符串/空背包，只有一种处理方式——不选/不做”。所以我们把 dp[0]=1 当成初始条件，保证后面的转移公式可以正确套用。
+     */
+    /*【补充说明】
+     动态规划里常见的“空集一法”
+         走台阶：dp[0]=1 表示爬 0 级台阶有 1 种走法（啥也不做）。
+         子集和：dp[0]=1 表示不选任何元素时和为 0 有 1 种方案。
+         背包问题：容量为 0 时有 1 种方案（不放任何物品）。
+         同理，这里空串解码方式“1 种”就是“啥都不做”的那 1 种，为了递推方便。
+
+     总结
+         dp[0]=1 并不是说空串真的有一个字母解码，而是动态规划的基底：
+         它表示在还没有开始处理任何字符时，只有 1 种“空操作”。
+         这样递推时才能正确地累加第一位、前两位等情况。
      */
     public int numDecodings(String s) {
         if(s==null||s.length()==0||s.charAt(0)=='0') return 0;
@@ -657,7 +916,6 @@ public class codetop_unskilled_6_10 {
     }
 
 
-
     /*440. 字典序的第K小数字
         给定整数 n 和 k，返回  [1, n] 中字典序第 k 小的数字。
             示例 1:
@@ -668,6 +926,28 @@ public class codetop_unskilled_6_10 {
 //    public int findKthNumber(int n, int k) {
 //
 //    }
+
+    /*9. 回文数的判断*/
+    public boolean isPalindrome(int x) {
+        /*step1：base case的考虑。
+            ①负数一定不是回文数；
+            ②如果一个非零数的最后一个数是0，一定不是回文数*/
+        if(x<0||(x%10==0&&x!=0)) return false;
+
+        /*step2：使用rev记录反转后得到的数，只要rev<x就一直反转*/
+        int rev = 0;
+        while (rev<x){
+            int digit = x%10;
+            rev = rev*10+digit;
+            x /= 10;
+        }
+        /*step3：除了while循环有两种可能。
+            ①如果形参x是偶数位的话，两个部分如果是相等的，说明是回文数；
+            ②如果形参x是奇数位的话，两个部分一定不相等且rev一定大，因为此时最中间的那个数
+         在rev中，此时如果x==rev/10的话，说明是回文数。。比如：初始时形参x是53135，则出了
+         while循环时x的值时53，rev的值是531.(满足x==rev/10)*/
+        return x==rev||x==rev/10;
+    }
 
 
     /*450
@@ -681,8 +961,8 @@ public class codetop_unskilled_6_10 {
      【解题思路】删除二叉搜索树中的一个节点，根据该节点的处境分为几种情况————
           1. 如果该节点是叶子节点，则直接删除就可以。由于它就在叶子节点，因此也不需要用其他节点代替它的位置；
           2. 如果该节点只有一个孩子非null————换言之相等于只有一个孩子；
-          3. 如果该节点的左右孩子都不是null，则有两种做法：一种是让左子树的最大值代替这个节点，另一种是让右
-        子树的最小值代替这个节点......下面的代码使用右子树的最小值来代替要被删除的节点
+          3. 如果该节点的左右孩子都不是null，则有两种做法(两种做法是等价的)：一种是让左子树的最大值代替这个
+        节点，另一种是让右子树的最小值代替这个节点......下面的代码使用右子树的最小值来代替要被删除的节点
           【说明】下面的代码中，实际上将1和2的逻辑写在了一起
      */
     /*解法1：递归方法删除*/
@@ -691,9 +971,11 @@ public class codetop_unskilled_6_10 {
         if(root==null) return null;
         /*step2：外层的if-else if-else会先找到要删除的节点。进入else块说明找到了要删除的节点*/
         if (key<root.val){
-            return deleteNode(root.left,key);
+//            return deleteNode(root.left,key); //这样写是错误的，这样写“只是把删除后替换的节点返回了，并没有在树中完成节点的替换”
+            root.left = deleteNode(root.left,key); /**err：注意必须要把递归的返回值赋给root.left，才会真正从树中删除节点*/
         } else if (key>root.val) {
-            return deleteNode(root.right,key);
+//            return deleteNode(root.right,key);
+            root.right = deleteNode(root.right,key);
         }else { /**进入到else，说明定位到了要删除的节点*/
             /*情况1：如果只有一个子节点 或者 一个子节点都没有，则返回不是null的节点*/
             if (root.left==null) return root.right;
@@ -703,8 +985,10 @@ public class codetop_unskilled_6_10 {
                 然后，取右子树递归删除最小值的那个节点*/
             TreeNode minNode = findMin(root.right);
             root.val = minNode.val;
-            return deleteNode(root.right, minNode.val);
+//            return deleteNode(root.right, minNode.val);
+            root.right = deleteNode(root.right,minNode.val);
         }
+        return root;
     }
 
     private TreeNode findMin(TreeNode right) {
@@ -767,6 +1051,50 @@ public class codetop_unskilled_6_10 {
     }
 
 
+    /*295
+    中位数是有序整数列表中的中间值。如果列表的大小是偶数，则没有中间值，中位数是两个中间值的
+    平均值。
+    例如 arr = [2,3,4] 的中位数是 3 。
+    例如 arr = [2,3] 的中位数是 (2 + 3) / 2 = 2.5 。
+    实现 MedianFinder 类:
+        MedianFinder() 初始化 MedianFinder 对象。
+        void addNum(int num) 将数据流中的整数 num 添加到数据结构中。
+        double findMedian() 返回到目前为止所有元素的中位数。与实际答案相差 10-5 以内的答
+        案将被接受。
+     */
+    class MedianFinder {
+
+        PriorityQueue<Integer> small;
+        PriorityQueue<Integer> big;
+        public MedianFinder() {
+            small = new PriorityQueue<>((a,b)->b-a);
+            big = new PriorityQueue<>();
+        }
+
+
+        public void addNum(int num) {
+            if (small.size()==big.size()){
+                big.offer(num);
+                small.offer(big.poll());
+            }else {
+                small.offer(num);
+                big.offer(small.poll());
+            }
+        }
+
+
+
+        public double findMedian() {
+            int size = small.size() + big.size();
+            if ((size&1)==1){
+                return small.peek();
+            }else {
+                return (small.peek()+big.peek())/2.0;
+            }
+        }
+    }
+
+
     /*328
     给定单链表的头节点 head ，将所有索引为奇数的节点和索引为偶数的节点分别分组，保持它们原有的相对顺序，然后把偶数索引节点分组连接到奇数索引节点分组之后，返回重新排序的链表。
     第一个节点的索引被认为是 奇数 ， 第二个节点的索引为 偶数 ，以此类推。
@@ -824,7 +1152,7 @@ public class codetop_unskilled_6_10 {
     class Trie {
 
         class TrieNode{
-            TrieNode[] children = new TrieNode[26];
+            TrieNode[] children = new TrieNode[26]; /**err：注意在声明的时候进行初始化，或者 在空参的构造器中进行初始化也可以*/
             boolean isEnd;
         }
 
@@ -930,7 +1258,7 @@ public class codetop_unskilled_6_10 {
 
         public void push(int x) {
             queue.offer(x);
-            int size = queue.size();
+            int size = queue.size(); //必须使用额外的变量来记录此时的size，这个思想类似于“层序遍历时，遍历某一层节点之前记录queue中有多少节点————即本层有多少节点”————因为在遍历时回不断的向queue中添加节点，导致queue的节点不断的变，因此.size()不能放在for循环的条件中
             for (int i = 0; i < size - 1; i++) { /**【注】这里是”i<size-1“，即将”除当前元素x以外的其他元素出队列“*/
                 queue.offer(queue.poll());
             }
@@ -960,8 +1288,14 @@ public class codetop_unskilled_6_10 {
      状态转移方程：
             情况1：如果i、j位置的字符相同，则dp[i][j] = dp[i+1][j-1] + 2
             情况2：如果i、j位置的字符不相同，则dp[i][j] = max(dp[i+1][j], dp[i][j-1])
-     初始化：i和j相等的时候，子串的长度是1，回文串的长度是1
-     遍历顺序的确定：因为 dp[i][j] 依赖于 dp[i+1][j-1]，所以必须从 区间长度 递增的顺序来填表（i 从大到小，j 从小到大）。
+     初始化：i和j相等的时候，子串的长度是1，“最大回文子序列”的长度是1
+     遍历顺序的确定：
+            ①当i和j位置字符相等的时候，因为 dp[i][j] 依赖于 dp[i+1][j-1]，所以 i的计算方向必
+        须是从大到小的，这一步不能确定出j的遍历方向
+            ②当i和j位置字符不相等的时候，此时 dp[i][j] 会依赖于 dp[i+1][j]、dp[i][j-1]，即
+        会依赖于下一行的同一位置，因此要先计算出下一行的值，即i的方向是从大到小；也会依赖于同一行前
+        一个位置的数，因此同一行计算的时候需要先计算前面的数，从前往后依次计算。
+            综上，行的顺序是从下往上计算每一行的元素、列的顺序是从前往后计算
      */
     /*二维的dp，下面是“宫水题解”，这种枚举子串长度的思想比较难想.....*/
     public int longestPalindromeSubseq(String s) {
@@ -985,5 +1319,675 @@ public class codetop_unskilled_6_10 {
         return dp[0][n-1];
     }
 
+    /**建议的解法：常规的思想————二维表的行列分别标识s串对应位置的字符
+        dp数组的含义：dp[i][j]标识“i....j”这个子串的最大回文子序列长度；
+        状态转移：
+            情况1：如果i位置的字符 和 j位置的字符 是一样的，则dp[i][j] = dp[i+1][j-1] + 2;
+            情况2：如果i位置的字符 和 j位置的字符 是不一样的，则dp[i][j] = Math.max(dp[i+1][j],
+         dp[i][j-1])。即dp[i][j]取决于中间子串的最优解
+    */
+    public int longestPalindromeSubseq_kaer(String s) {
+        /*step1：声明dp数组。
+            这里不用多1维，原因在于dp[i][j]的含义————代表子串“i....j”中最长的回文子序列长度，因此
+         是包含左右边界的，因此不用多一维就可以*/
+        int n = s.length();
+        int[][] dp = new int[n][n];
+        /*step2：base case。主对角线就是只有一个字符的情况，此时的最长回文子序列长度就是1*/
+        for (int i = 0; i < n; i++) {
+            dp[i][i] = 1;
+        }
+        /*step3：由于最后一行只有一个元素dp[n-1][n-1],这个位置其实在base case就填充了。因此
+            这里直接从倒数第二行(索引为n-2)开始向上研究。
+            研究每一行时，j从i+1开始研究。原因：首先“i....j”的子串因此j必须不小于i；同时“i..i”
+         这样长度位1的子串在base case就已经设置完成了，因此j直接从i+1开始。
+        */
+        for (int i = n-2; i >=0; i--) {
+            for (int j = i+1; j < n; j++) {
+                //①拿出当前子串的首尾字符
+                char l = s.charAt(i);
+                char r = s.charAt(j);
+                if (l==r){ //②首尾字符相同的时候
+                    dp[i][j] = dp[i+1][j-1]+2;
+                }else { //③首尾字符不相同的时候
+                    dp[i][j] = Math.max(dp[i+1][j],dp[i][j-1]);
+                }
+            }
+        }
+        /*step4：因为求解的是s中最长的回文子序列长度。因此返回dp[0][n-1]—————“代表子串0....n-1中
+            最长回文子序列的长度”*/
+        return dp[0][n-1];
+    }
+
+
+        /*673. 最长递增子序列的个数
+给定一个未排序的整数数组 nums ， 返回最长递增子序列的个数 。
+
+注意 这个数列必须是 严格 递增的。
+     */
+    /**
+     【建议的解法】建议使用解法“findNumberOfLIS”
+     【注意】
+        1. dp数组中dp[i]表示以nums[i]结尾的最长递增子序列的长度。
+        2. 但是这样的长度有多少呢？这个是需要知道的，因为我们需要计算“最长递增子序列
+     的数量”，因此这个值在后面会用到。比如：nums[i]<nums[i+m]，因此会有有一个递增子
+     序列，这样长度的子序列有多少个呢？？？答：以nums[i]结尾的最长递增子序列的个数就是
+     “.......nums[i]、nums[i+m]”这样递增子序列的个数，因此我们需要能快速的得到以nums[i]结
+     尾的最长递增子序列的个数
+         综上，额外需要一个数组cnt，其中cnt[i]表示“以nums[i]结尾的最长递增子序列 的个数”
+     */
+//    public int findNumberOfLIS(int[] nums) {
+//        int res = 0,maxLen = 0;
+//        int[] dp = new int[nums.length];
+//        Arrays.fill(dp,1);
+//        Arrays.fill(count,1);
+//        for (int i = 1; i < nums.length; i++) {
+//            int newVal = dp[i];
+//            for (int j = 0; j < i; j++) {
+//                if (nums[i]>nums[j]){
+//                    newVal = Math.max(dp[j]+1,dp[i]);
+//                }
+//                dp[i] = newVal;
+//                if (newVal>maxLen){
+//                    maxLen = newVal;
+//                    res = dp[j];
+//                } else if (newVal == maxLen) {
+//                    res += dp[j];
+//                }
+//            }
+//        }
+//        return res;
+//    }
+
+
+    public int findNumberOfLIS(int[] nums) {
+        int maxLen = 0;
+        /*step1：初始化两个数组————dp以及cnt
+            dp数组：dp[i]的含义————以nums[i]结尾的最长递增子序列的长度。
+            cnt数组：cnt[i]的含义————以nums[i]结尾的最长递增子序列的方案数。
+            初始时，两个数组的元素值都是1，因为“以nums[i]结尾的最长递增子序列”的长度至少
+        是1，此时的子序列仅仅包含nums[i]自身————即dp数组的任何一个值至少是1；“以nums[i]
+        结尾的最长递增子序列”的种类数此时也是1，因为仅仅包含nums[i]自身————即cnt数组的任何
+        一个值至少是1.
+        */
+        int[] dp = new int[nums.length];
+        int[] cnt = new int[nums.length];
+        Arrays.fill(dp,1);
+        Arrays.fill(cnt,1);
+        /*step2：使用for循环完成dp、cnt数组的计算*/
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = 0; j < i; j++) {
+                /**条件1：只需要研究nums[j]<nums[i]的情况，因此此时才会更新dp、cnt数组，其他的情况数组的默认值不用动*/
+                if (nums[i]>nums[j]){
+                    /**条件2：在满足条件1的基础上，还必须满足“dp[j]+1>=dp[i]”，此时才会涉及到更新操作*/
+                    if (dp[j]+1>dp[i]){ //情况1：此时对于nums[i]结尾的子序列，有一个更大的递增子序列长度。因此更新dp[i]，同时更新cnt
+                        dp[i] = dp[j]+1;
+                        cnt[i] = cnt[j];
+                    } else if (dp[j] + 1 == dp[i]) { //情况2：对于nums[i]来说，找到了同样长度的最长递增子序列，因此需要更新cnt
+                        cnt[i] += cnt[j];
+                    }
+                }
+            }
+            //更新整个过程中遇到的“最长递增子序列的长度”
+            maxLen = Math.max(maxLen,dp[i]);
+        }
+        /*step3：遍历dp数组，如果nums[i]结尾的最长递增子序列的长度等于maxLen。
+            说明：以nums[i]结尾的最长递增子序列的长度就是“整个数组的最长递增子序列长度”，因此需要将
+        以nums[i]结尾的最长递增子序列的种类数累加到res，这个种类数是多少呢？？就是cnt[i]！！*/
+        int res  =0;
+        for (int i = 0; i < cnt.length; i++) {
+            if (dp[i]==maxLen){
+                res += cnt[i];
+            }
+        }
+        return res;
+    }
+
+
+    /*344
+    给定一个字符数组 s，请你原地反转这个字符串，不要分配额外空间。
+    示例：
+    输入：s = ['h','e','l','l','o']
+    输出：['o','l','l','e','h']
+     */
+
+    /**
+     【说明】注意感受一下 while循环 以及 for循环 的写法，以及区别
+     */
+    public void reverseString(char[] s) {
+        int left = 0,right = s.length-1;
+        while (left<right){
+            char tmp = s[left];
+            s[left] = s[right];
+            s[right] = tmp;
+            left++;
+            right--;
+        }
+    }
+
+    public void reverseString_for(char[] s) {
+        for (int left = 0,right = s.length-1;left<right;left++,right--){
+            char tmp = s[left];
+            s[left] = s[right];
+            s[right] = tmp;
+        }
+    }
+
+
+
+        /*120
+    给定一个三角形 triangle ，找出自顶向下的最小路径和。
+
+每一步只能移动到下一行中相邻的结点上。相邻的结点 在这里指的是 下标 与 上一层结点下标 相同或者等于 上一层结点下标 + 1 的两个结点。也就是说，如果正位于当前行的下标 i ，那么下一步可以移动到下一行的下标 i 或 i + 1 。
+     */
+
+    /**
+     【关键】
+        1. 从最后一行倒着遍历，在每一行的时候就能从前往后顺序更新了。会简化很多
+     */
+    public int minimumTotal(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int[] dp = new int[n + 1]; /**空间多1防止越界*/
+        for (int i = n-1; i > 0; i--) {
+            for (int j = 0; j < triangle.get(i).size(); j++) {
+                /**
+                 【这里的理解】
+                        比如当前研究第m行，(m,j)位置的最小值，就取决于下一行的j位置、j+1位置（因为题目已知每一个位置
+                 可以到下一行的相同索引 以及 相同索引加1的位置），那这两个位置的值是多少呢？？其实就是dp[j]、dp[j+1]，
+                 那当前位置的值是多少呢？是triangle.get(i).get(j)
+                 */
+                dp[j] = Math.min(dp[j],dp[j+1])+triangle.get(i).get(j);
+            }
+        }
+
+        return dp[0];
+    }
+
+
+
+            /*207.课程表
+    你这个学期必须选修 numCourses 门课程，记为 0 到 numCourses - 1 。
+    在选修某些课程之前需要一些先修课程。 先修课程按数组 prerequisites 给出，其中 prerequisites[i] = [ai, bi] ，表示如果要学习课程 ai 则 必须 先学习课程  bi 。
+    例如，先修课程对 [0, 1] 表示：想要学习课程 0 ，你需要先完成课程 1 。
+    请你判断是否可能完成所有课程的学习？如果可以，返回 true ；否则，返回 false 。
+    * */
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        List<List<Integer>> graph = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            graph.add(new LinkedList<>());
+        }
+
+        int[] indgree = new int[numCourses];
+        for (int[] cur : prerequisites) {
+            int index = cur[0], ele = cur[1];
+            graph.get(ele).add(index);
+            indgree[index]++;
+        }
+
+        LinkedList<Integer> zeroIndgree = new LinkedList<>();
+        for (int i = 0; i < indgree.length; i++) {
+            if (indgree[i] == 0) zeroIndgree.offer(i);
+        }
+
+        int count = 0;
+        while (!zeroIndgree.isEmpty()) {
+            Integer curIndex = zeroIndgree.poll();
+            count++;
+            for (int index : graph.get(curIndex)) {
+                indgree[index]--;
+                if (indgree[index] == 0) {
+                    zeroIndgree.offer(index);
+                }
+            }
+        }
+        return count == numCourses;
+    }
+
+
+    /*210 课程表Ⅱ
+        有 numCourses 门课程（编号 0…numCourses-1）。
+        给出先修关系 prerequisites[i] = [a,b] 表示必须先修 b 才能修 a。
+
+        要求返回一种可行的修课顺序（拓扑序）。
+        如果不存在（有环）则返回空数组。
+    */
+    /**标准的有向图的拓扑排序问题*/
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        /*1. 构建存储图的架子*/
+        List<List<Integer>> graph = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            graph.add(new LinkedList<>());
+        }
+        /*2. 构建图、入度表*/
+        int[] indgree = new int[numCourses];
+        for (int[] cur:prerequisites){
+            int prereq  =cur[1],course = cur[0];
+            graph.get(prereq).add(course);
+            indgree[course]++;
+        }
+        /*3. 初始化队列存储“入度为0”的节点*/
+        LinkedList<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < indgree.length; i++) {
+            if (indgree[i]==0) queue.offer(i);
+        }
+        /**4. 创建res来收集拓扑排序的结果
+            【说明】上面的1~3和207题课程表的代码甚至是一样的，最主要的区别是下面的代码，使用res数组来收集结果
+         */
+        int[] res = new int[numCourses];
+        int index = 0;
+        while (!queue.isEmpty()){
+            Integer curIndex = queue.poll();
+            res[index++] = curIndex;
+            for (int inx:graph.get(curIndex)){
+                indgree[inx]--;
+                if (indgree[inx]==0) queue.offer(inx);
+            }
+        }
+        if (index!=numCourses) return new int[0]; //如果res中存放的节点数小于numCourses，说明有课程遍历不到，即存在环
+        return res;
+    }
+
+
+
+    /*50,计算幂
+    实现一个函数计算 xⁿ（x 的 n 次幂）。
+     */
+    public double myPow(double x, int n) {
+        long N = n;
+        return N>0?quickPow(x,N):1.0/quickPow(x,-N);
+    }
+
+    private double quickPow(double x, long n) {
+        if (n==0) return 1.0;
+        double y = quickPow(x,n/2);
+        return n%2==0?y*y:y*y*x;
+    }
+
+
+    public double myPow_diedai(double x, int n) {
+        long N = n;
+        if (N<0){
+            x = 1.0/x;
+            N = -N;
+        }
+
+        double ans = 1.0;
+        while (N>0){
+            if (N%2==0){
+                N /= 2;
+                x *= x;
+            }else {
+                N = N-1;
+                ans *= x;
+            }
+        }
+        return ans;
+    }
+
+
+    /**迭代的官方写法
+     下面的写法是最简化的写法
+     */
+    public double myPow_diedai_offical(double x, int n) {
+        long N = n;
+        if (N < 0) {
+            N = -N;
+            x = 1.0 / x;
+        }
+
+        double res = 1.0;
+        double base = x; //存储底数，初始的时候底数是x，指数是N
+        while (N > 0) {
+            /*步骤1：如果N是奇数的话需要特殊处理，将base先成到res，此时N就已经变成了N-1，因此指数变为偶数*/
+            if ((N & 1) == 1) {
+                res = res * base;
+            }
+            /*步骤2：到了这里指数一定是偶数了。。比如4^6相当于16^3即底数变为4*4，指数缩为原来的一半！！
+                 因此做如下操作————
+                    ①更新底数base。更新为原来的平方；
+                    ②更新指数N。注意N为奇数的时候if块内没有更新N，但是“N/2”和“(N-1)/2”的结果一样。比
+                 如”7/2==3“并且”6/2==3“，是一样的
+                */
+            base = base * base;
+            N /= 2;
+        }
+        return res;
+    }
+
+
+    /*611、有效三角形的个数
+
+     */
+    public int triangleNumber(int[] nums) {
+        Arrays.sort(nums);
+        int res = 0;
+        for (int i = 0; i < nums.length - 2; i++) {
+            int left = i+1,right = nums.length-1;
+            while (left<right){
+                int curVal = nums[i]+nums[left]-nums[right];
+                if (curVal>0){
+                    res += (right-left);
+                    right--;
+                }else {
+                    left++;
+                }
+            }
+        }
+        return res;
+    }
+
+    /*400
+    给你一个整数 n ，请你在无限的整数序列 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ...] 中找出并返回第 n 位上的数字。
+     */
+    public int findNthDigit(int n) {
+        int start = 1,digit = 1;
+        while (n>start*digit*9){
+            n -= start*digit*9;
+            digit++;
+            start *= 10;
+        }
+        /**err：需要注意的就是下面获取num以及index的时候都是使用n-1。*/
+        int num = start+(n-1)/digit; /**看一下所求的数位在哪一个数*/
+        int index = (n-1)%digit; /**计算所求的数位是num的哪一位*/
+        return String.valueOf(num).charAt(index)-'0';
+    }
+
+    /*10
+    给你一个字符串 s 和一个字符模式 p，请实现支持 . 和 * 的正则表达式匹配：
+        . 匹配任意单个字符。
+        * 匹配零个或多个前面的那一个元素。
+        匹配应该覆盖整个字符串（而不是部分字符串）。
+     */
+    /**
+     【详细的解释】
+        1.dp数组的含义： dp[i][j] 表示 s[0..i-1]（长度 i）能否被模式 p[0..j-1]（长度 j）完全匹配。
+     下标的含义是很重要：s 的第 i 个字符是 s[i-1]，p 的第 j 个字符是 p[j-1]。
+        2. 状态转移：
+            情况1：如果s的i-1字符和p的j-1字符相同 或者 p的j-1字符是“。”，说明这两个位置是可以匹配的，因
+        此dp[i][j]取决于dp[i-1][j-1].
+            情况2：如果p串j-1位置是“*”。则继续讨论————
+                ①匹配0次。此时p串的形式类似于“。。。。。。。p.charAt(j-2)*”，如果p串的“p.charAt(j-2)*”
+            匹配0次，就相当于p串去掉这两个字符，因此dp[i][j]=dp[i][j-2].
+                ②匹配1次或者多次。此时的要求就是：p.charAt(j-2)==‘。’ 或者 p.charAt(j-2)==s.charAt(i-1),
+            用语言来描述的话就是说 p子串中*前面的字符 必须等于 s子串的最后一个字符~~~~其中*获取的方式是p.charAt(j-1)，
+            因此“*前面的那个字符”就是p.charAt(j-2)，“s子串的最后一个字符”就是现在研究的位置，由于现在计算的是
+            dp[i][j]，因此“s子串的最后一个字符”就是s.charAt(i-1).
+     */
+    /*正则表达式的多维版本*/
+    public boolean isMatch_twoDim(String s, String p) {
+        int m = s.length(),n = p.length();
+        boolean[][] dp = new boolean[m + 1][n + 1];
+        dp[0][0] = true;
+
+        for (int i=2;i<=n;i++){
+            if (p.charAt(i-1)=='*'){
+                dp[0][i] = dp[0][i-2];
+            }
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char sc = s.charAt(i - 1);
+                char pc = p.charAt(j - 1);
+                if (sc==pc || pc =='.'){
+                    dp[i][j] = dp[i-1][j-1];
+                } else if (pc == '*') {
+                    /*情况1——匹配0次：模式串p中的“字母*”并不匹配s串中的任何字符*/
+                    dp[i][j] = dp[i][j-2];
+                    /*情况2——匹配多次：*/
+                    char pre = p.charAt(j - 2); //拿到“*”前面的那个字符
+                    if (pre=='.' || pre==sc){ //如果“*”前面的字符是“.”或者等于sc，则说明“*”前面的那个字符可以匹配s中的字符
+                        dp[i][j] = dp[i][j] || dp[i-1][j];
+                    }
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+
+    /*正则表达式2个一维的交替版本*/
+    /**
+     【和二维动规的区别】
+         两行滚动的dp中prev就是当前位置的上一行数据，因此“prev就相当于二维中的dp[i-1]”，代码中出
+     现prev的地方换成“dp[i-1]”跟二维的写法就是一样的了；
+         同理代码中的cur就是当前的这一行，因此“cur就相当于二维中的dp[i]”，代码中出现cur的地方换成
+     “dp[i]”跟二维的写法就一样了
+     */
+    public boolean isMatch_twoRow(String s, String p) {
+        int m = s.length(),n = p.length();
+        boolean[] prev = new boolean[n + 1];
+        boolean[] cur = new boolean[n + 1];
+
+        prev[0] = true;
+        for (int i = 2; i <= n; i++) {
+            if (p.charAt(i-1)=='*'){
+                prev[i] = prev[i-2];
+            }
+        }
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char sc = s.charAt(i - 1);
+                char pc = p.charAt(j - 1);
+                if (sc==pc||pc=='.'){
+                    cur[j] = prev[j-1]; /**1. 相当于二维中的“dp[i][j] = dp[i-1][j-1]”*/
+                } else if (pc == '*') {
+                    cur[j] = cur[j-2];  /**2. 相当于二维中的“dp[i][j] = dp[i][j-2]”*/
+                    char pre = p.charAt(j - 2);
+                    if (pre==sc||pre=='.'){
+                        cur[j] = cur[j] || prev[j]; /**3. 相当于二维中的“dp[i][j] = dp[i][j] || dp[i-1][j]”*/
+                    }
+                }
+            }
+            boolean[] tmp = prev;
+            prev = cur;
+            cur = tmp;
+        }
+        return prev[n];
+    }
+
+
+    /*一行数组+常数变量*/
+    public boolean isMatch_oneRow(String s, String p) {
+        int m = s.length(), n = p.length();
+        boolean[] dp = new boolean[n + 1];
+        dp[0] = true;
+
+        for (int i = 2; i <= n; i++) {
+            if (p.charAt(i - 1) == '*') {
+                dp[i] = dp[i - 2];
+            }
+        }
+
+        for (int i = 1; i <= m; i++) {
+            boolean prevDiagonal = dp[0]; /**记录上一行的dp[0]*/
+            dp[0] = false;
+            for (int j = 1; j <= n; j++) {
+                char sc = s.charAt(i - 1);
+                char pc = p.charAt(j - 1);
+                boolean tmp = dp[j]; /**这一轮内层循环结束时dp[j]就是当前行的了，但是计算dp[j+1]时可能还会用到上一行的dp[j]，因此需要记录旧值*/
+                if (sc == pc || pc == '.') {
+                    dp[j] = prevDiagonal;
+                } else if (pc == '*') {
+                    char prev = p.charAt(j - 2);
+                    if (prev == sc || prev == '.') {
+                        dp[j] = dp[j - 2] || dp[j];
+                    }
+                }
+                prevDiagonal = tmp; /**将上一行的dp[j]（即二维中的dp[i-1][j]）回填到prevDiagonal，因为计算dp[j+1]的时候可能会用到（即二维中的dp[i][j+1]）*/
+            }
+        }
+        return dp[n];
+    }
+
+
+    /*44 通配符匹配
+    给定一个字符串 s 和一个模式 p，p 中可以包含普通字符、?（匹配任意单个字符）和 *（匹配任意长度字符串，包括空串）。判断 p 是否能匹配整个 s。
+     */
+    /**
+     【基础说明】
+        1. dp数组的含义：我们设 dp[i][j] 表示s[0..i-1] 是否可以被 p[0..j-1] 匹配。
+        2. 状态转移：
+             如果 p[j-1] == s[i-1] 或 p[j-1] == '?'======> dp[i][j] = dp[i-1][j-1]
+             如果 p[j-1] == '*'==========>dp[i][j] = dp[i][j-1] || dp[i-1][j]
+          解释：
+            ①dp[i][j-1]：* 匹配空串；因为*匹配空串，因此dp[i][j] = dp[i][j-1]
+            ②dp[i-1][j]：* 匹配一个或多个字符。因此dp[i][j] = dp[i-1][j]
+            ③否则：dp[i][j] = false
+        3. 初始化
+         dp[0][0] = true；dp[0][j] = dp[0][j-1] && p[j-1]=='*'
+         当 s 为空串时，p 只有全是 * 才能匹配
+     【“通配符匹配”和“正则表达式”匹配的区别】
+           区别1：44题中“?”可以匹配原字符串中的单个字符；10题中“。”表示可以匹配源字符串的单个字符。因此
+       这两个字符在两个题目中的作用其实是一样的，地位是等价的。。。。并且这个逻辑在代码中也是一样的，如下
+       (所以从本质上来说，“区别1”其实是“相同点”)
+                                 if (sc==pc||pc=='?'){
+                                    dp[i][j] = dp[i-1][j-1];
+                                 }
+                    【补充信息】if语句块也可以这么写，下面的写法跟“交错字符串”的写法是类似的
+                                 if (pc!='*'){
+                                    dp[i][j] = (sc==pc||pc=='?') && dp[i-1][j-1];
+                                 }
+            区别2：10题中的“*”表示前面的字符可以匹配0次、1次或者任意多次；但是44题中的“*”表示仅仅这个*
+       就能匹配原字符串中的任意多个字符。————这是两个题最本质、最根本的区别。导致最终在代码中最直接的区别
+       就是————
+                44中的实现：if (pc=='*'){
+                              dp[i][j] = dp[i-1][j] || dp[i][j-1];
+                          }
+                10中的实现：if (pc == '*') {
+                             char prev = p.charAt(j - 2); //拿出“*”前面的那个字符
+                             if (prev == sc || prev == '.') { //如果“*”前面的那个字符可以匹配s字符串当前研究的字符即s.charAt(i-1)
+                                dp[j] = dp[j - 2] || dp[j];
+                             }
+                          }
+    */
+    public boolean isMatch_44(String s, String p) {
+        int m = s.length(),n = p.length();
+        boolean[][] dp = new boolean[m + 1][n + 1];
+        dp[0][0] = true;
+        for (int i = 1; i <= n; i++) {
+            if (p.charAt(i-1)=='*'){
+                dp[0][i] = dp[0][i-1];
+            }
+        }
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char sc = s.charAt(i - 1);
+                char pc = p.charAt(j - 1);
+                if (sc==pc||pc=='?'){
+                    dp[i][j] = dp[i-1][j-1];
+                }else if (pc=='*'){
+                    dp[i][j] = dp[i-1][j] || dp[i][j-1];
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+
+    /*994 腐烂的橘子 (Rotting Oranges)
+    在一个 m x n 的网格中，每个单元格有三种值：
+        0 表示空格
+        1 表示新鲜橘子
+        2 表示腐烂橘子
+
+        每过 1 分钟，所有腐烂橘子都会让上下左右四个方向的新鲜橘子变腐烂。
+        求需要多少分钟，才能让所有新鲜橘子都腐烂。
+        如果不可能让所有橘子都腐烂，返回 -1。
+     */
+    public int orangesRotting(int[][] grid) {
+        int m = grid.length,n = grid[0].length;
+        LinkedList<int[]> queue = new LinkedList<>();
+        int fresh = 0;
+        /*step1：包括2个内容，一是把所有腐烂的位置添加到queue、二是将计算新鲜的橘子有多少个*/
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j]==2){
+                    queue.offer(new int[]{i,j});
+                } else if (grid[i][j]==1){
+                    fresh++;
+                }
+            }
+        }
+        /*step2：如果开始的时候新鲜的橘子数量就是0，说明不需要耗费时间————直接返回0*/
+        if (fresh==0) return 0;
+
+        int minute = 0;
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+
+        /*step3：根据腐烂橘子的位置，进行扩散，每扩散一轮需要更新花费的时间minute*/
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            minute++;    /**err：这里应该是有问题的，判断是否还需要进行的标准应该是“queue不是空 并且 新鲜橘子的数量fresh大于0”*/
+            for (int i = 0; i < size; i++) {
+                /**有一个疑问：为什么对于腐烂的橘子，研究一遍就能直接出队列？？
+                    解释：因为一个腐烂的橘子，经过一分钟已经把周围的橘子都变腐烂了，因此只需要从4周已经腐烂的橘子继续
+                 感染下去。。。所以每一个腐烂的橘子只需要研究一次，它的任务就完成了，因为被它传染的橘子会继续传染下去，
+                 因此研究一次后腐烂的橘子就需要弹出队列
+                */
+                int[] cur = queue.poll();
+                //for循环尝试从cur位置向4个方向扩散，碰到正常的橘子就变腐烂
+                for (int[] d:dirs){
+                    int x = cur[0]+d[0],y = cur[1]+d[1];
+                    /*做三个事：如果得到的某个方位不越界，并且新位置的橘子是好的橘子，就让它变腐烂；新鲜橘子
+                        的数量-1；将腐烂橘子的位置添加进queue*/
+                    if (x>=0&&x<m&&y>=0&&y<n&&grid[x][y]==1){
+                        grid[x][y] =2;
+                        fresh--;
+                        queue.offer(new int[]{x,y});
+                    }
+                }
+            }
+        }
+        return fresh==0?minute:-1;
+    }
+
+
+        /*97. 交错字符串
+    给定三个字符串 s1、s2、s3，请你帮忙验证 s3 是否是由 s1 和 s2 交错 组成的。
+
+    两个字符串 s 和 t 交错 的定义与过程如下，其中每个字符串都会被分割成若干 非空 子字符串：
+
+    s = s1 + s2 + ... + sn
+    t = t1 + t2 + ... + tm
+    |n - m| <= 1
+    交错 是 s1 + t1 + s2 + t2 + s3 + t3 + ... 或者 t1 + s1 + t2 + s2 + t3 + s3 + ...
+    注意：a + b 意味着字符串 a 和 b 连接。
+    * */
+    /*解法1：网友解法。官方有滚动数组优化的解法*/
+    public boolean isInterleave(String s1, String s2, String s3) {
+        int m = s1.length(), n = s2.length();
+        if (m + n != s3.length()) return false;
+
+        boolean[][] dp = new boolean[m + 1][n + 1];
+        dp[0][0] = true;
+        for (int i = 1; i <= n; i++) {
+            dp[0][i] = dp[0][i - 1] && s2.charAt(i - 1) == s3.charAt(i - 1);
+        }
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] = dp[i - 1][0] && s1.charAt(i - 1) == s3.charAt(i - 1);
+        }
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                /**
+                 10、44、还有这个题很明显的一个特征是————
+                    dp[i][j]代表的是“第一个字符串前i个字符”和“第二个字符串前j个字符”的某种匹配关系，因此
+                 当前研究的字符其实是“s1.charAt(i-1)”和“s2.charAt(j-1)”。
+                 */
+                char s3c = s3.charAt(i + j - 2);   //这里应该是-2吧
+                /*
+                    “dp[i - 1][j] && s1.charAt(i - 1) == s3c”代表：①s1的“0、1、2....i-2”这个子串 和 s2的“0、
+                1、2、.....j-1”这个子串 可以拼成s3的前面的子串；②并且s1的第i个字符(即当前研究的字符)和s3当前研究的字
+                符是一样的，因此dp[i][j]是true；
+                    “dp[i][j - 1] && s2.charAt(j - 1) == s3c”也是同理
+                 */
+                dp[i][j] = (dp[i - 1][j] && s1.charAt(i - 1) == s3c) ||
+                        (dp[i][j - 1] && s2.charAt(j - 1) == s3c);
+            }
+        }
+        return dp[m][n];
+    }
 
 }

@@ -312,7 +312,7 @@ public class _14DP {
      * 仅仅选取最大值则遍历到元素3的时候，会选择单独成一个子数组，这样是不对的。应该到任何一个
      * 位置，都应该记录当前子数组的最大值、最小值...
      *     然后到每一个位置的时候，需要决策出当前位置的最大目标值
-     * 【建议】建议使用maxProduct2 或者 maxProduct3，条理清晰
+     * 【建议】建议使用maxProduct2 或者 maxProduct3，条理清晰。。。最推荐的是 maxProduct2！！
      * */
     public int maxProduct(int[] nums) {
         //dp数组的定义：以nums[i-1]结尾的最大子数组的乘积..每一个数可以和前面的数个数合成一个子数组 或者 自己成立一个子数组
@@ -354,7 +354,7 @@ public class _14DP {
             int curMax = Math.max(nums[i],Math.max(maxPre*nums[i],maxPre*nums[i]));
             minPre = curMin; /**err：这里是赋值，而不是取最值*/
             maxPre = curMax;
-            res = Math.max(res,maxPre);
+            res = Math.max(res,maxPre); /**【注】在这里更新res，保证了每一轮都会进行更新*/
         }
         return res;
     }
@@ -369,6 +369,23 @@ public class _14DP {
             maxPre = curMax;
             res = Math.max(res,curMax);
         }
+        return res;
+    }
+
+    /**
+     * 下面是这个题错误的写法!!!!!!!!!!
+     */
+    public int maxProduct_ERROR(int[] nums) {
+        int res = Integer.MIN_VALUE;
+        int preMin = nums[0],preMax = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            res = Math.max(res,preMax);
+            int curMin = Math.min(Math.min(preMin*nums[i],preMax*nums[i]),nums[i]);
+            int curMax = Math.max(Math.max(preMin*nums[i],preMax*nums[i]),nums[i]);
+            preMin = curMin;
+            preMax = curMax;
+        }
+//        res = Math.max(res,preMax); /**err：错误的原因在这里，如果没有这一句，会导致最后一轮的循环不会更新，就可能丢失最大值*/
         return res;
     }
 

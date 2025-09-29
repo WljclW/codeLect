@@ -11,7 +11,7 @@ import java.util.*;
 
 /**
  * 470需要理解一下官方的解、283有没有直接交换的方法省略最后的遍历操作
- * err：234、179、234、69、146
+ * err：234、179、69、146
  * 468、1324、113、堆排序、148、151、76、8、93
  * 72、1143写出空间优化版本
  */
@@ -439,17 +439,84 @@ public class All1_5_review {
     插入一个字符
     删除一个字符
     替换一个字符*/
-    /*二维dp的写法*/
-//    public int minDistance(String word1, String word2) {
-//
-//    }
+    /*解法1：二维dp的写法*/
+    public int minDistance(String word1, String word2) {
+        int m = word1.length(),n = word2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (i==0||j==0){
+                    dp[i][j] = i==0?j:i;
+                }else {
+                    char c1 = word1.charAt(i - 1);
+                    char c2 = word2.charAt(j - 1);
+                    if (c1==c2){
+                        dp[i][j] = dp[i-1][j-1];
+                    }else {
+                        dp[i][j] = Math.min(Math.min(dp[i-1][j],dp[i][j-1]),dp[i-1][j-1])+1;
+                    }
+                }
+            }
+        }
+        return dp[m][n];
+    }
 
-    /*一维dp的写法
-        复杂度分析：时间复杂度：O(m·n)（还是要遍历整个表）；空间复杂度：O(min(m, n))（只保留一行）
-    */
-//    public int minDistance_1dim(String word1, String word2) {
-//
-//    }
+
+    /*解法2：两行形式的dp*/
+    public int minDistance_2_1dim(String word1, String word2) {
+        int m = word1.length(),n = word2.length();
+        if (m<n) return minDistance_2_1dim(word2,word1);
+        int[] prev = new int[n + 1];
+        int[] cur = new int[n + 1];
+        for (int i = 0; i < n + 1; i++) {
+            prev[i] = i;
+        }
+
+        for (int i = 1; i <= m; i++) {
+            cur[0] = i;
+            for (int j = 1; j <= n; j++) {
+                char c1 = word1.charAt(i - 1);
+                char c2 = word2.charAt(j - 1);
+                if (c1==c2)
+                    cur[j] = prev[j-1];
+                else
+                    cur[j] = Math.min(Math.min(prev[j],cur[j-1]),prev[j-1]);
+            }
+            /**这里必须要把两个数组交换吗？？感觉有点不对劲*/
+            int[] tmp = cur;
+            cur = prev;
+            prev = tmp;
+        }
+        return cur[n];
+    }
+
+
+    /*解法3：一行DP+额外变量的写法*/
+    public int minDistance_1dim(String word1, String word2) {
+        int m = word1.length(), n = word2.length();
+        if (m < n) return minDistance_1dim(word2, word1);
+        int[] dp = new int[n + 1];
+
+        for (int i = 0; i <= n; i++) {
+            dp[i] = i;
+        }
+
+        for (int i = 1; i <= m; i++) {
+            int prev = dp[0];
+            dp[0] = 0;
+            for (int j = 1; j <= n; j++) {
+                int tmp = dp[j];
+                char c1 = word1.charAt(i - 1);
+                char c2 = word2.charAt(j - 1);
+                if (c1 == c2)
+                    dp[j] = prev;
+                else
+                    dp[j] = Math.min(Math.min(dp[j - 1], dp[j]), prev) + 1;
+                prev = tmp;
+            }
+        }
+        return dp[n];
+    }
 
 
     /*124. 二叉树中的最大路径和
@@ -470,14 +537,87 @@ public class All1_5_review {
 
     例如，"ace" 是 "abcde" 的子序列，但 "aec" 不是 "abcde" 的子序列。
     两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。*/
-//    public int longestCommonSubsequence(String text1, String text2) {
-//
-//    }
+    /*写法1：2维 的写法*/
+    public int longestCommonSubsequence(String text1, String text2) {
+        int m = text1.length(),n = text2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char c1 = text1.charAt(i - 1);
+                char c2 = text2.charAt(j - 1);
+                if (c1==c2){
+                    dp[i][j] = dp[i-1][j-1] +1;
+                }else {
+                    dp[i][j] = Math.max(dp[i][j-1],dp[i-1][j]);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    /*写法2：2行动规的写法*/
+    /**
+     【说明】
+            1. 两行DP的写法中，prev就看作是二维DP中的dp[i-1][..]，而cur看作是二维DP中的dp[i][..]。（简单点说，计算时代码中的
+        prev直接改成dp[i-1]、代码中的cur直接改写成dp[i]）比如，下面的代码中————
+                ①“cur[j] = prev[i-1] + 1;”就相当于“dp[i][j] = prev[i-1][j-1] + 1”；
+                ②“cur[j] = Math.max(cur[j-1],prev[j]);”就相当于“dp[i][j] = Math.max(dp[i][j-1],dp[i-1][j])”
+                可以看出，改写后的表达式跟二维DP的表达式一模一样！！
+            2. 两行的DP中，由于习惯研究某一行的每一列，因此“脑补出短的元素在一行”。比如：如果text1短就让text1写在行的位置，这样
+        创建的dp长度就是text1.length+1；反之如果text2比较短，就让text2写在行的位置，此时创建的动规数组长度就是text2.lenth+1。
+        这样的话空间复杂度能降低到O(M,N)（其中M时text1的长度，N是text2的长度~~~）
+     */
+    public int longestCommonSubsequence_2_1dim(String text1, String text2) {
+        int m = text1.length(),n = text2.length();
+        if (m<n) return longestCommonSubsequence_2_1dim(text2,text1);
+        int[] prev = new int[n + 1]; //prev用于存储dp表上一行的信息
+        int[] cur = new int[n + 1]; //cur用于存储dp表现在研究的这一行的信息
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char c1 = text1.charAt(i - 1);
+                char c2 = text2.charAt(j - 1);
+                if (c1==c2){
+                    cur[j] = prev[i-1] + 1;
+                }else {
+                    cur[j] = Math.max(cur[j-1],prev[j]);
+                }
+            }
+            int[] tmp = cur;
+            cur = prev;
+            prev = tmp;
+        }
+        return cur[n];
+    }
 
 
-//    public int longestCommonSubsequence1(String text1, String text2) {
-//
-//    }
+    /*写法3：1维+额外变量的写法*/
+    /**
+     【说明】
+            1. 二维DP中如果一个位置(i,j)会依赖于左上角的三个位置————(i-1,j-1)、(i,j-1)、(i-1,j)，这种形式的DP是
+        不能简化成一行DP的！！！可以简化成“2行形式的DP”、“1行+额外变量的DP”
+     */
+    public int longestCommonSubsequence_1dim(String text1, String text2) {
+        int m = text1.length(),n = text2.length();
+        if (m<n) return longestCommonSubsequence_1dim(text2,text1);
+        int[] dp = new int[n + 1];
+        for (int i = 1; i <= m; i++) {
+            int prev = dp[0];
+            dp[0] = 0;
+            for (int j = 1; j <= n; j++) {
+                int tmp = dp[j];
+                char c1 = text1.charAt(i - 1);
+                char c2 = text2.charAt(j - 1);
+                if (c1==c2){
+                    dp[j] = prev+1;
+                }else {
+                    dp[j] = Math.max(dp[j-1],dp[j]);
+                }
+                prev = tmp;
+            }
+        }
+        return dp[n];
+    }
 
 
 
@@ -488,9 +628,40 @@ public class All1_5_review {
 给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过
     在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
     * */
-//    public List<String> restoreIpAddresses(String s) {
-//
-//    }
+    /**
+     * 下面的代码大概率，不对！！！！！！！
+     */
+    List<String> resRestoreIpAddresses;
+    public List<String> restoreIpAddresses(String s) {
+        resRestoreIpAddresses = new LinkedList<>();
+        StringBuilder path = new StringBuilder(s);
+        restoreIpAddresses(s,path,0,0);
+        return resRestoreIpAddresses;
+    }
+
+    private void restoreIpAddresses(String s, StringBuilder path, int index, int num) {
+        if (num==3){
+            if (isValid(s,index,s.length()))
+                resRestoreIpAddresses.add(new String(path));
+            return;
+        }
+        for (int i = index+1; i < s.length(); i++) {
+            if (isValid(s,index,i)){
+                path.insert(i+num,'.');
+                restoreIpAddresses(s,path,i,num+1);
+                path.deleteCharAt(i+num);
+            }
+        }
+    }
+
+    private boolean isValid(String s, int index,int end) {
+        String substring = s.substring(index,end);
+        if (substring.length()>=4) return false;
+        if (substring.length()==3&&Integer.parseInt(substring)>=100&&Integer.parseInt(substring)<=255) return true;
+        if (substring.length()==2&&Integer.parseInt(substring)>=10) return true;
+        if (substring.length()==1) return true;
+        return false;
+    }
 
 
     /*
@@ -628,9 +799,48 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 
     /*148.
      * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
-//    public ListNode sortList(ListNode head) {
-//
-//    }
+
+    /**
+     排序链表的题目中：偶数节点的时候，必须让中间后面的那个节点在后一半中，必须吗？？？？应该代码也能跑通
+     下面的写法中“如果是偶数个节点，中间的两个节点都在前一半链表，会导致两边的递归深度不一样”。。。
+        如果“偶数节点的时候让中间的两个节点，第一个位于前一半链表，第二个位于后一半链表，这样两边的递归深度就接近”，这样的话，
+     我们希望偶数节点的时候，从最中间的位置断开——————因此希望①偶数时找到中间两个中的第一个节点；②然后记录中间的第二个节点；
+     ③将第一个节点的next置为null。。。
+     */
+    public ListNode sortList(ListNode head) {
+        if (head==null||head.next==null) return head;
+        ListNode mid = findMid(head);
+        ListNode start = mid.next;
+        mid.next = null;
+        ListNode left = sortList(head);
+        ListNode right = sortList(start);
+        return mergeTwo(left,right);
+    }
+
+    private ListNode mergeTwo(ListNode left, ListNode right) {
+        ListNode dummy = new ListNode(-1),cur = dummy;
+        while (left!=null&&right!=null){
+            if (left.val<right.val){
+                cur.next = left;
+                left = left.next;
+            }else {
+                cur.next = right;
+                right = right.next;
+            }
+            cur = cur.next;
+        }
+        cur.next = left==null?right:left;
+        return dummy.next;
+    }
+
+    private ListNode findMid(ListNode head) {
+        ListNode slow = head,fast = head;
+        while (fast!=null&&fast.next!=null){
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
 
 
     /*31. 下一个排列
@@ -754,9 +964,41 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      * 给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s
      * 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
      * */
-//    public String minWindow(String s, String t) {
-//
-//    }
+    public String minWindow(String s, String t) {
+        if (s.length()==0||s.length()<t.length()) return "";
+        HashMap<Character, Integer> need = new HashMap<>();
+        for (char c:t.toCharArray()){
+            need.put(c,need.getOrDefault(c,0)+1);
+        }
+
+        HashMap<Character, Integer> map = new HashMap<>();
+        int left = 0,valid = 0;
+        int start = -1;
+        int len = Integer.MAX_VALUE;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (need.containsKey(c)){
+                map.put(c,map.getOrDefault(c,0)+1);
+                if (map.get(c)==need.get(c)){ /**【注意】涉及到map.get的时候，如果是“==”比较，则必须使用“.intValue()”或者“.equals()”~~不要使用“==”,因为map中get得到的是Integer！！！！！！*/
+                    valid++;
+                }
+            }
+            while (valid==need.size()){
+                if (i-left+1<len){
+                    len = i-left+1;
+                    start = left;
+                }
+                char c1 = s.charAt(left++);
+                if (need.containsKey(c1)){
+                    map.put(c1,map.get(c1)-1);
+                    if (map.get(c1)<need.get(c1)){
+                        valid--;
+                    }
+                }
+            }
+        }
+        return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
+    }
 
 
     /*41.缺失的第一个正数
@@ -783,6 +1025,54 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 //    public String reverseWords(String s) {
 //
 //    }
+
+
+    /**chatgpt给出的代码如下*/
+    public String reverseWords(String s) {
+        String trim = s.trim();
+        String s1 = reverString(trim);
+        String[] s2 = s1.split("\\s+"); // ✅ 用正则去除多余空格
+        StringBuilder sb = new StringBuilder();
+        for (String str : s2) {
+            sb.append(reverString(str)).append(" ");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    private String reverString(String s) {
+        return new StringBuilder(s).reverse().toString();
+    }
+
+    /**
+     split("\\s+") 会按“至少一个空白字符”去拆分字符串，并自动去掉多余的空白。
+         String s1 = "  hello   world  ";
+         String[] s2 = s1.split("\\s+");
+             拆出来结果：
+                 s2[0] = "hello"
+                 s2[1] = "world"
+     如果写 split(" ")：
+            " hello world ".split(" ")会得到：["", "", "hello", "", "", "world"] 里面有空字符串。
+     */
+    /*下面的代码是自己写的，可能会出错*/
+    public String reverseWords_(String s) {
+        String trim = s.trim();
+        String s1 = reverString1(trim);
+        String[] s2 = s1.split(" ");
+        StringBuilder sb = new StringBuilder();
+        for (String str:s2){
+            sb.append(reverString1(str));
+            sb.append(" ");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
+
+    private String reverString1(String s) {
+        StringBuilder sb = new StringBuilder(s);
+        return sb.reverse().toString();
+    }
+
 
 
     /*78. 子集
@@ -1128,9 +1418,28 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
 
 叶子节点 是指没有子节点的节点。*/
-//    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
-//
-//    }
+    /**
+     下面的代码是错误的。。。。
+     */
+    List<List<Integer>> resPathSum;
+    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
+        resPathSum = new LinkedList<>();
+        LinkedList<Integer> path = new LinkedList<>();
+        pathSum(root,targetSum,path);
+        return resPathSum;
+    }
+
+    private void pathSum(TreeNode root, int targetSum, LinkedList<Integer> path) {
+        if (root==null) return;
+        if (root.left==null&&root.right==null&&root.val==targetSum){
+            resPathSum.add(new LinkedList<>(path));
+            return;
+        }
+        path.add(root.val);
+        pathSum(root.left,targetSum-root.val,path);
+        pathSum(root.right,targetSum-root.val,path);
+        path.removeLast();
+    }
 
 
     /*179. 最大数
@@ -1195,7 +1504,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 测试用例的答案是一个 32-位 整数。
      */
-    /**下面的写法对吗？？为什么下面的写法是错误的？？？？？*/
+    /**下面的写法对吗？？为什么下面的写法是错误的？？？？？下面的改正需要验证一下*/
     public int maxProduct(int[] nums) {
         int res = Integer.MIN_VALUE;
         int preMin = nums[0],preMax = nums[0];
@@ -1206,6 +1515,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             preMin = curMin;
             preMax = curMax;
         }
+        res = Math.max(res,preMax); /**err：错误的原因在这里，如果没有这一句，会导致最后一轮的循环不会更新，就可能丢失最大值*/
         return res;
     }
     /**下面的写法呢，对吗？？*/

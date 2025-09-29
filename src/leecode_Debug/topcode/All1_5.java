@@ -1434,7 +1434,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         int left = 0,right = x; /**如果不优化的话，这里右边界应该是x，因为0和1的平方根就是本身，因此右边界要声明为x*/
         while (left<=right){
             int mid = left+(right-left)/2;
-            /**mid*mid可能会发生整型溢出，需不需要考虑这个情况？？？chatgpt给的优化建议：long square = (long) mid * mid;*/
+            /**err：mid*mid可能会发生整型溢出，需不需要考虑这个情况？？？需要验证！！！chatgpt给的优化建议：long square = (long) mid * mid;*/
             if (mid*mid>x){
                 right = mid-1;
             }else if (mid*mid<x){
