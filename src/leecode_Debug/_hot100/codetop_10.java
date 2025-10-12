@@ -115,7 +115,8 @@ void put(int key, int value) - 如果键 key 已存在，则变更其值；如�
         LinkedList<Character> stack = new LinkedList<>();
         /*step1：将每一位入栈的过程中维持最小栈结构————只要当前的数比栈顶的数小，栈顶的数就出栈*/
         for (char c : num.toCharArray()) {
-            /**err：①这里直接入栈的是字符，而不是索引，因此比较的是"c<stack.peekLast()"
+            /**err：①这里直接入栈的是字符，而不是索引，因此比较的是"c<stack.peekLast()"。小于的时候
+             *  才尝试把栈顶的元素弹出来，等于的时候不用动。
              *      ②k的含义是要删除的字符数量，因此k-1应该绑定在删除字符（从栈中弹出字符）的时
              * 候，每一次字符弹出双端队列时k-1
              *      ③k的条件是"k>0"，不能带等于。因为如果带等于，则k的变化过程为：k、k-1、k-2....2、1、0.
@@ -253,7 +254,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                  【结论】循环变量i从0开始的话————
                         （1）如果循环条件是“i<M”，则整个循环体会执行M次。因为i的范围是[0,M-1]，共M个可取值。
                         （2）如果循环条件是“i>-M”，则整个循环体会执行M次。因为i的范围是[-(M-1)，0]，共M个可选值*/
-        cur = head;
+        cur = head; /**这里如果cur不动，应该更好懂，见rotateRight1*/
         for (int i = 0; i < size - k - 1; i++) { /**err：注意每个节点向右移动k，因此要从前往后数size-k个节点，而不是数k个节点！！之所以是“ i < size - k - 1”，是因为开始就在head，但是计数是0*/
             cur = cur.next;
         }
@@ -262,6 +263,30 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         cur.next = null;
         return res;
     }
+
+
+    public ListNode rotateRight1(ListNode head, int k) {
+        if(head==null||head.next==null||k==0) return head;
+        int size = 1;
+        ListNode cur = head;
+        while (cur.next!=null){
+            cur = cur.next;
+            size++;
+        }
+        ListNode tail = cur;
+        tail.next = head;
+        k %= size;
+        /**
+         这里cur处于链表的最后一个节点，如果cur不动，反而更清晰一点
+         */
+        for (int i = 0; i <size - k; i++) {
+            cur = cur.next;
+        }
+        ListNode res = cur.next;
+        cur.next = null;
+        return res;
+    }
+
 
     /*114
     给你二叉树的根结点 root ，请你将它展开为一个单链表：
@@ -443,6 +468,10 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     给你一棵二叉树的根节点 root ，返回其节点值的 后序遍历 。
     * */
     /*解法1：非递归方法*/
+    /**
+        后序遍历的顺序是“左、右、根”，但是遍历的时候我们使用“根、右、左”。。因此碰到节点就先打印，然后先是左孩
+     子入栈，这样的话右孩子先出栈，因此就是“根、右、左”，然后将收集结果的集合reverse就是正确的后序遍历了
+     */
     public List<Integer> postorderTraversal(TreeNode root) {
         LinkedList<Integer> res = new LinkedList<>();
         /**这个LinkedList要充当栈的作用，因此建议直接将变量名改为stack；并且使用方法时注意：
@@ -573,7 +602,12 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     public List<Integer> findDuplicates(int[] nums) {
         LinkedList<Integer> res = new LinkedList<>();
         for (int i = 0; i < nums.length; i++) {
-            int cur = Math.abs(nums[i]);
+            int cur = Math.abs(nums[i]); /**i位置的数可能已经变成负数，因此这里需要取绝对值*/
+            /*
+            依据我们的想法，num这个数应该放在num-1的位置，我们将对应位置的数标记为负数。
+                if块：表明对应位置的数已经是负数了，则说明这个数之前遇到过，说明重复了，需要添加到结果集；
+                else块：表明当前数cur是第一次遇到，因此将cur-1位置的数变为负数，说明是第一次遇到。
+             */
             if (nums[cur-1]<0){
                 res.add(cur);
             }else {
@@ -646,7 +680,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 //
 //    }
 
-    /*LCR 144. 翻转二叉树
+    /*LCR 144(226相同). 翻转二叉树
     给定一棵二叉树的根节点 root，请左右翻转这棵二叉树，并返回其根节点。
     * */
     /**
@@ -687,6 +721,12 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         TreeNode temp = root.left;
         root.left = invertTree(root.right);
         root.right = invertTree(temp);
+
+        /*或者使用下面的代码*/
+//        TreeNode left = flipTree(root.left);
+//        TreeNode right = flipTree(root.right);
+//        root.left = right;
+//        root.right = left;
 
         return root;
     }
@@ -732,7 +772,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         LinkedList<Character> stack = new LinkedList<>();
         int[] count = new int[26]; // 每个字符剩余的出现次数
         boolean[] visited = new boolean[26]; // 当前栈中是否已有该字符
-        /*step1：统计每一个字符最后出现的位置*/
+        /*step1：统计每一个字符出现的次数*/
         for (int i=0;i<s.length();i++){
             count[s.charAt(i)-'a']++;
         }
@@ -763,7 +803,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     }
 
 
-    /*解法2：记录出现的最晚位置 以及 栈中是不是有某个字符*/
+    /*解法2：记录出现的最晚位置（最后出现的位置） 以及 栈中是不是有某个字符*/
     public String removeDuplicateLetters_1(String s) {
         int[] lastIndex = new int[26];
         boolean[] isExit = new boolean[26];
@@ -778,7 +818,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                 continue;
             }
             while (!stack.isEmpty()&&c<stack.peekLast()&&lastIndex[stack.peekLast()-'a']>=i){
-                Character c1 = stack.pollLast();
+                Character c1 = stack.pollLast(); /**LinkedList充当栈的时候使用“offerLast/pollLast”代替入栈/出栈*/
                 isExit[c1-'a']=false;
             }
             stack.offerLast(c);
@@ -909,7 +949,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
     public int canCompleteCircuit(int[] gas, int[] cost) {
         int totalSum = 0 /*记录总体的gas-cost*/, curSum = 0 /*记录当前所有已遍历位置的gas-cost*/;
-        int res = 0; /**err：存在一种特殊情况，curSum最小值为0，此时不会进入for循环中的if，因此res初始值为-1不合适*/
+        int res = 0; /**err：存在一种特殊情况，curSum最小值大于等于0，此时不会进入for循环中的if导致res的值不变，因此res初始值为-1不合适*/
         for (int i = 0; i < gas.length; i++) {
             totalSum += (gas[i] - cost[i]);
             curSum += (gas[i] - cost[i]);
@@ -926,14 +966,22 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     结束时最后一位成员的编号。
      */
     /**
+     *【说明】这个题目中：①人员的编号是从0开始的；②报数是从1开始的，报target的那个人需要删除
      *【约瑟夫环问题】定义f(n, m)：表示 n 个人、每次数到第 m 个出局，最终剩下的人的编号。则有递推公式————
      *      f(1,m)=0         //只剩下一个人，不论m是多少，最后剩下的那个人编号都是0.
      *      f(n,m)=(f(n-1,m) + m) % n
-     *   这个公式表示：当前人数是 n 时的生还者编号 等于 上一步 n - 1 人时生还者编号向右移动 m 位后的结果。
+     *   这个公式表示：当前人数是 n 时的生还者编号 等于 上一步 n - 1 人时生还者编号向右移动 m 位后（需要取余
+     * 体现循环的特点）的结果。
      *
      */
     public int iceBreakingGame(int num, int target) {
+        /*base case：如果只有一个数，则最后留下的那个数的编号就是0*/
         int res = 0;
+        /*从两个数开始推，一直推到第num个数的答案。
+            如果开始有m个数，最后剩下的那个数编号是digit；
+            则如果开始有m+1个数时，最后剩下的那个数编号是（digit+target）% （m+1）。
+            ......依次类推
+        * */
         for (int i = 2; i <= num; i++) {
             res = (res + target) % i;
         }
@@ -959,7 +1007,8 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *【具体的思路】在上面关键信息的基础上————
      *      每次碰到'('，则low和high都得+1.因为左括号是确认的，必须要匹配到右括号；
      *      每次碰到')'，则low和high都得-1，因为右括号必须明确的匹配左括号；
-     *      每次碰到‘*’。如果我们把它当作左括号，则high需要加1；如果我们把它当右括号，则low需要减1
+     *      每次碰到‘*’。如果我们把它当作左括号，则此时未匹配的右括号数量多1，即high需要加1；如果我们把它当
+     * 右括号，则未匹配的右括号数量少1，即low需要减1
      *【易错点】整个过程中low和high的最小值都是0———
      *       ①如果high小于0，直接返回false。（表示最多未匹配的左括号是-high个，不可能哇）
      *       ②如果low小于0，则将low重置为0。low < 0 是无效的逻辑，因为它意味着我们尝试把更多的 * 当成 )，而
@@ -982,7 +1031,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             }
             /**关键的校验流程2个步骤，缺一不可！！*/
             if (high < 0) return false; /**err：high只有在碰到右括号才会减1，小于0说明右括号明确的多了，返回false*/
-            if (low < 0) low = 0; /**err：low小于0的时候置为0，符合实际含义*/
+            if (low < 0) low = 0; /**err：每一轮结束是low小于0的时候必须置为0，符合实际含义*/
         }
         return low == 0;
     }
@@ -1099,9 +1148,10 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     给定一个仅包含 0 和 1 、大小为 rows x cols 的二维二进制矩阵，找出只包含 1 的最大矩形，并返回其面积。
      */
     /**
-     * 【关键】遍历每一行，在每一行的时候研究每一列的高度，并调用类似84题的方法求解此时的最大矩形，那这个结果去更新最终的返回结果。
-     * 【难点】遍历每一行的时候，heights数组如何计算————只要(row,col)位置的值是0，就将heights[col]置为0；否则的话说明该位置
-     *      是1，heights[col]++。
+     * 【关键】遍历每一行，在每一行的时候研究每一列的高度，并调用类似84题的方法求解此时的最大矩形，那这个
+     * 结果去更新最终的返回结果。
+     *【难点】遍历每一行的时候，heights数组如何计算————只要(row,col)位置的值是0，就将heights[col]重置为0；
+     * 否则的话说明该位置是1，heights[col]++。
      */
     public int maximalRectangle(char[][] matrix) {
         int[] heights = new int[matrix[0].length];
@@ -1127,12 +1177,12 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         for (int i = 0; i <= heights.length; i++) {
             int curHeight = (i == heights.length) ? 0 : heights[i];
             while (!stack.isEmpty() && curHeight < heights[stack.peek()]) {
-                Integer cur = stack.pop();
+                Integer cur = stack.pop(); /**err：要使用“pop()”弹出，否则85提交后会提示“超出时间限制”*/
                 int left = stack.isEmpty() ? -1 : stack.peek();
                 int curVal = heights[cur] * (i - left - 1);
                 curRowMaxArea = Math.max(curVal, curRowMaxArea);
             }
-            stack.push(i); /**err：注意，这里记得将i入栈，否则样例的结果一直是0*/
+            stack.push(i); /**err：注意，这里记得将i入栈，否则样例的结果一直是0！！！*/
         }
         return curRowMaxArea;
     }
@@ -1173,8 +1223,16 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *【思路】规律：1位数共有1*9*1位；2位数共有10*9*2位；3位数共有100*9*3位
      *     1. 根据规律，利用while循环每一次过掉所有的m位数
      *     2. 最后如果n对应的是i位数，则start就是10^(i-1)次方————即i位数中最小的那个数
-     *【关键！！！】这个题最大的关键是最后确定在哪一个数字使用"num = start + (n-1)/digit",必须使用"n-1"去
+     *【关键！！！】
+     *     1. 这个题最大的关键是最后确定在哪一个数字使用"num = start + (n-1)/digit",必须使用"n-1"去
      *     除！！！！
+     *     2. start 和 出现的数num要使用long来存放，int可能发生越界。。导致提交后有错误的测试用例，如
+     *     下————
+                             n =1000000000
+                             输出
+                             2
+                             预期结果
+                             1
      * */
     public int findNthDigit(int n) {
         int digit = 1; //当前研究的轮次是几位数。1位数、2位数、3位数....
@@ -1199,10 +1257,27 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         return s.charAt((n - 1) % digit) - '0';
     }
 
+    public int findNthDigit_own(int n) {
+        long start = 1; /**start这个数int不一定放得下，因此start和后续计算的num应该使用long来计算*/
+        int digit = 1;
+        while (n>start*digit*9){
+            n -= start*digit*9;
+            digit++;
+            start *= 10;
+        }
+        /**err：需要注意的就是下面获取num以及index的时候都是使用n-1。*/
+        long num = start+(n-1)/digit; /**看一下所求的数位在哪一个数*/
+        int index = (n-1)%digit; /**计算所求的数位是num的哪一位*/
+        return String.valueOf(num).charAt(index)-'0';
+    }
+
     /*611
     给定一个包含非负整数的数组 nums ，返回其中可以组成三角形三条边的三元组个数。
      */
     /**
+     * 【关键】————很关键！
+     *      1. 这个题最关键的是“要从大到小枚举最大边”，不要枚举最小边！！！需要多思考思考为啥（本质原因是每一次不能确定一批有
+     *  效解！！）
      * 【思路】首先对整个数组排序，然后倒着研究每一个数
      *      每次研究到一个数（比如索引是k）时，固定left指针为0，right指针为k-1。根据left、right位置两数和与m位置数的大小关系
      *  来移动指针————
@@ -1217,8 +1292,13 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             int left = 0,right = k-1;
             while (left<right){
                 if (nums[left]+nums[right]>nums[k]){
-                    res += (right-left); /*想象成j不变，i可以选择i、i+1、i+2...j-2、j-1。因此选择后下一行改变j就不会有重复的组合*/
-                    right--; /**为什么这里需要j--，不会重复吗？？不会，因为j--之后，j肯定不一样了。结合上一行的注解可知不会重复*/
+                    /*  想象成right不变，left可以选择left、left+1、left+2...right-2、right-1。因此选择后下
+                    一行改变right就不会有重复的组合
+                        此时三角形的三条边从小到大依次是：nums[left]、nums[right]、nums[i]。。。因此下一行
+                    改变right，三角形的三条边就一定是新的组合了。
+                    */
+                    res += (right-left);
+                    right--; /**为什么这里需要right--，不会重复吗？？不会，因为right--之后，right肯定不一样了。结合上一行的注解可知不会重复*/
                 }else {
                     left++;
                 }
@@ -1227,14 +1307,45 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         return res;
     }
 
+    /**
+     * 下面是错误的解法！！见for循环的注释说明。结论————
+     *      一个有序的数组，能快速的找出“两个数之和满足某种条件”的所有组合，重点是“两数之和满足
+     *  某种条件”，三数之和、最接近的三数之和、这个题它们都是使用的这个特性。
+     *      本质原因：一个有序数组，求解两数和满足某一条件的时候，可以实现简化。
+     *      换到这个题，“有效三角形”的定义是“较小两边之和大于第三遍”，因此我们可以枚举最大的那
+     *  条边，然后剩下两个较小的边的要求就是和大于最大的边！！————因此需要枚举最大边。。。反之，
+     *  如果枚举的是最小边，有效三角形的定义式“较大的两边之差小于最小的边”，但是这个“两边之差”的
+     *  方案数寻找问题不能用有序数组来简化
+     */
+//    public int triangleNumber(int[] nums) {
+//        Arrays.sort(nums);
+//        int res = 0;
+    /**常见的错误在下面的地方，不能枚举最短边！！！即i必须从nums.length-1开始枚举！！*/
+//        for (int i = 0; i < nums.length - 2; i++) {
+//            int left = i+1,right = nums.length-1;
+//            while (left<right){
+//                int val = nums[i]+nums[left]-nums[right];
+//                if (val>0){
+//                    res += (right-left);
+//                    right--;
+//                }else {
+//                    left++;
+//                }
+//            }
+//        }
+//        return res;
+//    }
+
     /*
     264. 丑数 II
     给你一个整数 n ，请你找出并返回第 n 个 丑数 。
     丑数 就是质因子只包含 2、3 和 5 的正整数。
      */
     /**
-     【关键】①第一个丑数是1。②后面的任何一个丑数，都”一定“是由前面的某一个丑数”乘以2 或者 乘以3 或
-          者 乘以5“得到的。——————这很关键！！是由前面的某一个丑数乘出来的，出处还是丑数~~
+     【建议】建议使用nthUglyNumber
+     【关键】①第一个丑数是1。
+            ②后面的任何一个丑数，都”一定“是由前面的某一个丑数”乘以2 或者 乘以3 或者 乘以5“得
+        到的。——————这很关键！！是由前面的某一个丑数乘出来的，出处还是丑数~~
      【思路要点（核心直观解释）】
           丑数集合是闭合的：若 x 是丑数，则 2x, 3x, 5x 也都是丑数。
           如果按从小到大生成丑数序列 dp[0]=1, dp[1]=2, dp[2]=3, ...，每个后续丑数一定是之前某
@@ -1244,7 +1355,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
           每一步取 candidate = min(dp[p2]*2, dp[p3]*3, dp[p5]*5) 作为下一个丑数，并相应
        地移动等于 candidate 的每个指针（可能同时移动多个，以避免重复）。
      */
-    public int nthUglyNumber1(int n) {
+    public int nthUglyNumber(int n) {
         int[] dp = new int[n];
         dp[0] = 1; /*dp[i]理解为”第i+1个丑数“*/
         int p2 = 0,p3 = 0,p5 = 0;
@@ -1263,14 +1374,35 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     }
 
 
+    /**总体上就是上面的形式，但是可以多申请一个空间————数组长度为n+1，此时体现在for循环条件以及返回值
+     */
+    public int nthUglyNumber_(int n) {
+        int[] dp = new int[n+1];
+        /*多一个空间的话index=0的位置相当于没有作用，因此从index=1开始，同时p2、p3、p5三个指针
+         也都是从1开始了。。*/
+        dp[1] = 1;
+        int p2 =1,p3 =1,p5 =1;
+        for (int i = 2; i <= n; i++) {
+            int val2 = dp[p2]*2;
+            int val3 = dp[p3]*3;
+            int val5 = dp[p5]*5;
+            dp[i] = Math.min(Math.min(val2,val3),val5);
+            if (dp[i]==val2) p2++;
+            if (dp[i]==val3) p3++;
+            if (dp[i]==val5) p5++;
+        }
+        return dp[n];
+    }
+
+
 
     /*1004
     给定一个二进制数组 nums 和一个整数 k，假设最多可以翻转 k 个 0 ，则返回执行操作后 数组中连续 1 的最大个数 。
      */
     /**
      *【解题关键】一句话：滑动窗口解，把握核心————维护窗口内0的数量必须小于等于k
-     *【感悟】滑动窗口问题的关键是：从题目中找出窗口应该满足的条件！！！比如这个题”最多可以翻转
-     *    K个0“，因此就是说：窗口内0的个数必须不大于K
+     *【感悟】滑动窗口问题的关键是：从题目中找出窗口应该满足的条件！！！比如这个题"最多可以翻转
+     *    K个0"，因此就是说：窗口内0的个数必须不大于K
      *【说明】
      *    1. 下面两个方法的区别主要是由于right更新的时机不同，导致计算最大连续1的长度计算时
      *也不相同。去别的根本原因：长度算不算right位置本身！！————这个问题只要涉及“双指针”、“滑
@@ -1311,6 +1443,20 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         return res;
     }
 
+    public int longestOnes_02(int[] nums, int k) {
+        int count = 0;
+        int left = 0;
+        int res = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i]==0) count++;
+            while (count>k){
+                if (nums[left++]==0) count--;
+            }
+            res = Math.max(res,i-left+1);
+        }
+        return res;
+    }
+
     /*63
     给定一个 m x n 的整数数组 grid。一个机器人初始位于 左上角（即 grid[0][0]）。机器人尝试移动到 右下角（即 grid[m - 1][n - 1]）。机器人每次只能向下或者向右移动一步。
 
@@ -1321,6 +1467,13 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     测试用例保证答案小于等于 2 * 109。
      */
     /*解法1：二维数组*/
+    /**
+     【关键】
+            1. 二维dp时第一行 和 第一列 的初始化。。如果第一行某个位置有障碍物，则第一行后面的位置的路径数量
+        都是0。。。。第一列也是同样的道理。
+            第一行和第一列的初始化不能仅仅看当前位置的obstacleGrid是不是有障碍物，还要看它前面或者上面的那个
+        位置。
+     */
     public int uniquePathsWithObstacles(int[][] obstacleGrid) {
         int m = obstacleGrid.length,n = obstacleGrid[0].length;
         int[][] dp = new int[m][n];
@@ -1346,6 +1499,29 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             }
         }
         return dp[m-1][n-1];
+    }
+
+    /*二维dp也可以使用下面的写法，总之这个题中二维的初始化是关键，不能放在双层for循环*/
+    public int uniquePathsWithObstacles_1(int[][] obstacleGrid) {
+        int m = obstacleGrid.length, n = obstacleGrid[0].length;
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < n; i++) {
+            if (obstacleGrid[0][i]==1) break;
+            dp[0][i] = 1;
+        }
+        for (int i = 0; i < m; i++) {
+            if (obstacleGrid[i][0]==1) break;
+            dp[i][0] = 1;
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j] != 1) {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+            }
+        }
+        return dp[m - 1][n - 1];
     }
 
     /*解法2：一维数组的优化*/
@@ -1382,6 +1558,9 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      *      2. Character.toLowerCase：将字母转换为小写字母
      *      3. while (l<r&&!Character.isLetterOrDigit(s.charAt(l))) l++：从l开
      *  始向右，跳过所有的不是字母和数字的字符
+     *【错误点】
+     *      1. 注意的是全程判断的是left位置以及right位置的字符！要使用“s.charAt(left)”获
+     *  取某位置的字符。
      */
     public boolean isPalindrome(String s) {
         int l = 0,r = s.length()-1;
@@ -1468,7 +1647,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
             if (split[i].equals("")||split[i].equals(".")){
                 continue;
             }else if (split[i].equals("..")){
-                if (!stack.isEmpty()){
+                if (!stack.isEmpty()){ /*从栈中弹出元素需要确保栈不是空*/
                     stack.pollLast(); /**err：不能使用pop()，只能使用pollLast()*/
                 }
             }else {
@@ -1627,7 +1806,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         while (root != null || !stack.isEmpty()) {
             if (root != null) {
                 stack.push(root);
-                root = root.right; //一直入右孩子。中序遍历这里是一路入左孩子
+                root = root.right; /**由于寻找第cnt大的节点，因此需要是中序遍历的倒序，即：右、根、左。。。因此root先一直往右子树走*/
             } else {
                 TreeNode cur = stack.pop();
                 if (--cnt == 0) {
@@ -1769,11 +1948,12 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
          * 二叉搜索树；
          *      综上，上述的所有方案加和即为总数。
          */
-        for (int i = 2; i < n+1; i++) { /*求解：i个节点组成的二叉搜索树有多少种*/
+        for (int i = 2; i < n+1; i++) { /*依次求解：i个节点组成的二叉搜索树有多少种*/
 //            for (int j = 1; j <= n; j++) { /*求解方式：分别以第j个节点为根的搜索树有多少种，加和就是dp[i]。。。【补充说明】如果这里j从0开始，则范围j<n，就不能带等于了*/
 //                dp[i] = dp[j-1]*dp[i-j]; /*以j为根的二叉搜索树有多少种？左边就是j-1个节点；右边就是i-j个节点。（左右子树一共i-1个节点正确）*/
-            for (int j = 1; j <= n; j++) { /*求解方式：分别求出以第j个节点为根的搜索树有多少种，加和就是dp[i]*/
-                /**【注】这是一个累加的过程。分别是第1个节点作为根的方案数、第2个节点作为根的方案数.....因此总方案数是这些的加和*/
+            for (int j = 1; j <= n; j++) { /*求解方式：分别求出以“第j个节点为根”的搜索树有多少种，加和就是dp[i]*/
+                /**【注】这是一个累加的过程。分别是第1个节点作为根的方案数、第2个节点作为根的方案数.....因此总方案数是这些的加和。
+                 【注】j的含义是”把第几个节点作为根节点“，因此j取0是没有意义的，应该从1开始取*/
                 dp[i] += dp[j-1]*dp[i-j]; /*求出以j（第j个节点）为根的二叉搜索树有多少种？左边就是j-1个节点；右边就是i-j个节点。（左右子树一共i个节点正确）*/
             }
         }

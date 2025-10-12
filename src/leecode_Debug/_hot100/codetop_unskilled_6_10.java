@@ -10,13 +10,13 @@ import java.util.*;
  * @date 2025/9/9 10:10
  */
 public class codetop_unskilled_6_10 {
-    /*手撕堆排序
-
-     */
-
-
-
-
+//    /*手撕堆排序
+//
+//     */
+//
+//
+//
+//
     /*297
 序列化是将一个数据结构或者对象转换为连续的比特位的操作，进而可以将转换后的数据存储在
 一个文件或者内存中，同时也可以通过网络传输到另一个计算机环境，采取相反方式重构得到原
@@ -71,37 +71,31 @@ public class codetop_unskilled_6_10 {
                             此时A、B两个树的先序遍历都是“1，2”；后序遍历都是“2，1”。但是很明显2个树是不一样的，因此反序列化
                             的结果到底是哪一棵树呢？？综上，不能唯一恢复一颗二叉树。
      */
-    class Codec {
+    /*解法1：层序遍历的写法*/
+    public class Codec {
 
-        /**
-         【层序遍历的序列化】
-             1. 正常的层序遍历，分情况————
-                ①如果碰到了null节点，则添加“null,”；
-                ②如果碰到的不是null，则需要添加“cur.val,”。同时由于cur并不是null，因此需要将它的左右孩子添加到queue.
-             2. 其他说明：
-                ①需要判断是不是root就是null，如果root就是null，就直接返回了
-                ②并不需要严格的区分每一层，因此实际上并不需要像“正规层序遍历”那样，研究每一层之前使用“queue.size()”记
-              录队列的大小。这里并不需要严格的区分每一层~~~
-         */
         // Encodes a tree to a single string.
         public String serialize(TreeNode root) {
             if (root==null) return "null";
-            StringBuilder sb = new StringBuilder();
+            StringBuilder res = new StringBuilder();
             LinkedList<TreeNode> queue = new LinkedList<>();
             queue.offer(root);
             while (!queue.isEmpty()){
                 TreeNode cur = queue.poll();
+                /**
+                 这里有两种写法：
+                 一种就是下面的if里面添加continue，因此命中if后后面的就不会执行了。
+                 第二种就是将后面的代码整体写入到else分支
+                 * */
                 if (cur==null){
-                    sb.append("null,");
-                }else {
-                    sb.append(cur.val).append(",");
-                    queue.offer(cur.left);
-                    queue.offer(cur.right);
+                    res.append("null,");
+                    continue;
                 }
+                res.append(cur.val).append(",");
+                queue.offer(cur.left);
+                queue.offer(cur.right);
             }
-            /**chatgpt的建议是去除最后一个“,”，需要测试一下如果不去除对吗？不去除的话会走到Integer解析“”，需要看看这个会不会报错应该*/
-//            if (sb.length()>0) sb.setLength(sb.length()-1);  //去除最后一个逗号的代码，其实就是设置了StringBuilder的长度
-            return sb.toString();
+            return res.toString();
         }
 
         /**
@@ -126,24 +120,30 @@ public class codetop_unskilled_6_10 {
         // Decodes your encoded data to tree.
         public TreeNode deserialize(String data) {
             if (data.equals("null")) return null;
-            String[] strs = data.split(",");
-            TreeNode root = new TreeNode(Integer.valueOf(strs[0]));
+            String[] split = data.split(",");
             LinkedList<TreeNode> queue = new LinkedList<>();
+            TreeNode root = new TreeNode(Integer.parseInt(split[0]));
             queue.offer(root);
-            int index = 1;
+            int index = 1; /*标识当前应该解析哪一个位置了*/
+
             while (!queue.isEmpty()){
-                TreeNode cur = queue.poll();
-                if (!strs[index].equals("null")){ /**chatgpt：需要判断index是不是超出了strs的长度，不校验应该是有问题的*/
-                    TreeNode node = new TreeNode(Integer.valueOf(strs[index]));
-                    cur.left = node;
+                TreeNode curnode = queue.poll();
+                /**chatgpt：需要判断index是不是超出了strs的长度，不校验应该是有问题的..
+                    但是实际上不限制也没问题的*/
+                /*拼接构造左孩子。如果是null就不用管只用更新index，因为指针的默认值就是null*/
+                if (!"null".equals(split[index])){
+                    TreeNode node = new TreeNode(Integer.parseInt(split[index]));
+                    curnode.left = node;
                     queue.offer(node);
                 }
                 index++;
-                if (!strs[index].equals("null")){ /**chatgpt：需要判断index是不是超出了strs的长度，不校验应该是有问题的*/
-                    TreeNode node = new TreeNode(Integer.valueOf(strs[index]));
-                    cur.right = node;
+
+                if (!"null".equals(split[index])){
+                    TreeNode node = new TreeNode(Integer.parseInt(split[index]));
+                    curnode.right = node;
                     queue.offer(node);
                 }
+                index++;
             }
             return root;
         }
@@ -201,9 +201,9 @@ public class codetop_unskilled_6_10 {
             return node;
         }
     }
-
-
-
+//
+//
+//
     /*349
         给定两个数组 nums1 和 nums2，返回它们的交集。
 
@@ -231,9 +231,11 @@ public class codetop_unskilled_6_10 {
         }
         return res;
     }
-
-
-    /*排序+双指针的解法*/
+//
+//
+    /*解法2：排序+双指针的解法
+      步骤：①对两个数组分别排序；
+            ②从索引为0的位置开始，根据nums1[i]和nums2[j]的大小分别移动指针。任何一个指针越界停止即可*/
     public int[] intersection_1(int[] nums1, int[] nums2) {
         Arrays.sort(nums1);
         Arrays.sort(nums2);
@@ -418,7 +420,7 @@ public class codetop_unskilled_6_10 {
             }
         }
     }
-    
+
     /*47 全排列Ⅱ
             见回溯795行的写法
      */
@@ -447,6 +449,15 @@ public class codetop_unskilled_6_10 {
         }
     }
 
+    /*123. 买卖股票的最佳时机 III
+    给定一个数组，它的第 i 个元素是一支给定的股票在第 i 天的价格。
+
+    设计一个算法来计算你所能获取的最大利润。你最多可以完成 两笔 交易。
+
+    注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+     */
+
+
     /*7
         给定一个 32 位有符号整数 x，返回将其数字部分反转后的结果。如果反转后超出了 32 位有符号整数的范围 [-2^31, 2^31 - 1]，则返回 0
      */
@@ -463,7 +474,7 @@ public class codetop_unskilled_6_10 {
      */
     public int reverse(int x) {
         int res = 0;
-        while (x!=0){
+        while (x!=0){ /**【注】结束的标志是x==0，而不是x<0（每一轮就将x除10留下整数部分）*/
             /*step1：拿出最后一个数字digit；并更新x*/
             int digit = x%10;
             x /= 10;
@@ -484,6 +495,59 @@ public class codetop_unskilled_6_10 {
         return res;
     }
 
+
+    /**
+     说明：由于初始的数是x，即输入的 -2147483648<=x<=2147483647，所以翻转后的最后一位是1或2并不会
+     导致溢出。。因此其实下面的写法中res是不存在“等于Integer.MAX_VALUE/10”或者“等于Integer.MIN_VALUE/10”的
+     可能的，具体原因如下————
+            情况1：如果最终不会越界int，则res必然符合要求。
+            情况2：如果最终会越界int，则res越界之前的部分一定是“大于Integer.MAX_VALUE/10”或者“小于Integer.MIN_VALUE/10”
+        的。
+        综上，整个题目的代码可以简化为下面的形式
+     */
+    public int reverse_(int x) {
+        int res = 0;
+        while (x!=0){ /**【注】结束的标志是x==0，而不是x<0（每一轮就将x除10留下整数部分）*/
+            int digit = x%10;
+            x /= 10;
+            if (res>Integer.MAX_VALUE/10) return 0; /*判断越界可以简化为这里的形式*/
+            if (res<Integer.MIN_VALUE/10) return 0;
+            res = res*10 + digit;
+        }
+        return res;
+    }
+
+
+    /*958
+    给你一棵二叉树的根节点 root ，请你判断这棵树是否是一棵 完全二叉树 。
+
+在一棵 完全二叉树 中，除了最后一层外，所有层都被完全填满，并且最后一层中的所有节点都尽可能靠左。最后一层（第 h 层）中可以包含 1 到 2h 个节点。
+     */
+    /**层序遍历方法解题的时候，每一层的节点必须分明吗？？——————即访问每一层之前必须结合”queue.size()以
+     及for循环来进行吗“？？，应该是不需要的！！
+     【补充说明】完全二叉树的定义是：任何一层节点必须是从左到右依次填满。如果某个节点是null，则它所处的那
+     层右边的节点都是null，它下面所有层的节点都是null。
+     【思考】二叉树层序遍历的题目中，什么时候必须严格区分每一层？？什么时候不用严格区分每一层？？
+     */
+    public boolean isCompleteTree(TreeNode root) {
+        if (root==null) return true;
+        boolean hasNull = false;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            TreeNode cur = queue.poll();
+            if (hasNull&&cur!=null){
+                return false;
+            }
+            if (cur==null){
+                hasNull = true;
+            }else {
+                queue.offer(cur.left);
+                queue.offer(cur.right);
+            }
+        }
+        return true;
+    }
 
     /*LCR 155. 将二叉搜索树转化为排序的双向链表
 将一个 二叉搜索树 就地转化为一个 已排序的双向循环链表 。
@@ -571,6 +635,12 @@ public class codetop_unskilled_6_10 {
         遍历完后再首尾相连：head.left = prev; prev.right = head;
         返回 head。
      */
+    /**
+     * 【关键】这个题目中必须使用两个局部变量————
+     *      ①一个指针prev用于在遍历过程中完成节点的拼接
+     *      ②第二个指针head用于记录头结点，以及最后进行首尾节点的拼接。
+     *      【注意】中序遍历的第一个节点大概率不是root，因此必须要使用额外的节点来记录头结点
+     * */
     public NodeNode treeToDoublyList(NodeNode root) {
         if (root == null) return root;
         Stack<NodeNode> stack = new Stack<>();
@@ -591,7 +661,7 @@ public class codetop_unskilled_6_10 {
                 root = cur.right;
             }
         }
-
+        /*最后记得首尾相接，构成循环链表*/
         head.left = prev;
         prev.right = head;
         return prev;
@@ -736,8 +806,8 @@ public class codetop_unskilled_6_10 {
 //                isMatch1(a.left,b.left)&&
 //                isMatch1(a.right,b.right);
 //    }
-
-
+//
+//
     /*572
     给你两棵二叉树 root 和 subRoot 。检验 root 中是否包含和 subRoot 具有相同结构和节点值的子树。如果存在，返回 true ；否则，返回 false 。
     二叉树 tree 的一棵子树包括 tree 的某个节点和这个节点的所有后代节点。tree 也可以看做它自身的一棵子树。
@@ -815,10 +885,10 @@ public class codetop_unskilled_6_10 {
 //                isMatch1(root.left,subRoot.left)&&
 //                isMatch1(root.right,subRoot.right);
 //    }
-
-
-
-
+//
+//
+//
+//
     /*
      91. 解码方法
      一条包含字母 A-Z 的消息通过以下映射进行了 编码 ：
@@ -883,12 +953,21 @@ public class codetop_unskilled_6_10 {
     public int numDecodings(String s) {
         if(s==null||s.length()==0||s.charAt(0)=='0') return 0;
         int[] dp = new int[s.length() + 1];
+        /*base case：需要初始化两个。其中dp[0]作为启动的参数、dp[1]是判断第一个字符是不是0(如果第一个字
+            符是0，说白了这个字符串是不能被解码的。因为0不能解码并且它前面也没有字符不能组成“10”、“20”的样
+            子)*/
         dp[0] = 1;
         dp[1] = 1;
 
         for (int i = 2; i <=s.length(); i++) {
             char c2 = s.charAt(i - 1);
             char c1 = s.charAt(i - 2);
+            /*
+             根据1位数进行解码 和 2位数解码，更新dp[i].
+                   方案1：和前面的数合起来进行解码。前提条件————是不是能和前面的数组成[10,26]中的一个数，不在这个范围就不行
+                   方案2：当前字符(即index=i-1的字符)单独及逆行解码。前提条件————当前的这一位数位于区间(0,9]，如果不在这个
+                        区间，则不行
+             */
             if (c2!='0') dp[i] += dp[i-1]; //①i位置的值依赖于 i-1位置的值
             int val = (c1-'0')*10+c2-'0';
             if (val>=10&&val<=26) dp[i] += dp[i-2]; //②i位置的值依赖于 i-2位置的值
@@ -897,6 +976,8 @@ public class codetop_unskilled_6_10 {
     }
 
     /*空间优化到滚动变量*/
+    /**由于一个位置最多依赖于之前的两个位置，因此简化为仅仅使用2个变量来滚动计算....
+       写出一维的dp以后，这里的优化其实就很像”斐波那契数列“的题目*/
     public int numDecodings_(String s) {
         if (s==null||s.length()==0||s.charAt(0)=='0') return 0;
         int fir = 1;
@@ -932,10 +1013,12 @@ public class codetop_unskilled_6_10 {
         /*step1：base case的考虑。
             ①负数一定不是回文数；
             ②如果一个非零数的最后一个数是0，一定不是回文数*/
+        /**err：如果一个数的最后一位是0，说明肯定不是回文数，一个数不会以0开头（但是有一个例外，0本身）*/
         if(x<0||(x%10==0&&x!=0)) return false;
 
         /*step2：使用rev记录反转后得到的数，只要rev<x就一直反转*/
         int rev = 0;
+        /**不论x是什么数，也不管是不是回文。。循环条件while中”res<x“就保证了res最多只会比x多一位数*/
         while (rev<x){
             int digit = x%10;
             rev = rev*10+digit;
@@ -1093,15 +1176,14 @@ public class codetop_unskilled_6_10 {
             }
         }
     }
-
-
+//
+//
     /*328
     给定单链表的头节点 head ，将所有索引为奇数的节点和索引为偶数的节点分别分组，保持它们原有的相对顺序，然后把偶数索引节点分组连接到奇数索引节点分组之后，返回重新排序的链表。
     第一个节点的索引被认为是 奇数 ， 第二个节点的索引为 偶数 ，以此类推。
     请注意，偶数组和奇数组内部的相对顺序应该与输入时保持一致。
     你必须在 O(1) 的额外空间复杂度和 O(n) 的时间复杂度下解决这个问题。
      */
-
     /**
      【出错点】
             1. 拼接下一个节点的代码“curEven.next = curEven.next.next;”——————即“把下下一个节点拼接到当
@@ -1118,8 +1200,46 @@ public class codetop_unskilled_6_10 {
             curEven.next = curEven.next.next; //连接下一个偶数节点
             curEven = curEven.next;
         }
-        odd.next = even;
+        odd.next = even; /**【说明】这里不用特殊化处理为null，因为直接赋值“odd.next”就会覆盖之前的旧值*/
         return head;
+    }
+
+
+    /*
+    LCR 161. 连续天数的最高销售额
+某公司每日销售额记于整数数组 sales，请返回所有 连续 一或多天销售额总和的最大值。
+
+要求实现时间复杂度为 O(n) 的算法。
+     */
+    /*下面是错误的写法*/
+    public int maxSales(int[] sales) {
+        int res = Integer.MIN_VALUE;
+        int preSum = 0;
+        for (int i = 0; i < sales.length; i++) {
+            /**这个题下面的这种写法是错的，53题也不能这麽写？？
+             已知一个数组，求解最大的子数组和。是不一定大于等于0的，因为这个数组的子数组是明确
+             的，任何子数组的和也是明确的。。如果一个数组的所有数都是负数，则子数组的最大和一定是小
+             于0的！！
+             不像“买卖股票Ⅰ”，可以选择不买，因此利润的下限就是0，不可能说利润反而是负数！！
+             */
+            preSum = Math.max(preSum,preSum+sales[i]);
+            res = Math.max(preSum,res);
+        }
+        return res;
+    }
+
+    /*下面是正确的解法*/
+    public int maxSales_(int[] sales) {
+        /**
+         这种类型的题目中，如果开始的时候难考虑。。。则建议使用nums[0]初始化，然后从nums[1]开始研究剩下位置的元素
+         */
+        int res = sales[0];
+        int preSum = sales[0];
+        for (int i = 1; i < sales.length; i++) {
+            preSum = Math.max(preSum+sales[i],sales[i]);
+            res = Math.max(res,preSum);
+        }
+        return res;
     }
 
 
@@ -1139,6 +1259,11 @@ public class codetop_unskilled_6_10 {
             量isEnd）
      【代码的重点】①声明TrieNode，标志着节点的样子；②类内声明一个root作为根节点，每一次查找
         和 想插入的时候 都必须从root开始。
+     【疑问】
+            1. 前缀树的方法中第一行往往都是"TrieNode node = root;"，原因是什么？？
+        答：每一次操作都是从根节点出发一步一步进行的，因此要保证整个树根是确定的，所以每一次
+        方法执行之前要拷贝一份根节点，来使用拷贝后的指针node来执行操作。。。否则上一步操作完
+        root节点就变了，因此就不对了
      【其他说明】
              ①每个节点存的是一个“分支数组 + 是否是单词结尾”；
              ②单词的路径就是从 root 一路走下去；
@@ -1172,6 +1297,12 @@ public class codetop_unskilled_6_10 {
          接返回false了。
          */
         public void insert(String word) {
+            /**疑问？每一个方法之前都会这样记录一下这个变量，不记录的话行不行？？记录的意义又
+             是什么？？
+                答：不记录是不行的。意义就是保证全局记录的根节点root是正确的。如果这里不记录
+             的话，会导致下面的问题————
+                以insert为例，最终root指针将会来到插入节点的最后的位置，后面的操作就不知道根
+             节点是啥了，所有的查找、插入都无从下手了*/
             TrieNode node = root;
             for (char c:word.toCharArray()){
                 int index = c-'a';
@@ -1229,7 +1360,9 @@ public class codetop_unskilled_6_10 {
             成了先进先出）
           3. 如何用队列实现栈？
                 使用一个队列：元素添加进队列，要求每次添加进一个元素，就把队列中 除它以
-            外(即循环变量”i<size-1“，除了它)的其他所有元素依次弹出 并 重新添加进队列。。。
+            外(即循环变量”i<size-1“，除了它)的其他所有元素依次弹出 并 重新添加进队列。。
+            然后就等价于最后进入的那个元素是最先进入的，因此出队列的时候也是最先出，即"后
+            进先出"。
      【API说明】
           1. LinkedList就是Queue，方法offer()、poll()就天然的实现了先进先出的结构————
             1.1 offer()是向队列尾部添加元素
@@ -1320,7 +1453,8 @@ public class codetop_unskilled_6_10 {
     }
 
     /**建议的解法：常规的思想————二维表的行列分别标识s串对应位置的字符
-        dp数组的含义：dp[i][j]标识“i....j”这个子串的最大回文子序列长度；
+        dp数组的含义：dp[i][j]标识“i....j”这个子串的最大回文子序列长度（因此只有右上半的二维表位置
+     才有实际意义，这些位置的j>i）；
         状态转移：
             情况1：如果i位置的字符 和 j位置的字符 是一样的，则dp[i][j] = dp[i+1][j-1] + 2;
             情况2：如果i位置的字符 和 j位置的字符 是不一样的，则dp[i][j] = Math.max(dp[i+1][j],
@@ -1365,7 +1499,10 @@ public class codetop_unskilled_6_10 {
 注意 这个数列必须是 严格 递增的。
      */
     /**
-     【建议的解法】建议使用解法“findNumberOfLIS”
+     【建议的解法】建议使用解法“findNumberOfLIS”。即采取如下的步骤————
+            step1：先把dp数组以及cnt数组计算完成；
+            step2：然后遍历dp数组，如果dp[i]等于最长长度，则将cnt[i]累加到返回值。
+            [说明]不建议在计算dp数组和cnt的过程中就计算结果，容易出错~~
      【注意】
         1. dp数组中dp[i]表示以nums[i]结尾的最长递增子序列的长度。
         2. 但是这样的长度有多少呢？这个是需要知道的，因为我们需要计算“最长递增子序列
@@ -1398,7 +1535,6 @@ public class codetop_unskilled_6_10 {
 //        return res;
 //    }
 
-
     public int findNumberOfLIS(int[] nums) {
         int maxLen = 0;
         /*step1：初始化两个数组————dp以及cnt
@@ -1427,7 +1563,7 @@ public class codetop_unskilled_6_10 {
                     }
                 }
             }
-            //更新整个过程中遇到的“最长递增子序列的长度”
+            //更新整个过程中遇到的“最长递增子序列的长度”。。经过内层的for循环会计算出i位置的dp值以及cnt值
             maxLen = Math.max(maxLen,dp[i]);
         }
         /*step3：遍历dp数组，如果nums[i]结尾的最长递增子序列的长度等于maxLen。
@@ -1441,6 +1577,36 @@ public class codetop_unskilled_6_10 {
         }
         return res;
     }
+
+    /*另一种写法：在遍历的过程中进行res的计算。。。
+    【说明】容易写错，因此不建议使用这个方法*/
+    public int findNumberOfLIS1(int[] nums) {
+        int maxLen = 0,res = 0;
+        int[] dp = new int[nums.length];
+        int[] num = new int[nums.length];
+        Arrays.fill(dp,1);
+        Arrays.fill(num,1);
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[j]<nums[i]){
+                    if (dp[j]+1>dp[i]){
+                        num[i] = num[j];
+                        dp[i] = dp[j]+1;
+                    }else if (dp[j]+1==dp[i]){
+                        num[i] += num[j];
+                    }
+                }
+            }
+            if (dp[i]>maxLen){
+                maxLen = dp[i];
+                res = num[i];
+            }else if (dp[i]==maxLen){
+                res += num[i];
+            }
+        }
+        return res;
+    }
+
 
 
     /*344
@@ -1653,6 +1819,22 @@ public class codetop_unskilled_6_10 {
         return res;
     }
 
+    /*另外的写法*/
+    public double myPow2(double x, int n) {
+        if (n<0){
+            x = 1/x;
+            n = -n;
+        }
+
+        double res = 1;
+        while (n!=0){
+            if ((n&1)==1) res *= x;
+            x *= x;
+            n /= 2;
+        }
+        return res;
+    }
+
 
     /*611、有效三角形的个数
 
@@ -1679,14 +1861,15 @@ public class codetop_unskilled_6_10 {
     给你一个整数 n ，请你在无限的整数序列 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ...] 中找出并返回第 n 位上的数字。
      */
     public int findNthDigit(int n) {
-        int start = 1,digit = 1;
+        long start = 1;
+        int digit = 1;
         while (n>start*digit*9){
             n -= start*digit*9;
             digit++;
             start *= 10;
         }
         /**err：需要注意的就是下面获取num以及index的时候都是使用n-1。*/
-        int num = start+(n-1)/digit; /**看一下所求的数位在哪一个数*/
+        long num = start+(n-1)/digit; /**看一下所求的数位在哪一个数*/
         int index = (n-1)%digit; /**计算所求的数位是num的哪一位*/
         return String.valueOf(num).charAt(index)-'0';
     }
@@ -1829,9 +2012,15 @@ public class codetop_unskilled_6_10 {
         1. dp数组的含义：我们设 dp[i][j] 表示s[0..i-1] 是否可以被 p[0..j-1] 匹配。
         2. 状态转移：
              如果 p[j-1] == s[i-1] 或 p[j-1] == '?'======> dp[i][j] = dp[i-1][j-1]
+                    含义：最后一位匹配成功，就看前面的子串是不是匹配了
              如果 p[j-1] == '*'==========>dp[i][j] = dp[i][j-1] || dp[i-1][j]
+                    含义：由于匹配串的最后一位是*号，因此匹配串的*号可以匹配一次或者0次。
+                如果匹配0次，就取决于dp[i][j-1]即相当于p的最后一位不参与忽略它的存在；如
+                果匹配多次，则s的最后一位可以匹配忽略它，取决于dp[i-1][j]
           解释：
-            ①dp[i][j-1]：* 匹配空串；因为*匹配空串，因此dp[i][j] = dp[i][j-1]
+            ①dp[i][j-1]：* 匹配空串；因为*匹配空串，因此dp[i][j] = dp[i][j-1]。
+                ❗：注意匹配一次或者多次不是dp[i-1][j-1]，因为匹配一个字符后*号还可以继续匹
+            配前面的其他字符，因此这里应该取决于dp[i-1][j]，*还需要继续存在。
             ②dp[i-1][j]：* 匹配一个或多个字符。因此dp[i][j] = dp[i-1][j]
             ③否则：dp[i][j] = false
         3. 初始化
@@ -1862,23 +2051,21 @@ public class codetop_unskilled_6_10 {
                           }
     */
     public boolean isMatch_44(String s, String p) {
-        int m = s.length(),n = p.length();
+        int m = s.length(), n = p.length();
         boolean[][] dp = new boolean[m + 1][n + 1];
         dp[0][0] = true;
         for (int i = 1; i <= n; i++) {
-            if (p.charAt(i-1)=='*'){
-                dp[0][i] = dp[0][i-1];
-            }
+            dp[0][i] = dp[0][i - 1] && p.charAt(i - 1) == '*';
         }
 
         for (int i = 1; i <= m; i++) {
             for (int j = 1; j <= n; j++) {
                 char sc = s.charAt(i - 1);
                 char pc = p.charAt(j - 1);
-                if (sc==pc||pc=='?'){
-                    dp[i][j] = dp[i-1][j-1];
-                }else if (pc=='*'){
-                    dp[i][j] = dp[i-1][j] || dp[i][j-1];
+                if (sc == pc || pc == '?') {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else if (pc == '*') {
+                    dp[i][j] = dp[i - 1][j] || dp[i][j - 1];
                 }
             }
         }

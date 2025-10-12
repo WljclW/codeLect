@@ -306,6 +306,20 @@ public class topcode6_10 {
         return left+1;
     }
 
+    /*写法2：*/
+    public int removeDuplicates1(int[] nums) {
+        if (nums.length==1) return 1; /**这一句不要也是可以的*/
+        int left = 0,cur = 1;
+        while (cur< nums.length){
+            if (nums[left]!=nums[cur]){
+                nums[++left] = nums[cur];
+            }
+            cur++;
+        }
+        return left+1;
+    }
+
+
     //114
     /**递归的写法呢？？怎么解？？？*/
     public void flatten(TreeNode root) {

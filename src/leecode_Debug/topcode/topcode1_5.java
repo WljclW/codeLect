@@ -203,6 +203,12 @@ public class topcode1_5 {
      * 个节点！由于我们需要特殊处理第right个节点 以及 记录第right+1个节点，所以这里“i<right”。
      */
     public ListNode reverseBetween_2(ListNode head, int left, int right) {
+        /**
+         【关键建议】
+         链表中数节点的时候，建议使用下面的方法——————
+         先创建虚拟头节点dummy，cur=dummy，然后计数从0开始数。”for (int i = 0; i < m; i++)“出
+         了for循环cur就来到了链表的第m个节点
+         */
         ListNode dummy = new ListNode(-1, head),slow = dummy,fast = dummy;
         for (int i = 0; i < left-1; i++) { /**err：slow要来到left的前一个节点，因此满足“i<left-1”*/
             slow = slow.next;
@@ -1470,6 +1476,10 @@ public class topcode1_5 {
     }
 
     //110
+
+    /**
+     【注意】其他的解法需要了解一下~~
+     */
     public boolean isBalanced(TreeNode root) {
         if (root==null) return true;
         int left = getDepth(root.left);
@@ -1504,6 +1514,12 @@ public class topcode1_5 {
 
 
     //221
+
+    /**
+     【第一行 或者 第一列】 第一行或者第一列时1的位置就是1，否则时0；
+     【矩阵中间的位置】 如果matrix的该位置时‘1’，则取决于左上角三个位置dp值的最小值；否则matrix该位置的值
+            是0，则该位置的dp值也是0
+     */
     public int maximalSquare(char[][] matrix) {
         int m = matrix.length,n = matrix[0].length;
         int[][] dp = new int[m][n];

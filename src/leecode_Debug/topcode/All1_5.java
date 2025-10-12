@@ -423,7 +423,6 @@ public class All1_5 {
 请你 合并 nums2 到 nums1 中，使合并后的数组同样按 非递减顺序 排列。
 
 注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。*/
-
     /**
      *【关键】倒序合并————两个指针p1、p2，一个指着cur。。。p1、p2从nums1、nums2最后一个数倒着研究，将比
      *   较大的数放到nums1的cur位置(即末尾)
@@ -464,6 +463,18 @@ public class All1_5 {
         while (p2 >= 0) {
             nums1[tail--] = nums2[p2--];
         }
+    }
+
+    //自己写的朴素版本
+    public void merge_2(int[] nums1, int m, int[] nums2, int n) {
+        int index = m + n - 1;
+        int i = m - 1, j = n - 1;
+        while (i >= 0 && j >= 0) {
+            if (nums1[i] > nums2[j]) nums1[index--] = nums1[i--];
+            else nums1[index--] = nums2[j--];
+        }
+        while (i >= 0) nums1[index--] = nums1[i--]; /**其实这一行可以省略，如果nums1没研究完，则剩下的数就在nums1，不用动！！*/
+        while (j >= 0) nums1[index--] = nums2[j--];
     }
 
 
@@ -779,7 +790,8 @@ public class All1_5 {
 
 你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。*/
     /**
-     * 【注】是字符串不是链表
+     *【思路】两个字符串倒着相加
+     *【注】是字符串不是链表
      *【说明】跟”两数相加“其实代码是一样的。
      *      ”两数相加“题目中：
      *          什么时候结束循环？两个链表都来到最后 并且 进位信息carry是0
@@ -1277,8 +1289,8 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      *      否则如果outStack不是空，则直接从outStack弹出即可，此时也满足先进先出
      */
     class MyQueue {
-        Stack<Integer> inStack;
-        Stack<Integer> outStack;
+        Stack<Integer> inStack; /**任何一个输入，都必须先进入到这个栈*/
+        Stack<Integer> outStack; /**只能从这个栈中弹出*/
         public MyQueue() {
             inStack = new Stack<>();
             outStack = new Stack<>();
@@ -1435,9 +1447,9 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         while (left<=right){
             int mid = left+(right-left)/2;
             /**err：mid*mid可能会发生整型溢出，需不需要考虑这个情况？？？需要验证！！！chatgpt给的优化建议：long square = (long) mid * mid;*/
-            if (mid*mid>x){
+            if ((long)mid*mid>x){ /**err：在要转换为long类型！！*/
                 right = mid-1;
-            }else if (mid*mid<x){
+            }else if ((long)mid*mid<x){
                 left = mid+1;
             }else {
                 return mid;
@@ -1447,6 +1459,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     }
 
     /**
+     *【易错点】mid*mid可能超出int的范围，因此必须要用long类型表示
      *【解的本质】查找”某数的平方“小于等于x的右边界，即”最大的 满足平方小于等于x“的数..
      *      基于这句话的本质，是不是同样也可以理解成”求解平方大于x的左边界“的那个数-1？？？（应该是可以的）
      *【优化】0和1的平方根的特殊考虑；右边界初始化为x/2。
@@ -1473,7 +1486,12 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         int left = 1, right = x / 2, ans = 0;
         while (left <= right) {
             int mid = left + (right - left) / 2;
-            long square = (long) mid * mid; // 防止溢出
+            /**
+                err：下面的语句必须使用“long square = (long) mid * mid;”，由于大数的平方可能导致超出int的范
+             围，因此必须使用long类型。
+                使用“long square =  mid * mid;”也是错误的！！！
+             */
+            long square = (long) mid * mid;
 
             if (square == x) {
                 return mid; //如果是等于的话直接返回
@@ -1707,7 +1725,9 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     }
 
     private TreeNode buildTree(int[] preorder, int[] inorder, int l, int r) {
-        if (l>r) return null; /**err：这里的条件判断不能缺失！！！等于的时候不用考虑，因为l==r的时候，根节点可以构造成功，但是构造左右子树时由于”l>r“因此得到的都是null*/
+        /**err：这里的条件判断不能缺失！！！等于的时候不用考虑，因为l==r的时候，根节点可以构造成
+         * 功，但是构造左右子树时由于”l>r“因此得到的都是null*/
+        if (l>r) return null;  /**err：必须有这个终止条件，并且不能带等号~~*/
         int rootVal = preorder[preorderIndex++];
         TreeNode root = new TreeNode(rootVal);
         Integer index = inorderMap.get(rootVal);
@@ -2006,6 +2026,19 @@ int getMin() 获取堆栈中的最小元素。*/
         return res;
     }
 
+    /*写法2*/
+
+    /**
+     最简化的写法，不断的增加能获得的利润
+     */
+    public int maxProfit2(int[] prices) {
+        int res = 0;
+        for (int i = 1; i < prices.length; i++) {
+            res += Math.max(0,prices[i]-prices[i-1]);
+        }
+        return res;
+    }
+
 
 
     /*48旋转图像
@@ -2152,6 +2185,28 @@ int getMin() 获取堆栈中的最小元素。*/
         return isValidBST(root.left,min,root.val)&&
                 isValidBST(root.right,root.val,max);
     }
+
+    /**解法2：中序遍历验证升序*/
+    public boolean isValidBST1(TreeNode root) {
+        {
+            if (root == null) return true;
+            Stack<TreeNode> queue = new Stack<>();
+            Integer pre = null;
+            while (root != null || !queue.isEmpty()) {
+                if (root != null) {
+                    queue.push(root);
+                    root = root.left;
+                } else {
+                    TreeNode cur = queue.pop();
+                    if (pre != null && cur.val <= pre) return false;
+                    pre = cur.val;
+                    root = cur.right;
+                }
+            }
+            return true;
+        }
+    }
+
 
     /*543.二叉树的直径
     * 给你一棵二叉树的根节点，返回该树的 直径 。

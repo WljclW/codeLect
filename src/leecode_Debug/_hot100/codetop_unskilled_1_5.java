@@ -10,6 +10,13 @@ import java.util.Random;
  * @date 2025/9/2 14:43
  */
 public class codetop_unskilled_1_5 {
+
+
+    public static void main(String[] args) {
+        codetop_unskilled_1_5 codetop_unskilled_1_5 = new codetop_unskilled_1_5();
+        codetop_unskilled_1_5.findKthLargest(new int[]{3,2,1,5,6,4},2);
+    }
+
     //215
     public int findKthLargest(int[] nums, int k) {
         int n = nums.length;
@@ -94,8 +101,8 @@ public class codetop_unskilled_1_5 {
                       （1）计算出i位置关于“目前回文中心”center的对称位置。
                       （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
             int mirror = 2 * center - i;
-            if (i < right) {
-                p[i] = Math.min(right - i, p[mirror]);
+            if (i < right) { /**err：i小于“回文串的最右边界”，会误写成mirror*/
+                p[i] = Math.min(right - i, p[mirror]); /**得到i位置回文半径的最小值，i位置的回文串还可能往两边扩————3.2干的活*/
             }
 
             /*3.2   尝试向两边继续扩展，看看位置i是否能得到更长的回文子串。
@@ -320,6 +327,7 @@ public class codetop_unskilled_1_5 {
 
 
     //14
+    /*写法1*/
     public String longestCommonPrefix(String[] strs) {
         if (strs==null||strs.length==0) return "";
         /*step1：使用第一个字符串作为基准*/
@@ -341,5 +349,18 @@ public class codetop_unskilled_1_5 {
          *      综上，虽然是两种情况，但是返回值是统一的。
          */
         return str;
+    }
+
+    /*写法2*/
+    public String longestCommonPrefix_(String[] strs) {
+        String flag = strs[0];
+        for (int i = 0; i < flag.length(); i++) {
+            for (int j = 1; j < strs.length; j++) {
+                String cur = strs[j];
+                if (cur.length()==i || cur.charAt(i)!=flag.charAt(i))
+                    return flag.substring(0,i);
+            }
+        }
+        return flag;
     }
 }

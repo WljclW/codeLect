@@ -3,7 +3,6 @@ package leecode_Debug._hot100;
 import leecode_Debug.top100.ListNode;
 import leecode_Debug.top100.TreeNode;
 
-import javax.sound.sampled.Line;
 import java.util.*;
 
 /**
@@ -117,10 +116,12 @@ public class codetop_5 {
             int val = cur.next.val; /**记录相等的值是多少*/
             if (cur.next.next.val==val){ /**如果相等，用while循环跳过所有相等的节点*/
                 while (cur.next.next!=null&&cur.next.next.val==val){
-                    cur.next = cur.next.next;
+                    /**删除掉cur后面的第二个节点。即”cur===>node1====>node2====>node3“变
+                     为”cur===>node1====>node3”，删除中间的node2*/
+                    cur.next.next  = cur.next.next.next;
                 }
                 cur.next = cur.next.next;
-            }else { /**err：这里的else块是精髓！！*/
+            }else { /**err：这里的else是精髓，必须使用else来实现*/
                 cur = cur.next;
             }
         }
@@ -194,7 +195,8 @@ public class codetop_5 {
             [1,2,3,3]
             预期结果
             [1,2,3]
-        出错原因：除了while循环时fast指向null，slow指向第一个3，但是第一个3和第二个三的链没有断开！！
+        出错原因：出了while循环时fast指向null，slow指向第一个3，但是第一个3和第二个3中间的链没有断开！！
+               因此出了while循环需要执行"slow.next = null;"
     * */
     public ListNode deleteDuplicates_83(ListNode head) {
         if (head == null) return head; /**err：必须要有，因为下面fast指针的初始值是head.next*/
@@ -202,7 +204,7 @@ public class codetop_5 {
         ListNode slow = head,fast = head.next;
 
         while (fast != null) {
-            if (fast.val != slow.val) { /*slow和fast的值不相等：说明这个节点应该在结果的链表中，因此拼接到slow的后面*/
+            if (fast.val != slow.val) { /*slow和fast的值不相等：说明这个节点应该在结果的链表中，因此fast拼接到slow的后面*/
                 slow.next = fast;
                 slow = slow.next;  // 只有“当新的节点添加到结果链中”时，才更新 slow
             }
@@ -384,6 +386,32 @@ public class codetop_5 {
         dfsSumNumbers(root.right, curSum);
     }
 
+    /*写法2的变形*/
+    private int ansSumNumbers;
+
+    public int sumNumbers_2(TreeNode root) {
+        if (root == null) return 0;
+        dfs(root, root.val); /**【说明】与写法2的区别在于初始调用的时候不再是"dfs(root,0)"*/
+        return ans;
+    }
+
+    private void dfs(TreeNode node, int x) {
+        /**
+         *写在这里处理数据，就相当于在先序的位置添加处理逻辑
+         */
+        if (node.left == null && node.right == null) { // 叶子节点
+            ans += x;
+            return;
+        }
+        /**【注】因为这种方法在初始调用时就要把root节点的值传进去，因此必须先判断不能是null*/
+        if (node.left != null) {
+            dfs(node.left, x * 10 + node.left.val);
+        }
+        if (node.right != null) {
+            dfs(node.right, x * 10 + node.right.val);
+        }
+    }
+
 
 
 
@@ -430,6 +458,39 @@ public class codetop_5 {
         return sum;
     }
 
+    /*解法3：层序遍历的另一种写法*/
+    public int sumNumbers_3(TreeNode root) {
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        LinkedList<Integer> vals = new LinkedList<>();
+        if (root == null) return 0;
+        /**
+         与解法2的区别在下面的地方————
+                由于开始的时候采用的是：queue.offer(root);
+                                       vals.offer(0);
+                因此vals对应的值是“从根节点到它的父节点的路径和”，这个定义就影响了后续“如果是叶子节点时计算路
+            径的过程”、“普通节点入队列后，vals对应的入队值的问题”
+         */
+        queue.offer(root);
+        vals.offer(0);
+        int res = 0;
+        while (!queue.isEmpty()) {
+            TreeNode cur = queue.poll();
+            Integer curVal = vals.poll();
+            if (cur.left == null && cur.right == null) {
+                res += (curVal * 10 + cur.val);
+            }
+            if (cur.left != null) {
+                queue.offer(cur.left);
+                vals.offer(curVal * 10 + cur.val);
+            }
+            if (cur.right != null) {
+                queue.offer(cur.right);
+                vals.offer(curVal * 10 + cur.val);
+            }
+        }
+        return res;
+    }
+
 
 
     /*98
@@ -465,13 +526,14 @@ public class codetop_5 {
      *      否则的话，中序遍历结束，返回true。
      * 【易错点】记录前一个值的变量初始值不能使用Integr.MIN_VALUE，而要使用“long preValent = Long.MIN_VALUE;”。
      *      用Integr.MIN_VALUE或导致测试用例"[-2147483648]"报错，而-2147483648其实就正好是Integer.MIN_VALUE.
+     *      [补充说明]题目中说树中节点值的范围为"-231 <= Node.val <= 231 - 1"~~~是可以取到Integer的边界值的！！
      * */
     public boolean isValidBST1(TreeNode root) {
         if (root==null) return true;
         LinkedList<TreeNode> deque = new LinkedList<>();
         TreeNode cur = root;
 //        int preValent= Integer.MIN_VALUE; /*这里用int类型是错误的！！！用int范围过小了————原因：系欸但的最小值是int的最小值*/
-        long preValent = Long.MIN_VALUE; /**err：注意这里不能使用Integer.MIN_VALUE；并且不能声明为Long类型（声明为对象类型使没有int->long的隐式转换的，就会报错）。*/
+        long preValent = Long.MIN_VALUE; /**err~~~：注意这里不能使用Integer.MIN_VALUE；并且不能声明为Long类型（声明为对象类型使没有int->long的隐式转换的，就会报错）。*/
         while (cur!=null || !deque.isEmpty()) {
             if (cur != null) {
                 deque.push(cur);
@@ -584,6 +646,44 @@ public class codetop_5 {
     }
 
 
+    /*第三种写法，建议使用下面的写法*/
+    public void reorderList2(ListNode head) {
+        ListNode mid = findMiddle1(head);
+        ListNode start = mid.next;
+        mid.next =  null; /**这里如果置为null的话后面在合并的时候就不用出了循环指定head.next=null了，应该是*/
+        ListNode head2 = rever2(start);
+        while (head2!=null){
+            ListNode next1 = head.next;
+            ListNode next2 = head2.next;
+            head.next = head2;
+            head2.next = next1;
+            head = next1;
+            head2 = next2;
+        }
+    }
+
+    private ListNode rever2(ListNode head) {
+        ListNode pre = null,cur = head;
+        while (cur!=null){
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+
+    /*常规的寻找中间节点的做法*/
+    private ListNode findMiddle1(ListNode head) {
+        ListNode slow = head,fast = head;
+        while (fast!=null&&fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+
     /*43
     给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
     注意：不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
@@ -610,14 +710,14 @@ public class codetop_5 {
             for (int j = len2 - 1; j >= 0; j--) {
                 int digit2 = num2.charAt(j) - '0';
                 int curSum = digit1 * digit2 + multiRes[i + j + 1]; //digit1和digit2相乘的结果对应第”i+j+1“位，还要加上这个位置本来的数（是上一轮计算出来的）。
-                multiRes[i + j] += curSum / 10; /**err：把进位的信息加到前一个位置，注意是加到前一位，而不是赋值给前一位*/
+                multiRes[i + j] += curSum / 10; /**err：把进位的信息加到前一个位置，注意是加到前一位，而不是赋值给前一位。如果使用"="导致之前相乘的信息就丢失了*/
                 multiRes[i + j + 1] = curSum % 10; //”i+j+1“位置存放digit1和digit2的相乘信息
             }
         }
         /*step2：将存放结果的数组拼到StringBuilder中*/
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < multiRes.length; i++) {
-            if (sb.length() == 0 && multiRes[i] == 0) continue; /**err：跳过前导零*/
+            if (sb.length() == 0 && multiRes[i] == 0) continue; /**err：跳过前导零的代码实现*/
             sb.append(multiRes[i]);
         }
         return sb.toString();
@@ -683,7 +783,8 @@ public class codetop_5 {
     相同，两端点间会出现一些延伸到这一层的 null 节点，这些 null 节点也计入长度。
     题目数据保证答案将会在  32 位 带符号整数范围内。
     * */
-    /*写法1：宽度优先遍历……
+    /**理解一下这个题的DFS写法*/
+    /*写法1：宽度优先遍历（层序遍历）……
             两个队列（一个放节点，一个放节点对应的编号），也可以使用一个队
        列（队列中存放Pair<TreeNode,Integer>）。两种做法其实本质是一样的。*/
     public int widthOfBinaryTree(TreeNode root) {

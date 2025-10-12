@@ -11,6 +11,7 @@ import java.util.*;
 public class hot100_remain {
     /*108.升序数组转换为平衡二叉搜索树*/
 //    public TreeNode sortedArrayToBST(int[] nums) {
+//
 //    }
 
 
@@ -33,14 +34,6 @@ public class hot100_remain {
 
 
 
-
-
-
-
-
-    /**
-     * 体会下面的两个题都必须额外的使用一个方法来深度优先遍历二叉树的原因。
-     */
     /*543.
     * 给你一棵二叉树的根节点，返回该树的 直径 。
     二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
@@ -103,34 +96,23 @@ public class hot100_remain {
         double findMedian() 返回到目前为止所有元素的中位数。与实际答案相差 10-5 以内的答
         案将被接受。
      */
-    class MedianFinder {
-
-        PriorityQueue<Integer> small; //要求堆顶是最小值
-        PriorityQueue<Integer> big;
-        public MedianFinder() {
-            small = new PriorityQueue<>();
-            big = new PriorityQueue<>((o1,o2)->{
-                return o2-o1;
-            });
-        }
-
-        //正确的方法应该是下面的形式，原因？？
-        public void addNum(int num) {
-            small.offer(num);
-            if (small.size()>big.size()){
-                big.offer(small.poll());
-            }
-        }
-
-
-
-        public double findMedian() {
-            if (small.size()==big.size()){
-                return (small.poll()+big.poll())/2.0;
-            }
-                return small.peek();
-        }
-    }
+//    class MedianFinder {
+//
+////        public MedianFinder() {
+////
+////        }
+//
+//        //正确的方法应该是下面的形式，原因？？
+////        public void addNum(int num) {
+////
+////        }
+//
+//
+//
+//        public double findMedian() {
+//
+//        }
+//    }
 
     /**
      * =============================================================================================================
@@ -141,63 +123,23 @@ public class hot100_remain {
        完全平方数 是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数
        自乘的积。例如，1、4、9 和 16 都是完全平方数，而 3 和 11 不是。*/
     /*最快的算法其实是数学定理，但原理过于复杂*/
-    public int numSquares(int n) {
-        int[] dp = new int[n + 1];
-        Arrays.fill(dp, n);
-        dp[0] = 0;
-        /**思考：这里的i和j都从0开始，都从1开始都是正确的，为什么？？*/
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j * j <= i; j++) {
-                dp[i] = Math.min(dp[i], dp[i - j * j] + 1); /**err：关键是这里记得取最小值，而不要直接赋值，直接赋值就错了*/
-            }
-        }
-        return dp[n];
-    }
+//    public int numSquares(int n) {
+//
+//    }
 
 
     /*416.
      * 给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两
      * 个子集，使得两个子集的元素和相等。*/
     /**见leecode_Debug._hot100._01bag*/
-    public boolean canPartition_dims(int[] nums) {
-        int sum = 0;
-        for (int i = 0; i < nums.length; i++) {
-            sum += nums[i];
-        }
-        if (sum%2!=0) return false;
-        sum /= 2;
-
-        int[][] dp = new int[nums.length][sum + 1];
-        for (int i = 0; i < sum + 1; i++) {
-            if (i>=nums[0])
-                dp[0][i] = nums[0];
-        }
-
-        for (int i = 1; i < nums.length; i++) {
-            for (int j = 1; j < sum + 1; j++) {
-                if (j>=nums[i]){
-                    dp[i][j] = Math.max(dp[i-1][j-nums[i]]+nums[i],dp[i][j]);
-                }else
-                    dp[i][j] = dp[i-1][j];
-            }
-        }
-        return dp[nums.length-1][sum]==sum;
-    }
+//    public boolean canPartition_dims(int[] nums) {
+//
+//    }
 
 
-    public boolean canPartition(int[] nums) {
-        int sum = Arrays.stream(nums).sum();
-        if ((sum&1)==1) return false; /**这里可以用“与运算”来快速判断是不是偶数*/
-        sum /= 2;
-
-        int[] dp = new int[sum + 1];
-        for (int i = 0; i < nums.length; i++) {
-            for (int j = sum; j >=nums[i]; j--) {
-                dp[j] = Math.max(dp[i],dp[j-nums[i]]+nums[i]);
-            }
-        }
-        return dp[sum]==sum;
-    }
+//    public boolean canPartition(int[] nums) {
+//
+//    }
 
 
     /**chatgpt给出的优化版本，需要测试准确性*/
@@ -227,45 +169,13 @@ public class hot100_remain {
     计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
     * 金额，返回 -1 。
     你可以认为每种硬币的数量是无限的。*/
-    public int coinChange_dims(int[] coins, int amount) {
-        int[][] dp = new int[coins.length][amount + 1];
-        Arrays.fill(dp,Integer.MAX_VALUE);
-        for (int i = 0; i < amount + 1; i++) {
-            if (amount%coins[0]==0) dp[0][i] = i/coins[0];
-        }
-        for (int i = 0; i < coins.length; i++) {
-            dp[i][0] = 0;
-        }
-
-        for (int i = 1; i < coins.length; i++) {
-            for (int j = 1; j < amount + 1; j++) {
-                if (j>=coins[i]&&dp[i][j-coins[i]]!=Integer.MAX_VALUE){
-                    dp[i][j] = Math.min(dp[i][j-coins[i]]+1,dp[i][j]); /**【说明】与0-1背包最大的区别所在，物品能重复选择，因此从本行转移而来*/
-                }else {
-                    dp[i][j] = dp[i-1][j];
-                }
-            }
-        }
-        return dp[coins.length-1][amount]==Integer.MAX_VALUE?-1:dp[coins.length-1][amount];
-    }
+//    public int coinChange_dims(int[] coins, int amount) {
+//
+//    }
 
     /*验证一下下面的写法是不是可以？？可以将dp的初始化省略，集成到双层for循环中*/
-    public int coinChange(int[] coins, int amount) {
-        int[] dp = new int[amount + 1];
-        Arrays.fill(dp,Integer.MAX_VALUE);
-        dp[0] = 0;
-        for (int i = 0; i < amount + 1; i++) {
-            if (i%coins[0]==0){
-                dp[i] = i/coins[0];
-            }
-        }
-        for (int i = 1; i < coins.length; i++) {
-            for (int j = 1; j < amount + 1; j++) {
-                if (j>=coins[i]&&dp[j-coins[i]]!=Integer.MAX_VALUE)
-                    dp[j] = Math.min(dp[j-coins[i]]+1,dp[j]);
-            }
-        }
-        return dp[amount]==Integer.MAX_VALUE?-1:dp[amount];
-    }
+//    public int coinChange(int[] coins, int amount) {
+//
+//    }
 
 }

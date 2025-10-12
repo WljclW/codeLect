@@ -310,23 +310,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      * ==========================================================================================================
      * ==========================================================================================================
      */
-    //958
-    public boolean isCompleteTree(TreeNode root) {
-        LinkedList<TreeNode> queue = new LinkedList<>();
-        boolean hasNull = false;
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            TreeNode cur = queue.poll();
-            if (cur == null) {
-                hasNull = true;
-            } else {
-                if (hasNull) return false;
-                queue.offer(cur.left);
-                queue.offer(cur.right);
-            }
-        }
-        return true;
-    }
 
 
     //5
@@ -389,6 +372,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
 
+
     //92
     public ListNode reverseBetween(ListNode head, int left, int right) {
         ListNode dummy = new ListNode(-1, head), cur = dummy, end = dummy;
@@ -418,12 +402,13 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
     /**
+     * ==============================1~5 page====================================================================================
+     * ==============================1~5 page====================================================================================
+     * ==============================1~5 page====================================================================================
+     * ==============================1~5 page====================================================================================
      * ==================================================================================================================
-     * ==================================================================================================================
-     * ==================================================================================================================
-     * ==================================================================================================================
-     * 9.1
      */
+    //215
     /*
     方法1：调用Arrays.sort()进行完整的排序。时间复杂度——O(n log n)，空间复杂度O(1).
     方法2：借助优先级队列。只要优先级队列的数字超过k，就弹出。
@@ -447,13 +432,13 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return queue.poll();
     }
 
-    /*解法2：快排的思路。
-     *   快排是每一轮会把一个数放在正确的位置，如果某一轮结束某个数被放在n-k的位置，说明这个数就是答案。
-     * 为什么最优？这个题求解的是第K个最大数，其他的数并不要求有序！
-     *   此时的复杂度分析：
-     *       时间复杂度：O(N)
-     *       空间复杂度：O(1)（原地操作，递归栈深度 O(log n)）。
-     * */
+    /*解法2：快排的思路。下面的写法会超时，为什么？？？
+    *   快排是每一轮会把一个数放在正确的位置，如果某一轮结束某个数被放在n-k的位置，说明这个数就是答案。
+    * 为什么最优？这个题求解的是第K个最大数，其他的数并不要求有序！
+    *   此时的复杂度分析：
+    *       时间复杂度：O(N)
+    *       空间复杂度：O(1)（原地操作，递归栈深度 O(log n)）。
+    * */
     public int findKthLargest_quickSort(int[] nums, int k) {
         int n = nums.length;
         return quickSort(nums, 0, n - 1, n - k);
@@ -509,14 +494,52 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
 
-    //53
+    /*
+    *K神快排的写法，这种写法就不会超时，为什么？？
+    * */
+    private int quickSelect(List<Integer> nums, int k) {
+        // 随机选择基准数
+        Random rand = new Random();
+        int pivot = nums.get(rand.nextInt(nums.size()));
+        // 将大于、小于、等于 pivot 的元素划分至 big, small, equal 中
+        List<Integer> big = new ArrayList<>();
+        List<Integer> equal = new ArrayList<>();
+        List<Integer> small = new ArrayList<>();
+        for (int num : nums) {
+            if (num > pivot)
+                big.add(num);
+            else if (num < pivot)
+                small.add(num);
+            else
+                equal.add(num);
+        }
+        // 第 k 大元素在 big 中，递归划分
+        if (k <= big.size())
+            return quickSelect(big, k);
+        // 第 k 大元素在 small 中，递归划分
+        if (nums.size() - small.size() < k)
+            return quickSelect(small, k - nums.size() + small.size());
+        // 第 k 大元素在 equal 中，直接返回 pivot
+        return pivot;
+    }
+
+    public int findKthLargest_good(int[] nums, int k) {
+        List<Integer> numList = new ArrayList<>();
+        for (int num : nums) {
+            numList.add(num);
+        }
+        return quickSelect(numList, k);
+    }
+
+
+    //53. 最大子数组和
     public int maxSubArray(int[] nums) {
         int res = Integer.MIN_VALUE;
         int preSum = 0;
         for (int i = 0; i < nums.length; i++) {
             preSum += nums[i];
-            preSum = Math.max(preSum, nums[i]);
-            res = Math.max(res, preSum);
+            preSum = Math.max(preSum,nums[i]); /**每一个数要麽跟前面的数形成子数组；要麽自己独立开始形成一个子数组*/
+            res = Math.max(res,preSum);
         }
         return res;
     }
@@ -526,78 +549,126 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     public String longestPalindrome_review(String s) {
         if (s == null || s.length() == 0) return "";
         StringBuilder sb = new StringBuilder("#");
-        for (char c : s.toCharArray()) {
+        for (char c:s.toCharArray()){
             sb.append(c).append("#");
         }
         String str = sb.toString();
+        int n = str.length();
 
-        int[] flags = new int[str.length()];
-        int center = 0, p = 0;
-        int start = 0, maxLen = 0;
-        for (int i = 0; i < str.length(); i++) {
-            int mirror = 2 * center - i;
-            if (i < p) {
-                flags[i] = Math.min(flags[mirror], p - i);
+        int[] p = new int[n]; //声明int数组用于存放每一个位置的回文半径
+        int center = 0,right = 0; /*center表示当前的回文中心；right表示当前最远的回文半径。*/
+        int start = 0,maxLen = 0; /*这是返回结果的关键信息。start表示“最长回文子串”的开始位置，maxLen表示“最长回文子串”的长度*/
+        /*step3：for循环依次研究每一个位置*/
+        for (int i = 0; i < n; i++) {
+            /*3.1 这一步就是“马拉车算法”的核心精髓。。具体的做法如下————
+                      （1）计算出i位置关于“目前回文中心”center的对称位置。
+                      （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
+            int mirror = 2*center-i;
+            if (i<right){
+                p[i] = Math.min(right-i,p[mirror]);
             }
 
-            int left = i + flags[i] - 1, right = i + flags[i] + 1;
-            while (left >= 0 && right < str.length() && str.charAt(left) == str.charAt(right)) {
-                flags[i]++;
-                left--;
-                right++;
+            /*3.2   尝试向两边继续扩展，看看位置i是否能得到更长的回文子串。
+                    这一步具体的做法呢，如下————
+                        ①声明两个指针l,r分别为i位置的左右；
+                        ②只要l和r不越界 并且 l和r位置的字符相等，就“增加p[i]”、移动l和r指针*/
+            int l = i-p[i]-1,r = i+p[i]+1;
+            while (l>=0&&r<n&&str.charAt(l)==str.charAt(r)){
+                p[i]++;
+                l--;
+                r++;
             }
-
-            if (i + flags[i] > p) {
+            /*3.3 更新“最远回文右边界”（同时更新对应的回文中心）。
+             *   “最远回文右边界”right 和 “当前的回文中心”center 是成对起作用的，因此更新right的时候就要更新center。
+             *   为什么说是“成对起作用”的呢？？因为right和i比较能加速p[i]计算；center用于计算位置i关于回文中心的对称位置*/
+            if (i+p[i]>right){
                 center = i;
-                p = i + flags[i];
+                right = i+p[i];
             }
-
-            if (flags[i] > maxLen) {
-                maxLen = flags[i];
-                start = (i - maxLen) / 2;
+            /*3.4 更新最长回文子串。
+             *   “最长回文子串”maxLen 和 “回文子串的开始位置”start也是成对出现的，因此更新maxLen的时候呀需要更新start。*/
+            if (p[i]>maxLen){
+                /**
+                 * err：更新的顺序不能错了，必须先更新maxLen
+                 */
+                maxLen = p[i]; /**err：回文半径就是最长的长度*/
+                start = (i-maxLen)/2; /**？？？*/
             }
         }
         return s.substring(start, start + maxLen);
     }
 
-    //5题，两边扩散的方法
-    public String longestPalindrome_(String s) {
+    /**
+     * 中心扩散法的复杂度分析：
+     *      时间复杂度：O(N^2)；
+     *      空间复杂度：O(1)
+     *中心扩散法中最关键的有两点：
+     *      第一点：双指针 + while循环计算回文长度返回，此时返回值是“(r-1)-(l+1)+1”即r-l-1。并且这个值就
+     *  是真实的回文子串的长度，因为计算方式是边界索引值相减的，与“回文中心是（i，i）还是（i，i+1）”是没有关
+     *  系的。
+     *      第二点：更新回文子串的最大长度时，同时更新回文子串的起始位置，这个起始位置是关键————i-(len-1)/2。
+     * @param s
+     * @return
+     */
+    public String longestPalindrome_1(String s) {
         int start = 0, maxLen = 0;
         for (int i = 0; i < s.length(); i++) {
-            int odd = getPalind(s, i, i);
-            int even = getPalind(s, i, i + 1);
-            int len = Math.max(odd, even);
-
-            if (len > maxLen) {
-                maxLen = len;
-                start = i - (len - 1) / 2;
+            int odd = getLength(s, i, i);
+            int even = getLength(s, i, i + 1);
+            int curLen = Math.max(odd, even);
+            if (curLen > maxLen) {
+                maxLen = curLen;
+                start = i - (curLen - 1) / 2; /**err：这里是如何理解的？？*/
             }
         }
         return s.substring(start, start + maxLen);
     }
 
-    private int getPalind(String s, int left, int right) {
-        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
-            left--;
-            right++;
+    private int getLength(String s, int l, int r) {
+        while (l>=0&&r<s.length()&&s.charAt(l)==s.charAt(r)){
+            l--;
+            r++;
         }
-        return right - left - 1;
+        /**
+         * 如何理解下面返回值的计算？？？
+         *      根据while循环可知，只要“满足不越界 并且 字符相等”，就会执行while循环。。。。如果某次不再进
+         *   入了，说明此时此刻此时l和r“要么越界了 要么对应的字符不相等”————即回文子串不包含r位置也不包含l位
+         *   置。
+         *      如果是之前滑动窗口、二分法等包括左右边界，此时计算长度的表达式就是“r-l+1”。
+         *      但是这里是既不包含左边界，也不包含右边界，因此最后有效回文是闭区间 [l+1, r-1]，此时的长度
+         *   是“(r-1)-(l+1)+1”即r-l-1
+         */
+        return r-l-1; /***err：这里是如何理解的？？*/
     }
 
 
     //92
+
+    /**
+     *【思路】
+     *      1、使用虚拟头节点dummy；
+     *      2、for循环移动指针。目标：让pre指向left的前一个节点，让end指向right节点。
+     *      3、记录pre.next(此节点是需要翻转部分的第一个节点)，记录end.next(此节点即是反转部分
+     *          过后的第一个节点)；然后将end.next=null。
+     *          [补充说明]K个一组反转链表、这个题都会涉及到将某节点的next指针置为null，原因：翻
+     *          转链表的代码中，"while (cur!=null)"因此停止翻转的标志是cur来到null，如果不设置，
+     *          就会导致每一次都反转到链表的末尾才结束，这明显是错的。因为我们只需要翻转中间的某
+     *          一部分链表。
+     *      4、翻转从pre.next开始的链表，并进行节点的拼接。
+     *      5、返回dummy.next
+     */
     public ListNode reverseBetween_(ListNode head, int left, int right) {
-        ListNode dummy = new ListNode(-1, head), pre = dummy, end = dummy;
-        for (int i = 0; i < left - 1; i++) {
+        ListNode dummy = new ListNode(-1, head),pre = dummy,end = dummy;
+        for (int i = 0; i < left - 1; i++) { /**注意i的范围：让pre来到left的前一个节点，因此i只能走left-1步*/
             pre = pre.next;
         }
-        for (int i = 0; i < right; i++) {
+        for (int i = 0; i < right; i++) { /**注意i的范围：让end来到right节点，因此i需要走right步*/
             end = end.next;
         }
         /**这里的操作类似于“K个一组翻转链表”的操作。
          *      1. 首先两个指针，分别来到“要反转部分的前一个节点pre（相当于 k个一组中前一组的最后一个节点）” 以及 “要反转部分的最后一个
          *  节点end（相当于 k个一组中当前组的最后一个节点）”
-         *      2. 记录一下要反转部分的第一个节点start；要反转部分之后的第一个节点next；
+         *      2. 记录一下要反转部分的第一个节点start即pre.next；要反转部分之后的第一个节点next即end.next；
          *      3. 将end.next置为null，之所以这麽设置是因为：翻转链表的时候“cur!=null”是循环结束的标志。
          *      4. 翻转需要翻转的部分，并进行结果的拼接*/
         ListNode start = pre.next;
@@ -609,9 +680,10 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return dummy.next;
     }
 
+    //翻转链表的完整代码
     private ListNode rever(ListNode head) {
-        ListNode pre = null, cur = head;
-        while (cur != null) {
+        ListNode pre = null,cur = head;
+        while (cur!=null){
             ListNode next = cur.next;
             cur.next = pre;
             pre = cur;
@@ -623,17 +695,17 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     //1143
     public int longestCommonSubsequence(String text1, String text2) {
-        int len1 = text1.length(), len2 = text2.length();
+        int len1 = text1.length(),len2 = text2.length();
         int[][] dp = new int[len1 + 1][len2 + 1];
         int res = 0;
         for (int i = 1; i <= len1; i++) {
             for (int j = 1; j <= len2; j++) {
-                if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
-                    dp[i][j] = dp[i - 1][j - 1] + 1;
-                } else {
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                if (text1.charAt(i-1)==text2.charAt(j-1)){
+                    dp[i][j] = dp[i-1][j-1]+1;
+                }else {
+                    dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
                 }
-                res = Math.max(dp[i][j], res);
+                res = Math.max(dp[i][j],res);
             }
         }
         return res;
@@ -641,18 +713,18 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     /*1143一维数组*/
     public int longestCommonSubsequence_(String text1, String text2) {
-        int len1 = text1.length(), len2 = text2.length();
-        int[] dp = new int[len2 + 1];
+        int len1 = text1.length(),len2 = text2.length();
+        int[] dp = new int[len2+1];
         int res = 0;
 
         for (int i = 1; i <= len1; i++) {
             for (int j = 1; j <= len2; j++) {
-                if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
-                    dp[j] = dp[j - 1] + 1;
-                } else {
-                    dp[j] = Math.max(dp[j], dp[j - 1]);
+                if (text1.charAt(i-1)==text2.charAt(j-1)){
+                    dp[j] = dp[j-1]+1;
+                }else {
+                    dp[j] = Math.max(dp[j],dp[j-1]);
                 }
-                res = Math.max(dp[j], res);
+                res = Math.max(dp[j],res);
             }
         }
         return res;
@@ -661,7 +733,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     //93
     List<String> resRestoreIpAddresses;
-
     public List<String> restoreIpAddresses_(String s) {
         resRestoreIpAddresses = new LinkedList<>();
         StringBuilder sb = new StringBuilder(s);
@@ -692,7 +763,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     //78
     List<List<Integer>> resSubsets;
-
     public List<List<Integer>> subsets(int[] nums) {
         resSubsets = new LinkedList<>();
         dfs(nums, new LinkedList<Integer>(), 0);
@@ -703,7 +773,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         resSubsets.add(new LinkedList<>(path));
         for (int i = index; i < nums.length; i++) {
             path.add(nums[i]);
-            dfs(nums, path, i + 1);
+            dfs(nums,path,i+1);
             path.removeLast();
         }
     }
@@ -712,15 +782,15 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     //322
     public int coinChange(int[] coins, int amount) {
         int[] dp = new int[amount + 1];
-        Arrays.fill(dp, -1);
-        dp[0] = 0;
+        Arrays.fill(dp,-1);
+        dp[0] =0;
         for (int i = 0; i < coins.length; i++) {
             for (int j = coins[i]; j < amount + 1; j++) {
-                if (dp[j - coins[i]] != -1) /**必须要保证金额“j-coins[i]”是可以凑出来的*/
-                    dp[j] = Math.max(dp[j], dp[j - coins[i]] + 1);
+                if (dp[j-coins[i]]!=-1) /**必须要保证金额“j-coins[i]”是可以凑出来的*/
+                    dp[j] = Math.max(dp[j],dp[j-coins[i]]+1);
             }
         }
-        return dp[amount] == -1 ? -1 : dp[amount];
+        return dp[amount]==-1?-1:dp[amount];
     }
 
     /*chatgpt给出下面的答案，应该也是可以的*/
@@ -764,7 +834,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     //39
     List<List<Integer>> resCombinationSum;
-
     public List<List<Integer>> combinationSum(int[] candidates, int target) {
         resCombinationSum = new LinkedList<>();
         LinkedList<Integer> path = new LinkedList<>();
@@ -784,6 +853,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             target += candidates[i];
         }
     }
+
 
 
     //470，实现rand10()
@@ -866,10 +936,9 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     //113
     List<List<Integer>> resPathSum;
-
     public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
         resPathSum = new LinkedList<>();
-        pathSum(root, new LinkedList<Integer>(), targetSum);
+        pathSum(root,new LinkedList<Integer>(),targetSum);
         return resPathSum;
     }
 
@@ -1006,7 +1075,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         */
         for (int[] p : prerequisites) { /**err：最绕的是这个for循环的内容*/
             int index = p[0], ele = p[1];
-            graph.get(index).add(ele); /**这里应该写错了，需要捋清楚添加的顺序~~~*/
+            graph.get(ele).add(index); /**这里容易写错，需要捋清楚添加的顺序~~~*/
             indegree[index]++;
         }
 
@@ -1024,7 +1093,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             Integer curVal = queue.poll();
             count++;
             for (int index : graph.get(curVal)) {
-                indegree[index]--;
+                indegree[index]--; /**将对应后置课程的入度减一*/
                 if (indegree[index] == 0) queue.offer(index);
             }
         }
@@ -1107,7 +1176,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     //数组中的逆序对
-
     /**
      * 逆序对的关键：满足 i < j 且 nums[i] > nums[j] 的数对。在归并时，左半部分 [left..mid] 和右半部
      * 分 [mid+1..right] 都已经是有序的。统计逆序对的关键就在 合并过程中。
@@ -1119,6 +1187,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         能更好。
             因此可以把归并排序的代码也统一一下，初始时形参直接传入tmp数组
      */
+    /*写法1：官方的写法*/
     public int reversePairs(int[] nums) {
         if (nums == null || nums.length == 0) return 0;
         int[] temp = new int[nums.length];
@@ -1149,7 +1218,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                 /**
                  *    只有右边的数比左边的数小的时候才会更新count!!举个例子：
                  *    假设当前左边的指针位置在p1，右边的指针位置在p2。并且nums[p1]>nums[p2]，因此前面的数
-                 * 比后面的数打了，产生逆序对。产生多少呢？？
+                 * 比后面的数大了，产生逆序对。产生多少呢？？
                  *    答：nums[p1]>nums[p2]，并且左边排好序了，因此左半的区间[left,mid]这个闭区间内p1位置之
                  * 后的数也都大于nums[p2]，那一共有多少个数呢？由于包含p1位置，包含mid位置，因此产生逆序对“mid-p1+1”
                  */
@@ -1164,6 +1233,9 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
              这意味着右边所有元素都比左边剩下的元素小或等于，因此逆序对该算的已经在之前算过了；
              左边剩下的元素只能直接放到 temp 里，不会再产生新的逆序对。所以这里 不能再加 curCount，
              否则就重复计数了。
+             【因此】这个题目中我们的思想是“对于[mid+1,right]”中的每一个数，看前面有多少个数比它看，
+             比它大的有多少个，就说明逆序对有多少个。。最后如果区间[mid+1,right]已经没有数了，说明它
+             对应的逆序对已经算过了，因此仅仅需要在while循环更新逆序对总数
              * */
 //            curCount += (right-mid);
         }
@@ -1176,8 +1248,139 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return curCount;
     }
 
+    /*错误的写法，后面给出纠正的方法*/
+//    public int reversePairs(int[] record) {
+//        int res = 0;
+    /**在 Java 里，所有参数传递都是值传递。
+        当你把一个基本类型（例如 int res）传进函数时，函数里拿到的是它的一个拷贝。因此在mergerSort方法中
+     修改的res仅仅是自己拷贝的那一份，reversePairs方法中定义的res并不会发生改变！！
+        修改的思路分为三种（这三种思路不仅仅体现在这里，在回溯的题目、二叉树递归的题目中也有体现）————
+            第一种：定义全局int变量来更新；
+            第二种：扩展的方法直接返回int类型；
+            第三种：由于java是值传递，因此考虑传递引用类型（比如这个题的话可以使用int数组）
+     */
+//        mergerSort(record,0,record.length-1,res);
+//        return res;
+//    }
+//
+//    private void mergerSort(int[] record, int left, int right, int res) {
+//        if (left>right) return;
+//        int mid = left+(right-left)/2;
+//        mergerSort(record,left,mid,res);
+//        mergerSort(record,mid+1,right,res);
+//        mergeTwo(record,left,mid,right,res);
+//    }
+//
+//    private void mergeTwo(int[] record, int left, int mid, int right, int res) {
+//        int[] tmp = new int[right - left + 1];
+//        int index = 0;
+//        int p1 = left,p2 = mid+1;
+//        while (p1<=mid&&p2<=right){
+//            if (record[p1]>record[p2]){
+//                res += (mid-p1+1);
+//                tmp[index++] = record[p2++];
+//            }else {
+//                tmp[index++] = record[p1++];
+//            }
+//        }
+//        while (p1<=mid) tmp[index++] = record[p1++];
+//        while (p2<=right) tmp[index++] = record[p2++];
+//
+//        int cur = 0;
+//        while (cur<tmp.length){
+//            record[cur+left] = tmp[cur++];
+//        }
+//    }
+
+    /*修改写法2：*/
+    public int reversePairs1(int[] record) {
+        return mergeSort(record, 0, record.length - 1);
+    }
+
+    private int mergeSort(int[] record, int left, int right) {
+        if (left >= right) return 0;
+        int mid = left + (right - left) / 2;
+        int res = mergeSort(record, left, mid)
+                + mergeSort(record, mid + 1, right)
+                + merge(record, left, mid, right);
+        return res;
+    }
+
+    private int merge(int[] record, int left, int mid, int right) {
+        int[] tmp = new int[right - left + 1];
+        int index = 0, count = 0;
+        int p1 = left, p2 = mid + 1;
+        while (p1 <= mid && p2 <= right) {
+            if (record[p1] > record[p2]) {
+                count += (mid - p1 + 1);
+                tmp[index++] = record[p2++];
+            } else {
+                tmp[index++] = record[p1++];
+            }
+        }
+        while (p1 <= mid) tmp[index++] = record[p1++];
+        while (p2 <= right) tmp[index++] = record[p2++];
+
+        for (int i = 0; i < tmp.length; i++) record[left + i] = tmp[i];
+        return count;
+    }
+
+
+    /*修改写法3：引用传递*/
+    public int reversePairs2(int[] record) {
+        int[] res = new int[1];
+        mergerSort(record, 0, record.length - 1, res);
+        return res[0];
+    }
+
+    private void mergerSort(int[] record, int left, int right, int[] res) {
+        if (left >= right) return;
+        int mid = left + (right - left) / 2;
+        mergerSort(record, left, mid, res);
+        mergerSort(record, mid + 1, right, res);
+        mergeTwo(record, left, mid, right, res);
+    }
+
+    private void mergeTwo(int[] record, int left, int mid, int right, int[] res) {
+        int[] tmp = new int[right - left + 1];
+        int index = 0;
+        int p1 = left, p2 = mid + 1;
+        while (p1 <= mid && p2 <= right) {
+            if (record[p1] > record[p2]) {
+                res[0] += (mid - p1 + 1);
+                tmp[index++] = record[p2++];
+            } else {
+                tmp[index++] = record[p1++];
+            }
+        }
+        while (p1 <= mid) tmp[index++] = record[p1++];
+        while (p2 <= right) tmp[index++] = record[p2++];
+
+        for (int i = 0; i < tmp.length; i++) record[left + i] = tmp[i];
+    }
+
+
+
 
     //958
+    public boolean isCompleteTree(TreeNode root) {
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        boolean hasNull = false;
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode cur = queue.poll();
+            if (cur == null) {
+                hasNull = true;
+            } else {
+                if (hasNull) return false;
+                queue.offer(cur.left);
+                queue.offer(cur.right);
+            }
+        }
+        return true;
+    }
+
+
     /*写法2：不使用if-else*/
     public boolean isCompleteTree1(TreeNode root) {
         if (root == null) return true;
@@ -1193,6 +1396,24 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             if (hasNull) {
                 return false;
             }
+            queue.offer(cur.left);
+            queue.offer(cur.right);
+        }
+        return true;
+    }
+
+
+    /*写法3：*/
+    public boolean isCompleteTree2(TreeNode root) {
+        if (root==null) return true;
+        boolean hasNull = false;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            /**这种类型的题目并不需要关注某一层有多少节点，只要queue不是空就进行循环即可*/
+            TreeNode cur = queue.poll();
+            if (cur==null) hasNull = true;
+            if (hasNull&&cur!=null) return false;
             queue.offer(cur.left);
             queue.offer(cur.right);
         }
@@ -1405,10 +1626,10 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      */
     private int dfs(int[][] memo, int i, int j, int[][] matrix) {
         if (memo[i][j] != 0) return memo[i][j]; /*如果不是0说明已经计算过了直接返回*/
-        int max = 1; //初始化为1，递增子路径至少包含自己，因此长度至少为1
+        int max = 1; //初始化为1（初始化位0其实结果也是对的），递增子路径至少包含自己，因此长度至少为1。。。这里不用考虑matrix是空的情况
         for (int[] d : dirs) {
             int x = i + d[0], y = j + d[1];
-            if (x >= 0 && x < m && y >= 0 && y < n && matrix[i][j] < matrix[x][y]) {
+            if (x >= 0 && x < m && y >= 0 && y < n && matrix[i][j] < matrix[x][y]) { /**err：比较之前先判断x和y不能越界*/
                 /**
                  当前位置(i,j)的dp值取决于4个方向的最大值，记录为max，最后需要返回。
                  【疑问】为什么不是加？？而是取最大值？？
@@ -1465,29 +1686,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return prev1;
     }
 
-
-    //106
-    int postorderIndex;
-    HashMap<Integer, Integer> inorderMap;
-
-    public TreeNode buildTree(int[] inorder, int[] postorder) {
-        inorderMap = new HashMap<>();
-        postorderIndex = inorder.length - 1;
-        for (int i = 0; i < inorder.length; i++) {
-            inorderMap.put(inorder[i], i);
-        }
-        return buildTree(inorder, postorder, 0, inorder.length - 1);
-    }
-
-    private TreeNode buildTree(int[] inorder, int[] postorder, int left, int right) {
-        int curVal = postorder[postorderIndex--];
-        TreeNode root = new TreeNode(curVal);
-        Integer index = inorderMap.get(curVal);
-        root.right = buildTree(inorder, postorder, index + 1, right);
-        root.left = buildTree(inorder, postorder, left, index - 1);
-        return root;
-    }
-
     /* 384
         实现一个支持以下操作的类：
 
@@ -1497,7 +1695,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
         shuffle() —— 返回数组随机打乱后的结果
      */
-
     /**
          这是典型的 Fisher–Yates 洗牌算法（又叫 Knuth Shuffle）：如果直接 Collections.shuffle 会占用额外空间。
      Fisher–Yates 可以原地 O(n) 打乱并且保证所有排列等概率。
@@ -1527,17 +1724,23 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
 
         public int[] reset() {
-            array = origin.clone();
+            /*
+                由于要保证origin数组保持不变，因此在reset的时候必须使用“ origin.clone()”给array拷贝一份。
+            这个道理有点类似于“前缀树”题目中，每一次查找、插入等方法时“拷贝一份root”是类似的，因为前缀树的
+            题目中必须使当前类知道root节点，这个代表根节点，根节点是不能变得，否则在查找插入等过程由于会不
+            断的移动指针导致root的指向变化了
+             */
+            array = origin.clone(); /**err：这里必须是使用“clone()”方法给array*/
             return array;
         }
 
-        public int[] shuffle() {
-            for (int i = 0; i < array.length; i++) {
-                int j = random.nextInt(origin.length); /**err：这样的写法应该是错误的，不能从所有的数里面选*/
-                swap2(array, i, j);
-            }
-            return array;
-        }
+//        public int[] shuffle() {
+//            for (int i = 0; i < array.length; i++) {
+//                int j = random.nextInt(origin.length); /**err：这样的写法是错误的*/
+//                swap2(array, i, j);
+//            }
+//            return array;
+//        }
 
         //chatgpt给的其实是下面的样子
         /*
@@ -1549,13 +1752,13 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                    i = n-2 → 从 [0, i] 里随机选一个 j，交换
                    直到 i = 0 结束
          */
-//        public int[] shuffle() {
-//            for (int i = array.length - 1; i > 0; i--) {
-//                int j = random.nextInt(i + 1); // [0, i] 之间随机
-//                swap(array, i, j);
-//            }
-//            return array;
-//        }
+        public int[] shuffle() {
+            for (int i = array.length - 1; i > 0; i--) { /**err：注意这种写法i必须是倒序~~*/
+                int j = random.nextInt(i + 1); // [0, i] 之间随机
+                swap(array, i, j);
+            }
+            return array;
+        }
 
         //或者下面的写法也可以？？？
 //        public int[] shuffle() {
