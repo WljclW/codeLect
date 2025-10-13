@@ -853,7 +853,7 @@ public class _06ListNode {
         private void removeRealTail() {
             DouListNode tailReal = tail.pre;
             removeNode(tailReal);
-            map.remove(tailReal.key);
+            map.remove(tailReal.key); /**err：这里要根据key来删除，容易误写成value*/
         }
 
         /*删除一个节点：

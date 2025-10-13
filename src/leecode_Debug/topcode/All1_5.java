@@ -11,6 +11,12 @@ import java.util.*;
  * err：5、20、215、92、105、234、283、
  * undo：46的最优解、88、415、72题优化空间、1143空间优化的最优解、93、69、8、151、468、718
  * 模糊：54
+ *
+ * 2025.10.13：
+ *      _hot100._06ListNode#isPalindrome(leecode_Debug.top100.ListNode)这个题中的注释需要核对，两半链
+ *  表的数量以及翻转的位置等相关注释有问题
+ *      _hot100._06ListNode#isPalindrome(leecode_Debug.top100.ListNode)这个题上面的注释中也是错误的，尤
+ *  其是翻转后半部分后两半链表的形态————根源：这是单链表，一个节点的后继必然是相同的节点
  */
 public class All1_5 {
     /*
@@ -598,7 +604,8 @@ public class All1_5 {
         for (int i = 0; i < right; i++) { /**err：fast要来到right节点，因此“i<right”*/
             fast = fast.next;
         }
-
+        /*其实就是“翻转从slow.next到fast的这段链表”，整体局面分为三部分“slow节点———>slow.next到fast翻转的结
+          果————>restStart开始的剩余部分链表”，因此翻转完成后拼接上即可*/
         ListNode start = slow.next;
         ListNode restStart = fast.next;
         fast.next = null;
@@ -790,7 +797,7 @@ public class All1_5 {
 
 你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。*/
     /**
-     *【思路】两个字符串倒着相加
+     *【思路】两个字符串倒着相加，字符串是可以倒着取数相加的（从这个角度看，字符串的相加要比链表的相加简单）
      *【注】是字符串不是链表
      *【说明】跟”两数相加“其实代码是一样的。
      *      ”两数相加“题目中：
@@ -919,14 +926,54 @@ public class All1_5 {
         return dp[len1][len2];
     }
 
+    /*两行数组的滚动优化版本*/
+    public int minDistance_2row(String word1, String word2) {
+        int m = word1.length(), n = word2.length();
+        if (m < n) return minDistance(word2, word1); // 优化空间使用
+
+        int[] prev = new int[n + 1]; // 上一行
+        int[] cur = new int[n + 1];  // 当前行
+
+        // 初始化第一行：把 word2 的前 j 个字符变成空串需要 j 次删除
+        for (int j = 0; j <= n; j++) {
+            prev[j] = j;
+        }
+
+        // 遍历 word1 的每个字符
+        for (int i = 1; i <= m; i++) {
+            cur[0] = i; // 把 word1 前 i 个字符变成空串需要 i 次删除
+            for (int j = 1; j <= n; j++) {
+                char c1 = word1.charAt(i - 1);
+                char c2 = word2.charAt(j - 1);
+                if (c1 == c2) {
+                    cur[j] = prev[j - 1]; // 字符相同，不需要操作
+                } else {
+                    cur[j] = Math.min(Math.min(prev[j], cur[j - 1]), prev[j - 1]) + 1;
+                    // 三种操作：删除（prev[j]）、插入（cur[j-1]）、替换（prev[j-1]）
+                }
+            }
+            // 滚动数组：交换引用，而不是复制
+            int[] tmp = prev;
+            prev = cur;
+            cur = tmp;
+        }
+
+        return prev[n]; // 最后一行结果
+    }
+
     /*一维dp的写法
         复杂度分析：时间复杂度：O(m·n)（还是要遍历整个表）；空间复杂度：O(min(m, n))（只保留一行）
     */
     /**
      *【解释】根据二维dp可以发现，每一个位置依赖于它的”左上角的三个位置“，这样的局面有问题！
-     *     情况1：dp[i][j]依赖于dp[i-1][j]、dp[i][j-1]。此时每一行从左往右计算就可以；
-     *     情况2：dp[i][j]依赖于dp[i-1][j]、dp[i][j-1]、dp[i-1][j-1]。此时从前往后计
-     *  算就不对，必须借助额外的变量存储dp[i-1][j-1]的信息
+     *     问题：dp[i][j]依赖于dp[i-1][j]、dp[i][j-1]、dp[i-1][j-1]。此时从前往后计
+     *  算就不对，必须借助额外的变量存储dp[i-1][j-1]的信息————代表着上一行前一个位置的值。
+     *     如何解决：在一行数组的动规中，要求在更新任何一个位置的值之前，必须先记录，比如：计
+     *  算dp[3]的之前先使用tmp记录dp[3]的值dp[3](old)，dp[3]更新后将dp[3](old)赋值给局
+     *  部变量prev;接下来会计算dp[4]，依然先记录dp[4]（old）到变量tmp中，更新dp[4]时二维中
+     *  会使用到左上角的位置值即dp[i-1][j-1]，就等价于一维中的dp[3](old)，而此时的dp[3]（old）
+     *  是在变量prev中存储的。。。。。综上，整个过程形成了闭环，同时可以看到prev,tmp变量是缺一不
+     *  可的！！！
      */
     public int minDistance_1dim(String word1, String word2) {
         /*setep1：保证空间复杂度为O(min(m,n))————即把短的字符串放在二维表中列的位置*/
@@ -946,11 +993,11 @@ public class All1_5 {
         for (int i = 1; i < m + 1; i++) {
             /**【注】此时的dp[0]并不单单是dp[0]，而是二维表中第i行的第0列————即取word1的前i个字符，word2的0个字符*/
             int prev = dp[0];
-            dp[0] = i;
+            dp[0] = i; /**更新dp某位置的值①：这里会更新dp某位置的值，因此更新前必须记录原来的值————即上一行干的事*/
             for (int j = 1; j < n + 1; j++) {
                 int tmp = dp[j]; /**err：这里必须用一个新的变量来暂时存储dp值*/
                 if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
-                    dp[j] = prev;
+                    dp[j] = prev; /**更新dp某位置的值②：这里会更新dp某位置的值，因此更新前必须记录原来的值————即if-else块之外所干的事*/
                 } else {
                     dp[j] = Math.min(Math.min(dp[j - 1], dp[j]), prev) + 1;
                 }
@@ -1021,8 +1068,9 @@ public class All1_5 {
         int[] dp = new int[n + 1];
         for (int i = 1; i < m+1; i++) {
             int prev = 0; /**①记录dp[0]的值，1143题dp[0]固定是0————dp[0]等价于二维中的第i行第0列，即长度为i的text1和长度为0的text2子串公共子序列必然是0*/
+            /**在72的1行数组动规中，这里会更新“dp[0]=i”，由于这个题是计算公共子序列，且dp[0]表示第二个串是空串，因此dp[0]必然是0，数组的默认值以及初始值就是0，因此省略此步骤*/
             for (int j = 1; j < n+1; j++) {
-                int tmp = dp[j]; /**②计算之前先记录dp[i]*/
+                int tmp = dp[j]; /**②if-else块会更新dp某位置，因此计算之前先记录dp[i]*/
                 if (text1.charAt(i-1)==text2.charAt(j-1)){
                     dp[j] = prev + 1;
                 }else {
@@ -1442,6 +1490,16 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     给你一个非负整数 x ，计算并返回 x 的 算术平方根 。
     由于返回类型是整数，结果只保留 整数部分 ，小数部分将被 舍去 。
     注意：不允许使用任何内置指数函数和算符，例如 pow(x, 0.5) 或者 x ** 0.5 。*/
+    /**
+     【解法】实质就是二分查找“自身平方小于等于x的最大的整数”————因此等价于二分查找右边界问题。
+     【关键问题】
+            1. 0、1的特殊处理，平方根是它自身。
+            2. 二分查找过程中————
+                ①如果计算mid*mid，可能会发生int溢出的现象，因此如果计算mid*mid必须使用long来保存；
+                ②可以使用“mid与x/mid比较大小”的方式来进行，就规避了这种风险。如果mid>x/mid，此时
+              的mid必然偏大了，因此right=mid-1;反之，left=mid+1。
+            综上，这个题的解法，建议使用 mySqrt_best
+     */
     public int mySqrt(int x) {
         int left = 0,right = x; /**如果不优化的话，这里右边界应该是x，因为0和1的平方根就是本身，因此右边界要声明为x*/
         while (left<=right){
@@ -1481,7 +1539,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      *
      */
     public int mySqrt1(int x) {
-        if (x < 2) return x; // 0 和 1 特殊处理
+        if (x < 2) return x; // 0 和 1 特殊处理，平方根是自己
 
         int left = 1, right = x / 2, ans = 0;
         while (left <= right) {
@@ -1496,13 +1554,27 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
             if (square == x) {
                 return mid; //如果是等于的话直接返回
             } else if (square < x) {
-                ans = mid;      /*记录上一次平方小于x的解*/
+                ans = mid;      /*记录上一次平方小于x的解，此时的mid可能是答案*/
                 left = mid + 1; // 去右边找更大的
             } else {
                 right = mid - 1; // 去左边找
             }
         }
         return ans;
+    }
+
+    public int mySqrt_best(int x) {
+        if (x <= 1) return x;
+        int left = 1, right = x / 2;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (mid > x / mid) { /**这种写法避免了使用long，避免了mid*mid发生int溢出的风险*/
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return right;
     }
 
 
@@ -1514,6 +1586,39 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     转换：通过跳过前置零来读取该整数，直到遇到非数字字符或到达字符串的结尾。如果没有读取数字，则结果为0。
     舍入：如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231 的整数应该被舍入为 −231 ，大于 231 − 1 的整数应该被舍入为 231 − 1 。
     返回整数作为最终结果。*/
+
+    public int myAtoi__(String s) {
+       int index = 0; //变量1：index记录当前研究到哪个位置了
+       /*step1：跳过前导的空格*/
+       while (index<s.length()&&s.charAt(index)==' ') index++;
+       if (index==s.length()) return 0;
+
+       /*step2：处理符号*/
+       int flag = 1;
+       if (s.charAt(index)=='-'||s.charAt(index)=='+'){
+           flag = s.charAt(index)=='-'?-1:1;
+           index++;
+       }
+
+       /*step3：计算结果*/
+       int res = 0;
+       while (index<s.length()&&Character.isDigit(s.charAt(index))){
+           int digit = s.charAt(index)-'0';
+           /**下面的判断溢出的方法是错误的*/
+           if (flag==1&&res>Integer.MAX_VALUE/10) return Integer.MAX_VALUE;
+           if (flag==-1&&res<Integer.MIN_VALUE/10) return Integer.MIN_VALUE;
+           /**正确的需要使用下面的方法？？？与“7.整数反转”是有区别的，如何理解？？如何统一？？*/
+//           if (res > Integer.MAX_VALUE / 10 ||
+//                   (res == Integer.MAX_VALUE / 10 && digit > Integer.MAX_VALUE % 10)) {
+//               return flag == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+//           }
+           res = res*10 + digit;
+
+           index++;  //如果这个忘了会出现什么问题？？
+       }
+       return res*flag;
+    }
+
     /**
      * 下面的写法为什么是错误的？？？
      */
@@ -1726,7 +1831,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 
     private TreeNode buildTree(int[] preorder, int[] inorder, int l, int r) {
         /**err：这里的条件判断不能缺失！！！等于的时候不用考虑，因为l==r的时候，根节点可以构造成
-         * 功，但是构造左右子树时由于”l>r“因此得到的都是null*/
+         * 功，但是构造左右子树时执行buildTree，由于”l>r“因此得到的都是null*/
         if (l>r) return null;  /**err：必须有这个终止条件，并且不能带等号~~*/
         int rootVal = preorder[preorderIndex++];
         TreeNode root = new TreeNode(rootVal);
@@ -2153,7 +2258,9 @@ int getMin() 获取堆栈中的最小元素。*/
     }
 
     /**“回文链表”题目中找中间节点的时候，就走常规的逻辑没问题————即偶数时找到中间偏后的节点，甚至前一半链表最
-           后一个节点的next域不置null也没问题(不置为null反而简化了流程的处理)*/
+           后一个节点的next域不置null也没问题(不置为null反而简化了流程的处理)。。。这里不像“排序链表”一样必
+           须将前后两半链表拆开，因为“排序链表”中需要根据null来判断链表的结束，需要不断的拆链表每次规模减小为
+           原来的一半*/
     private ListNode findMid2(ListNode head) {
         ListNode slow = head,fast = head;
         while (fast!=null&&fast.next!=null){
@@ -2624,11 +2731,21 @@ int getMin() 获取堆栈中的最小元素。*/
     给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
     请注意 ，必须在不复制数组的情况下原地对数组进行操作。
      */
+    /*最简化，且效率最高的写法*/
+    /**
+     易错点：为什么for循环内不能使用while循环？？比如nums = {1,0,2,0,0,0}.
+            开始时left=0，i=0，执行while循环时发现“nums[i]!=0”，因此会进入while循环执行代
+        码“swap5(nums,left++,i)”，由于i等于left，因此交换后其实相当于不交换因为是一个位置。。
+        交换完成后left++所以left变为1，但是i的值依然是0。。。。。
+            然后再回到while判断条件“ while (nums[i]!=0)”，由于交换后i的值没变依然h是0，并且由
+        于原来i和left相等，因此相当于同一个位置交换，nums[0]的值依然是1，因此满足while条件，进入
+        到循环执行“swap5(nums,left++,i);”......
+     */
     public void moveZeroes(int[] nums) {
         if (nums.length<=1) return;
         int left = 0;
         for (int i = 0; i < nums.length; i++) {
-            while (nums[i]!=0){ /**下面的写法是错误的！会导致死循环。。。。。这里需要使用if，不能用while*/
+            while (nums[i]!=0){ /**err：会导致死循环。。。。。这里需要使用if，不能用while*/
                 swap5(nums,left++,i);
             }
         }
