@@ -20,101 +20,9 @@ import java.util.*;
  * 2025.10.13......
  *      单行注释都是以前写的代码
  *      给“leecode_Debug._hot100._11stack.MinStack”补充判断相等的另外方法，使用“.intValue()”
+ *   err:5、、、、、、、、、
  */
 public class All1_5_review {
-   /*146.LRU 缓存
-    请你设计并实现一个满足  LRU (最近最少使用) 缓存 约束的数据结构。
-    实现 LRUCache 类：
-    LRUCache(int capacity) 以 正整数 作为容量 capacity 初始化 LRU 缓存
-    int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的值，否则返回 -1 。
-    void put(int key, int value) 如果关键字 key 已经存在，则变更其数据值 value ；如果不存在，则向缓存中插入该组 key-value 。如果插入操作导致关键字数量超过 capacity ，则应该 逐出 最久未使用的关键字。
-    函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
-    * */
-    class LRUCache {
-        class DouNode{
-            int key;
-            int value;
-            DouNode prev;
-            DouNode next;
-            public DouNode(){}
-            public DouNode(int key,int value){
-                this.key = key;
-                this.value = value;
-            }
-        }
-
-        DouNode head;
-        DouNode tail;
-        HashMap<Integer,DouNode> map;
-        int capacity;
-        int size;
-
-        public LRUCache(int capacity) {
-            this.capacity = capacity;
-            this.size = 0;
-            map = new HashMap<>();
-            head = new DouNode();
-            tail = new DouNode();
-            head.next = tail;
-            tail.prev = head;
-        }
-
-        public int get(int key) {
-            DouNode node = map.get(key);
-            if (node!=null){
-                moveToHead(node);
-                return node.value;
-            }
-            return -1;
-        }
-
-        public void put(int key, int value) {
-            DouNode node = map.get(key);
-            if (node!=null){
-                moveToHead(node);
-                node.value = value;
-            }else {
-                DouNode newNode = new DouNode(key, value);
-                addToHead(newNode);
-                map.put(key,newNode);
-                this.size++;
-                if (this.size>capacity){
-                    removeTail();
-                }
-            }
-        }
-
-       private void removeTail() {
-           DouNode relTail = tail.prev;
-           removeNode(relTail);
-           map.remove(relTail.key);
-           this.size--;
-       }
-
-       private void addToHead(DouNode node) {
-           DouNode next = head.next;
-           head.next = node;
-           node.next = next;
-           next.prev = node;
-           node.prev = head;
-       }
-
-       private void moveToHead(DouNode node) {
-           removeNode(node);
-           addToHead(node);
-       }
-
-       private void removeNode(DouNode node) {
-           DouNode next = node.next;
-           DouNode prev = node.prev;
-           prev.next = next;
-           next.prev = prev;
-       }
-   }
-
-
-
-
     /*215. 数组中的第K个最大元素
 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
 
@@ -122,44 +30,6 @@ public class All1_5_review {
 
 你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
      */
-
-
-
-    /*25
-    k个一组翻转链表
-     */
-    public ListNode reverseKGroup(ListNode head, int k) {
-        ListNode dummy = new ListNode(-1, head);
-        ListNode pre = dummy,end = dummy;
-        while (end.next!=null){
-            for (int i = 0; i < k && end != null; i++) {
-                end = end.next;
-            }
-            if (end==null) break;
-
-            ListNode thisStart = pre.next;
-            ListNode nextStart = end.next;
-            end.next = null;
-            pre.next = reverse1(thisStart);
-            thisStart.next = nextStart;
-
-            pre = thisStart;
-            end = thisStart;
-        }
-        return dummy.next;
-    }
-
-    private ListNode reverse1(ListNode head) {
-        ListNode pre = null,cur = head;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre =cur;
-            cur = next;
-        }
-        return pre;
-    }
-
 
     /*
     手撕快排
@@ -235,153 +105,12 @@ public class All1_5_review {
         return s.substring(start,start+maxLenRel);
     }
 
-
-    /*88. 合并两个有序数组
-给你两个按 非递减顺序 排列的整数数组 nums1 和 nums2，另有两个整数 m 和 n ，分别表示 nums1 和 nums2 中的元素数目。
-
-请你 合并 nums2 到 nums1 中，使合并后的数组同样按 非递减顺序 排列。
-
-注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。*/
-    public void merge(int[] nums1, int m, int[] nums2, int n) {
-        int curIndex = m+n-1;
-        int i = m-1,j = n-1;
-        while (i>=0&&j>=0){
-            nums1[curIndex--] = nums1[i]<nums2[j]?nums2[j--] : nums1[i++];
-        }
-        while (j>=0) nums1[curIndex--] = nums2[j--];
-    }
-
-
-    /*236.二叉树最近公共祖先
-     * */
-    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-        if (root==null) return null;
-        if (root==p||root==q) return root;
-        TreeNode left = lowestCommonAncestor(root.left, p, q);
-        TreeNode right = lowestCommonAncestor(root.right, p, q);
-        if (left!=null&&right!=null) return root;
-        return left==null?right:left;
-    }
-
-    /*
-    103. 二叉树的锯齿形层序遍历
-    给你二叉树的根节点 root ，返回其节点值的 锯齿形层序遍历 。（即先从左往右，再从右往左进行下一层遍历，以此类推，层与层之间交替进行）。*/
-    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
-        List<List<Integer>> res = new LinkedList<>();
-        LinkedList<TreeNode> queue = new LinkedList<>();
-        if (root==null) return res;
-        queue.offer(root);
-        while (!queue.isEmpty()){
-            int size = queue.size();
-            LinkedList<Integer> ele = new LinkedList<>();
-            for (int i = 0; i < size; i++) {
-                TreeNode cur = queue.poll();
-                if (res.size()%2==0){
-                    ele.offerLast(cur.val);
-                }else {
-                    ele.offerFirst(cur.val);
-                }
-                if (cur.left!=null) queue.offer(cur.left);
-                if (cur.right!=null) queue.offer(cur.right);
-            }
-            res.add(ele);
-        }
-        return res;
-    }
-
-
     /**
      * ============================================2=========================
      * ============================================2=========================
      * ============================================2=========================
      * ============================================2=========================
      */
-
-    /*92. 反转链表 II
-给你单链表的头指针 head 和两个整数 left 和 right ，其中 left <= right 。请你反转从位置 left 到位置 right 的链表节点，返回 反转后的链表 。*/
-    public ListNode reverseBetween(ListNode head, int left, int right) {
-        ListNode dummy = new ListNode(-1, head),slow = dummy,fast = dummy;
-        for (int i = 0; i < left - 1; i++) {
-            slow = slow.next;
-        }
-        for (int i = 0; i < right; i++) {
-            fast = fast.next;
-        }
-
-        ListNode start = slow.next;
-        ListNode nextStart = fast.next;
-        fast.next = null;
-        slow.next = reverse2(start);
-        start.next = nextStart;
-        return dummy.next;
-    }
-
-    private ListNode reverse2(ListNode head) {
-        ListNode pre = null,cur = head;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
-
-    /*54.螺旋矩阵
-     * 给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
-     * */
-    public List<Integer> spiralOrder(int[][] matrix) {
-        LinkedList<Integer> res = new LinkedList<>();
-        int top = 0,bottom = matrix.length-1,left = 0,right = matrix[0].length-1;
-        while (true){
-            for (int i = left; i <= right; i++) {
-                res.add(matrix[top][i]);
-            }
-            if (++top>bottom) break;
-
-            for (int i = top; i <= bottom; i++) {
-                res.add(matrix[i][right]);
-            }
-            if (--right<left) break;
-
-            for (int i = right; i >= left; i--) {
-                res.add(matrix[bottom][i]);
-            }
-            if (--bottom<top) break;
-
-            for (int i = bottom; i >= top; i--) {
-                res.add(matrix[i][left]);
-            }
-            if (++left>right) break;
-        }
-        return res;
-    }
-
-
-    /*300.最长递增子序列
-    * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
-    子序列 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺
-    * 序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。*/
-    public int lengthOfLIS1(int[] nums) {
-        int size = 0;
-        int[] dp = new int[nums.length];
-        for (int num:nums){
-            int left = 0,right = size-1;
-            while (left<=right){
-                int mid = left+(right-left)/2;
-                if (dp[mid]<num){
-                    left = mid+1;
-                }else {
-                    right = mid-1;
-                }
-            }
-            dp[left] = num;
-            if (left==size) size++;
-        }
-        return size;
-    }
-
-
     /*
     143重排链表
     给定一个单链表 L 的头节点 head ，单链表 L 表示为：
@@ -393,47 +122,6 @@ public class All1_5_review {
 //    public void reorderList(ListNode head) {
 //
 //    }
-
-
-    /*415. 字符串相加
-    给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和并同样以字符串形式返回。
-
-你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。*/
-    public String addStrings(String num1, String num2) {
-        int i = num1.length()-1,j = num2.length()-1;
-        int carry = 0;
-        StringBuilder res = new StringBuilder();
-        while (i>=0||j>=0||carry!=0){
-            int val1 = i<0?0:num1.charAt(i)-'0';
-            int val2 = j<0?0:num2.charAt(j)-'0';
-            int curVal = val1+val2+carry;
-            res.append(curVal%10);
-            carry = curVal/10;
-            i--;
-            j--;
-        }
-        return res.reverse().toString();
-    }
-
-    /*56.合并区间
-     *以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。请你合并所有重
-     * 叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。
-     * */
-    public int[][] merge(int[][] intervals) {
-        LinkedList<int[]> res = new LinkedList<>();
-        Arrays.sort(intervals, Comparator.comparingInt(a -> a[0]));
-        res.add(intervals[0]);
-        for (int i = 1; i < intervals.length; i++) {
-            int[] cur = intervals[i];
-            if (cur[0]<=res.getLast()[1]){
-                res.getLast()[1] = Math.max(cur[1],res.getLast()[1]);
-            }else {
-                res.add(cur);
-            }
-        }
-        return res.toArray(new int[res.size()][]);
-    }
-
 
     /*72.编辑距离
     * 给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数  。
@@ -656,87 +344,6 @@ public class All1_5_review {
         return dummy.next;
     }
 
-    /*19.删除链表的倒数第 N 个结点
-     * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。*/
-    public ListNode removeNthFromEnd(ListNode head, int n) {
-        ListNode dummy = new ListNode(-1, head),slow = dummy,fast = head;
-        for (int i = 0; i < n; i++) {
-            fast = fast.next;
-        }
-        while (fast!=null){
-            slow = slow.next;
-            fast = fast.next;
-        }
-        slow.next = slow.next.next;
-        return dummy.next;
-    }
-
-
-    /*4.寻找两个正序数组的中位数
-    给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
-算法的时间复杂度应该为 O(log (m+n)) 。
-    * */
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        if (nums1.length>nums2.length) return findMedianSortedArrays(nums2,nums1);
-        int i = 0,j = nums1.length;
-        while (i<=j){
-            int nums1Tmp = i+(j-1)/2;
-            int nums2Tmp = (nums1.length+nums2.length+1)/2 -i;
-
-            int nums1L = nums1Tmp==0?Integer.MIN_VALUE:nums1[nums1Tmp-1];
-            int nums1R = nums1Tmp==nums1.length?Integer.MAX_VALUE:nums1[nums1Tmp];
-            int nums2L = nums2Tmp==0?Integer.MIN_VALUE:nums2[nums2Tmp-1];
-            int nums2R = nums2Tmp==nums2.length?Integer.MAX_VALUE:nums2[nums2Tmp];
-
-            if (nums1L<=nums2R&&nums2L<=nums1R){
-                if ((nums1.length+nums2.length)%2==0){
-                    return (Math.max(nums1L,nums2L)+Math.min(nums1R,nums2R))/2.0;
-                }else {
-                    return Math.max(nums1L,nums2L);
-                }
-            }else if (nums1L>nums2R){
-                j= nums1Tmp-1;
-            }else {
-                i = nums1Tmp+1;
-            }
-        }
-        return -1;
-    }
-
-
-
-
-
-    /*165. 比较版本号
-    给你两个 版本号字符串 version1 和 version2 ，请你比较它们。版本号由被点 '.' 分开的修订号组成。修订号的值 是它 转换为整数 并忽略前导零。
-    比较版本号时，请按 从左到右的顺序 依次比较它们的修订号。如果其中一个版本字符串的修订号较少，则将缺失的修订号视为 0。
-    返回规则如下：
-    如果 version1 < version2 返回 -1，
-    如果 version1 > version2 返回 1，
-    除此之外返回 0。
-    * */
-    public int compareVersion(String version1, String version2) {
-        int i = 0,j = 0;
-        while (i<version1.length()||j<version2.length()){
-            int val1 = 0;
-            for (; i < version1.length(); i++) {
-                val1 = val1*10 + version1.charAt(i)-'0';
-            }
-            i++;
-
-            int val2 = 0;
-            for (; j<version2.length();j++) {
-                val2 = val2*10 + version2.charAt(j)-'0';
-            }
-            j++;
-
-            if (val1!=val2){
-                return val1>val2?1:-1;
-            }
-        }
-        return 0;
-    }
-
 
     /**
      * =======================================3================================
@@ -745,107 +352,7 @@ public class All1_5_review {
      * =======================================3================================
      * =======================================3================================
      */
-    /*22.括号生成
-    数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。*/
-    /*解法1：官方解回溯法*/
-    List<String> resGenerateParenthesis;
-    public List<String> generateParenthesis(int n) {
-        resGenerateParenthesis = new LinkedList<>();
-        generateParenthesis(n,0,0,new StringBuilder());
-        return resGenerateParenthesis;
-    }
-
-    private void generateParenthesis(int n, int open, int close, StringBuilder path) {
-        if (path.length()==2*n){
-            resGenerateParenthesis.add(new String(path));
-            return;
-        }
-        if (open<n){
-            path.append('(');
-            generateParenthesis(n,open+1,close,path);
-            path.deleteCharAt(path.length()-1);
-        }
-        if (close<open){
-            path.append(')');
-            generateParenthesis(n,open,close+1,path);
-            path.deleteCharAt(path.length()-1);
-        }
-    }
-
-    /*
-    239.滑动窗口最大值
-    * 给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右
-    * 侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
-    * 返回 滑动窗口中的最大值 。
-    * */
-    public int[] maxSlidingWindow(int[] nums, int k) {
-        int[] res = new int[nums.length - k + 1];
-        LinkedList<Integer> queue = new LinkedList<>();
-        for (int i = 0; i < k; i++) {
-            while (!queue.isEmpty()&&nums[i]>=nums[queue.peekLast()]){
-                queue.pollLast();
-            }
-            queue.offerLast(i);
-        }
-        res[0] = nums[queue.peekFirst()];
-
-        for (int i = k; i < nums.length; i++) {
-            while (!queue.isEmpty()&&nums[i]>=nums[queue.peekLast()]){
-                queue.pollLast();
-            }
-            queue.offerLast(i);
-            if (queue.peekFirst()==i-k) queue.pollFirst();
-            res[i-k+1] = nums[queue.peekFirst()];
-        }
-        return res;
-    }
-
-
-    /*148.
-     * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
-
-    public ListNode sortList(ListNode head) {
-        if (head==null||head.next==null) return head;
-        ListNode midPrev = findMidPrev(head);
-        ListNode prevRes = sortList(head);
-        ListNode nextPrev = sortList(midPrev.next);
-        midPrev.next = null; /**置null的操作写在这里，这么写行不行？？？*/
-        return mergeTwo(prevRes,nextPrev);
-    }
-
-    private ListNode findMidPrev(ListNode head) {
-        ListNode slow = head,fast = head.next;
-        while (fast!=null&&fast.next!=null){
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-        return slow;
-    }
-
-    private ListNode mergeTwo(ListNode prevRes, ListNode nextPrev) {
-        ListNode dummy = new ListNode(-1),cur = dummy;
-        while (prevRes!=null&&nextPrev!=null){
-            if (prevRes.val<nextPrev.val){
-                cur.next = prevRes;
-                prevRes = prevRes.next;
-            }else {
-                cur.next = nextPrev;
-                nextPrev = nextPrev.next;
-            }
-            cur = cur.next;
-        }
-        cur.next = prevRes==null?nextPrev:prevRes;
-        return dummy.next;
-    }
-
-
-//    /**
-//     排序链表的题目中：偶数节点的时候，必须让中间后面的那个节点在后一半中，必须吗？？？？应该代码也能跑通
-//     下面的写法中“如果是偶数个节点，中间的两个节点都在前一半链表，会导致两边的递归深度不一样”。。。
-//        如果“偶数节点的时候让中间的两个节点，第一个位于前一半链表，第二个位于后一半链表，这样两边的递归深度就接近”，这样的话，
-//     我们希望偶数节点的时候，从最中间的位置断开——————因此希望①偶数时找到中间两个中的第一个节点；②然后记录中间的第二个节点；
-//     ③将第一个节点的next置为null。。。
-//     */
+    /**下面的代码为什么是错误的*/
 //    public ListNode sortList(ListNode head) {
 //        if (head==null||head.next==null) return head;
 //        ListNode mid = findMid(head);
@@ -882,84 +389,6 @@ public class All1_5_review {
 //    }
 
 
-    /*31. 下一个排列
-整数数组的一个 排列  就是将其所有成员以序列或线性顺序排列。
-
-例如，arr = [1,2,3] ，以下这些都可以视作 arr 的排列：[1,2,3]、[1,3,2]、[3,1,2]、[2,3,1] 。
-整数数组的 下一个排列 是指其整数的下一个字典序更大的排列。更正式地，如果数组的所有排列根据其字典顺序从小到大排列在一个容器中，那么数组的 下一个排列 就是在这个有序容器中排在它后面的那个排列。如果不存在下一个更大的排列，那么这个数组必须重排为字典序最小的排列（即，其元素按升序排列）。
-
-例如，arr = [1,2,3] 的下一个排列是 [1,3,2] 。
-类似地，arr = [2,3,1] 的下一个排列是 [3,1,2] 。
-而 arr = [3,2,1] 的下一个排列是 [1,2,3] ，因为 [3,2,1] 不存在一个字典序更大的排列。
-给你一个整数数组 nums ，找出 nums 的下一个排列。
-
-必须 原地 修改，只允许使用额外常数空间。*/
-    public void nextPermutation(int[] nums) {
-        int flag = -1;
-        for (int i = nums.length-2; i >=0; i--) {
-            if (nums[i]<nums[i+1]){
-                flag = i;
-                break;
-            }
-        }
-
-        if (flag>=0){
-            for (int i = nums.length-1; i > flag; i--) {
-                if (nums[i]>nums[flag]){
-                    swap2(nums,i,flag);
-                    break;
-                }
-            }
-        }
-        rever(nums,flag+1);
-    }
-
-    private void swap2(int[] nums, int l, int flag) {
-        int tmp = nums[l];
-        nums[l] = nums[flag];
-        nums[flag] = tmp;
-    }
-
-    private void rever(int[] nums, int i) {
-        int left = i,right = nums.length-1;
-        while (left<right){
-            int tmp = nums[left];
-            nums[left] = nums[right];
-            nums[right] = tmp;
-            left++;
-            right--;
-        }
-    }
-
-
-    /*32.最长有效括号
-     * 给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的
-     * 长度。*/
-    public int longestValidParentheses(String s) {
-        int left = 0,right = 0;
-        int maxLen = 0;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c=='(') left++;
-            else right++;
-            if (left==right) maxLen = Math.max(maxLen,2*left);
-            if (left<right) left=right=0;
-        }
-
-        left=right=0;
-        for (int i = s.length()-1; i >=0 ; i--) {
-            char c = s.charAt(i);
-            if (c==')') right++;
-            else left++;
-            if (left==right) maxLen = Math.max(maxLen,2*left);
-            if (left>right) left=right=0;
-        }
-        return maxLen;
-    }
-
-
-
-
     /*322. 零钱兑换
     * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
     计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
@@ -982,33 +411,6 @@ public class All1_5_review {
             }
         }
         return dp[amount]==amount+1?-1:dp[amount];
-    }
-
-
-     /*43 字符串相乘
-    给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
-    注意：不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
-    * */
-    public String multiply(String num1, String num2) {
-        if ("0".equals(num1)||"0".equals(num2)) return "0";
-        int len1 = num1.length(),len2 = num2.length();
-        int[] res = new int[len1 + len2];
-        for (int i = len1-1; i >=0 ; i--) {
-            for (int j = len2-1; j >=0 ; j--) {
-                int digit1 = num1.charAt(i) - '0';
-                int digit2 = num2.charAt(j) - '0';
-                int curSum = digit2*digit1+res[i+j+1];
-                res[i+j+1] = curSum%10;
-                res[i+j] += curSum/10;
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < res.length; i++) {
-            if (sb.length()==0&&res[i]==0) continue;
-            sb.append(res[i]);
-        }
-        return sb.toString();
     }
 
 
@@ -1090,54 +492,6 @@ public class All1_5_review {
 //        return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
 //    }
 
-
-    /*41.缺失的第一个正数
-    * 给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
-        请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
-    * */
-    public int firstMissingPositive(int[] nums) {
-        for (int i = 0; i < nums.length; i++) {
-            while (nums[i]>0&&nums[i]<=nums.length&&nums[nums[i]-1]!=nums[i]){
-                swap3(nums,nums[i]-1,i);
-            }
-        }
-
-        for (int i = 0; i < nums.length; i++) {
-            if (nums[i]!=i+1) return i+1;
-        }
-        return nums.length+1;
-    }
-
-    private void swap3(int[] nums, int l, int r) {
-        int tmp  =nums[l];
-        nums[l] = nums[r];
-        nums[r] = tmp;
-    }
-
-
-    //    /*105.
-//     * 从前序 和 中序 构造出二叉树*/
-    HashMap<Integer,Integer> inorderMap;
-    int preorderIndex;
-    public TreeNode buildTree(int[] preorder, int[] inorder) {
-        inorderMap = new HashMap<>();
-        for (int i = 0; i < inorder.length; i++) {
-            inorderMap.put(inorder[i],i);
-        }
-        return buildTree(preorder,inorder,0,inorder.length-1);
-    }
-
-    private TreeNode buildTree(int[] preorder, int[] inorder, int left, int right) {
-        if (left>right) return null;
-        int curVal = preorder[preorderIndex++];
-        Integer inorderIndex = inorderMap.get(curVal);
-        TreeNode root = new TreeNode(curVal);
-        root.left = buildTree(preorder,inorder,left,inorderIndex-1);
-        root.right = buildTree(preorder,inorder,inorderIndex+1,right);
-        return root;
-    }
-
-
     /*151. 反转字符串中的单词
     给你一个字符串 s ，请你反转字符串中 单词 的顺序。
     单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
@@ -1214,30 +568,10 @@ public class All1_5_review {
     计算从根节点到叶节点生成的 所有数字之和 。
     叶节点 是指没有子节点的节点。
     * */
-    public int sumNumbers(TreeNode root) {
-        if (root==null) return 0;
-        int res = 0;
-        LinkedList<TreeNode> queueNode = new LinkedList<>();
-        LinkedList<Integer> queueVal = new LinkedList<>();
-        queueNode.offer(root);
-        queueVal.offer(root.val); /**这里必须offer的是root.val吗？？？能不能offer 0？？？*/
-        while (!queueNode.isEmpty()){
-            TreeNode curNode = queueNode.poll();
-            Integer curVal = queueVal.poll();
-            if (curNode.left==null&&curNode.right==null){
-                res += curVal;
-            }
-            if (curNode.left!=null){
-                queueNode.offer(curNode.left);
-                queueVal.offer(curVal*10+curNode.left.val);
-            }
-            if (curNode.right!=null){
-                queueNode.offer(curNode.right);
-                queueVal.offer(curVal*10+curNode.right.val);
-            }
-        }
-        return res;
-    }
+            /**补充一下递归的写法*/
+//    public int sumNumbers(TreeNode root) {
+//
+//    }
 
 
 
@@ -1259,7 +593,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     private void combinationSum(int[] candidates, int target, int index, LinkedList<Integer> path) {
         if (target==0){
             resCombinationSum.add(new LinkedList<>(path));
-            return;
         }
         if (target<0||index==candidates.length){
             return;
@@ -1273,110 +606,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
     }
 
-
-    /*122. 买卖股票的最佳时机 II
-给你一个整数数组 prices ，其中 prices[i] 表示某支股票第 i 天的价格。
-
-在每一天，你可以决定是否购买和/或出售股票。你在任何时候 最多 只能持有 一股 股票。你也可以先购买，然后在 同一天 出售。
-
-返回 你能获得的 最大 利润 。*/
-    public int maxProfit1(int[] prices) {
-        int res = 0;
-        for (int i = 1; i < prices.length; i++) {
-            res += Math.max(0,prices[i]-prices[i-1]);
-        }
-        return res;
-    }
-
-
-    /*234。回文链表
-    给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返回 true ；否则，返回 false 。
-     */
-    public boolean isPalindrome(ListNode head) {
-        ListNode mid = findMid(head);
-        ListNode head2 = reverse3(mid);
-        while (head2!=null){
-            if (head2.val!=head.val) return false;
-            head2 = head2.next;
-            head = head.next;
-        }
-        return true;
-    }
-
-    private ListNode reverse3(ListNode head) {
-        ListNode pre = null,cur =head;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
-
-    private ListNode findMid(ListNode head) {
-        ListNode slow = head,fast = head;
-        while (fast!=null&&fast.next!=null){
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-        return slow;
-    }
-
-
-    /*543.二叉树的直径
-    * 给你一棵二叉树的根节点，返回该树的 直径 。
-    二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
-    两节点之间路径的 长度 由它们之间边数表示。*/
-    int resDiameterOfBinaryTree = 0;
-    public int diameterOfBinaryTree(TreeNode root) {
-        if (root==null) return 0;
-        dfs(root);
-        return resDiameterOfBinaryTree;
-    }
-
-    private int dfs(TreeNode root) {
-        if (root==null) return 0;
-        int left = dfs(root.left);
-        int right = dfs(root.right);
-        resDiameterOfBinaryTree = Math.max(left+right,resDiameterOfBinaryTree);
-        return Math.max(left,right);
-    }
-
-
-    /*695. 岛屿的最大面积
-给你一个大小为 m x n 的二进制矩阵 grid 。
-
-岛屿 是由一些相邻的 1 (代表土地) 构成的组合，这里的「相邻」要求两个 1 必须在 水平或者竖直的四个方向上 相邻。你可以假设 grid 的四个边缘都被 0（代表水）包围着。
-
-岛屿的面积是岛上值为 1 的单元格的数目。
-
-计算并返回 grid 中最大的岛屿面积。如果没有岛屿，则返回面积为 0 。
-     */
-    public int maxAreaOfIsland(int[][] grid) {
-        int res = 0;
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; j++) {
-                if (grid[i][j]==1){
-                    res = Math.max(res,dfs(grid,i,j));
-                }
-            }
-        }
-        return res;
-    }
-
-    private int dfs(int[][] grid, int i, int j) {
-        if (i<0||j<0||i>=grid.length||j>=grid[0].length){
-            return 0;
-        }
-        grid[i][j] = 0;
-        return 1+dfs(grid,i+1,j)+
-                dfs(grid,i-1,j)+
-                dfs(grid,i,j-1)+
-                dfs(grid,i,j+1);
-        /**这个题不还原grid的值应该是没问题的*/
-    }
-
     /**
      *=================================================5=====================================
      *=================================================5=====================================
@@ -1385,37 +614,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      *=================================================5=====================================
      *=================================================5=====================================
      */
-
-    /*
-    14. 最长公共前缀
-编写一个函数来查找字符串数组中的最长公共前缀。
-
-如果不存在公共前缀，返回空字符串 ""。
-     */
-    public String longestCommonPrefix(String[] strs) {
-        String flag = strs[0];
-        for (int i = 0; i < flag.length(); i++) {
-            char flagC = flag.charAt(i);
-            for (int j = 1; j < strs.length; j++) {
-                if (strs[j].length()<=i||strs[j].charAt(i)!=flagC)
-                    return flag.substring(0,i);
-            }
-        }
-        return flag;
-    }
-
-
-    /*662. 二叉树最大宽度
-给你一棵二叉树的根节点 root ，返回树的 最大宽度 。
-
-树的 最大宽度 是所有层中最大的 宽度 。
-
-每一层的 宽度 被定义为该层最左和最右的非空节点（即，两个端点）之间的长度。将这个二叉树视作与满二叉树结构相同，两端点间会出现一些延伸到这一层的 null 节点，这些 null 节点也计入长度。
-
-题目数据保证答案将会在  32 位 带符号整数范围内。*/
-    /**这个题目就必须要严格的区分每一层，不区分每一层你就不知道哪个是第一个节点，哪个是第二个节点*/
-
-
     /*113. 路径总和 II
 给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
 
@@ -1442,46 +640,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 //        pathSum(root.right,targetSum-root.val,path);
 //        path.removeLast();
 //    }
-
-
-    /*179. 最大数
-给定一组非负整数 nums，重新排列每个数的顺序（每个数不可拆分）使之组成一个最大的整数。
-
-注意：输出结果可能非常大，所以你需要返回一个字符串而不是整数。
-     */
-    public String largestNumber(int[] nums) {
-        String[] strs = new String[nums.length];
-        for (int i = 0; i < nums.length; i++) {
-            strs[i] = String.valueOf(nums[i]);
-        }
-
-        Arrays.sort(strs,(a,b)->(b+a).compareTo(a+b));
-        if ("0".equals(strs[0])) return "0";
-        StringBuilder res = new StringBuilder();
-        for (int i = 0; i < strs.length; i++) {
-            res.append(strs[i]);
-        }
-        return res.toString();
-    }
-
-
-    /*152. 乘积最大子数组
-给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续 子数组（该子数组中至少包含一个数字），并返回该子数组所对应的乘积。
-
-测试用例的答案是一个 32-位 整数。
-     */
-    public int maxProduct1(int[] nums) {
-        int res = nums[0];
-        int preMin = nums[0],preMax = nums[0];
-        for (int i = 1; i < nums.length; i++) {
-            int curMin = Math.min(Math.min(preMin*nums[i],preMax*nums[i]),nums[i]);
-            int curMax = Math.max(Math.max(preMin*nums[i],preMax*nums[i]),nums[i]);
-            res = Math.max(curMax,res);
-            preMin = curMin;
-            preMax = curMax;
-        }
-        return res;
-    }
 
 
 //    /**下面的写法对吗？？为什么下面的写法是错误的？？？？？下面的改正需要验证一下*/
@@ -1521,64 +679,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 //    public boolean hasPathSum(TreeNode root, int targetSum) {
 //
 //    }
-
-
-    /*83. 删除排序链表中的重复元素
-给定一个已排序的链表的头 head ， 删除所有重复的元素，使每个元素只出现一次 。返回 已排序的链表 。
-     */
-    public ListNode deleteDuplicates1(ListNode head) {
-        if (head==null||head.next==null) return head;
-        ListNode slow = head,fast = head.next;
-        while (fast!=null){
-            if (slow.val!=fast.val){
-                slow.next = fast;
-                slow = slow.next;
-            }
-            fast = fast.next;
-        }
-        slow.next = null;
-        return head;  /**由于这个题要求相同的节点会保留一个，因此最后直接返回head就可以了*/
-    }
-
-
-    /*209. 长度最小的子数组
-给定一个含有 n 个正整数的数组和一个正整数 target 。
-
-找出该数组中满足其总和大于等于 target 的长度最小的 子数组 [numsl, numsl+1, ..., numsr-1, numsr] ，并返回其长度。如果不存在符合条件的子数组，返回 0 。
-     */
-    public int minSubArrayLen(int target, int[] nums) {
-        int res = nums.length+1,left = 0;
-        int curSum = 0;
-        for (int i = 0; i < nums.length; i++) {
-            curSum += nums[i];
-            while (curSum>=target){
-                res = Math.min(res,i-left+1);
-                curSum -= nums[left++];
-            }
-        }
-        return res;
-    }
-
-
-    /*24. 两两交换链表中的节点
-给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下完成本题（即，只能进行节点交换）。
-     */
-    public ListNode swapPairs(ListNode head) {
-        ListNode dummy = new ListNode(-1, head),cur = dummy;
-        while (cur.next!=null&&cur.next.next!=null){
-            ListNode node1 = cur.next;
-            ListNode node2 = cur.next.next;
-            ListNode next = node2.next;
-
-            node2.next = node1;
-            node1.next = next;
-            cur.next = node2;
-
-            cur = node1;
-        }
-        return dummy.next;
-    }
-
 
     /*468. 验证IP地址
     给定一个字符串 queryIP。如果是有效的 IPv4 地址，返回 "IPv4" ；如果是有效的 IPv6 地址，返回 "IPv6" ；如果不是上述类型的 IP 地址，返回 "Neither" 。

@@ -1248,23 +1248,48 @@ public class All1_5 {
     如果 version1 > version2 返回 1，
     除此之外返回 0。
     * */
+    /**
+     *【思路】双指针，从左往右依次判断。
+     *【关键】while循环条件的“||”暗含着两个版本号长度不一致的情况。出现版本号长度不一样的时候，版本号短的那一个
+     *      后面的值就是0.
+     * */
+    /*建议的解法*/
     public int compareVersion(String version1, String version2) {
-        int m = version1.length(),n = version2.length();
-        int i =0,j =0;
-        while (i<m||j<n){
+        int len1 = version1.length(),len2 = version2.length();
+        int cur1 = 0,cur2 = 0;
+        while (cur1 < len1 || cur2 < len2) { /**err：注意这里必须是“||”连接，多次错。。。跟“链表两数相加”类似，只要有一个还没到头就继续*/
+            /*step1：分别初始化两个val1和val2，计算两个'.'之间的数；并且保证如果没有数也是初始值0*/
             int val1 = 0;
-            for (;i<m&&version1.charAt(i)!='.';i++){
-                val1 = val1*10+version1.charAt(i)-'0';
+            for (; cur1 < len1 && version1.charAt(cur1) != '.'; cur1++) {
+                val1 = val1 * 10 + version1.charAt(cur1) - '0';
             }
-            i++;
+            cur1++; //跳过版本号之间的"."
 
             int val2 = 0;
-            for (;j<n&&version2.charAt(j)!='.';j++){
-                val2 = val2*10+version2.charAt(j)-'0';
+            for (; cur2 < len2 && version2.charAt(cur2) != '.'; cur2++) {
+                val2 = val2 * 10 + version2.charAt(cur2) - '0';
             }
-            j++;
+            cur2++;
 
-            if (val1!=val2) return val1>val2?1:-1;
+            /*step2：如果不相等就说明已经比较出两个的大小关系了*/
+            if (val1 != val2) {
+                return val1 > val2 ? 1 : -1;
+            }
+        }
+        return 0;
+    }
+
+    /*写法2：分割字符串*/
+    public int compareVersion2(String version1, String version2) {
+        String[] v1 = version1.split("\\.");
+        String[] v2 = version2.split("\\.");
+        int n = Math.max(v1.length, v2.length);
+        for (int i = 0; i < n; i++) {
+            int num1 = i < v1.length ? Integer.parseInt(v1[i]) : 0;
+            int num2 = i < v2.length ? Integer.parseInt(v2[i]) : 0;
+            if (num1 != num2) {
+                return num1 > num2 ? 1 : -1;
+            }
         }
         return 0;
     }
@@ -2132,7 +2157,6 @@ int getMin() 获取堆栈中的最小元素。*/
     }
 
     /*写法2*/
-
     /**
      最简化的写法，不断的增加能获得的利润
      */
@@ -2356,12 +2380,13 @@ int getMin() 获取堆栈中的最小元素。*/
     }
 
     private int dfs5(int[][] grid, int i, int j) {
-        if (i<0||i>=grid.length||j<0||j>=grid[0].length||grid[i][j]!=1) return 0;
+        if (i<0||i>=grid.length||j<0||j>=grid[0].length||grid[i][j]!=1) return 0; /*若缺少判断条件，会发生StackOverFlow*/
         grid[i][j] = 0;
         return 1+dfs5(grid,i,j-1) /**【注】记得+1，走到这里说明当前位置grid[i][j]是陆地，需要+1*/
                 +dfs5(grid,i,j+1)
                 +dfs5(grid,i-1,j)
                 +dfs5(grid,i+1,j);
+        /**这个题不还原grid[i][j]的值是没问题的*/
     }
 
     /**

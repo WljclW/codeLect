@@ -281,45 +281,12 @@ public class codetop_unskilled_1_5 {
     //470
 
 
-
-
-    //122
-//    public int rand10() {
-//        while (true){
-//            int tmp = (rand7()-1)*7+rand7();
-//            if (tmp<=40){
-//                return 1+tmp%10;
-//            }
-//        }
-//    }
-
-
     //112
 
 
 
     //113
 
-
-
-
-    //179
-    public String largestNumber(int[] nums) {
-        String[] strings = new String[nums.length];
-        for (int i = 0; i < nums.length; i++) {
-            strings[i] = String.valueOf(nums[i]);
-        }
-        Arrays.sort(strings,(a,b)->(b+a).compareTo(a+b));
-
-        if ("0".equals(strings[0])){
-            return "0";
-        }
-        StringBuilder sb = new StringBuilder();
-        for (String str:strings){
-            sb.append(str);
-        }
-        return sb.toString();
-    }
 
 
     //718
@@ -335,7 +302,7 @@ public class codetop_unskilled_1_5 {
         /*step2：依次拿出str每一个位置的字符，遍历所有的字符串看看对应的位置字符是不是相等；如果不相等立即返回*/
         for (int i = 0; i < str.length(); i++) { /*依次拿出第一个字符串0、1、2....位置的字符*/
             char c = str.charAt(i);
-            for (int j = 1; j < strs.length; j++) { /*从第二个字符串开始，依次研究每一个字符串位置i的字符，看看是不是等于c*/
+            for (int j = 1; j < strs.length; j++) { /*从第二个字符串开始，依次研究每一个字符串位置i的字符，看看是不是等于c。如果发现不相等，立即返回*/
                 if (i>=strs[j].length()||c!=strs[j].charAt(i)){
                     return str.substring(0,i);
                 }

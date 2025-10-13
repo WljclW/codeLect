@@ -774,162 +774,10 @@ public class topcode1_5 {
         return -1;
     }
 
-
-    //165
-    public int compareVersion(String version1, String version2) {
-        int len1 = version1.length(),len2 = version2.length();
-        int i=0,j=0;
-        while (i<len1||j<len2){
-            int val1 = 0;
-            for (;i<len1&&version1.charAt(i)!='.';i++){
-                val1 = val1*10 +version1.charAt(i)-'0';
-            }
-            i++;
-
-            int val2 = 0;
-            for (;j<len2&&version2.charAt(j)!='.';j++){
-                val2 = val2*10 +version2.charAt(j)-'0';
-            }
-            j++;
-
-            if (val1!=val2){
-                return val1>val2?1:-1;
-            }
-        }
-        return 0;
-    }
-
     //704
 //    public int search(int[] nums, int target) {
 //
 //    }
-
-    //148
-    public ListNode sortList(ListNode head) {
-        if (head==null||head.next==null) return head;
-        ListNode mid = findmid(head);
-        ListNode left = sortList(head);
-        ListNode right = sortList(mid);
-        return merge(left,right);
-    }
-
-    private ListNode merge(ListNode left, ListNode right) {
-        ListNode dummy = new ListNode(-1),cur = dummy;
-        while (left!=null&&right!=null){
-            if (left.val<right.val){
-                cur.next = left;
-                left = left.next;
-            }else {
-                cur.next = right;
-                right = right.next;
-            }
-            cur = cur.next;
-        }
-        cur.next = left==null?right:left;
-        return dummy.next;
-    }
-
-    private ListNode findmid(ListNode head) {
-        ListNode slow = head,fast = head.next;
-        while (fast!=null&&fast.next!=null){
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-        ListNode res = slow.next;
-        slow.next = null;
-        return res;
-    }
-
-
-    //22
-    List<String> resGenerateParenthesis;
-    StringBuilder sbGenerateParenthesis;
-    public List<String> generateParenthesis(int n) {
-        resGenerateParenthesis = new LinkedList<>();
-        sbGenerateParenthesis = new StringBuilder();
-        generateParenthesisBack(n,0,0);
-        return resGenerateParenthesis;
-    }
-
-    private void generateParenthesisBack(int n, int l, int r) {
-        if (sbGenerateParenthesis.length()==2*n){
-            resGenerateParenthesis.add(new String(sbGenerateParenthesis));
-            return;
-        }
-        if (l<n){
-            sbGenerateParenthesis.append('(');
-            generateParenthesisBack(n,l+1,r);
-            sbGenerateParenthesis.deleteCharAt(sbGenerateParenthesis.length()-1);
-        }
-        if (r<l){
-            sbGenerateParenthesis.append(')');
-            generateParenthesisBack(n,l,r+1);
-            sbGenerateParenthesis.deleteCharAt(sbGenerateParenthesis.length()-1);
-        }
-    }
-
-
-    //239
-    public int[] maxSlidingWindow(int[] nums, int k) {
-        int[] res = new int[nums.length - k + 1];
-        LinkedList<Integer> deque = new LinkedList<>();
-        for (int i = 0; i < k; i++) {
-            while (!deque.isEmpty()&&nums[i]>=nums[deque.peekLast()]){
-                deque.pollLast();
-            }
-            deque.offerLast(i);
-        }
-        res[0] = nums[deque.peekFirst()];
-
-        for (int i = k; i < nums.length; i++) {
-            while (!deque.isEmpty()&&nums[i]>=nums[deque.peekLast()]){
-                deque.pollLast();
-            }
-            deque.offerLast(i);
-            if (deque.peekFirst()==i-k){
-                deque.pollFirst();
-            }
-            res[i-k+1] = nums[deque.peekFirst()];
-        }
-
-        return res;
-    }
-
-    //31
-    public void nextPermutation(int[] nums) {
-        int flag = -1;
-        for (int i = nums.length-2; i >=0 ; i--) {
-            if (nums[i]<nums[i+1]){
-                flag = i;
-                break;
-            }
-        }
-
-        if (flag==-1){
-            rever(nums,0,nums.length-1);
-            return;
-        }
-
-        for (int i = nums.length-1; i > flag; i--) {
-            if (nums[i]>nums[flag]){
-                int tmp = nums[i];
-                nums[i] = nums[flag];
-                nums[flag] = tmp;
-                rever(nums,flag+1,nums.length-1);
-                return;
-            }
-        }
-    }
-
-    private void rever(int[] nums, int l, int r) {
-        while (l<r){
-            int tmp = nums[l];
-            nums[l] = nums[r];
-            nums[r] = tmp;
-            l++;
-            r--;
-        }
-    }
 
 
     //2
@@ -947,29 +795,6 @@ public class topcode1_5 {
             if (l2!=null) l2=l2.next;
         }
         return dummy.next;
-    }
-
-    //32
-    public int longestValidParentheses(String s) {
-        int l =0,r=0;
-        int res = 0;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c=='(') l++;
-            else r++;
-            if (l==r) res = Math.max(res,2*l);
-            if (r>l) l=r=0;
-        }
-
-        l=r=0;
-        for (int i = s.length()-1; i >=0 ; i--) {
-            char c = s.charAt(i);
-            if (c=='(') l++;
-            else r++;
-            if (l==r) res = Math.max(res,2*l);
-            if (l>r) l=r=0;
-        }
-        return res;
     }
 
     //70
@@ -997,29 +822,6 @@ public class topcode1_5 {
             if(i==n) return cur;
         }
         return -1;
-    }
-
-    //43
-    public String multiply(String num1, String num2) {
-        if ("0".equals(num1)||"0".equals(num2)) return "0";
-        int len1 = num1.length(),len2 = num2.length();
-        int[] res = new int[len1 + len2];
-        for (int i = len1-1; i >=0 ; i--) {
-            for (int j = len2-1; j >=0; j--) {
-                int val1 = num1.charAt(i)-'0';
-                int val2 = num2.charAt(j)-'0';
-                int curMul = val1*val2+res[i+j+1];
-                res[i+j+1] = curMul%10;
-                res[i+j] += curMul/10;
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < res.length; i++) {
-            if (sb.length()==0&&res[i]==0) continue;
-            sb.append(res[i]);
-        }
-        return sb.toString();
     }
 
 
@@ -1059,31 +861,6 @@ public class topcode1_5 {
         }
         return start==-1?"":s.substring(start,start+len);
     }
-
-
-    //41
-    public int firstMissingPositive(int[] nums) {
-        int i = 0;
-        while (i<nums.length) {
-            if (nums[i]>0&&nums[i]<=nums.length&&nums[nums[i]-1]!=nums[i]){
-                swap(nums,nums[i]-1,i);
-            }else {
-                i++;
-            }
-
-        }
-
-        for (int j = 0; j < nums.length; j++) {
-            if (nums[j]!=j+1) return j+1;
-        }
-        return nums.length+1;
-    }
-
-//    private void swap(int[] nums, int l, int r) {
-//        int tmp = nums[l];
-//        nums[l] = nums[r];
-//        nums[r] = tmp;
-//    }
 
     //105
     HashMap<Integer,Integer> inorderMap;
@@ -1185,34 +962,6 @@ public class topcode1_5 {
     private String reverString(String s) {
         StringBuilder sb = new StringBuilder(s);
         return sb.reverse().toString();
-    }
-
-    //129
-    public int sumNumbers(TreeNode root) {
-        int res = 0;
-        if (root==null) return 0;
-        LinkedList<TreeNode> nodes = new LinkedList<>();
-        LinkedList<Integer> vals = new LinkedList<>();
-        nodes.offer(root);
-        vals.offer(root.val);
-        while (!nodes.isEmpty()){
-            int size = nodes.size();
-            for (int i = 0; i < size; i++) {
-                TreeNode cur = nodes.poll();
-                Integer curVal = vals.poll();
-                if (cur.left==null&&cur.right==null)
-                    res += curVal; /**err：如果没有左右孩子，则把当前节点的值累加到结果，不能乘10*/
-                if (cur.left!=null){
-                    nodes.offer(cur.left);
-                    vals.offer(curVal*10+cur.left.val);
-                }
-                if (cur.right!=null){
-                    nodes.offer(cur.right);
-                    vals.offer(curVal*10+cur.right.val);
-                }
-            }
-        }
-        return res;
     }
 
     //155
@@ -1497,22 +1246,6 @@ public class topcode1_5 {
     }
 
 
-    //543
-    int resDiameterOfBinaryTree = 0;
-    public int diameterOfBinaryTree(TreeNode root) {
-        dfs1(root);
-        return resDiameterOfBinaryTree;
-    }
-
-    private int dfs1(TreeNode root) {
-        if (root==null) return 0;
-        int l = dfs1(root.left);
-        int r = dfs1(root.right);
-        resDiameterOfBinaryTree = Math.max(resDiameterOfBinaryTree,l+r);
-        return Math.max(l,r)+1;
-    }
-
-
     //221
 
     /**
@@ -1535,67 +1268,6 @@ public class topcode1_5 {
             }
         }
         return res*res;
-    }
-
-    //234
-    public boolean isPalindrome(ListNode head) {
-        ListNode mid = findMiddle(head);
-        ListNode head2 = reve(mid);
-        while (head2!=null){
-            if (head.val!=head2.val){
-                return false;
-            }
-            head2 = head2.next;
-            head = head.next;
-        }
-        return true;
-    }
-
-    private ListNode reve(ListNode mid) {
-        ListNode pre = null,cur = mid;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
-
-    /**“回文链表”题目中找中间节点的时候，就走常规的逻辑没问题，甚至前一半链表最后一个节点的next域不置null也没问题*/
-    private ListNode findMiddle(ListNode head) {
-        ListNode slow = head,fast = head;
-        while (fast!=null&&fast.next!=null){
-            slow  =slow.next;
-            fast = fast.next.next;
-        }
-        return slow;
-    }
-
-    //695
-    public int maxAreaOfIsland(int[][] grid) {
-        int m = grid.length,n = grid[0].length;
-        int res = 0;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (grid[i][j]==1){
-                     int cur = dfs2(grid,i,j);
-                     res = Math.max(cur,res);
-                }
-            }
-        }
-        return res;
-    }
-
-    private int dfs2(int[][] grid, int i, int j) {
-        if (i<0||j<0||i==grid.length||j==grid[0].length||grid[i][j]!=1){
-            return 0;
-        }
-        grid[i][j] = 0;
-        return (dfs2(grid,i+1,j)+
-                dfs2(grid,i-1,j)+
-                dfs2(grid,i,j-1)+
-                dfs2(grid,i,j+1)) + 1; /**【注】记得+1，走到这里说明当前位置grid[i][j]是陆地，需要+1*/
     }
 
 
@@ -1631,37 +1303,6 @@ public class topcode1_5 {
         return l;
     }
 
-
-    //662
-    public int widthOfBinaryTree(TreeNode root) {
-        int res = 0;
-        if (root ==null)return res;
-        LinkedList<TreeNode> deque = new LinkedList<>();
-        LinkedList<Integer> nodeVal = new LinkedList<>();
-        deque.offer(root);
-        nodeVal.offer(0);
-        while (!deque.isEmpty()){
-            int size = deque.size();
-            int first = -1,last = -1;
-            for (int i = 0; i < size; i++) {
-                TreeNode cur = deque.poll();
-                Integer curVal = nodeVal.poll();
-                if (i==0) first = curVal;
-                if (i==size-1) last = curVal;
-                if (cur.left!=null){
-                    deque.offer(cur.left);
-                    nodeVal.offer(curVal*2);
-                }
-                if (cur.right!=null){
-                    deque.offer(cur.right);
-                    nodeVal.offer(curVal*2+1);
-                }
-            }
-            res = Math.max(last-first+1,res);
-        }
-        return res;
-    }
-
     //62
     public int uniquePaths(int m, int n) {
         int[][] dp = new int[m][n];
@@ -1672,20 +1313,6 @@ public class topcode1_5 {
             }
         }
         return dp[m-1][n-1];
-    }
-
-    //152
-    public int maxProduct(int[] nums) {
-        int res = nums[0];
-        int preMin = nums[0],preMax = nums[0];
-        for (int i = 1; i < nums.length; i++) {
-            int curMin = Math.min(Math.min(preMin*nums[i],preMax*nums[i]),nums[i]);
-            int curMax = Math.max(Math.max(preMin*nums[i],preMax*nums[i]),nums[i]);
-            res = Math.max(curMax,res);
-            preMax = curMax;
-            preMin = curMin;
-        }
-        return res;
     }
 
     //112
@@ -1773,20 +1400,6 @@ public class topcode1_5 {
         return head;
     }
 
-    //209
-    public int minSubArrayLen(int target, int[] nums) {
-        int left = 0,right= 0;
-        int sum = 0;
-        int res = nums.length+1;
-        while (right<nums.length){
-            sum += nums[right++];
-            while (sum>=target){
-                res = Math.min(res,right-left);
-                sum -= nums[left++];
-            }
-        }
-        return res==nums.length+1?0:res;
-    }
 
     //139
     public boolean wordBreak(String s, List<String> wordDict) {
@@ -1802,49 +1415,5 @@ public class topcode1_5 {
             }
         }
         return dp[s.length()];
-    }
-
-    //24
-    public ListNode swapPairs(ListNode head) {
-        ListNode dummy = new ListNode(-1,head),cur=dummy;
-        while (cur.next!=null&&cur.next.next!=null){
-            ListNode node1 = cur.next;
-            ListNode node2 = cur.next.next;
-
-            cur.next = node2;
-            node1.next = node2.next;
-            node2.next = node1;
-
-            cur = node1;
-        }
-        return dummy.next;
-    }
-
-
-    //14
-    /**
-     * 不建议使用下面的写法，比较乱
-     * @param strs
-     * @return
-     */
-    public String longestCommonPrefix(String[] strs) {
-        String flag = strs[0];
-        int len = -1;
-        for (int i = 0; i < flag.length(); i++) {
-            char c = flag.charAt(i);
-            int j = 1;
-            for (; j < strs.length; j++) {
-                if (i >= strs[j].length() || strs[j].charAt(i) != c) {
-                    break;
-                }
-            }
-            if (j == strs.length - 1) continue;
-            else {
-                len = i;
-                break;
-            }
-        }
-        return flag.substring(0, len);
-
     }
 }

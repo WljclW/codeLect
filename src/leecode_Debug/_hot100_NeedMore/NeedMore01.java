@@ -68,40 +68,8 @@ public class NeedMore01 {
 
     /*148.
      * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
-    public ListNode sortList(ListNode head) {
-        if (head==null||head.next==null) return head;
-        ListNode mid = findMid(head);
-        ListNode left = sortList(head);
-        ListNode right = sortList(mid);
-        return merge(left,right);
-    }
-
-    private ListNode merge(ListNode left, ListNode right) {
-        ListNode dummy = new ListNode(-1),cur = dummy;
-        while (left!=null&&right!=null){
-            if (left.val<right.val){
-                cur.next =  left;
-                left = left.next;
-            }else{
-                cur.next = right;
-                right = right.next;
-            }
-            cur = cur.next;
-        }
-        cur.next = left==null?right:left;
-        return dummy.next;
-    }
-
-    private ListNode findMid(ListNode head) {
-        ListNode slow = head,fast = head.next;
-        while (fast!=null && fast.next!=null){
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-        ListNode res = slow.next;
-        slow.next = null;
-        return res;
-    }
+//    public ListNode sortList(ListNode head) {
+//    }
 
 
     /*146.
