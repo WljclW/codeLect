@@ -368,7 +368,8 @@ public class codetop_5 {
             return curSum;
         }
         /*step3：递归它的左右孩子*/
-        return dfsSumNumbers(root.left, curSum) + dfsSumNumbers(root.right, curSum);
+        return dfsSumNumbers(root.left, curSum) +
+                dfsSumNumbers(root.right, curSum);
     }
 
     /*写法2：深度优先遍历的另一种写法....使用全局变量来记录结果*/
@@ -381,7 +382,8 @@ public class codetop_5 {
     private void dfsSumNumbers1(TreeNode root, int curSum) {
         if (root==null) return;
         curSum = curSum*10 + root.val;
-        if (root.left==null&&root.right==null) maxSumNumbers += curSum;
+        if (root.left==null&&root.right==null)
+            maxSumNumbers += curSum; /**遍历的过程中，碰到叶子节点更新全局变量maxSumNumbers*/
         dfsSumNumbers(root.left, curSum);
         dfsSumNumbers(root.right, curSum);
     }
@@ -858,11 +860,12 @@ public class codetop_5 {
     }
 
 
-    /*113
+    /*113/路径总和 II
     给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
     叶子节点 是指没有子节点的节点。
     * */
     /*写法1：递归的写法*/
+    /**递归的写法总是写错！！！！！！！！*/
     LinkedList<List<Integer>> resPathSum;
     LinkedList<Integer> pathPathSum;
     public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
@@ -922,6 +925,96 @@ public class codetop_5 {
         path.removeLast();
     }
 
+    /**113题BFS的迭代写法（强烈建议结合112题的BFS写法理解）。。。
+     112题仅仅是判断有没有那样的路径，遍历时需要的信息：节点、从根节点到这个节点的路径和。因此使用到
+     两个队列————一个存储节点，一个存储从根节点到这个节点的路径和。。
+     疑问1：为什么使用队列？？因为是BFS的写法，BFS需要使用队列；
+     疑问2：为什么使用两个队列，因为需要两个信息（其实这里使用Pair这个类型也可以，但是为了逻辑清
+     晰，二叉树中的BFS通常将不同的信息存储到不同的队列）
+     113题不仅仅需要得到是不是有这样的路径，还要将所有满足的路径返回。此时我们需要的信息：节点（判断是
+     不是叶子节点以及得到它的左右孩子，BFS遍历必须的一个元素）、从根节点到该节点的路径和信息（判断是不是符
+     合题目要求的路径）、从根节点到该节点的路径（如果满足条件时需要打印）。因此此时需要使用3个队列分别存储
+     这些不同的信息
+     */
+    public List<List<Integer>> pathSum_diedai(leecode_Debug.BTree.TreeNode root, int targetSum) {
+        List<List<Integer>> res = new LinkedList<>();
+        if (root==null) return res;
+
+        LinkedList<leecode_Debug.BTree.TreeNode> queueNodes = new LinkedList<>();
+        LinkedList<Integer> queueVal = new LinkedList<>();
+        LinkedList<List<Integer>> queuePath = new LinkedList<>();
+        queueNodes.offer(root);
+        queueVal.offer(root.val);
+        queuePath.offer(new LinkedList<>(List.of(root.val)));
+        while (!queueNodes.isEmpty()){
+            leecode_Debug.BTree.TreeNode curNode = queueNodes.poll();
+            Integer curVal = queueVal.poll();
+            List<Integer> curPath = queuePath.poll();
+            if (curNode.left==null&&curNode.right==null&&curVal==targetSum){
+                res.add(curPath);
+            }
+
+            if (curNode.left!=null){
+                queueNodes.offer(curNode.left);
+                queueVal.offer(curVal+curNode.left.val);
+                LinkedList<Integer> newPath = new LinkedList<>(curPath);
+                newPath.add(curNode.left.val);
+                queuePath.offer(newPath);
+            }
+
+            if (curNode.right != null) {
+                queueNodes.offer(curNode.right);
+                List<Integer> newPath = new LinkedList<>(curPath);
+                newPath.add(curNode.right.val);
+                queuePath.offer(newPath);
+                queueVal.offer(curVal + curNode.right.val);
+            }
+        }
+
+        return res;
+    }
+
+    /**同理，我们只要任何时刻能拿到节点、节点对应的路径和、从根到节点的路径，且这三个信息是对应的，这就OK。
+     因此还可以写出下面的dfs的迭代版本。
+     1. 113题bfs的迭代版本，依然可以结合112题的bfs迭代版本理解。
+     2. 与bfs的代码比起来，几乎是一摸一样的，唯一不同的就是使用栈还是队列 以及 左右孩子入队的顺序。由于
+     下面的dfs是先序遍历的迭代，因此入栈的顺序是“右孩子————>再左孩子”
+     * */
+    public List<List<Integer>> pathSum_diedaidfs(leecode_Debug.BTree.TreeNode root, int targetSum) {
+        List<List<Integer>> res = new LinkedList<>();
+        if (root==null) return res;
+        Stack<leecode_Debug.BTree.TreeNode> stackNode = new Stack<>();
+        Stack<Integer> stackVal = new Stack<>();
+        Stack<List<Integer>> stackPath = new Stack<>();
+        stackNode.push(root);
+        stackVal.push(root.val);
+        stackPath.push(new LinkedList<>(List.of(root.val)));
+        while (!stackNode.isEmpty()){
+            leecode_Debug.BTree.TreeNode curNode = stackNode.pop();
+            Integer curVal = stackVal.pop();
+            List<Integer> curPath = stackPath.pop();
+            if (curNode.left==null&&curNode.right==null&&curVal==targetSum){
+                res.add(new LinkedList<>(curPath));
+            }
+
+            if (curNode.right!=null){
+                stackNode.push(curNode.right);
+                stackVal.push(curVal+curNode.right.val);
+                LinkedList<Integer> newPath = new LinkedList<>(curPath);
+                newPath.add(curNode.right.val);
+                stackPath.push(newPath);
+            }
+
+            if (curNode.left!=null){
+                stackNode.push(curNode.left);
+                stackVal.push(curVal+curNode.left.val);
+                LinkedList<Integer> newPath = new LinkedList<>(curPath);
+                newPath.add(curNode.left.val);
+                stackPath.push(newPath);
+            }
+        }
+        return res;
+    }
 
     /*209
     给定一个含有 n 个正整数的数组和一个正整数 target 。
@@ -1127,6 +1220,35 @@ public class codetop_5 {
                 valQueue.offer(curVal - curNode.val);
             }
 
+        }
+        return false;
+    }
+
+
+    /**层序遍历的另外的写法*/
+    public boolean hasPathSum_cengxu(leecode_Debug.BTree.TreeNode root, int targetSum) {
+        if (root==null) return false;
+        LinkedList<leecode_Debug.BTree.TreeNode> queueNodes = new LinkedList<>();
+        LinkedList<Integer> queueVal = new LinkedList<>();
+        queueNodes.offer(root);
+        queueVal.offer(root.val); //与写法3的区别....一个是存储差值，一个存储和
+        while (!queueNodes.isEmpty()){
+            leecode_Debug.BTree.TreeNode curNode = queueNodes.poll();
+            Integer curVal = queueVal.poll();
+
+            if (curNode.left==null&&curNode.right==null&&curVal==targetSum){ //与写法3的区别
+                return true;
+            }
+
+            if (curNode.left!=null){
+                queueNodes.offer(curNode.left);
+                queueVal.offer(curVal+curNode.left.val);
+            }
+
+            if (curNode.right!=null){
+                queueNodes.offer(curNode.right);
+                queueVal.offer(curVal+curNode.right.val);
+            }
         }
         return false;
     }

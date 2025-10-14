@@ -868,12 +868,9 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
     叶子节点 是指没有子节点的节点。
     * */
-    LinkedList<List<Integer>> resPathSum;
-    LinkedList<Integer> pathPathSum;
-
-    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
-        return resPathSum;
-    }
+//    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
+//
+//    }
 
 
    /*112
@@ -881,9 +878,9 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
    路径上所有节点值相加等于目标和 targetSum 。如果存在，返回 true ；否则，返回 false 。叶子节点 是指没有子节
    点的节点。
    */
-    public boolean hasPathSum(TreeNode root, int targetSum) {
-        return false;
-    }
+//    public boolean hasPathSum(TreeNode root, int targetSum) {
+//
+//    }
 
     /*437,与560题是类似的
     给定一个二叉树的根节点 root ，和一个整数 targetSum ，求该二叉树里节点值之和等于 targetSum 的 路径 的数目。

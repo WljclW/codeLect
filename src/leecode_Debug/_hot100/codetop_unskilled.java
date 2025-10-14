@@ -228,10 +228,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 叶子节点 是指没有子节点的节点。
      */
 //    public boolean hasPathSum(TreeNode root, int targetSum) {
-//        if (root==null) return false;
-//        if (root.left==null&&root.right==null&&root.val==targetSum) return true;
-//        return hasPathSum(root.left,targetSum-root.val)||
-//                hasPathSum(root.right,targetSum-root.val);
+//
 //    }
 
     /*113
@@ -709,25 +706,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return res;
     }
 
-    /*1143一维数组*/
-    public int longestCommonSubsequence_(String text1, String text2) {
-        int len1 = text1.length(),len2 = text2.length();
-        int[] dp = new int[len2+1];
-        int res = 0;
-
-        for (int i = 1; i <= len1; i++) {
-            for (int j = 1; j <= len2; j++) {
-                if (text1.charAt(i-1)==text2.charAt(j-1)){
-                    dp[j] = dp[j-1]+1;
-                }else {
-                    dp[j] = Math.max(dp[j],dp[j-1]);
-                }
-                res = Math.max(dp[j],res);
-            }
-        }
-        return res;
-    }
-
 
     //93
     List<String> resRestoreIpAddresses;
@@ -921,35 +899,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             }
         }
         return res;
-    }
-
-
-    //112
-    public boolean hasPathSum(TreeNode root, int targetSum) {
-        if (root == null) return false;
-        if (root.left == null && root.right == null && targetSum == root.val) return true;
-        return hasPathSum(root.left, targetSum - root.val) ||
-                hasPathSum(root.right, targetSum - root.val);
-    }
-
-
-    //113
-    List<List<Integer>> resPathSum;
-    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
-        resPathSum = new LinkedList<>();
-        pathSum(root,new LinkedList<Integer>(),targetSum);
-        return resPathSum;
-    }
-
-    private void pathSum(TreeNode root, LinkedList<Integer> path, int targetSum) {
-        if (root == null) return;
-        if (root.left == null && root.right == null && targetSum == root.val) { /**【注】2点：一是必须判断root是不是叶子节点，不能等来到null节点的时候判断，是错的；二是判断的条件是“targetSum==root.val”，而不是“targetSum==0”*/
-            resPathSum.add(new LinkedList<>(path));
-            return;
-        }
-        path.add(root.val);
-        pathSum(root.left, path, targetSum - root.val);
-        pathSum(root.right, path, targetSum - root.val);
     }
 
 

@@ -824,44 +824,6 @@ public class topcode1_5 {
         return -1;
     }
 
-
-    //76
-    public String minWindow(String s, String t) {
-        if (s.length()<t.length()) return "";
-        HashMap<Character, Integer> need = new HashMap<>();
-        for (char c:t.toCharArray()){
-            need.put(c,need.getOrDefault(c,0)+1);
-        }
-
-        HashMap<Character, Integer> window = new HashMap<>();
-        int valid = 0;
-        int left = 0;
-        int start = -1,len = Integer.MAX_VALUE;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (need.containsKey(c)){
-                window.put(c,window.getOrDefault(c,0)+1);
-                if (window.get(c).intValue()==need.get(c).intValue()){
-                    valid++;
-                }
-                while (valid==need.size()){
-                    if (i-left+1<len){
-                        len = i-left+1;
-                        start = left;
-                    }
-                    char c1 = s.charAt(left++);
-                    if (need.containsKey(c1)){
-                        window.put(c1,window.get(c1)-1);
-                        if (window.get(c1)<need.get(c1)){
-                            valid--;
-                        }
-                    }
-                }
-            }
-        }
-        return start==-1?"":s.substring(start,start+len);
-    }
-
     //105
     HashMap<Integer,Integer> inorderMap;
     int preorderIndex;
@@ -1313,16 +1275,6 @@ public class topcode1_5 {
             }
         }
         return dp[m-1][n-1];
-    }
-
-    //112
-    public boolean hasPathSum(TreeNode root, int targetSum) {
-        if (root==null){
-            if (targetSum==0) return true;
-            return false;
-        }
-        return hasPathSum(root.left,targetSum-root.val)||
-                hasPathSum(root.right,targetSum-root.val);
     }
 
     //560

@@ -926,55 +926,6 @@ public class All1_5 {
         return dp[len1][len2];
     }
 
-    /*两行数组的滚动优化版本*/
-    public int minDistance_2row(String word1, String word2) {
-        int m = word1.length(), n = word2.length();
-        if (m < n) return minDistance(word2, word1); // 优化空间使用
-
-        int[] prev = new int[n + 1]; // 上一行
-        int[] cur = new int[n + 1];  // 当前行
-
-        // 初始化第一行：把 word2 的前 j 个字符变成空串需要 j 次删除
-        for (int j = 0; j <= n; j++) {
-            prev[j] = j;
-        }
-
-        // 遍历 word1 的每个字符
-        for (int i = 1; i <= m; i++) {
-            cur[0] = i; // 把 word1 前 i 个字符变成空串需要 i 次删除
-            for (int j = 1; j <= n; j++) {
-                char c1 = word1.charAt(i - 1);
-                char c2 = word2.charAt(j - 1);
-                if (c1 == c2) {
-                    cur[j] = prev[j - 1]; // 字符相同，不需要操作
-                } else {
-                    cur[j] = Math.min(Math.min(prev[j], cur[j - 1]), prev[j - 1]) + 1;
-                    // 三种操作：删除（prev[j]）、插入（cur[j-1]）、替换（prev[j-1]）
-                }
-            }
-            // 滚动数组：交换引用，而不是复制
-            int[] tmp = prev;
-            prev = cur;
-            cur = tmp;
-        }
-
-        return prev[n]; // 最后一行结果
-    }
-
-    /*一维dp的写法
-        复杂度分析：时间复杂度：O(m·n)（还是要遍历整个表）；空间复杂度：O(min(m, n))（只保留一行）
-    */
-    /**
-     *【解释】根据二维dp可以发现，每一个位置依赖于它的”左上角的三个位置“，这样的局面有问题！
-     *     问题：dp[i][j]依赖于dp[i-1][j]、dp[i][j-1]、dp[i-1][j-1]。此时从前往后计
-     *  算就不对，必须借助额外的变量存储dp[i-1][j-1]的信息————代表着上一行前一个位置的值。
-     *     如何解决：在一行数组的动规中，要求在更新任何一个位置的值之前，必须先记录，比如：计
-     *  算dp[3]的之前先使用tmp记录dp[3]的值dp[3](old)，dp[3]更新后将dp[3](old)赋值给局
-     *  部变量prev;接下来会计算dp[4]，依然先记录dp[4]（old）到变量tmp中，更新dp[4]时二维中
-     *  会使用到左上角的位置值即dp[i-1][j-1]，就等价于一维中的dp[3](old)，而此时的dp[3]（old）
-     *  是在变量prev中存储的。。。。。综上，整个过程形成了闭环，同时可以看到prev,tmp变量是缺一不
-     *  可的！！！
-     */
     public int minDistance_1dim(String word1, String word2) {
         /*setep1：保证空间复杂度为O(min(m,n))————即把短的字符串放在二维表中列的位置*/
         int m = word1.length(), n = word2.length();
@@ -1054,11 +1005,6 @@ public class All1_5 {
     }
 
     /*空间优化到一维版本*/
-    /**
-     *【总结】代码中的①②③和72题一维优化的形式是一样的。根本原因在于：1143和72题中二维dp任何一个位
-     *    置(i,j)需要依赖到位置(i-1,j)、(i,j-1)、(i-1,j-1)，而优化到一维版本的时候(i-1,j-1)位置
-     *    的值必须使用额外的变量来记录原始值，否则原始值就被污染了
-     */
     public int longestCommonSubsequence1(String text1, String text2) {
         int m = text1.length(),n = text2.length();
         if (m<n){
@@ -1067,16 +1013,15 @@ public class All1_5 {
 
         int[] dp = new int[n + 1];
         for (int i = 1; i < m+1; i++) {
-            int prev = 0; /**①记录dp[0]的值，1143题dp[0]固定是0————dp[0]等价于二维中的第i行第0列，即长度为i的text1和长度为0的text2子串公共子序列必然是0*/
-            /**在72的1行数组动规中，这里会更新“dp[0]=i”，由于这个题是计算公共子序列，且dp[0]表示第二个串是空串，因此dp[0]必然是0，数组的默认值以及初始值就是0，因此省略此步骤*/
+            int prev = 0;
             for (int j = 1; j < n+1; j++) {
-                int tmp = dp[j]; /**②if-else块会更新dp某位置，因此计算之前先记录dp[i]*/
+                int tmp = dp[j];
                 if (text1.charAt(i-1)==text2.charAt(j-1)){
                     dp[j] = prev + 1;
                 }else {
                     dp[j] = Math.max(dp[j-1],dp[j]);
                 }
-                prev = tmp; /**③dp[i]流程结束前将tmp更新到prev*/
+                prev = tmp;
             }
         }
         return dp[n];
