@@ -1973,10 +1973,6 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
             for (int i = 0; i < size; i++) {
                 TreeNode cur = queue.poll();
                 Integer curVal = integers.poll();
-                /**
-                 *这里也是同样的道理，不能到了null节点才更新res，那样就错了，相当于叶子节点的
-                 * 两个孩子都统计了，不对
-                 */
                 if (cur.left==null&&cur.right==null) res+= curVal;
                 if (cur.left!=null){
                     queue.offer(cur.left);
@@ -1990,11 +1986,6 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         }
         return res;
     }
-
-
-//    public int sumNumbers_digui(TreeNode root) {
-//
-//    }
 
 
 

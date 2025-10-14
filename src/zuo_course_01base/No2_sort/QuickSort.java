@@ -173,6 +173,8 @@ public class QuickSort {
      *【补充说明】：其中③中把arr[r]换到了flag的位置，flag就是第一个不小于arr[r]的位置，因此①②③结束以后有结论：
      *      1. arr[flag]左边的数都是小于它的，右边的数都是大于它的。
      *      2. arr[flag]这个数就在正确的位置
+     *      3. 归并排序的时候需要借助一个临时数组tmp，因为涉及到两个数组的合并！！！
+     *           快排的时候就不需要了，根据大小关系和索引完成交换！(双指针解法，类似于“颜色分类/荷兰国旗”问题)
      */
     private static int partion3(int[] arr, int l, int r) {
         int flag = l;

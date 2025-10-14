@@ -442,6 +442,10 @@ public class codetop_5 {
             Integer curVal = integers.poll();
             /*step2：如果发现了叶子节点，则更新sum。。
             * 说明，现在的这个节点就是符合条件的节点，需要更新sum*/
+            /**
+             *这里也是同样的道理，不能到了null节点才更新res，那样就错了，相当于叶子节点的
+             * 两个孩子都统计了，不对
+             */
             if (cur.left==null&&cur.right==null){
                 sum += curVal;
             }
@@ -469,6 +473,8 @@ public class codetop_5 {
                                        vals.offer(0);
                 因此vals对应的值是“从根节点到它的父节点的路径和”，这个定义就影响了后续“如果是叶子节点时计算路
             径的过程”、“普通节点入队列后，vals对应的入队值的问题”
+         根据解法2和解法3可以知道，初始的时候显示root节点入队列，同时会入队列一个值。这个值可以是root.val也可
+         以是0，重要的是在后续更新答案的时候明确这一点，并能形成闭环
          */
         queue.offer(root);
         vals.offer(0);
@@ -1024,9 +1030,14 @@ public class codetop_5 {
      *   targetSum==0，就会认为存在，这是错误的，因为null不是叶子节点 并且 它的父节点4也不是叶子节点。
      *          因此，必须保证是”叶子节点“的时候决定是不是更新答案
      *
-     * @param root
-     * @param targetSum
-     * @return
+     *      ⚠️综上所述：二叉树中“路径总和”相关的题目不能到了“root==null”才校验，校验的时机应该是“root是叶子节点的
+     *   时候即root.left==null&&root.right==null”。很重要！！！
+     *【补充说明】
+     *      1. 这个题无非就是到叶子节点的时候判断从根节点到这个节点的路径和问题，因此到叶子结点的时候知道“路径和”这个数
+     *   据就可以了。。。因此下面的DFS的迭代、BFS的层序遍历，虽然一个使用的是栈，一个使用的是队列，都是可以的。。根本原
+     *   因：①在DFS的迭代中， 每一次从栈中分别弹出节点以及路径和，这个路径和就是从根节点到这个节点的路径和。形成闭环；
+     *   ②在BFS的层序遍历中，每一次从队列中分别出队节点以及路径和，这个路径和就是从根节点到这个节点的路径和，形成闭环，因
+     *   此也是OK的
      */
     /*写法1：DFS递归方法*/
     public boolean hasPathSum(TreeNode root, int targetSum) {
@@ -1045,7 +1056,7 @@ public class codetop_5 {
 //
 //    }
 //    boolean dfs(TreeNode root, int targetSum){
-//        if (root==null&&targetSum==0) return true; /**【err】这里是错误的!!!!!!*/
+//        if (root==null&&targetSum==0) return true; /**【err】这里是错误的!!!!!!不能等到root来到null才进行判断*/
 //        if(root==null) return false;
 //        return dfs(root.left,targetSum-root.val)||
 //                dfs(root.right,targetSum-root.val);
@@ -1099,11 +1110,14 @@ public class codetop_5 {
              *        int size = nodesQueue.size();   //正规层序遍历时，需要获取size，知道这一层有多少个节点
              *        for (int i = 0; i < size; i++) {}
              */
+            //①分别从队列中弹出节点 以及 它对应的路径和
             TreeNode curNode = nodesQueue.poll();
             Integer curVal = valQueue.poll();
+            //②判断是不是答案————这个节点是叶子节点  &&  路径和是targetSum
             if (curNode.left == null && curNode.right == null && curVal == curNode.val) {
                 return true;
             }
+            //③依次将 左右孩子 以及 对应的路径和 添加到队列
             if (curNode.left != null) {
                 nodesQueue.offer(curNode.left);
                 valQueue.offer(curVal - curNode.val);
