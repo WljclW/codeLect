@@ -18,6 +18,9 @@ import java.util.*;
  *      _hot100._06ListNode#isPalindrome(leecode_Debug.top100.ListNode)这个题上面的注释中也是错误的，尤
  *  其是翻转后半部分后两半链表的形态————根源：这是单链表，一个节点的后继必然是相同的节点
  */
+/*源文件————codetop_unskilled_1_5
+    215、53、5、92、1143、151、78、322、8、39、470、112、718、14、手撕快排
+* */
 public class All1_5 {
     /*
      * 3.给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。无重复字符的最长子串
@@ -284,41 +287,102 @@ public class All1_5 {
     /*5 最长回文子串
     给你一个字符串 s，找到 s 中最长的 回文 子串。
      */
+    /**
+     * 马拉车算法 可以实现将时间复杂度降为O(N)，但是空间复杂度高于“中心扩散法”，空间复杂度为O(N)。
+     */
     public String longestPalindrome(String s) {
-        if (s==null||s.length()==0) return "";
+        /*step1：特殊情况的考虑*/
+        if (s == null || s.length() == 0) return "";
+        /*step2：StringBuilder预处理字符串并构造出新字符串。做法————给原字符串所有的间隔（包括开始位置和结束位置）都加“#”*/
         StringBuilder sb = new StringBuilder("#");
-        for (char c:s.toCharArray()){
+        for (char c : s.toCharArray()) {
             sb.append(c).append("#");
         }
         String str = sb.toString();
+        int n = str.length();
 
-        int[] p = new int[str.length()];
-        int center = 0,rightBound = 0;
-        int start = 0,maxLen = 0;
-        for (int i = 0; i < str.length(); i++) {
-            int mirror = 2*center-i;
-            if (i<rightBound){
-                p[i] = Math.min(p[mirror],rightBound-i);
+        int[] p = new int[n]; //声明int数组用于存放每一个位置的回文半径
+        int center = 0, right = 0; /*center表示当前的回文中心；right表示当前最远的回文半径。*/
+        int start = 0, maxLen = 0; /*这是返回结果的关键信息。start表示“最长回文子串”的开始位置，maxLen表示“最长回文子串”的长度*/
+        /*step3：for循环依次研究每一个位置*/
+        for (int i = 0; i < n; i++) {
+            /*3.1 这一步就是“马拉车算法”的核心精髓。。具体的做法如下————
+                      （1）计算出i位置关于“目前回文中心”center的对称位置。
+                      （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
+            int mirror = 2 * center - i;
+            if (i < right) { /**err：i小于“回文串的最右边界”，会误写成mirror*/
+                p[i] = Math.min(right - i, p[mirror]); /**得到i位置回文半径的最小值，i位置的回文串还可能往两边扩————3.2干的活*/
             }
 
-            int left = i-p[i]-1,right = i+p[i]+1;
-            while (left>=0&&right<str.length()&&str.charAt(left)==str.charAt(right)){
+            /*3.2   尝试向两边继续扩展，看看位置i是否能得到更长的回文子串。
+                    这一步具体的做法呢，如下————
+                        ①声明两个指针l,r分别为i位置的左右；
+                        ②只要l和r不越界 并且 l和r位置的字符相等，就“增加p[i]”、移动l和r指针*/
+            int l = i - p[i] - 1, r = i + p[i] + 1;
+            while (l >= 0 && r < n && str.charAt(l) == str.charAt(r)) {
                 p[i]++;
-                left--;
-                right++;
+                l--;
+                r++;
             }
-
-            if (i+p[i]>rightBound){
-                center  =i;
-                rightBound = i+p[i];
+            /*3.3 更新“最远回文右边界”。
+             *   “最远回文右边界”right 和 “当前的回文中心”center 是成对起作用的，因此更新right的时候就要更新center。
+             *   为什么说是“成对起作用”的呢？？因为right和i比较能加速p[i]计算；center用于计算位置i关于回文中心的对称位置*/
+            if (i + p[i] > right) {
+                center = i;
+                right = i + p[i];
             }
-
-            if (p[i]>maxLen){
-                maxLen = p[i];
-                start = (i-maxLen)/2;
+            /*3.4 更新最长回文子串。
+             *   “最长回文子串”maxLen 和 “回文子串的开始位置”start也是成对出现的，因此更新maxLen的时候呀需要更新start。*/
+            if (p[i] > maxLen) {
+                maxLen = p[i]; /**回文半径就是最长的长度*/
+                start = (i - maxLen) / 2; /**？？？*/
             }
         }
-        return s.substring(start,start+maxLen);
+        return s.substring(start, start + maxLen);
+    }
+
+
+    /**
+     * 中心扩散法的复杂度分析：
+     *      时间复杂度：O(N^2)；
+     *      空间复杂度：O(1)
+     *中心扩散法中最关键的有两点：
+     *      第一点：双指针 + while循环计算回文长度返回，此时返回值是“(r-1)-(l+1)+1”即r-l-1。并且这个值就
+     *  是真实的回文子串的长度，因为计算方式是边界索引值相减的，与“回文中心是（i，i）还是（i，i+1）”是没有关
+     *  系的。
+     *      第二点：更新回文子串的最大长度时，同时更新回文子串的起始位置，这个起始位置是关键————i-(len-1)/2。
+     * @param s
+     * @return
+     */
+    public String longestPalindrome_1(String s) {
+        int start = 0, maxLen = 0;
+        for (int i = 0; i < s.length(); i++) {
+            int odd = getLength(s, i, i);
+            int even = getLength(s, i, i + 1);
+            int curLen = Math.max(odd, even);
+            if (curLen > maxLen) {
+                maxLen = curLen;
+                start = i - (curLen - 1) / 2; /**这里是如何理解的？？*/
+            }
+        }
+        return s.substring(start, start + maxLen);
+    }
+
+    private int getLength(String s, int l, int r) {
+        while (l>=0&&r<s.length()&&s.charAt(l)==s.charAt(r)){
+            l--;
+            r++;
+        }
+        /**
+         * 如何理解下面返回值的计算？？？
+         *      根据while循环可知，只要“满足不越界 并且 字符相等”，就会执行while循环。。。。如果某次不再进
+         *   入了，说明此时此刻此时l和r“要么越界了 要么对应的字符不相等”————即回文子串不包含r位置也不包含l位
+         *   置。
+         *      如果是之前滑动窗口、二分法等包括左右边界，此时计算长度的表达式就是“r-l+1”。
+         *      但是这里是既不包含左边界，也不包含右边界，因此最后有效回文是闭区间 [l+1, r-1]，此时的长度
+         *   是“(r-1)-(l+1)+1”即r-l-1
+         */
+        return r-l-1; /***这里是如何理解的？？*/
     }
 
     /*102.层序遍历*/
@@ -1559,7 +1623,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 
     public int myAtoi__(String s) {
        int index = 0; //变量1：index记录当前研究到哪个位置了
-       /*step1：跳过前导的空格*/
+       /*step1：跳过前导的空格,并判断index是否到达s的末尾*/
        while (index<s.length()&&s.charAt(index)==' ') index++;
        if (index==s.length()) return 0;
 
@@ -1680,10 +1744,29 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
     * 金额，返回 -1 。
     你可以认为每种硬币的数量是无限的。*/
+
+    /**
+     【易错点】
+            1. 强烈建议将dp的所有值初始化为amount+1，不要初始化为-1.
+            2. dp[0]必须是0，不然的话结果一直是-1.
+     【关于dp数组初始化值的经验】
+             题型	        初始化思路	    示例
+             求最小值	    用大数	        dp[i] = amount + 1
+             求最大值	    用小数	        dp[i] = -∞
+             求组合/方案数	用 0	        dp[i] = 0
+             用 -1 表示无效	必须手动判断	    见下面的解法coinChange_
+     */
     public int coinChange(int[] coins, int amount) {
         int[] dp = new int[amount + 1];
+        /**
+         *【不要填充为-1，虽然可以，但是要改很多逻辑】
+         *      这里也可以用-1，填充数组。。此时代码需要改动，必须保证dp[j-coins[i]]不是-1才能取最小，否则取最
+         * 小时-1会干扰。。。换言之我们确保金额“j-coins[i]”是能凑出来的，才会根据它决策
+         *      否则“j-coins[i]”都凑不出来，“dp[j] = Math.min(dp[j-coins[i]]+1,dp[j]);”就没有意义，dp[i]
+         * 的值只能保持原值不动
+         */
         Arrays.fill(dp,amount+1);
-        dp[0] = 0;
+        dp[0] = 0; /**err：0位置必须初始化0，否则永远返回-1*/
         for (int i = 0; i < coins.length; i++) {
             for (int j = coins[i]; j <=amount; j++) {
                 dp[j] = Math.min(dp[j-coins[i]]+1,dp[j]);
@@ -1692,8 +1775,45 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         return dp[amount]==amount+1?-1:dp[amount];
     }
 
+    /*chatgpt给出下面的答案，应该也是可以的*/
+    public int coinChange_chatgpt(int[] coins, int amount) {
+        int max = amount + 1;
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, max);
+        dp[0] = 0;
 
-     /*43 字符串相乘
+        for (int coin : coins) { /**这里不用使用for循环，反而更好。。。因为现在是一行数组，用不到二维中的i，因此第一个for循环不需要知道索引就可以*/
+            for (int i = coin; i <= amount; i++) {
+                dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+            }
+        }
+
+        return dp[amount] > amount ? -1 : dp[amount];
+    }
+
+    /*dp数组初始时填充为-1的写法*/
+    public int coinChange_(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, -1);
+        dp[0] = 0;
+
+        for (int coin : coins) {
+            for (int i = coin; i <= amount; i++) {
+                /**如果每一个位置初始是-1，在状态转移时每使用一个位置，要确保这个位置不是-1————即保证那个位置是可达的*/
+                if (dp[i - coin] != -1) { // 表示可达
+                    if (dp[i] == -1)
+                        dp[i] = dp[i - coin] + 1;
+                    else
+                        dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+        return dp[amount];
+    }
+
+
+
+    /*43 字符串相乘
     给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
     注意：不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
     * */
@@ -2340,15 +2460,45 @@ int getMin() 获取堆栈中的最小元素。*/
 
 如果不存在公共前缀，返回空字符串 ""。
      */
+    /**
+     【复杂度分析】
+     时间复杂度————O(n×m)
+     其中:n = 字符串个数;m = '最短'字符串的长度（因为碰到最短的就一定知道答案了）
+     空间复杂度————O(1)
+     【强烈建议使用解法】longestCommonPrefix_
+     */
+    /*写法1*/
     public String longestCommonPrefix(String[] strs) {
         if (strs==null||strs.length==0) return "";
-        String flag = strs[0];
-        for (int i = 0; i < flag.length(); i++) {
-            char c = flag.charAt(i);
-            for (int j = 1; j < strs.length; j++) {
-                if (strs[j].length()<=i||strs[j].charAt(i)!=c){
-                    return flag.substring(0,i);
+        /*step1：使用第一个字符串作为基准*/
+        String str = strs[0];
+        /*step2：依次拿出str每一个位置的字符，遍历所有的字符串看看对应的位置字符是不是相等；如果不相等立即返回*/
+        for (int i = 0; i < str.length(); i++) { /*依次拿出第一个字符串0、1、2....位置的字符*/
+            char c = str.charAt(i);
+            for (int j = 1; j < strs.length; j++) { /*从第二个字符串开始，依次研究每一个字符串位置i的字符，看看是不是等于c。如果发现不相等，立即返回*/
+                if (i>=strs[j].length()||c!=strs[j].charAt(i)){
+                    return str.substring(0,i);
                 }
+            }
+        }
+        /**
+         *到了这里有两种情况————
+         *      情况1：压根就没进入双重for循环，表示strs只有一个字符串，因此返回strs[0]；
+         *      情况2：进入到双重for循环了，但是for循环完整执行结束。。。表示所有的字符串都研究了，strs[0]中有的
+         *          字符其他的字符串对应都有，因此返回strs[0]。
+         *      综上，虽然是两种情况，但是返回值是统一的。
+         */
+        return str;
+    }
+
+    /*写法2*/
+    public String longestCommonPrefix_(String[] strs) {
+        String flag = strs[0];
+        for (int i = 0; i < flag.length(); i++) {  /*这个for循环表示从0开始研究str[0]的每一个位置*/
+            for (int j = 1; j < strs.length; j++) { /*这个for循环表示：对于str[0]的每一个位置，研究剩下的所有字符串，看i位置的字符是不是相等*/
+                String cur = strs[j];
+                if (cur.length()==i || cur.charAt(i)!=flag.charAt(i)) /*但凡某一个位置的字符不相等 或者 i已经越界 ===》直接返回。此时i就是取子串的右边界*/
+                    return flag.substring(0,i);
             }
         }
         return flag;
@@ -2659,15 +2809,6 @@ int getMin() 获取堆栈中的最小元素。*/
         }
         return dp[s.length()];
     }
-
-
-    /*718. 最长重复子数组
-    给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 。
-     */
-//    public int findLength(int[] nums1, int[] nums2) {
-//
-//    }
-
 
     /*24. 两两交换链表中的节点
 给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下完成本题（即，只能进行节点交换）。

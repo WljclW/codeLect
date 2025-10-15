@@ -13,10 +13,6 @@ import java.util.*;
  * 93. 复原 IP 地址
  * 堆排序
  */
-
-/**
- * 82、124、129
- */
 public class codetop_5 {
     /*93
     有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
@@ -890,7 +886,7 @@ public class codetop_5 {
         pathSumBack(root.right, targetSum);
         /*step4：撤销选择*/
         pathPathSum.removeLast();
-        targetSum += root.val;
+        targetSum += root.val; /**看着后面没有再调用过这句，是不是这一句可以省略？？*/
     }
 
     /*下面是另一种写法*/
@@ -936,18 +932,18 @@ public class codetop_5 {
      合题目要求的路径）、从根节点到该节点的路径（如果满足条件时需要打印）。因此此时需要使用3个队列分别存储
      这些不同的信息
      */
-    public List<List<Integer>> pathSum_diedai(leecode_Debug.BTree.TreeNode root, int targetSum) {
+    public List<List<Integer>> pathSum_diedai(TreeNode root, int targetSum) {
         List<List<Integer>> res = new LinkedList<>();
         if (root==null) return res;
 
-        LinkedList<leecode_Debug.BTree.TreeNode> queueNodes = new LinkedList<>();
+        LinkedList<TreeNode> queueNodes = new LinkedList<>();
         LinkedList<Integer> queueVal = new LinkedList<>();
         LinkedList<List<Integer>> queuePath = new LinkedList<>();
         queueNodes.offer(root);
         queueVal.offer(root.val);
         queuePath.offer(new LinkedList<>(List.of(root.val)));
         while (!queueNodes.isEmpty()){
-            leecode_Debug.BTree.TreeNode curNode = queueNodes.poll();
+            TreeNode curNode = queueNodes.poll();
             Integer curVal = queueVal.poll();
             List<Integer> curPath = queuePath.poll();
             if (curNode.left==null&&curNode.right==null&&curVal==targetSum){
@@ -980,17 +976,17 @@ public class codetop_5 {
      2. 与bfs的代码比起来，几乎是一摸一样的，唯一不同的就是使用栈还是队列 以及 左右孩子入队的顺序。由于
      下面的dfs是先序遍历的迭代，因此入栈的顺序是“右孩子————>再左孩子”
      * */
-    public List<List<Integer>> pathSum_diedaidfs(leecode_Debug.BTree.TreeNode root, int targetSum) {
+    public List<List<Integer>> pathSum_diedaidfs(TreeNode root, int targetSum) {
         List<List<Integer>> res = new LinkedList<>();
         if (root==null) return res;
-        Stack<leecode_Debug.BTree.TreeNode> stackNode = new Stack<>();
+        Stack<TreeNode> stackNode = new Stack<>();
         Stack<Integer> stackVal = new Stack<>();
         Stack<List<Integer>> stackPath = new Stack<>();
         stackNode.push(root);
         stackVal.push(root.val);
         stackPath.push(new LinkedList<>(List.of(root.val)));
         while (!stackNode.isEmpty()){
-            leecode_Debug.BTree.TreeNode curNode = stackNode.pop();
+            TreeNode curNode = stackNode.pop();
             Integer curVal = stackVal.pop();
             List<Integer> curPath = stackPath.pop();
             if (curNode.left==null&&curNode.right==null&&curVal==targetSum){
@@ -1041,14 +1037,6 @@ public class codetop_5 {
         }
         return res == Integer.MAX_VALUE ? 0 : res;
     }
-
-
-    /*718
-    给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 。
-    * */
-//    public int findLength(int[] nums1, int[] nums2) {
-//
-//    }
 
 
     /*543

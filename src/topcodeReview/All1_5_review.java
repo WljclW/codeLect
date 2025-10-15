@@ -24,6 +24,57 @@ import java.util.*;
  *   err:5、113、112、、、、、、、
  */
 public class All1_5_review {
+    //8.chatgpt给出的版本如下：
+    /**【重要的说明】
+     1. 解析数字时，对于不是数字的字符怎么处理？？
+            这个题的一个重要隐含条件：解析到第一个不是数字的位置就停止解析。如果开始的位置就不是数字，直接返回0
+            同时，题目也明确的说明了最后得到的结果要在int范围内————
+        如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。
+     2. 判断是否越界的逻辑是重点。为什么下面的判断越界逻辑是对的？
+         声明：最大正数：2147483647；最小负数：-2147483648
+         例子1===》输入："-2147483649"。最后一位累加前，res = 214748364、当前 digit = 9、
+     判断 (Integer.MAX_VALUE - 9)/10 = (2147483647-9)/10 = 214748363，
+     res = 214748364 > 214748363 → 越界 → 返回 Integer.MIN_VALUE ✅
+         例子2===》输入：“-2147483648”。最后一位累加前，res = 214748364、当前 digit = 8、
+     判断 (Integer.MAX_VALUE - 8)/10 = (2147483647-8)/10 = 214748363，
+     res = 214748364 > 214748363→ 越界 → 返回 Integer.MIN_VALUE ✅
+        【补充】类似的道理可以参考69题的”mySqrt_best“方法实现，69题中的mid*mid可能超出int范围，因此直接计算不
+     方便，但是比较”mid“和”x/mid“的大小可以避免这种溢出情况
+     */
+    public int myAtoi(String s) {
+        int index = 0, n = s.length();
+        // 1. 跳过空格
+        while (index < n && s.charAt(index) == ' ') index++;
+        if (index == n) return 0;
+
+        // 2. 判断符号
+        int sign = 1;
+        char c = s.charAt(index);
+        if (c == '+' || c == '-') {
+            sign = (c == '-') ? -1 : 1;
+            index++;
+        }
+
+        // 3. 遍历数字
+        int res = 0;
+        while (index < n) {
+            char ch = s.charAt(index);
+            if (!Character.isDigit(ch)) break;
+
+            int digit = ch - '0';
+
+            // 4. 溢出判断
+            if (res > (Integer.MAX_VALUE - digit) / 10) {
+                return (sign == 1) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            }
+
+            res = res * 10 + digit;
+            index++;
+        }
+
+        return res * sign;
+    }
+
     /*215. 数组中的第K个最大元素
 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
 
@@ -56,7 +107,7 @@ public class All1_5_review {
                 swap1(nums,cur++,i);
             }
         }
-        swap1(nums,left,cur); /**这里不能再让cur加加了，快排的代码种也是一样的道理*/
+        swap1(nums,left,cur); /**与for循环块内的swap参数有区别。这里不能再让cur加加了，快排的代码中也是一样的道理。。因为partion1方法要返回随机选的数放在哪个位置了(位置指的是索引值)*/
         return cur;
     }
 
@@ -222,32 +273,6 @@ public class All1_5_review {
      * =======================================3================================
      * =======================================3================================
      */
-    /*322. 零钱兑换
-    * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
-    计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
-    * 金额，返回 -1 。
-    你可以认为每种硬币的数量是无限的。*/
-
-    /**
-        这个题填充为-1行不行？？就尽量不要填充为-1了，统一填充为一个比amount更大的数
-     下面的代码为什么是错误的？？？
-     */
-    public int coinChange(int[] coins, int amount) {
-        int[] dp = new int[amount + 1];
-        Arrays.fill(dp,amount+1);
-        /**应该错误在这里。。。。。这里少了一句，需要将dp[0]重置为0*/
-        for (int i = coins[0]; i <= amount; i++) {
-            if (i%coins[0]==0) dp[i] = dp[i-coins[0]]+1;
-        }
-
-        for (int i = 1; i < coins.length; i++) {
-            for (int j = coins[i]; j <= amount; j++) {
-                dp[j] = Math.min(dp[j-coins[i]]+1,dp[j]);
-            }
-        }
-        return dp[amount]==amount+1?-1:dp[amount];
-    }
-
     /*151. 反转字符串中的单词
     给你一个字符串 s ，请你反转字符串中 单词 的顺序。
     单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。

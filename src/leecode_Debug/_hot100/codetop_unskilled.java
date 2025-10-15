@@ -24,15 +24,7 @@ public class codetop_unskilled {
     计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总
     * 金额，返回 -1 。
     你可以认为每种硬币的数量是无限的。*/
-//    public int coinChange(int[] coins, int amount) {
-//        int[] dp = new int[amount + 1];
-//        for (int i = 0; i < coins.length; i++) {
-//            for (int j = 0; j <=amount; j++) {
-//                if (j>=coins[i]){
-//                    dp[j] = Math.                }
-//            }
-//        }
-//    }
+//    public int coinChange(int[] coins, int amount) {}
 
 
     //最长回文子串
@@ -183,15 +175,6 @@ public class codetop_unskilled {
 //
 //    }
 
-
-
-    /*8
-
-     */
-//    public int myAtoi(String s) {
-//
-//    }
-
     /*470
     给定方法 rand7 可生成 [1,7] 范围内的均匀随机整数，试写一个方法 rand10 生成 [1,10] 范围内的均匀随机整数。
 
@@ -264,29 +247,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 如果不存在公共前缀，返回空字符串 ""。
      */
 
-    /**
-     * 时间复杂度————O(n×m)
-     * 其中:n = 字符串个数;m = '最短'字符串的长度（因为碰到最短的就一定知道答案了）
-     * 空间复杂度————O(1)
-     *
-     * @param strs
-     * @return
-     */
-    public String longestCommonPrefix(String[] strs) {
-        if (strs == null || strs.length == 0) return "";
-        if (strs.length == 1) return strs[0];
-        String first = strs[0];
-        for (int i = 0; i < first.length(); i++) {
-            char c = first.charAt(i);
-            for (int j = 1; j < strs.length; j++) {
-                if (strs[j] == null || i >= strs[j].length() || strs[j].charAt(i) != c) {
-                    return first.substring(0, i);
-                }
-            }
-        }
-        return ""; /**这一行是错误的*/
-    }
-
 
     /**
      * ==========================================================================================================
@@ -297,7 +257,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     //5
-
     /**
      * 马拉车算法 可以实现将时间复杂度降为O(N)，但是空间复杂度高于“中心扩散法”，空间复杂度为O(N)。
      【注意】原串中s的任何一个回文串，不论是奇数长度还是偶数长度，预处理后（比如下面的是通过加”#“预处理）的串中，任何一个回文串
@@ -756,34 +715,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     //322
-    public int coinChange(int[] coins, int amount) {
-        int[] dp = new int[amount + 1];
-        Arrays.fill(dp,-1);
-        dp[0] =0;
-        for (int i = 0; i < coins.length; i++) {
-            for (int j = coins[i]; j < amount + 1; j++) {
-                if (dp[j-coins[i]]!=-1) /**必须要保证金额“j-coins[i]”是可以凑出来的*/
-                    dp[j] = Math.max(dp[j],dp[j-coins[i]]+1);
-            }
-        }
-        return dp[amount]==-1?-1:dp[amount];
-    }
-
-    /*chatgpt给出下面的答案，应该也是可以的*/
-//    public int coinChange(int[] coins, int amount) {
-//        int max = amount + 1;
-//        int[] dp = new int[amount + 1];
-//        Arrays.fill(dp, max);
-//        dp[0] = 0;
-//
-//        for (int coin : coins) {
-//            for (int i = coin; i <= amount; i++) {
-//                dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-//            }
-//        }
-//
-//        return dp[amount] > amount ? -1 : dp[amount];
-//    }
 
     //8 字符串转换为整形
     public int myAtoi(String s) {
@@ -905,13 +836,13 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     //179
     /**
      * 【复杂度分析】假设n个数组元素，每一个数组元素最大有k位数。
-     * 时间复杂度：涉及到了字符串中字符的排序，因此复杂度O(n*logn*k);
-     * 空间复杂度：存储字符串数组 以及 拼接答案。O(N*K)
+     *      时间复杂度：涉及到了字符串中字符的排序，因此复杂度O(n*logn*k);
+     *      空间复杂度：存储字符串数组 以及 拼接答案。O(N*K)
      * 【比较器的排序规则，容易搞混】
-     * 比较器的返回值含义（Java 约定），根据接口方法的返回值决定形参a和b的先后顺序
-     * compare(a, b) < 0 → 形参a 排在 形参b 前面（a < b）。
-     * compare(a, b) > 0 → 形参a 排在 形参b 后面（a > b）。
-     * compare(a, b) == 0 → 视为相等（顺序不变或由稳定性决定）。
+     *      比较器的返回值含义（Java 约定），根据接口方法的返回值决定形参a和b的先后顺序
+     *  compare(a, b) < 0 → 形参a 排在 形参b 前面（a < b）。
+     *  compare(a, b) > 0 → 形参a 排在 形参b 后面（a > b）。
+     *  compare(a, b) == 0 → 视为相等（顺序不变或由稳定性决定）。
      * 【如何更好的理解compare方法返回值大于0的时候“第一个形参排在后面”，因为数组默认是升序的，返回值大于0表示
      * 第一个参数大，因此第一个参数放在后面】
      */
@@ -952,18 +883,9 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     //14
-    public String longestCommonPrefix_(String[] strs) {
-        if (strs == null || strs.length == 0) return "";
-        String str = strs[0];
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            for (int j = 1; j < strs.length; j++) {
-                if (i == strs[j].length() || c != strs[j].charAt(i))
-                    return str.substring(0, i);
-            }
-        }
-        return str;
-    }
+//    public String longestCommonPrefix_(String[] strs) {
+//
+//    }
 
 
     /**

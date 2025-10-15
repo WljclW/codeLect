@@ -760,11 +760,9 @@ public class review_all {
 candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。
 对于给定的输入，保证和为 target 的不同组合数少于 150 个。
     * */
-    List<List<Integer>> resCombinationSum;
-    List<Integer> pathCombinationSum;
-    public List<List<Integer>> combinationSum1(int[] candidates, int target) {
-        return resCombinationSum;
-    }
+//    public List<List<Integer>> combinationSum1(int[] candidates, int target) {
+//
+//    }
 
 
 
@@ -975,32 +973,6 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 //            left = _left;
 //            right = _right;
 //        }
-//    }
-    /**这个题最后需要返回，双向链表。因此尽量不要使用虚拟头节点*/
-//    public Node treeToDoublyList(Node root) {
-//        if (root==null) return root;
-//        Node res = null,resTmp = res;
-//        Stack<Node> stack = new Stack<>();
-//        while (root!=null||!stack.isEmpty()){
-//            if (root!=null){
-//                stack.push(root);
-//                root = root.left;
-//            }else {
-//                Node cur = stack.pop();
-//                root = cur.right;
-//                if (res==null){
-//                    res = cur;
-//                }else {
-//                    res.right = cur;
-//                    cur.left = res;
-//                }
-//                if (root==null){
-//                    cur.right = resTmp;
-//                    resTmp.left = cur;
-//                }
-//            }
-//        }
-//        return resTmp;
 //    }
 
 
