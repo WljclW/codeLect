@@ -1,5 +1,7 @@
 package leecode_Debug._hot100;
 
+import java.util.Arrays;
+
 /**
  * @author: Zhou
  * @date: 2025/6/15 19:59
@@ -17,6 +19,7 @@ public class _15DP_dims {
     机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标
     * 记为 “Finish” ）。
     问总共有多少条不同的路径？*/
+    /*解法1：二维的写法*/
     public int uniquePaths(int m, int n) {
         int[][] res = new int[m][n];
         //可以将第一行、第一列的初始化挪到双层for循环内————只要i或者j为0，就将dp[i][j]赋值为0
@@ -34,10 +37,23 @@ public class _15DP_dims {
         return res[m-1][n-1];
     }
 
+    /*解法2：一维的写法*/
+    public int uniquePaths1(int m, int n) {
+        int[] dp = new int[n];
+        Arrays.fill(dp,1);
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[j] += dp[j-1];
+            }
+        }
+        return dp[n-1];
+    }
+
     /*64.
     * 给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路
     * 径，使得路径上的数字总和为最小。
     说明：每次只能向下或者向右移动一步。*/
+    /*解法1：二维下的动态规划*/
     public int minPathSum(int[][] grid) {
         /*step1：变量的初始化*/
         int res = Integer.MAX_VALUE;
@@ -57,6 +73,25 @@ public class _15DP_dims {
                 dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
             }
         return dp[grid.length - 1][grid[0].length - 1];
+    }
+
+
+    /*解法2：一维的解法。。。官方第一条评论给的一维解法代码更简*/
+    public int minPathSum_1dim(int[][] grid) {
+        int m = grid.length,n = grid[0].length;
+        int[] dp = new int[n];
+        dp[0] = grid[0][0];
+        for (int i = 1; i < n; i++) {
+            dp[i] = dp[i-1]+grid[0][i];
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (j==0) dp[j] += grid[i][0];
+                else
+                    dp[j] = Math.min(dp[j-1],dp[j])+grid[i][j];
+            }
+        }
+        return dp[n-1];
     }
 
 
@@ -100,6 +135,81 @@ public class _15DP_dims {
             }
         }
         return dp[m][n]; /*这里直接返回右下角的元素值就可以。。当然在每一步求出来dp元素值后使用res记录答案取最大值也可以*/
+    }
+
+    /**空间优化：两行数组的写法
+     【说明】
+     1. 两行DP的写法中，prev就看作是二维DP中的dp[i-1][..]，而cur看作是二维DP中的dp[i][..]。（简单点说，计算时代码中的
+     prev直接改成dp[i-1]、代码中的cur直接改写成dp[i]）比如，下面的代码中————
+         ①“cur[j] = prev[j-1] + 1;”就相当于“dp[i][j] = prev[i-1][j-1] + 1”；
+         ②“cur[j] = Math.max(cur[j-1],prev[j]);”就相当于“dp[i][j] = Math.max(dp[i][j-1],dp[i-1][j])”
+     可以看出，改写后的表达式跟二维DP的表达式一模一样！！
+     2. 两行的DP中，由于习惯研究某一行的每一列，因此“脑补出短的元素在一行”。比如：如果text1短就让text1写在行的位置，这样
+     创建的dp长度就是text1.length+1；反之如果text2比较短，就让text2写在行的位置，此时创建的动规数组长度就是text2.lenth+1。
+     这样的话空间复杂度能降低到O(M,N)（其中M时text1的长度，N是text2的长度~~~）
+     */
+    public int longestCommonSubsequence_2row(String text1, String text2) {
+        int m = text1.length(),n = text2.length();
+        if (m<n) return longestCommonSubsequence_2row(text2,text1);
+        int[] prev = new int[n + 1]; //prev用于存储dp表上一行的信息
+        int[] cur = new int[n + 1];  //cur用于存储dp表现在研究的这一行的信息
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char c1 = text1.charAt(i - 1);
+                char c2 = text2.charAt(j - 1);
+                if (c1==c2){
+                    cur[j] = prev[j-1]+1; /**“prev”这个字符串等价于在二维写法中的“dp[i-1]”，“cur”这个字符串等价于二维写法中的“dp[i]”*/
+                }else {
+                    cur[j] = Math.max(cur[j-1],prev[j]);
+                }
+            }
+            /**下面的必须要这么写吗？？有没有其他的写法
+             这里虽然是把prev给了cur，看着好像是上一行的数据给了cur，但是没关系，因为从index=1位置计算，index=0永远是0，因此在更新
+             cur时不会因为交换后的prev受到影响
+             */
+            int[] tmp = prev;
+            prev = cur;
+            cur = tmp;
+        }
+        return prev[n];
+    }
+
+    /**空间优化：使用一行数组*/
+    /**
+     【说明】
+            1. 二维DP中如果一个位置(i,j)会依赖于左上角的三个位置————(i-1,j-1)、(i,j-1)、(i-1,j)，这种形式的DP是
+        不能简化成一行DP的！！！可以简化成“2行形式的DP”、“1行+额外变量的DP”
+     *【总结】代码中的①②③和72题一维优化的形式是一样的。根本原因在于：1143和72题中二维dp任何一个位
+     *    置(i,j)需要依赖到位置(i-1,j)、(i,j-1)、(i-1,j-1)，而优化到一维版本的时候(i-1,j-1)位置
+     *    的值必须使用额外的变量来记录原始值，否则原始值就被污染了
+     *【代码中的①②③的详细解释】
+     *   ①记录dp[0]的值，1143题dp[0]固定是0————dp[0]等价于二维中的第i行第0列，即长度为i的text1和
+     *长度为0的text2子串公共子序列必然是0。。。。
+     *    区别于72题。在72的1行数组动规中，这里会更新“dp[0]=i”，由于这个题是计算公共子序列，且dp[0]
+     *表示第二个串是空串，因此dp[0]必然是0，数组的默认值以及初始值就是0，因此省略此步骤
+     *   ②if-else块会更新dp某位置，因此计算之前先记录dp[i]
+     *   ③dp[i]流程结束前将tmp更新到prev
+     */
+    public int longestCommonSubsequence_1dim(String text1, String text2) {
+        int m = text1.length(),n = text2.length();
+        if (m<n) return longestCommonSubsequence_1dim(text2,text1);
+        int[] dp = new int[n + 1];
+        for (int i = 1; i <= m; i++) {
+            int prev = 0; //①、对应 dp[i-1][j-1]
+            dp[0] = 0;
+            for (int j = 1; j <= n; j++) {
+                int tmp = dp[j]; //②、暂存 dp[i-1][j]，因为它马上要被覆盖
+                char c1 = text1.charAt(i - 1);
+                char c2 = text2.charAt(j - 1);
+                if (c1==c2){
+                    dp[j] = prev+1;
+                }else {
+                    dp[j] = Math.max(dp[j-1],dp[j]);
+                }
+                prev = tmp; //③、更新 prev 为 dp[i-1][j]。。因为下一轮要计算dp[i][j+1]，这样prev还是它的左上角位置
+            }
+        }
+        return dp[n];
     }
 
 
@@ -180,6 +290,89 @@ public class _15DP_dims {
                 }
             }
         return dp[m][n];
+    }
+
+    /**两行数组的滚动优化版本
+     同理1143题，两行数组滚动更新中“prev”就等同于二维dp中的“dp[i-1]”，“cur”等同于二维dp中的“dp[i]
+     */
+    public int minDistance_2row(String word1, String word2) {
+        int m = word1.length(), n = word2.length();
+        if (m < n) return minDistance(word2, word1); // 优化空间使用
+
+        int[] prev = new int[n + 1]; // 上一行
+        int[] cur = new int[n + 1];  // 当前行
+
+        // 初始化第一行：把 word2 的前 j 个字符变成空串需要 j 次删除
+        for (int j = 0; j <= n; j++) {
+            prev[j] = j;
+        }
+
+        // 遍历 word1 的每个字符
+        for (int i = 1; i <= m; i++) {
+            cur[0] = i; // 把 word1 前 i 个字符变成空串需要 i 次删除
+            for (int j = 1; j <= n; j++) {
+                char c1 = word1.charAt(i - 1);
+                char c2 = word2.charAt(j - 1);
+                if (c1 == c2) {
+                    cur[j] = prev[j - 1]; // 字符相同，不需要操作
+                } else {
+                    cur[j] = Math.min(Math.min(prev[j], cur[j - 1]), prev[j - 1]) + 1;
+                    // 三种操作：删除（prev[j]）、插入（cur[j-1]）、替换（prev[j-1]）
+                }
+            }
+            // 滚动数组：交换引用，而不是复制
+            int[] tmp = prev;
+            prev = cur;
+            cur = tmp;
+        }
+
+        return prev[n]; // 最后一行结果
+    }
+
+    /**一行数组+局部变量 空间优化的实现————
+     *      复杂度分析：时间复杂度：O(m·n)（还是要遍历整个表）；空间复杂度：O(min(m, n))（只
+     *  保留一行）
+     *【解释】根据二维dp可以发现，每一个位置依赖于它的”左上角的三个位置“，这样的局面有问题！
+     *     问题：dp[i][j]依赖于dp[i-1][j]、dp[i][j-1]、dp[i-1][j-1]。此时从前往后计
+     *  算就不对，必须借助额外的变量存储dp[i-1][j-1]的信息————代表着上一行前一个位置的值。
+     *     如何解决：在一行数组的动规中，要求在更新任何一个位置的值之前，必须先记录，比如：计
+     *  算dp[3]的之前先使用tmp记录dp[3]的值dp[3](old)，dp[3]更新后将dp[3](old)赋值给局
+     *  部变量prev;接下来会计算dp[4]，依然先记录dp[4]（old）到变量tmp中，更新dp[4]时二维中
+     *  会使用到左上角的位置值即dp[i-1][j-1]，就等价于一维中的dp[3](old)，而此时的dp[3]（old）
+     *  是在变量prev中存储的。。。。。综上，整个过程形成了闭环，同时可以看到prev,tmp变量是缺一不
+     *  可的！！！
+     */
+    public int minDistance_1dim(String word1, String word2) {
+        int m = word1.length(),n = word2.length();
+        /*setep1：保证空间复杂度为O(min(m,n))————即把短的字符串放在二维表中列的位置*/
+        if (m<n) return minDistance_1dim(word2,word1);
+        /*step2：创建数组 并且 初始化。
+            【说明】此时初始化相当于”二维dp“时初始化第一行的操作，即把word1当作是空串。
+        * */
+        int[] dp = new int[n + 1];
+        for (int i = 0; i <= n; i++) {
+            dp[i] = i;
+        }
+        /*step3：遍历研究其余位置*/
+        /**可以看到，在“一行数组+局部变量”的dp形式中。“prev“相当于“二维中的dp[i-1][j-1]”*/
+        for (int i = 1; i <= m; i++) {
+            int prev = dp[0];
+            dp[0] = i;
+            for (int j = 1; j <= n; j++) {
+                int tmp = dp[j];
+                char c1 = word1.charAt(i - 1);
+                char c2 = word2.charAt(j - 1);
+                if (c1==c2){
+                    dp[j] = prev;
+                }else {
+                    /**左边的dp[j]相当于二维中的dp[i][j]，右边的dp[j-1]相当于二维中的dp[i][j-1]，右边的dp[j]相当于二维中
+                     * 的dp[i-1][j]，右边的prev相当于二维中的dp[i-1][j-1]*/
+                    dp[j] = Math.min(Math.min(dp[j-1],dp[j]),prev)+1;
+                }
+                prev = tmp;
+            }
+        }
+        return dp[n];
     }
 
 

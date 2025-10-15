@@ -247,7 +247,7 @@ public class _09huisu {
     }
 
 
-    /*39.
+    /*39.组合总和
     给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
 candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。
 对于给定的输入，保证和为 target 的不同组合数少于 150 个。
@@ -255,7 +255,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     List<List<Integer>> resCombinationSum;
     List<Integer> pathCombinationSum;
     int sum = 0;
-    public List<List<Integer>> combinationSum1(int[] candidates, int target) {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
         resCombinationSum = new LinkedList<>();
         pathCombinationSum = new LinkedList<>();
         combinationSumback(candidates,target,0);
@@ -298,13 +298,15 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             target -= candidates[i];
             path.add(candidates[i]);
             /**err：递归的时候要从i开始而不是index!
+             *     【疑问】为什么不是从index开始？？
+             *          答：集合、子集、组合问题都是从下一个位置继续研究，前面的位置一概不管！！！
              *     【疑问】为什么递归时依然是从i开始，而不是从i+1开始？？
-             *          答：因为题中说了每一个数可以无限次被选取。也正因为下一次递归依然从i开始，因
-             *     此必须要有"if(target<0) return;"这句逻辑，否则就会出现StackOverflow！！————即这
-             *     个题使用递归达到重复选择每一个数的目的！！
+             *          答：因为题中说了"每一个数可以无限次被选取！！！（即这一轮选了，下一轮也能继续选）"。也
+             *     正因为下一次递归依然从i开始，因此必须要有"if(target<0) return;"这句逻辑，否则就会出现StackOverflow！！
+             *     ————即这个题使用递归达到重复选择每一个数的目的！！
              * */
 //            combinationSumTrace(candidates,index,target,path);
-            combinationSumTrace(candidates,i,target,path); /**递归时需要从i开始，而不是i+1，更不是index*/
+            combinationSumTrace(candidates,i,target,path); /**err：递归时需要从i开始，而不是i+1，更不是index*/
             target += candidates[i];
             path.removeLast();
         }
@@ -316,6 +318,8 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     /**
      * 【解题关键】尝试，用open和close分别表示左右括号，在合法的前提下（合法的要求：①任意时刻左括号的
      *      数量必须不小于右括号的数量 且 ②左括号的数量小于n），尝试添加一个左括号或者右括号。
+     * 【同理】这段代码sbGenerateParenthesis放在形参的位置，其他的代码也不用变，把它作为形参变量每一
+     *      次递归的时候传即可。
      */
     /*解法1：官方解回溯法*/
     public List<String> generateParenthesis_offical(int n) {
@@ -373,6 +377,59 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
     }
 
+    /*自己常用的解法*/
+    List<String> resGenerateParenthesis;
+    public List<String> generateParenthesis_own(int n) {
+        resGenerateParenthesis = new LinkedList<>();
+        generateParenthesis(n,0,0,new StringBuilder());
+        return resGenerateParenthesis;
+    }
+
+    private void generateParenthesis(int n, int open, int close, StringBuilder path) {
+        if (path.length()==2*n){
+            resGenerateParenthesis.add(new String(path));
+            return;
+        }
+        if (open<n){
+            path.append('(');
+            generateParenthesis(n,open+1,close,path);
+            path.deleteCharAt(path.length()-1);
+        }
+        if (close<open){
+            path.append(')');
+            generateParenthesis(n,open,close+1,path);
+            path.deleteCharAt(path.length()-1);
+        }
+    }
+
+
+    /*路径变量声明为全局变量也OK*/
+    List<String> resGenerateParenthesis1;
+    StringBuilder sbGenerateParenthesis;
+    public List<String> generateParenthesis_(int n) {
+        resGenerateParenthesis1 = new LinkedList<>();
+        sbGenerateParenthesis = new StringBuilder();
+        generateParenthesisBack(n,0,0);
+        return resGenerateParenthesis1;
+    }
+
+    private void generateParenthesisBack(int n, int l, int r) {
+        if (sbGenerateParenthesis.length()==2*n){
+            resGenerateParenthesis1.add(new String(sbGenerateParenthesis));
+            return;
+        }
+        if (l<n){
+            sbGenerateParenthesis.append('(');
+            generateParenthesisBack(n,l+1,r);
+            sbGenerateParenthesis.deleteCharAt(sbGenerateParenthesis.length()-1);
+        }
+        if (r<l){
+            sbGenerateParenthesis.append(')');
+            generateParenthesisBack(n,l,r+1);
+            sbGenerateParenthesis.deleteCharAt(sbGenerateParenthesis.length()-1);
+        }
+    }
+
 
     /*79.
     给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。
@@ -388,6 +445,9 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      *          ③到这里就说明word的index索引的字符检验成功！此时首先标记下这个位置在当前的路径中已经
      *       研究过了(参考官方解的布尔数组 或者 解法1的特殊字符)，然后递归调用研究index+1位置，最后
      *       撤销之前的选择即取消做的标记。
+     * 【补充】借助这个题认真的体会一下下面的问题————
+     *      1. 为什么这个题需要标记走过的路，但是”矩阵中最长的递增路径“中并不需要标记走过的路；
+     *      2. dfs的一般使用方法，尤其是主函数的调用参数是什么？？怎么确定？？dfs的流程又是什么，返回值的确定怎么做？？
      * */
     /*
     * 解法1：在每一轮中，研究过的元素使用字符'\0'来标记

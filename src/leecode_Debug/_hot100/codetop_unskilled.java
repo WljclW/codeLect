@@ -264,6 +264,10 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         回文中心严格来说在两个b的中间
      【容易忘记的东西】
             1. 如何利用dp[i]以及i计算出对应的”回文串起始位置start“以及”回文串长度maxLen“...
+     【一次难忘的bug排查记录】
+            step2中创建StringBuilder的时候使用“StringBuilder sb = new StringBuilder('#');”，导致初始用例错误
+        错误原因：构造器的参数传的是字符'#'，必须要使用字符串"#"。如果是字符'#'（ASCII码是35），表示创建容量35
+        的StringBuilder
      */
     public String longestPalindrome(String s) {
         /*step1：特殊情况的考虑*/
@@ -285,7 +289,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                       （1）计算出i位置关于“目前回文中心”center的对称位置。
                       （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
             int mirror = 2 * center - i;
-            if (i < right) {
+            if (i < right) { /**说明：理论上这里不带等于，但是写成“if (i <= right)”结果也不错*/
                 p[i] = Math.min(right - i, p[mirror]);
             }
 
@@ -713,53 +717,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
     }
 
-
-    //322
-
     //8 字符串转换为整形
-    public int myAtoi(String s) {
-        int flag = 1;
-        int cur = 0;
-        while (cur < s.length() && s.charAt(cur) == ' ') {
-            cur++;
-        }
-        if (cur < s.length() && s.charAt(cur) == '-') {
-            flag *= -1;
-            cur++;
-        }
-
-        int res = 0;
-        for (int i = cur; i < s.length(); i++) {
-            res = res * 10 + s.charAt(i) - '0';
-            if (res > Integer.MAX_VALUE / 10) { /**【说】这里是判断是否会越界*/
-                return flag == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-            }
-        }
-        return res;
-    }
-
-
-    //39
-    List<List<Integer>> resCombinationSum;
-    public List<List<Integer>> combinationSum(int[] candidates, int target) {
-        resCombinationSum = new LinkedList<>();
-        LinkedList<Integer> path = new LinkedList<>();
-        dfs(candidates, 0, target, path);
-        return resCombinationSum;
-    }
-
-    private void dfs(int[] candidates, int index, int target, LinkedList<Integer> path) {
-        if (target == 0) {
-            resCombinationSum.add(new LinkedList<>());
-            return;
-        }
-//        if (target<0) return;       /**如果没有这一句会怎么样？？*/
-        for (int i = index; i < candidates.length; i++) {
-            target -= candidates[i];
-            dfs(candidates, i + 1, target, path);
-            target += candidates[i];
-        }
-    }
 
 
 
@@ -804,7 +762,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     //122
-
     /**
      * 【买卖股票问题总结】
      * Q121：要求只能买卖一次。

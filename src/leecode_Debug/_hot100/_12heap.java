@@ -57,7 +57,7 @@ public class _12heap {
         for (int num:nums){
             map.put(num,map.getOrDefault(num,0)+1);
         }
-        /*step2：声明优先级队列，并指定按照次数（即map的value，也即一维数组的第1维）升序*/
+        /*step2：声明优先级队列，并指定按照"出现次数"升序排列（即map的value，也即一维数组的第1维；升序就是“前-后”）*/
         PriorityQueue<int[]> queue = new PriorityQueue<>((O1,O2)->{
             return O1[1]-O2[1];
         });
@@ -75,7 +75,7 @@ public class _12heap {
                 queue.poll();
             }
         }
-        /*step4：声明存结果的数组，将优先级队列中数组的第0维拿出来*/
+        /*step4：声明存结果的数组，将优先级队列中数组的第0维拿出来依次存进数组*/
         int[] res = new int[k];
         int i=0;
         while(!queue.isEmpty()){
@@ -101,29 +101,68 @@ public class _12heap {
      * [说明]：
      *    1.这种方式是错的：添加元素的时候挑一个堆入，入进去了再调整
      *    2.小根堆存了nums中较大的一半；大根堆保存了nums中较小的一半
-     *【详细思路】
+     *【详细思路，建议使用下面的方法MedianFinder_1】
      *    1. 使用两个优先级队列。其中——
-     *      ①small的含义：存放较小的那一半元素，因此顶应该是 较小那一半元素 的最大值！
-     *      ②big的含义：存放较大的那一半元素，因此顶应该是 较大那一半元素 的最小值！
-     *      疑问：为什么“small顶是较小那些元素的最大值，big顶部是较大那些元素的最小值”？？
+     *      ①min的含义：存放较小的那一半元素，因此顶应该是 较小那一半元素 的最大值！
+     *      ②max的含义：存放较大的那一半元素，因此顶应该是 较大那一半元素 的最小值！
+     *      疑问：为什么“min顶是较小那些元素的最大值，max顶部是较大那些元素的最小值”？？
      *          因为如果元素总数是偶数的话，就需要用到中间的两个元素————即较小那半元素的最
      *      大值 和 较大那半元素的最小值 的平均值。
-     *          而small存储的是较小的那一半元素，因此它的最大值要能快速的拿到，因此顶部应
+     *          而min存储的是较小的那一半元素，因此它的最大值要能快速的拿到，因此顶部应
      *      该是最大值，即大顶堆（注意：PriorityQueue默认是小顶堆——升序，因此大顶堆需要
      *      指定排序规则）。
-     *          同理，由于big存储的是较大的那一半元素，因此需求是能快速的拿出它的最小值，即
+     *          同理，由于max存储的是较大的那一半元素，因此需求是能快速的拿出它的最小值，即
      *      小顶堆，PriorityQueue默认就是小顶堆，因此不用指定排序规则，，需要想一个不满足
      *      的例子？？？
      */
+    class MedianFinder_1 {
+        PriorityQueue<Integer> min;
+        PriorityQueue<Integer> max;
+        public MedianFinder_1() {
+            min = new PriorityQueue<>((A,B)->B.compareTo(A));
+            max = new PriorityQueue<>();
+        }
+
+        public void addNum(int num) {
+            /**
+                 只要两边的数是相等的，最终的目的就是将数放在较小的那一半即min，但是要想把数放到min中，必须先
+             放进max，然后弹出max的顶，把弹出来的数放入min。
+                 只要两边的数不相等，则只有可能是min的元素比max多1，因为每一次相等时都是向min中放元素。此时需
+             要把数放进max（这个是最终目的），也是同样的道理，数据最终要放进max，需要先放进min，然后从min中弹
+             出数放入max
+                上面的这种“南辕北辙”的方式，目的是保证数据的全局有序和有效，仅仅弹出顶的做法不可靠
+             */
+            if (min.size()-max.size()==0){
+                max.offer(num);
+                min.offer(max.poll());
+            }else {
+                min.offer(num);
+                max.offer(min.poll());
+            }
+        }
+
+        public double findMedian() {
+            /*
+                1. 如果元素数量不相等，则必然是min的元素数量多1，此时直接返回min的顶部元素
+                2. 如果元素数量相等，则需要min和max的顶部元素取平均值。
+             */
+            if (min.size()!=max.size()){
+                return min.peek();
+            }else {
+                return (min.peek()+max.peek())/2.0;
+            }
+        }
+    }
+
     class MedianFinder {
 
         PriorityQueue<Integer> small;
         PriorityQueue<Integer> big;
         public MedianFinder() {
-            small = new PriorityQueue<>();
+            small = new PriorityQueue<>(); /*small.peek() 得到的是 small 里最小的数。*/
             big = new PriorityQueue<>((a, b) -> {
                 return b - a;
-            });
+            }); /*big.peek() 得到的是 big 里最大的数。*/
         }
 
         /**添加时下面的逻辑是错误的。。这样的添加会导致最后两个堆中的数据没有必然的大小关系.。。

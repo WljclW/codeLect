@@ -59,7 +59,7 @@ public class _16tricks {
     public void sortColors(int[] nums) {
         int left = 0, right = nums.length - 1;
         int cur = 0;
-        while (cur <= right) {
+        while (cur <= right) { /**err：这里必须是小于等于（保证所有位置都研究过），并且注意边界是right。*/
             if (nums[cur] < 1) { /*如果是0，交换到left指向位置，*/
                 swap(nums, left++, cur++); /**err：注意，这种情况cur也得++，因为此时cur位置的值要麽是0要麽是1，left的位置要么是0要么是1，这两个位置的值不可能是2*/
             } else if (nums[cur] == 1) {
@@ -83,7 +83,9 @@ public class _16tricks {
     你设计的解决方案必须 不修改 数组 nums 且只用常量级 O(1) 的额外空间。
     * */
     /**
-     *【注意】这个题要求不能修改数组
+     *【注意】
+     *      1. 这个题要求不能修改数组!!
+     *      2. 【注】这个题数组是n+1个数，但是数值是[1,n]，因此数值作为下标是不会越界的
      *【总结】关于数组中重复数的题目————
      *      ①136：只出现一次的数字：使用异或运算，出现两次的数异或为0.
      *      ②442：标记num应该出现的位置，因为都是正数，此时将对应的位置|num|-1标记为负数，说
@@ -91,7 +93,7 @@ public class _16tricks {
      *      ③287：只有一个重复的数，但是不允许修改数组元素，因此使用的是“foleyd判圈”算法
      * */
     /*
-      解法1：快慢指针的解法
+      解法1：快慢指针的解法————找链表入环的节点
      *【快慢指针（Floyd 判圈法）】把数组中的每一个数看作是链表的next指针。
      */
     public int findDuplicate(int[] nums) {
@@ -103,7 +105,7 @@ public class _16tricks {
         *   共同点：链表中的while是slow、fast先走才判断是不是相等；数组这里do{}while()会保证循环体至少执行一次
         * 才进行判断，因此虽然使用的结构不一样，但是本质内容是一样的。————其实这种现象的本质原因是因为“slow、fast指
         * 针开始的位置是一样的”，如果不先走直接判断就错了。*/
-        do{ /**do{}while();这样的循环方法，循环体至少会执行一次。因为第一次执行完才会判断while条件*/
+        do{ /**do{}while();这样的循环方法，循环体至少会执行一次。第一次执行完才会判断while条件*/
             slow = nums[slow];
             fast = nums[nums[fast]];
         }while (slow!=fast);
@@ -188,7 +190,7 @@ public class _16tricks {
 
     /*31.下一个排列*/
     /**
-     * 【强烈建议】使用官方解，见方法nextPermutation_offical
+     * 【强烈建议】使用官方解，见方法nextPermutation_offical 或者 nextPermutation_2(更符合自己的想法)
      * 【如果有下一个更大的排列，则做法分为三步】
      *      1. 从最后一个数倒着找，找到第一次升序的位置。即数组元素满足nums[i]<nums[i+1]。【注
      * 意】这里必须找出严格小于的，等于的话不行！！
@@ -363,7 +365,7 @@ public class _16tricks {
                     int tmp = nums[i];
                     nums[i] = nums[flag];
                     nums[flag] = tmp;
-                    break;
+                    break; /**这样写break就可以直接跳出for循环，并且跳出if(flag>=0)*/
                 }
             }
         }

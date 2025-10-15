@@ -12,10 +12,12 @@ public class _03subString {
     * */
     /**
      * 【思路】使用双端队列，队列内的数严格单调减（换言之，只要当前的数nums[i]"大于等于"双端队列最后一个
-     * 数nums[m]，则双端队列尾部的nums[m]永远不可能是最大值了）。。
-     *      1。先将前面的k个数组添加进双端队列，此时会生成0位置的信息；
-     *      2. for循环内依次将剩下的元素添加进双端队列；每一轮循环需要确保双端队列头的位置还在窗口内，并
-     *  生成对应位置的信息
+     * 数nums[m]，则双端队列尾部的nums[m]永远不可能是最大值了，因此双端队列尾部的元素弹出）。。详细步骤
+     * 如下：
+     *      1。先将前面的k个数组添加进双端队列，此时会生成0位置的信息（前面K个数进入双端队列后，双端队列
+     *          的头部即为0位置的信息）；
+     *      2. for循环内依次将剩下的元素(i从k开始)添加进双端队列；每一轮循环需要确保双端队列头的位置还在
+     *          窗口内(即队首的索引不能是i-k)，并生成对应位置的信息(生成i-k+1位置的信息)
      */
     public int[] maxSlidingWindow(int[] nums, int k) {
         int[] res = new int[nums.length - k + 1]; //比如nums长度为3，窗口大小为3，则res中应该包含一个数
@@ -50,18 +52,17 @@ public class _03subString {
     * 76.给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s
     * 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
     * */
-
     /**
      *【思路】
      */
     public String minWindow(String s, String t) {
         if (s.length()<t.length()) return "";
-        /*step1：使用need这个map存储每一个字符对应的数量*/
+        /*step1：使用need这个map存储目标子串t中每一个字符对应的数量*/
         HashMap<Character, Integer> need = new HashMap<>();
         for (char c:t.toCharArray()){
             need.put(c,need.getOrDefault(c,0)+1);
         }
-
+        /*变量等需要的时候再过来声明*/
         int start = 0;
         int valid = 0;
         int left = 0,right = 0;
@@ -211,6 +212,62 @@ public class _03subString {
         return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
     }
 
+    /**下面的写法是常见的错误写法。。。。
+     * 错误原因1：
+     *      出现在“if (window.get(c)==need.get(c))”，map得到的值是Integer，判断相等不能用==。报错的信息————
+     *      “提交”时有长的字符串的报错
+     * 错误原因2：
+     *      出现在“char c1 = s.charAt(left);”没有更新left。报错的信息————
+     *      都不用提交，运行是第一个用例报错，如下：
+     输入
+     s =
+     "ADOBECODEBANC"
+     t =
+     "ABC"
+     输出
+     "ADOBEC"
+     预期结果
+     "BANC"
+     *             */
+//    public String minWindow(String s, String t) {
+//        HashMap<Character, Integer> need = new HashMap<>();
+//        for (int i = 0; i < t.length(); i++) {
+//            char c = t.charAt(i);
+//            need.put(c,need.getOrDefault(c,0)+1);
+//        }
+//
+//        int valid = 0;
+//        int start = -1,maxLen = Integer.MAX_VALUE;
+//        int left = 0;
+//        HashMap<Character, Integer> window = new HashMap<>();
+//        for (int i = 0; i < s.length(); i++) {
+//            char c = s.charAt(i);
+//            if (need.containsKey(c)){
+//                window.put(c,window.getOrDefault(c,0)+1);
+                  /**出错地方1：应该改为if (window.get(c).intValue()==need.get(c).intValue())*/
+//                if (window.get(c)==need.get(c)){
+//                    valid++;
+//                }
+//            }
+//
+//            while (valid==need.size()){
+//                if (maxLen>i-left+1){
+//                    maxLen = i-left+1;
+//                    start = left;
+//                }
+                  /**出错地方2：应该改为char c1 = s.charAt(left);*/
+//                char c1 = s.charAt(left);
+//                if (window.containsKey(c1)){
+//                    window.put(c1,window.get(c1)-1);
+//                    if (window.get(c1)<need.get(c1)){
+//                        valid--;
+//                    }
+//                }
+//            }
+//        }
+//        return start==-1?"":s.substring(start,start+maxLen);
+//    }
+
 
 
 
@@ -219,7 +276,14 @@ public class _03subString {
     子数组是数组中元素的连续非空序列。*/
     /**
      * 【解题关键】计算每一个位置的前缀和pre，放入map前判断是不是有pre-k。map中存放的是
-     *      每一个前缀和值 对应的数量
+     *      每一个前缀和数值 对应的数量。详细步骤如下：
+     *          1. 创建map，并先放入 map.put(0,1);
+     *          2. for循环从index=0开始，依次研究每一个位置。做如下操作————
+     *              ①先更新前缀和；②再从map获取满足条件前缀和的数量即"map.getOrDefault(pre-k,0)"，
+     *              并将结果添加到res；③将此位置的前缀和放进map。
+     *          3. 返回res.
+     *      最关键的是for循环内，①先更新pre、②再更新结果res、③最后才把pre放进map。其中②必
+     *      须是在③之前
      * */
     public int subarraySum(int[] nums, int k) {
         HashMap<Integer, Integer> map = new HashMap<>();

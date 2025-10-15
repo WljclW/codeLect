@@ -153,9 +153,31 @@ public class _14DP {
 
        完全平方数 是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数
        * 自乘的积。例如，1、4、9 和 16 都是完全平方数，而 3 和 11 不是。*/
-//    public int numSquares(int n) {
-//
-//    }
+    public int numSquares(int n) {
+        int[] dp = new int[n + 1];
+        Arrays.fill(dp,n+1);
+        dp[0] = 0; /*dp0的初始值是0*/
+        dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            for (int j = 1; j*j <= i; j++) {
+                dp[i] = Math.min(dp[i],dp[i-j*j]+1);
+            }
+        }
+        return dp[n];
+    }
+
+    /**另一个版本的写法，有点类似于coins change问题。。如何理解？？*/
+    public int numSquares1(int n) {
+        var f = new int[n + 1];
+        Arrays.fill(f, Integer.MAX_VALUE);
+        f[0] = 0;
+        for (int i = 1; i * i <= n; i++) {
+            for (int j = i * i; j <= n; j++) {
+                f[j] = Math.min(f[j], f[j - i * i] + 1);
+            }
+        }
+        return f[n];
+    }
 
 
 
@@ -277,7 +299,8 @@ public class _14DP {
         /*step1：初始化*/
         int[] tails = new int[nums.length];
         int size = 0; //size的含义：tails数组中0~size-1的位置已经放了满足的数字
-        /**for循环的完整逻辑：遍历nums数组的每一个数，判断它应该插入到tails数组的什么位置*/
+        /**for循环的完整逻辑：遍历nums数组的每一个数，判断它应该插入到tails数组的什么位置..
+         本质上是找到一个数在dp数组中应该插入的位置*/
         for (int num : nums) {
             /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置..跟力扣35题的原理、代码是一样的
             * 【目的】计算出num应该插入到tails数组的什么位置*/
@@ -481,6 +504,12 @@ public class _14DP {
     * 给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 。
     *   子数组是连续的！
     * */
+    /**
+     【说明】回头需要看一下其他类型的解法~~~
+     【DP数组含义】dp[i][j]：nums1以第i个字符结尾的子数组 和 nums2以第j个字符结尾的子数组 的公共长度
+     【状态转移】情况1：如果nums1[i-1]==nums2[j-1]，则dp[i][j] = dp[i-1][j-1]+1；
+                情况2：除情况1以外的其他情况，dp[i][j] = 0.
+     */
     public int findLength(int[] nums1, int[] nums2) {
         int[][] dp = new int[nums1.length + 1][nums2.length + 1];
         int res = 0;

@@ -33,6 +33,10 @@ public class _07binarytree {
     /**【】理解二叉树的深度优先遍历 和 广度优先遍历
      * 深度优先遍历————递归
      * 广度优先遍历————原型就是二叉树的层次遍历*/
+    /*递归法：本质上是后序遍历的思想。
+        即 先处理左子树、右子树，最后在访问当前节点的节点计算信息
+        可以参考“https://leetcode.cn/problems/maximum-depth-of-binary-tree/solutions/2361697/104-er-cha-shu-de-zui-da-shen-du-hou-xu-txzrx/”
+     看这里递归的理解*/
     public int maxDepth(TreeNode root) {
         if (root == null)
             return 0;
@@ -48,7 +52,7 @@ public class _07binarytree {
         LinkedList<TreeNode> deque = new LinkedList<>();
         deque.offer(root); /**当作队列使用，因此使用offer方法*/
         while (!deque.isEmpty()){
-            depth++;
+            depth++; /**关键：在新的一层的时候更新结果变量depth*/
             int size = deque.size();
             for (int i = 0; i < size; i++) {
                 TreeNode cur = deque.poll();
@@ -176,6 +180,9 @@ public class _07binarytree {
     二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
     两节点之间路径的 长度 由它们之间边数表示。*/
     /**
+     * 体会下面的两个题都必须额外的使用一个方法来深度优先遍历二叉树的原因。
+     */
+    /**
      *124与543有类似的道理
      *    543中每个节点返回给父节点的信息是以它为根的子树高度，但是每个节点的决策信息是左右子树高度的最大
      *值+1。因此需要使用额外的函数来改变返回值信息，同时在这个过程中更新结果。
@@ -200,6 +207,18 @@ public class _07binarytree {
 
 
     /*102.层序遍历*/
+
+    /**
+            【注意】层序遍历必须区分每一行，因此在while循环内，必须先使用“deque.size()”获得出当
+     前这一层的节点数；但是对于二叉树的题目中，有的就不需要要个区分每一层节点，因此就可以省略“while
+     循环内使用size()获取节点数的操作，以及for循环的操作。而是poll()然后继续操作就行”，此时的代码大
+     致如下：
+               while (!deque.isEmpty()){
+                    TreeNode cur = deque.poll(); //①弹出节点
+                    //……………………………………处于cur节点的处理
+                    //②研究左右孩子。有的题目需要判断null,有的题目不需要判断null
+                }
+     */
     public List<List<Integer>> levelOrder(TreeNode root) {
         LinkedList<List<Integer>> res = new LinkedList<>();
         LinkedList<TreeNode> deque = new LinkedList<>();
@@ -343,8 +362,16 @@ public class _07binarytree {
             }else{ //否则的话将nowNode拼接到cur节点右边
                 cur.right = nowNode;
                 cur.left = null; /**由于是先序遍历，因此到任何一个孩子的时候，左孩子节点一定已经研究过了，因此这一步不会导致错过节点*/
-                cur = cur.right;
+                cur = cur.right; /*这里的cur.right其实就是nowNode，因此这一句等同于“cur=nowNode。”*/
             }
+            /**上面的if-else逻辑可以简化为下面的形式。原因在于if-else有公用的一句“cur = nowNode;”，并且
+             if语句块只有这一句话。因此可以省略if块，原来的else块写为if语句块，把这个赋值的逻辑写在if块之
+             外。*/
+//            if (curNode!=null){
+//                curNode.right = cur;
+//                curNode.left = null;
+//            }
+//            curNode = cur;
             if (nowNode.right!=null){
                 stack.push(nowNode.right);
             }
@@ -359,14 +386,16 @@ public class _07binarytree {
     * 从前序 和 中序 构造出二叉树*/
     /**
      * 对于任何一颗树，前序的第一个节点一定是树的根；中序遍历中这个根节点的左边就是左子树，右边就是右子树
+     *【注意】“中序-先序构造二叉树”和“中序-后序构造二叉树”的题目中，递归的时候必须有终止条件————"if (left>right) return null;"
      *【思路】
      *      1. 从先序遍历中拿到第一个节点，是当前树的根节点————构造出TreeNode root；
      *      2. 在中序遍历中找到该节点所在的位置————利用左边的节点构造root.left、利用右边的节点构造出
      *          root.right
      *      3. 返回root
-     *[补充说明]
+     *【补充说明】
      *      1. 为了从中序遍历快速得到某个数据所在的位置，通常使用map来优化
-     *      2. “先序-后序”来构建的时候有区别
+     *      2. “先序-后序”来构建的时候有区别。因为后序遍历的顺序是“左-右-根”，因此倒着拿的时候
+     *  会先拿到右子树，因此需要先构造右子树、再构造出左子树
      */
     HashMap<Integer,Integer> inorderMap = new HashMap<>();
     int preOrderIndex;
@@ -378,7 +407,7 @@ public class _07binarytree {
     }
 
     private TreeNode buildTree(int[] preorder, int[] inorder, int l, int r) {
-        if (l>r) return null; /**这里只限制l<r就可以，这个条件就包含了preOrderIndex不越界的情况*/
+        if (l>r) return null; /**err：这里只限制l<=r就可以，这个条件就包含了preOrderIndex不越界的情况*/
         int curVal = preorder[preOrderIndex++];
         TreeNode root = new TreeNode(curVal);
         Integer inorderIndex = inorderMap.get(curVal);
@@ -430,6 +459,15 @@ public class _07binarytree {
     给你一个二叉树的根节点 root ，返回其 最大路径和 。
     * */
     /**
+     *【易错点】
+     *      1. 的初始值必须是“”，或者更小的数。err：初始化为0是错误的，提交代码有用例报错如下————
+     *      输入
+     *      root =
+     *      [-3]
+     *      输出
+     *      0
+     *      预期结果
+     *      -3
      *【关键要理解】为什么需要两个方法？
      *      原因就在于决策的表达式（即代表方法maxPathSum最终返回值的计算），与每个结点应该返回给父节点的信息
      * 是不一样的。不一样在哪里？

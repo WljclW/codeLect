@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.*;
 
 /**codetop 1~5的全量——————=========1~5使用这个文件
- * err：5、20、215、92、105、234、283、
+ * err：5、20、215、92、105、234、283、39
  * undo：46的最优解、88、415、72题优化空间、1143空间优化的最优解、93、69、8、151、468、718
  * 模糊：54
  *
@@ -1620,56 +1620,55 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     转换：通过跳过前置零来读取该整数，直到遇到非数字字符或到达字符串的结尾。如果没有读取数字，则结果为0。
     舍入：如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231 的整数应该被舍入为 −231 ，大于 231 − 1 的整数应该被舍入为 231 − 1 。
     返回整数作为最终结果。*/
-
-    public int myAtoi__(String s) {
-       int index = 0; //变量1：index记录当前研究到哪个位置了
-       /*step1：跳过前导的空格,并判断index是否到达s的末尾*/
-       while (index<s.length()&&s.charAt(index)==' ') index++;
-       if (index==s.length()) return 0;
-
-       /*step2：处理符号*/
-       int flag = 1;
-       if (s.charAt(index)=='-'||s.charAt(index)=='+'){
-           flag = s.charAt(index)=='-'?-1:1;
-           index++;
-       }
-
-       /*step3：计算结果*/
-       int res = 0;
-       while (index<s.length()&&Character.isDigit(s.charAt(index))){
-           int digit = s.charAt(index)-'0';
-           /**下面的判断溢出的方法是错误的*/
-           if (flag==1&&res>Integer.MAX_VALUE/10) return Integer.MAX_VALUE;
-           if (flag==-1&&res<Integer.MIN_VALUE/10) return Integer.MIN_VALUE;
-           /**正确的需要使用下面的方法？？？与“7.整数反转”是有区别的，如何理解？？如何统一？？*/
-//           if (res > Integer.MAX_VALUE / 10 ||
-//                   (res == Integer.MAX_VALUE / 10 && digit > Integer.MAX_VALUE % 10)) {
-//               return flag == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-//           }
-           res = res*10 + digit;
-
-           index++;  //如果这个忘了会出现什么问题？？
-       }
-       return res*flag;
-    }
-
-    /**
-     * 下面的写法为什么是错误的？？？
+    /**【重要的说明】
+     1. 解析数字时，对于不是数字的字符怎么处理？？
+     这个题的一个重要隐含条件：解析到第一个不是数字的位置就停止解析。如果开始的位置就不是数字，直接返回0
+     同时，题目也明确的说明了最后得到的结果要在int范围内————
+     如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。
+     2. 判断是否越界的逻辑是重点。为什么下面的判断越界逻辑是对的？
+     声明：最大正数：2147483647；最小负数：-2147483648
+     例子1===》输入："-2147483649"。最后一位累加前，res = 214748364、当前 digit = 9、
+     判断 (Integer.MAX_VALUE - 9)/10 = (2147483647-9)/10 = 214748363，
+     res = 214748364 > 214748363 → 越界 → 返回 Integer.MIN_VALUE ✅
+     例子2===》输入：“-2147483648”。最后一位累加前，res = 214748364、当前 digit = 8、
+     判断 (Integer.MAX_VALUE - 8)/10 = (2147483647-8)/10 = 214748363，
+     res = 214748364 > 214748363→ 越界 → 返回 Integer.MIN_VALUE ✅
+     【补充】类似的道理可以参考69题的”mySqrt_best“方法实现，69题中的mid*mid可能超出int范围，因此直接计算不
+     方便，但是比较”mid“和”x/mid“的大小可以避免这种溢出情况
      */
     public int myAtoi(String s) {
-        String trim = s.trim();
-        if (trim.length()==0) return 0;
-        int flag = trim.charAt(0)=='-'?-1:1;
-        int curVal = 0;
-        for (char c:trim.toCharArray()){
-            if (!Character.isDigit(c)) continue;
-            if (curVal==0&&c=='0') continue;
-            curVal = curVal*10 + c-'0';
-            if (curVal>Integer.MAX_VALUE/10) break;
-        }
-        return flag*curVal;
-    }
+        int index = 0, n = s.length();
+        // 1. 跳过空格
+        while (index < n && s.charAt(index) == ' ') index++;
+        if (index == n) return 0;
 
+        // 2. 判断符号
+        int sign = 1;
+        char c = s.charAt(index);
+        if (c == '+' || c == '-') {
+            sign = (c == '-') ? -1 : 1;
+            index++;
+        }
+
+        // 3. 遍历数字
+        int res = 0;
+        while (index < n) {
+            char ch = s.charAt(index);
+            if (!Character.isDigit(ch)) break;
+
+            int digit = ch - '0';
+
+            // 4. 溢出判断
+            if (res > (Integer.MAX_VALUE - digit) / 10) { /**err：溢出判断是精髓*/
+                return (sign == 1) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            }
+
+            res = res * 10 + digit;
+            index++;
+        }
+
+        return res * sign;
+    }
 
     /*32.最长有效括号
      * 给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的

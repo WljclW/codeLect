@@ -53,6 +53,22 @@ public class _01completeBag {
         return dp[amount];
     }
 
+    /*写法3：一维的写法，但是遍历背包容量的时候直接从“j = coins[i]”开始，因此就省略了解法2中“if (i >= coins[j])”的
+    * 过程*/
+    public int change2(int amount, int[] coins) {
+        int[] dp = new int[amount + 1];
+        for (int i = 0; i < amount + 1; i++) {
+            if (i%coins[0]==0) dp[i] = 1;
+        }
+
+        for (int i = 1; i < coins.length; i++) {
+            for (int j = coins[i]; j <= amount; j++) {
+                dp[j] += dp[j-coins[i]];
+            }
+        }
+        return dp[amount];
+    }
+
 
 
     /*
@@ -199,6 +215,20 @@ public class _01completeBag {
         }
         return dp[amount]==Integer.MAX_VALUE?-1:dp[amount];
     }
+
+    /*一维最简的写法*/
+    public int coinChange_3(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp,amount+1);
+        dp[0] = 0;
+        for (int i = 0; i < coins.length; i++) {
+            for (int j = coins[i]; j <=amount; j++) {
+                dp[j] = Math.min(dp[j-coins[i]]+1,dp[j]);
+            }
+        }
+        return dp[amount]==amount+1?-1:dp[amount];
+    }
+
 
 
 

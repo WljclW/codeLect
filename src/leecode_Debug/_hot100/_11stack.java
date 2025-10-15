@@ -61,16 +61,20 @@ public class _11stack {
             if (!map.containsKey(c)){ //说明是左括号直接入栈
                 stack.push(c);
             }else{ //说明是右括号
-                if (stack.isEmpty()||stack.peek()!=map.get(c)){ //如果栈顶不是c对应的左括号
+                if (stack.isEmpty()||stack.pop()!=map.get(c)){ /**验证栈顶是否匹配 直接弹出栈顶字符，使用pop()弹出并验证*/
                     return false;
                 }
-                stack.pop(); /**err：切记验证完后pop出栈顶。。在if条件中写也可以*/
             }
         }
         return stack.isEmpty(); /**err：注意返回值。否则“((”这样的字符串结果是错误的*/
     }
 
-    /**使用一个变量，一遍遍历*/
+    /**使用一个变量，一遍遍历——————这样的做法是错误的。。
+        【说明】如果字符串只包含一种括号，是可行的。比如字符串只包含“(”以及“)”就可以用下
+     面的方法。。但是这个题目中字符串中包含三种括号，因此使用一个变量就不够了，一个变量不
+     能区分三种括号。
+        【启发】那是不是使用三个变量就可以了？？应该不太行
+     */
     public boolean isValid_count(String s) {
         int count = 0;
         for (char c:s.toCharArray()){
@@ -167,6 +171,7 @@ public class _11stack {
 
         public void pop() {
             Integer pop = allStack.pop();
+            //Integer类型的比较需要使用"equals" 或者 使用 ".intValue()"方法
             if (minStack.peek().equals(pop)){ /**▲err：注意这里比u下使用equals。否则或有个用例“-1024”不对*/
                 minStack.pop();
             }
@@ -196,11 +201,19 @@ public class _11stack {
      * 【提示】思考一下这个题的过程中创建了多少字符串的问题
      */
     /*
-    【注意】计算multi的公式，如果写成了“digit = 10 * digit + digit”，会出错如下：
+    【注意1】计算multi的公式，如果写成了“digit = 10 * digit + digit”，会出错如下：
             s =
             "3[a]2[bc]"
             输出
             ""
+            预期结果
+            "aaabcbc"
+     【注意2】碰到“[”的时候，需要将字符串和数字入栈，需要重置res重置为“new StringBuilder()”、multi重
+            置为0。否则multi会不断的乘倍数，导致结果串很长，报错————
+            s =
+            "3[a]2[bc]"
+            输出
+            "aaaaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabcaaabc"
             预期结果
             "aaabcbc"
     * */
@@ -210,7 +223,7 @@ public class _11stack {
         LinkedList<Integer> stack_digit = new LinkedList<>();
         LinkedList<String> stack_str = new LinkedList<>();
         for (Character c : s.toCharArray()) {
-            if (c >= '0' && c <= '9') //①碰到数字，计算multi
+            if (c >= '0' && c <= '9') //①碰到数字，计算multi。【注意】闭区间['0','9']。
                 digit = 10 * digit + Integer.parseInt(c + "");
             else if (c == '[') { //碰到左括号
                 /*只要碰到左括号，说明接下来要重新计算了。因此将目前的数字和res分别入栈；
@@ -218,8 +231,8 @@ public class _11stack {
                 * */
                 stack_digit.push(digit);
                 stack_str.push(res.toString());
-                digit = 0;
-                res = new StringBuilder();
+                digit = 0;  /**err：需要重置数字 和 字符串*/
+                res = new StringBuilder(); /**err：需要重置数字 和 字符串*/
             } else if (c == ']') { //碰到右括号
                 /*【说明】这个题目的这个解法来说，只要碰到]，此时multi的值必然就是0；并且res就是
                 当前这组括号中的字符串————潜藏规则。因此从数字栈stack_digit中弹出数字，将res添加

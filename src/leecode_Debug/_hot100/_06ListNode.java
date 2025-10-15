@@ -19,7 +19,7 @@ import java.util.PriorityQueue;
  *【技巧1】找中间节点。
  *     1. 找到常规的中间节点，即常规的方法就可以。
  *          场景：适用于不需要将链表前后两半断开连接的时候。
- *          比如：234
+ *          比如：234(这个题的要求仅仅是判断，如果需要拆分就不能使用常规的找中间节点了)
  *     2. 找到链表中间的前一个结点，即：常规的方法使用时"fast"指针的初始值需要变为"head.next"，其他不变。
  *          场景：适用于需要将链表前后两半断开连接
  *          比如：排序链表、重排链表
@@ -137,6 +137,9 @@ public class _06ListNode {
     * 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返
     * 回 true ；否则，返回 false 。*/
     /**
+     * 【关键】
+     *      1. "找中间节点"时找到中间节点(奇数的情况) 或者 中间节点的下一个节点(偶数的情况)————即寻找
+     *  时slow、fast指针的初始值都是head。
      * 【易错点】
      *      1. 从什么地方翻转链表？找哪一个中间节点？
      *         如果是偶数个节点，需要从第二个节点翻转反转链表；如果是奇数个节点，需要从中间节点的下一个反转链表。
@@ -341,8 +344,8 @@ public class _06ListNode {
      *  第3个节点————即后面时刻fast会指向slow节点 前面的第n+1个节点*/
     public ListNode removeNthFromEnd1(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head);
-        /**     官方解中，slow指针开始时指向了head节点的前一个；fast指针指向head节点！！解释：这样相当
-         * 于fast指针和slow指针之间有n个节点，最后fast来到null的时候，slow指针指向倒数n+1个节点，只用
+        /**     官方解中，slow指针开始时指向了head节点的前一个；fast指针指向head节点！！
+         * 解释：这样相当于fast指针和slow指针之间有n个节点，最后fast来到null的时候，slow指针指向倒数n+1个节点，只用
          * 将slow.next = slow.next.next即可*/
         ListNode slow = dummy;
         ListNode fast = head;
@@ -531,6 +534,11 @@ public class _06ListNode {
         复制节点的操作不变；赋值random指针的操作不变。
      唯一的区别在于第三步拆分链表的时候逻辑更清晰。
     */
+    /**
+     *【常见错误】
+     *      1. 第三部结束链表的拆分以后需要将原始链表的next置为null，否则会报如下的错误：
+     *   Next pointer of node with label 1 from the original list was modified.
+     */
     public Node copyRandomList1(Node head) {
         if (head == null) return head;
 
@@ -570,7 +578,7 @@ public class _06ListNode {
             resCur.next = resCur.next.next;
             resCur = resCur.next;
         }
-        cur.next = null; /**err：最后需要把原始链表的末尾置为null*/
+        cur.next = null; /**err：最后需要把原始链表的末尾置为null，否则会报错见方法前注释*/
         return res;
     }
 
@@ -587,6 +595,7 @@ public class _06ListNode {
      *      4.经过3两半的链表都排序完成，这里将排序后的两半链表合并为一个。。【力扣；合并两个有序链表】
      * 【难点】在找中间节点的时候，一定要把前一半链表的最后节点指向null，否则会死循环，超出运行时间。
      * */
+    /*写法1：*/
     public ListNode sortList(ListNode head) {
         /*1.特殊情况的考虑————没有节点或者只有一个节点，此时不用排序*/
         if (head==null||head.next==null) return head;
@@ -645,6 +654,68 @@ public class _06ListNode {
         ListNode res = slow.next;
         slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”，我们是用null作为链表结束的标志*/
         return res;
+    }
+
+
+    /*写法2：自己常用的写法*/
+    /**
+     排序链表的题目中：偶数节点的时候，必须让中间后面的那个节点在后一半中，必须吗？？？？应该代码也能跑通
+     下面的写法中“如果是偶数个节点，中间的两个节点都在前一半链表，会导致两边的递归深度不一样”。。。
+     如果“偶数节点的时候让中间的两个节点，第一个位于前一半链表，第二个位于后一半链表，这样两边的递归深度就接近”，这样的话，
+     我们希望偶数节点的时候，从最中间的位置断开——————因此希望①偶数时找到中间两个中的第一个节点；②然后记录中间的第二个节点；
+     ③将第一个节点的next置为null。。。
+     */
+    public ListNode sortList_own(ListNode head) {
+        if (head==null||head.next==null) return head;
+        ListNode midPrev = findMidPrev(head);
+        ListNode tmp = midPrev.next;
+        midPrev.next = null; /**必须在递归调用sortList_own之前把两半链表明确断开连接*/
+        ListNode prevRes = sortList_own(head);
+        ListNode nextPrev = sortList_own(tmp);
+        // midPrev.next = null; /**置null的操作写在这里，是错误的*/
+        return mergeTwo(prevRes,nextPrev);
+    }
+
+    private ListNode findMidPrev(ListNode head) {
+        /**
+         【注意】“排序链表”题目必须先找到中间的前一个节点（如果是偶数个节点）————即fast初始值是head.next，否则会
+         报错栈溢出（报错位置主方法的“ListNode prevRes = sortList_own(head);”），如下：
+                 java.lang.StackOverflowError
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+                 at line 18, Solution.sortList
+            【复现】下面的“ListNode slow = head,fast = head.next”改为“ListNode slow = head,fast = head”，其他的代码
+         不用变。执行时就会出现上面的报错
+         */
+        ListNode slow = head,fast = head.next;
+        while (fast!=null&&fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    private ListNode mergeTwo(ListNode prevRes, ListNode nextPrev) {
+        ListNode dummy = new ListNode(-1),cur = dummy;
+        while (prevRes!=null&&nextPrev!=null){
+            if (prevRes.val<nextPrev.val){
+                cur.next = prevRes;
+                prevRes = prevRes.next;
+            }else {
+                cur.next = nextPrev;
+                nextPrev = nextPrev.next;
+            }
+            cur = cur.next;
+        }
+        cur.next = prevRes==null?nextPrev:prevRes;
+        return dummy.next;
     }
 
 
@@ -901,6 +972,56 @@ public class _06ListNode {
         p0.next = pre; //pre就是反转链表部分的最后一个节点
         return dummy.next;
     }
+
+
+    /*解法2：常规的数节点，然后反转*/
+    /**
+     *【关键问题————捋清楚找哪一个节点；以及对应的i应该取的范围】
+     *      捋清楚链表数节点的问题————
+     *    1.在i从0开始情况下，i<m。指针会从开始的地方走m步！！
+     *    2. 题目中left是第left个节点，因此要从head之前的节点开始走，走left步，指针会指向left节点！但
+     * 是由于我们实际需要来到left节点的前一个节点（需要做一些操作，比如：记录left前面的节点 以及 从left
+     * 节点开始翻转链表），因此这里“i<left-1”。
+     *    3. 题目中right指的也是第right个节点，因此从head前面的节点开始，走right步后指针会指向第right
+     * 个节点！由于我们需要特殊处理第right个节点 以及 记录第right+1个节点，所以这里“i<right”。
+     */
+    public ListNode reverseBetween_(ListNode head, int left, int right) {
+        /**err：计数是从0开始，因此两个指针 都从 dummy开始数！！第几个节点则走多少步。。
+         比如：如果for循环的条件是”...i<5..“，则i会来到dummy后面的第5个节点，由于dummy是head的前
+         一个节点，因此”dummy后面的第5个节点“就是原始链表的第5个节点。
+         明白上面的计数，然后回到这个题，①我们想让slow指向“left前面的节点”，也就是想来到”第left-1个
+         节点“，因此第一个for循环”i<letf-1“；②我们想让fast指向“right节点”，也就是想来到”第right个节点“，
+         因此第二个for循环条件是”i<right“.*/
+        ListNode dummy = new ListNode(-1, head),slow = dummy,fast = dummy;
+        for (int i = 0; i < left - 1; i++) { /**err：slow要来到left的前一个节点，因此满足“i<left-1”*/
+            slow = slow.next;
+        }
+        for (int i = 0; i < right; i++) { /**err：fast要来到right节点，因此“i<right”*/
+            fast = fast.next;
+        }
+        /*其实就是“翻转从slow.next到fast的这段链表”，整体局面分为三部分“slow节点———>slow.next到fast翻转的结
+          果————>restStart开始的剩余部分链表”，因此翻转完成后拼接上即可*/
+        ListNode start = slow.next;
+        ListNode restStart = fast.next;
+        fast.next = null;
+
+        slow.next = reverse1(start);
+        start.next = restStart;
+
+        return dummy.next;
+    }
+
+    private ListNode reverse1(ListNode head) {
+        ListNode pre = null,cur = head;
+        while (cur!=null){
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur =  next;
+        }
+        return pre;
+    }
+
 
 
     /*138题会用到，随即链表的复制*/

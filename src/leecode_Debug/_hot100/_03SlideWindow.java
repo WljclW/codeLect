@@ -36,6 +36,10 @@ public class _03SlideWindow {
      * 【建议】建议使用lengthOfLongestSubstring2 或者 lengthOfLongestSubstring01
      * 【关键】遍历s的每一个字符。。。
      *      每到一个位置right，先将这个字符加进map（无脑的先加到map）；然后利用while循环保证窗口是合法的
+     * 【注意】滑动窗口问题，在"更新答案一定是在满足题目要求的时候"。。。这个逻辑并不一定是在while循
+     *      环之内，也不一定是在while循环之外。比如这个题更新res是在while循环之外（因为通过while循环能保
+     *      证窗口时符合题目要求的）；但是力扣209就是在while循环中更新res的（因为while循环中能保证"窗口
+     *      内所有数之和大于K"，这时满足题意）
      * */
     public int lengthOfLongestSubstring(String s) {
         int left = 0,right=0; //窗口左边界、右边界
@@ -123,7 +127,7 @@ public class _03SlideWindow {
     }
 
 
-    /**下面是github的diamagnetic，目测也是对的。。。。。
+    /**下面是github的代码，目测也是对的。。。。。
      举例（s="cbaebabacd", p="abc"）
      初始化 count：a:1 b:1 c:1 其余:0
 

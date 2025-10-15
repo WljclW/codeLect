@@ -72,6 +72,10 @@ public class _00hard {
     /*
     41. 缺失的第一个正数
     * */
+    /**
+     *【建议】建议使用 firstMissingPositive1
+     */
+    /*写法1*/
     public int firstMissingPositive(int[] nums) {
         int cur = 0;
         /*step1：将每一个数放在正确的位置*/
@@ -95,6 +99,30 @@ public class _00hard {
         int tmp = nums[num];
         nums[num] = nums[cur];
         nums[cur] = tmp;
+    }
+
+    /**简化版的写法如下*/
+    public int firstMissingPositive1(int[] nums) {
+        for (int i = 0; i < nums.length; i++) {
+            /**
+             只要nums[i]不越界，并且nums[i]-1的位置不是nums[i]，则把nums[i]交换到正确的位置。
+             【补充】由于交换过来的数据可能也不在正确的位置，因此使用while循环重复这个操作
+             */
+            while (nums[i]>0&&nums[i]<=nums.length&&nums[nums[i]-1]!=nums[i]){
+                swap2(nums,nums[i]-1,i);
+            }
+        }
+        /*step2：一次遍历完整数组，看index=i的位置是不是i+1。如果i位置不是i+1,就返回i+1*/
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i]!=i+1) return i+1;
+        }
+        return nums.length+1;
+    }
+
+    private void swap2(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
     }
 
 

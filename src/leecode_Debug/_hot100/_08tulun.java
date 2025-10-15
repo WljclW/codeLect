@@ -29,6 +29,8 @@ public class _08tulun {
         dfs(grid,i,j-1,m,n);
         dfs(grid,i+1,j,m,n);
         dfs(grid,i,j+1,m,n);
+        /**由于这个题修改了grid也没事，因此最后不还原也是可以的*/
+//        grid[i][j] = '1';
     }
 
 

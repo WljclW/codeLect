@@ -18,8 +18,8 @@ public class _04normalArr {
     * 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元
     *   素），返回其最大和。( 子数组是数组中的一个连续部分)
     * */
-    /**【解题思想】到达任何一个数有两种选择：要麽和前面的数组成子数组；要麽自己单独成一个数组。
-     *      两种选择到底采用哪一个呢？取最大的那个。
+    /**【解题思想】到达任何一个数有两种选择：要麽和前面的数组成一个更大的子数组；要麽自己单独成一个数组。
+     *      两种选择到底采用哪一个呢？取和大的那1个。
      *      那到底最大子数组和是多少呢？使用一个外面的变量来标记,每计算出一个位置的值时更新。*/
     public int maxSubArray(int[] nums) {
         int maxSum = Integer.MIN_VALUE; //记录最大子数组和
@@ -37,14 +37,14 @@ public class _04normalArr {
     * */
     /**
      * 【解法】按照左端点排序，从左到右合并。（按照右端点排序也可以，但是需要倒着合并）
-     * 【题的关键】：将intervals中的区间先加进结果集(此时默认加在最后一位)，然后往后判断来更新结果集
-     *      中最后一个数组的结尾界线。【注意】如果不是先将第一个元素加进结果集，直接研究会显得很复杂，
-     *      逻辑上容易乱
-     * 判断的标准：
-     *      如果下一个区间的开始值 小于 结果集最后一个元素的结尾界限，比如：[1,4],[2,5]。则将结果集
+     * 【题的关键】：将intervals中的第一个区间先加进结果集(此时默认加在最后一位)，然后往后判断来更新结果集
+     *      中最后一个数组的结尾界线。【注意】如果不是先将第一个元素加进结果集，直接研究会显得很复杂，逻辑
+     *      上容易乱
+     * 从index=1开始依次研究每一个区间，判断的标准：
+     *      如果当前区间的开始值 小于 结果集最后一个元素的结尾界限，比如：[1,4],[2,5]。则将结果集
      *  中最后一个数组的结尾更新为4和5的最大值；
-     *      否则的话说明下一个区间的开始值 大于 结果集最后一个元素的结尾界限。说明这两个区间没有公共
-     *  部分，因此需要将当前区间放进去成立一个新的区间。比如：[1,3],[5,7]*/
+     *      否则的话说明当前区间的开始值 大于 结果集最后一个元素的结尾界限————即这两个区间没有公共
+     *  部分，因此需要将当前区间放进去成立一个新的区间。比如：[1,3],[5,7]。5>3表示没有重叠部分的*/
     public int[][] merge(int[][] intervals) {
         LinkedList<int[]> res = new LinkedList<>();
         //step1：将数组按照第一个维度升序排列
@@ -58,6 +58,7 @@ public class _04normalArr {
         /*step2：遍历剩下的数组。更新res中最后一个元素的右边界？还是往res中新添加一个区间？*/
         for (int i=1;i<intervals.length;i++) {
             int[] cur = intervals[i];
+            /**根据不同的情况看 更新res中最后一个区间？？还是把当前区间添加进res？？*/
             if (res.getLast()[1] >= cur[0]) { //情况1:更新res中最后一个区间的右边界（说明cur的起点在最后一个数组区间内）
                 res.getLast()[1] = Math.max(res.getLast()[1], cur[1]);
             } else {    //情况2：需要在res中添加新区间（因为cur的起点在res最后一个数组区间之外了）
@@ -99,9 +100,9 @@ public class _04normalArr {
     /**注意这道题————
      *    1."不包括自己"的其余数乘积，因此是"当前位置"前面的数的乘积 乘以 后面的数的乘积。
      *    2.因此计算nums[1]的前缀积其实就是nums[1-1]*1；nums[2]的前缀积就是nums[2-1]*preMutil[2-1]
-     *    整个过程要想串起来，就需要给preMutil[0]赋值为1，这样后面的就可以使用"preMutil[i-1]*nums[i-1"
+     *    整个过程要想串起来，就需要给preMutil[0]赋值为1，这样后面的就可以使用"preMutil[i-1]*nums[i-1]"
      *    来计算了。。。。后缀积也是一样的道理
-     *    3.不用看注释的方法了！*/
+     *    3.不用看注释的方法了！看productExceptSelf1*/
 //    public int[] productExceptSelf(int[] nums) { /**使用了三倍的数组来存储*/
 //        if(nums.length==1) return nums;
 //        int[] preMutil = new int[nums.length];
@@ -125,7 +126,7 @@ public class _04normalArr {
      *     第一次正着遍历原始数组nums,res数组位置i存放它的前缀积，遍历到末尾位置。。。。然后接着反序遍历结果数组，
      *  利用局部变量来记录当前索引j的后缀乘积，这样的话倒着遍历的时候每到一个位置，“局部变量”✖“结果集的当
      *  前位置值”就是该位置的结果*/
-    public int[] productExceptSelf(int[] nums){
+    public int[] productExceptSelf1(int[] nums){
         if(nums.length==1) return nums;
         int[] res = new int[nums.length];
 
@@ -151,7 +152,16 @@ public class _04normalArr {
         请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
     * */
     /**
-     * 【解题建议】建议使用解法1————firstMissingPositive（这种解法的"for循环内使用while循环"是精髓）
+     * 【解题建议】建议使用firstMissingPositive 或者 firstMissingPositive_2（这种解法的"for循环内使用while循环"是精髓）
+     * 【步骤】
+     *      1. for循环研究每一个位置，逻辑如下————
+     *          如果nums[i]位于区间(0,nums.length]，就将它交换到-1对应的索引位置。【注】交换来的数不一定就在
+     *       正确的位置，因此这个步骤要在 while 循环进行。
+     *      2. for循环从index=0开始，看看index=i位置的数是不是等于i+1。————
+     *          ①如果不等于，则说明缺少i+1，直接返回；
+     *          ②如果等于则继续判断后续位置。
+     *         出了for循环说明0、1、2、3....nums.length-1位置均正确放置了1、2、3、4....nums.length，因此返
+     *         回nums.length+1。
      */
     /*解法1：简洁*/
     public int firstMissingPositive(int[] nums) {
@@ -171,12 +181,12 @@ public class _04normalArr {
              *      ②如果“nums[nums[i] - 1] != nums[i]”写错了们就会导致提交时“有用例超时”，这个条件的
              * 解释：nums[i]应该放在nums[i]-1的位置，因此判断这个位置的值是不是等于nums[i]*/
             while (nums[i] > 0 && nums[i] <= nums.length && nums[nums[i] - 1] != nums[i]) { /**err：nums[i]是两个条件，否则会出现".....Index 6 out of bounds for length 5"*/
-                swap(nums, i, nums[i] - 1); /**err：这里用额外的方法来实现！*/
+                swap(nums, i, nums[i] - 1); /**err：建议这里用额外的方法来实现！*/
             }
         }
         //经过上面的步骤理论上i位置存放的就是数字i+1.比如0位置存放1，1位置存放2....
         for (int i = 0; i < nums.length; i++) {
-            if (nums[i] != i + 1) return i + 1; //下标i的地方应该存储i+1
+            if (nums[i] != i + 1) return i + 1; //下标i的地方应该存储i+1这个数
         }
 
         return nums.length + 1; /**err：到了这里说明数组中不缺，因此应该返回下一个数*/
@@ -212,6 +222,27 @@ public class _04normalArr {
         int tmp = nums[num];
         nums[num] = nums[cur];
         nums[cur] = tmp;
+    }
+
+    /*建议采用的解法*/
+    public int firstMissingPositive_2(int[] nums) {
+        for (int i = 0; i < nums.length; i++) {
+            while (nums[i]>0&&nums[i]<=nums.length&&nums[nums[i]-1]!=nums[i]){
+                swap3(nums,nums[i]-1,i);
+            }
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i]!=i+1){
+                return i+1;
+            }
+        }
+        return nums.length+1;
+    }
+    private void swap3(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
     }
 
 

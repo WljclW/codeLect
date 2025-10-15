@@ -24,57 +24,6 @@ import java.util.*;
  *   err:5、113、112、、、、、、、
  */
 public class All1_5_review {
-    //8.chatgpt给出的版本如下：
-    /**【重要的说明】
-     1. 解析数字时，对于不是数字的字符怎么处理？？
-            这个题的一个重要隐含条件：解析到第一个不是数字的位置就停止解析。如果开始的位置就不是数字，直接返回0
-            同时，题目也明确的说明了最后得到的结果要在int范围内————
-        如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。
-     2. 判断是否越界的逻辑是重点。为什么下面的判断越界逻辑是对的？
-         声明：最大正数：2147483647；最小负数：-2147483648
-         例子1===》输入："-2147483649"。最后一位累加前，res = 214748364、当前 digit = 9、
-     判断 (Integer.MAX_VALUE - 9)/10 = (2147483647-9)/10 = 214748363，
-     res = 214748364 > 214748363 → 越界 → 返回 Integer.MIN_VALUE ✅
-         例子2===》输入：“-2147483648”。最后一位累加前，res = 214748364、当前 digit = 8、
-     判断 (Integer.MAX_VALUE - 8)/10 = (2147483647-8)/10 = 214748363，
-     res = 214748364 > 214748363→ 越界 → 返回 Integer.MIN_VALUE ✅
-        【补充】类似的道理可以参考69题的”mySqrt_best“方法实现，69题中的mid*mid可能超出int范围，因此直接计算不
-     方便，但是比较”mid“和”x/mid“的大小可以避免这种溢出情况
-     */
-    public int myAtoi(String s) {
-        int index = 0, n = s.length();
-        // 1. 跳过空格
-        while (index < n && s.charAt(index) == ' ') index++;
-        if (index == n) return 0;
-
-        // 2. 判断符号
-        int sign = 1;
-        char c = s.charAt(index);
-        if (c == '+' || c == '-') {
-            sign = (c == '-') ? -1 : 1;
-            index++;
-        }
-
-        // 3. 遍历数字
-        int res = 0;
-        while (index < n) {
-            char ch = s.charAt(index);
-            if (!Character.isDigit(ch)) break;
-
-            int digit = ch - '0';
-
-            // 4. 溢出判断
-            if (res > (Integer.MAX_VALUE - digit) / 10) {
-                return (sign == 1) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-            }
-
-            res = res * 10 + digit;
-            index++;
-        }
-
-        return res * sign;
-    }
-
     /*215. 数组中的第K个最大元素
 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
 
@@ -115,47 +64,6 @@ public class All1_5_review {
         int tmp = nums[pivotIndex];
         nums[pivotIndex] = nums[right];
         nums[right] = tmp;
-    }
-
-
-    /*5 最长回文子串
-    给你一个字符串 s，找到 s 中最长的 回文 子串。
-     */
-    public String longestPalindrome(String s) {
-        if (s==null||s.length()<=1) return s;
-        StringBuilder sb = new StringBuilder("#");
-        for (char c:s.toCharArray()){
-            sb.append(c).append("#");
-        }
-        String s1 = sb.toString();
-
-        int[] dp = new int[sb.length()];
-        int center = 0,maxLen = 0;
-        int start = -1,maxLenRel = 0;
-        for (int i = 0; i < s1.length(); i++) {
-            int mirror = 2*center-i;
-            if (i<=maxLen){
-                dp[i] = Math.min(dp[mirror],maxLen-i);
-            }
-
-            int left = i-dp[i]-1,right = i+dp[i]+1;
-            while (left>=0&&right<sb.length()&&s1.charAt(left)==s1.charAt(right)){
-                dp[i]++;
-                left--;
-                right++;
-            }
-
-            if (i+dp[i]>maxLen){
-                center = i;
-                maxLen = i+dp[i];
-            }
-            /**下面的代码不是很懂！！！！！！！！！！*/
-            if (dp[i]>maxLenRel){
-                maxLenRel = dp[i];
-                start = (i-maxLenRel)/2;
-            }
-        }
-        return s.substring(start,start+maxLenRel);
     }
 
     /**
@@ -210,27 +118,6 @@ public class All1_5_review {
     }
 
 
-    /*124. 二叉树中的最大路径和
-    二叉树中的 路径 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列
-    中 至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。路径和 是路径中各节点值的总和。
-    给你一个二叉树的根节点 root ，返回其 最大路径和 。
-    * */
-    int resMaxPathSum;
-    public int maxPathSum(TreeNode root) {
-        if (root==null) return 0;
-        dfs2(root);
-        return resMaxPathSum;
-    }
-
-    private int dfs2(TreeNode root) {
-        if (root==null) return 0;
-        int left = Math.max(dfs2(root.left),0);
-        int right = Math.max(dfs2(root.right),0);
-        resMaxPathSum = Math.max(resMaxPathSum,left+right+root.val);
-        return root.val+Math.max(left,right);
-    }
-
-
 
     /*93. 复原 IP 地址
     有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
@@ -242,29 +129,6 @@ public class All1_5_review {
 //    public List<String> restoreIpAddresses(String s) {
 //
 //    }
-
-
-    /*
-    82. 删除排序链表中的重复元素 II
-    给定一个已排序的链表的头 head ， 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回 已排序的链表 。
-    * */
-    public ListNode deleteDuplicates(ListNode head) {
-        if (head==null||head.next==null||head.next.next==null) return head;
-        ListNode dummy = new ListNode(-1, head),cur = dummy;
-        while (cur.next!=null&&cur.next.next!=null){
-            int curVal = cur.next.val;
-            if (cur.next.next.val == curVal){
-                while (cur.next.next!=null&&cur.next.next.val==curVal){
-                    cur.next.next = cur.next.next.next;
-                }
-                cur.next = cur.next.next;
-            }else {
-                cur = cur.next;
-            }
-        }
-        return dummy.next;
-    }
-
 
     /**
      * =======================================3================================
@@ -329,48 +193,6 @@ public class All1_5_review {
 //        return sb.reverse().toString();
 //    }
 //
-
-
-    /**
-     * ==================================4==============================
-     * ==================================4==============================
-     * ==================================4==============================
-     * ==================================4==============================
-     * ==================================4==============================
-     * ==================================4==============================
-     */
-
-
-    /*39组合总和
-    给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
-
-candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。
-
-对于给定的输入，保证和为 target 的不同组合数少于 150 个。
-     */
-    List<List<Integer>> resCombinationSum;
-    public List<List<Integer>> combinationSum(int[] candidates, int target) {
-        resCombinationSum = new LinkedList<>();
-        combinationSum(candidates,target,0,new LinkedList<Integer>());
-        return resCombinationSum;
-    }
-
-    private void combinationSum(int[] candidates, int target, int index, LinkedList<Integer> path) {
-        if (target==0){
-            resCombinationSum.add(new LinkedList<>(path));
-        }
-        if (target<0||index==candidates.length){
-            return;
-        }
-        for (int i = index; i < candidates.length; i++) {
-            path.add(candidates[i]);
-            target -= candidates[i]; /**组合、子集问题需要注意，for循环内部研究的是index=i位置的元素*/
-            combinationSum(candidates,target,i+1,path);
-            path.removeLast();
-            target += candidates[i];
-        }
-    }
-
     /**
      *=================================================5=====================================
      *=================================================5=====================================

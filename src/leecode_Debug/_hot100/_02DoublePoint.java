@@ -71,8 +71,8 @@ public class _02DoublePoint {
     * */
     /**
      * 【步骤】双指针相向而行，计算以它们为边界能盛多少水。。只要中间有间距（即left<right）
-     *      1. 每到一个位置计算能盛的水（高度取决于左右指针height的最小值，宽度取决于两个指针的距离）
-     *      2. 看两个指针对应的height哪一个高，更新height小的那一个指针
+     *      1. 每到一个位置计算能盛的水（高度取决于左右指针位置height的最小值，宽度取决于两个指针的距离）
+     *      2. 看两个指针对应的height哪一个高，更新height小的那一个指针。
      */
     public int maxArea(int[] height) {
         int left = 0,right = height.length-1;
@@ -99,6 +99,15 @@ public class _02DoublePoint {
      * TODO：拿到“while (left<right && nums[left]==nums[++left]);”的字节码看一下
      * 【关键】先排序；然后从左向右遍历位置cur，每到一处位置cur，设置left、right指针，根据当前三个位置数的和
      *      与0的关系，来移动left或者right指针。
+     * 【步骤】
+     *      1. 对数组进行排序；
+     *      2. for循环研究每一个位置i，范围[0，nums.length-3]，因为至少要保证后面还有两个数。。。后续
+     *          所有的逻辑均在for循环内
+     *      3. left指针为i+1，right指针为nums.length-1...根据i、left、right三处的数之和判断指针如何移
+     *          动
+     *      4. 如果三数之和大于0，说明数要变小————左移right;
+     *         如果三数之和小于0，说明数要变大————右移left;
+     *         如果三数之和等于0，说明要添加进结果。并且 移动left、right跳过中间相等的数
      * 【去重】必须去重的地方有两个————
      *      ①遍历到位置cur，如果它和前面的数相等即nums[cur-1]==nums[cur]，说明cur-1位置的时候已经研究过
      *  了，cur位置需要跳过。【举例】：{-2，-2，-1，0，2}如果0位置的-2作为cur已经研究过了，cur来到1时就要跳
@@ -137,7 +146,7 @@ public class _02DoublePoint {
                 ①先判断 left < right。
                 ②++left 先让 left 加 1，然后比较 nums[left] == nums[left]。
              问题：
-                    这永远是 同一个位置和自己比较，所以一定为 true（除非数组里有 NaN 这种不相等的特殊情
+                    2的写法永远是 同一个位置和自己比较，所以一定为 true（除非数组里有 NaN 这种不相等的特殊情
                  况，但 Java 的 int/long 等不会这样）。
                     如果没有别的 break 条件，会死循环，直到 left >= right 才会退出。
      */
@@ -212,12 +221,15 @@ public class _02DoublePoint {
     * 42.给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
     * */
     /**
-     *【双指针的思路】left从index=0开始向右，right从index=height.length开始向左。过程中分别记录碰到的最大值。每一时刻————
-     *      ①根据left、right的位置更新leftmax、rightMax。二者分别标识left指针、right种子很遍历时遇到的最大值
-     *      ②根据leftMax、rightMax的最小值 更新left位置 或者 right位置 能存的雨水高度。————这里有一个trike，left和right位置
-     *  height元素小的那个，xxxxMax的值也小。比如：height[right]<height[left]，则rightMax<=leftMax，为什么？反证法
-     *      ③将②中计算的值累加到结果res
-     *      ④重复①~③过程，知道所有left==right
+     *【双指针的思路】left从index=0开始向右，right从index=height.length-1开始向左。过程中左右两边分别记录碰到的最大值。
+     *      每一时刻————
+     *      ①根据left、right的位置更新leftmax、rightMax。二者分别标识left指针、right指针遍历时遇到的height最大值
+     *      ②根据leftMax、rightMax的最小值 更新left位置能存的雨水高度 或者 更新right位置能存的雨水高度。————这里
+     *      有一个trike，left和right位置height元素小的那个，xxxxMax的值也小。比如：height[right]<height[left]，
+     *      则rightMax<=leftMax，为什么？？？反证法
+     *      ③将②中计算的值累加到结果res；并移动height小的那一侧对应的指针。（比如height[left]<height[right]则移
+     *      动left）
+     *      ④重复①~③过程，直到left==right
      */
     public int trap(int[] height) {
         int res = 0;

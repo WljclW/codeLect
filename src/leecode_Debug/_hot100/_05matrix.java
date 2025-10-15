@@ -98,11 +98,17 @@ public class _05matrix {
      */
     public List<Integer> spiralOrder(int[][] matrix) {
         ArrayList<Integer> res = new ArrayList<>();
+//        if (matrix.length==0) return new int[0]; /**LCR 146与这个题是类似的，唯一的区别在于matrix可能为空，因此要判断一下*/
         int top = 0;
         int bottom = matrix.length - 1;
         int left = 0;
         int right = matrix[0].length - 1;
-        while (res.size() < matrix.length * matrix[0].length) {
+        while (true) { /**err：这里写成"while(true)都没关系，真正关键在于“if判断语句的break”"*/
+            /**
+             * 合法打印必须是在每一行以及每一列打印完成后进行合法性校验！！！
+             * 或者
+             * 每一行以及每一列打印之前就行合法性校验
+             */
             for (int i = left; i <= right; i++) { /**可以添加判断的位置2：也可以给整体的for循环外添加if条件判断*/
                 res.add(matrix[top][i]);
             }

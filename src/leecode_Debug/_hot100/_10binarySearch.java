@@ -145,6 +145,14 @@ public class _10binarySearch {
      *          如果是求解target右边界，则nums[mid]==target的时候，需要收缩左边界，因此做操作：left = mid+1;
      *     区别2：返回值的区别。
      *          如果是求解左边界，则返回值应该是left；如果是求解右边界则返回值应该是right.
+     *     【补充说明】任何写法在“nums[mid]==target”的时候都必须移动边界为mid+1或者mid-1，不能将边界移动为mid，
+     *          移动为mid会出现死循环，代码直观的展示就是报错“运行时间超过限制”。举个例子————
+     *          如果求解右边界的diamagnetic写成下面的样子，就会出现“死循环”，比如数组为“”
+*                                     if (nums[mid]>target){
+                                          right = mid-1;
+                                      }else {
+                                          left = mid;
+                                      }
      *
      * 解法2（见方法searchRange_01）：求出target的左边界 以及 target+1的左边界.
      *     如果target的左边界对应的数是target，说明一定也有右边界；否则说明数组中没
@@ -366,7 +374,7 @@ public class _10binarySearch {
     /*写法1：不推荐*/
     public int search(int[] nums, int target) {
         int l = 0, r = nums.length - 1;
-        while (l <= r) {
+        while (l <= r) {    /**闭区间搜索，这里应该必须带”等号“*/
             int mid = l + (r - l) / 2;
             if (nums[mid] == target) return mid;
             //step1：①nums[mid]与nums[0]判断，可以知道哪边是有序的；②看看target是不是在有序的一边。。详细解释见if内的的注释
@@ -497,6 +505,23 @@ public class _10binarySearch {
         return min; /**▲err：题目要求返回最小值，而不是最小值的位置！！！*/
     }
 
+    /**补充：如果使用上面的写法，容易写错。。比如下面的洗发就是错误的！！！
+     原因不知？？*/
+//    public int findMin(int[] nums) {
+//        int left = 0, right = nums.length - 1;
+//        int index = -1;
+//        while (left <= right) {
+//            int mid = left + (right - left) / 2;
+//            if (nums[mid] <= nums[right]) {
+//                index = mid;
+//                right = mid - 1;
+//            } else {
+//                left = mid + 1;
+//            }
+//        }
+//        return nums[index];
+//    }
+
     /*
     解法2：就是当mid数小于最后一个数时,right指针更新为mid，而不是mid-1。
      */
@@ -542,7 +567,7 @@ public class _10binarySearch {
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
         /*step1：让nums1永远是长度较小的那一个*/
         if (nums1.length > nums2.length) return findMedianSortedArrays(nums2, nums1);
-        /*step2：定义"闭区间类型"左右边界。【注意】这里的索引是隔板，因此是[0,nums.length]*/
+        /*step2：定义"闭区间类型"左右边界。【注意】这里的索引是隔板，一共有nums.length+1个间隔，因此隔板的索引范围是[0,nums.length]*/
         int l = 0, r = nums1.length;
         /*step3：二分法 枚举nums1挡板出现的位置。（一旦他确定了位置，nums2中挡板的位置也就确定了）*/
         while (l <= r) {
@@ -587,6 +612,51 @@ public class _10binarySearch {
         }
         return -1; //其实代码走不到这里
     }
+
+
+    /*写法2：改写写法1，本质是一样的，只是写法改了一下，计算结果放在while循环外
+        在写法1中，使用的是“while (l <= r)”，此时再while循环内就计算出了返回值，其实-1是
+     不可能return的。
+        因此，可以改写一下，使用“while (l < r)”，出了while循环说明l==r，此时再计算结果
+     */
+    public double findMedianSortedArrays1(int[] nums1, int[] nums2) {
+        int len1 = nums1.length, len2 = nums2.length;
+        if (len1 > len2) return findMedianSortedArrays(nums2, nums1);
+
+        int left = 0, right = len1;
+        while (left < right) { /**是不是这里可以写成等于，然后出了while循环，才计算中位数是多少？？*/
+            int mid = left + (right - left) / 2;
+            int mid2 = (len2 + len1 + 1) / 2 - mid;
+
+            int num1Left = mid == 0 ? Integer.MIN_VALUE : nums1[mid - 1];
+            int num1Right = mid == nums1.length ? Integer.MAX_VALUE : nums1[mid];
+            int num2Left = mid2 == 0 ? Integer.MIN_VALUE : nums2[mid2 - 1];
+            int num2Right = mid2 == nums2.length ? Integer.MAX_VALUE : nums2[mid2];
+
+            if (num1Left > num2Right) right = mid - 1;
+            else if (num2Left > num1Right) left = mid + 1;
+        }
+
+
+        int mid = left + (right - left) / 2;
+        int mid2 = (len2 + len1 + 1) / 2 - mid;
+
+        int num1Left = mid == 0 ? Integer.MIN_VALUE : nums1[mid - 1];
+        int num1Right = mid == nums1.length ? Integer.MAX_VALUE : nums1[mid];
+        int num2Left = mid2 == 0 ? Integer.MIN_VALUE : nums2[mid2 - 1];
+        int num2Right = mid2 == nums2.length ? Integer.MAX_VALUE : nums2[mid2];
+
+        if ((len1 + len2) % 2 != 0) {
+            return Math.max(num1Left, num2Left);
+        } else {
+            return (
+                    Math.max(num1Left, num2Left) +
+                            Math.min(num1Right, num2Right)
+            ) / 2.0;
+        }
+
+    }
+
 
 
     public static void main(String[] args) {
