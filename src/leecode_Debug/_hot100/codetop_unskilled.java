@@ -290,7 +290,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                       （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
             int mirror = 2 * center - i;
             if (i < right) { /**说明：理论上这里不带等于，但是写成“if (i <= right)”结果也不错*/
-                p[i] = Math.min(right - i, p[mirror]);
+                p[i] = Math.min(right - i, p[mirror]); /**得到i位置回文半径的最小值，i位置的回文串还可能往两边扩————3.2干的活*/
             }
 
             /*3.2   尝试向两边继续扩展，看看位置i是否能得到更长的回文子串。
@@ -320,8 +320,10 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                  */
                 maxLen = p[i]; /**回文半径就是最长的长度*/
                 /**❗❗❗❗❗❗❗
-                    映射的原理：i是当前的位置————回文中心，maxLen是上一步更新后的p[i]，因此”i-maxLen“代表处理穿str中i位置的最长
-                 回文串的左边界，包含这个字符。这个字符对应原字符串的哪个位置呢？？除以2即可。因此需要除以2得到映射到原字符串的下标
+                    映射的原理：i是当前的位置————回文中心，maxLen是上一步更新后的p[i]，因此”i-maxLen“代表处理串str中i位置的最长
+                 回文串的左边界，包含这个字符。
+                    这个字符对应原字符串的哪个位置呢？？除以2即可。因此需要除以2得到映射到原字符串的下标，每两个位置对应原字符串的一
+                 个位置！
                  */
                 start = (i - maxLen) / 2; /**？？？*/
             }
@@ -332,32 +334,9 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     //92
-    public ListNode reverseBetween(ListNode head, int left, int right) {
-        ListNode dummy = new ListNode(-1, head), cur = dummy, end = dummy;
-        for (int i = 0; i < right; i++) {
-            end = end.next;
-        }
-        for (int i = 0; i < left - 1; i++) {
-            cur = cur.next;
-        }
-        ListNode start = cur.next;
-        ListNode nextStart = end.next;
-        end.next = null;
-        cur.next = reverse(start);
-        start.next = nextStart;
-        return dummy.next;
-    }
-
-    private ListNode reverse(ListNode start) {
-        ListNode pre = null, cur = start;
-        while (cur != null) {
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
+//    public ListNode reverseBetween(ListNode head, int left, int right) {
+//
+//    }
 
     /**
      * ==============================1~5 page====================================================================================

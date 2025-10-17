@@ -949,8 +949,30 @@ public class _06ListNode {
 
 
     /*92？？？
-    * 官方解的最优方案不是很懂？？？*/
+    /*官方解：穿针引线法*/
     public ListNode reverseBetween(ListNode head, int left, int right) {
+        ListNode dummy = new ListNode(-1, head);
+        ListNode pre = dummy;
+        for (int i = 0; i < left - 1; i++) { /**注意是从0到left-1，因为要来到左边界的前一个结点！！（有点类似于旋转链表遍历获取节点数的做法）*/
+            pre = pre.next;
+        }
+
+        ListNode cur = pre.next;
+        /**
+         * for循环的4步，顺序不能错。。思考思考~~
+         */
+        for (int i = 0; i < right - left; i++) {
+            ListNode next = cur.next;
+            cur.next = next.next;
+            next.next = pre.next; /**err：这里"pre.next"不能用cur来代替，为什么？？？*/
+            pre.next = next;
+        }
+        return dummy.next;
+    }
+
+
+    /* 官方解的最优方案不是很懂？？？*/
+    public ListNode reverseBetween1(ListNode head, int left, int right) {
         ListNode dummy = new ListNode(-1);
         dummy.next = head;
         ListNode p0 = dummy;
@@ -986,6 +1008,12 @@ public class _06ListNode {
      * 个节点！由于我们需要特殊处理第right个节点 以及 记录第right+1个节点，所以这里“i<right”。
      */
     public ListNode reverseBetween_(ListNode head, int left, int right) {
+        /**
+         【关键建议】
+         链表中数节点的时候，建议使用下面的方法——————
+         先创建虚拟头节点dummy，cur=dummy，然后计数从0开始数。”for (int i = 0; i < m; i++)“出
+         了for循环cur就来到了链表的第m个节点
+         */
         /**err：计数是从0开始，因此两个指针 都从 dummy开始数！！第几个节点则走多少步。。
          比如：如果for循环的条件是”...i<5..“，则i会来到dummy后面的第5个节点，由于dummy是head的前
          一个节点，因此”dummy后面的第5个节点“就是原始链表的第5个节点。
@@ -1011,6 +1039,7 @@ public class _06ListNode {
         return dummy.next;
     }
 
+    //常规的翻转链表代码
     private ListNode reverse1(ListNode head) {
         ListNode pre = null,cur = head;
         while (cur!=null){
