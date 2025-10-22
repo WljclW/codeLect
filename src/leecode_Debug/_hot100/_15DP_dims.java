@@ -428,4 +428,114 @@ public class _15DP_dims {
             }
         return dp[word1.length()][word2.length()];
     }
+
+
+    /*115. 不同的子序列
+    给你两个字符串 s 和 t ，统计并返回在 s 的 子序列 中 t 出现的个数。
+测试用例保证结果在 32 位有符号整数范围内。
+     */
+    /*二维的写法*/
+    public int numDistinct(String s, String t) {
+        /*step1：声明dp数组。
+        dp[i][j]表示：s串的前i个字符子串的子序列中有多少个 t的前j个字符组成的子串
+         */
+        int m = s.length(),n = t.length();
+        int[][] dp = new int[m + 1][n + 1];
+        dp[0][0] = 1;
+        /*step2：base case
+            第一行的初始化：第一行表示s是空串，t不是空串（除了dp[0][0]）。因此从i=1开始，dp[0][i]都是0，
+        由于int数组的默认值就是0，因此第一行的初始化可以省略。
+            第一列的初始化：第一列表示t是空串，但是s不是空串。此时能得到t的方案数就是1种————即s中所有的
+        字符都不要。因此下面需要进行初始化第一列
+        */
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] = 1;
+        }
+        /*step3：对于其他位置的计算*/
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char sc = s.charAt(i - 1);
+                char tc = t.charAt(j - 1);
+                /*决策1：不使用s的最后一个字符，因此种类数取决于dp[i-1][j]*/
+                dp[i][j] = dp[i-1][j];
+                /*决策2：如果最后一个字符相等，则可以采用*/
+                if (sc==tc){
+                    dp[i][j] += dp[i-1][j-1];
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    /*一维的写法*/
+    /**
+        在二维的写法中，会发现一个位置（i,j）的值依赖于左上角（i-1，j-1）位置的值 以及 上方（i-1，j）位置的值，
+     因此可以直接使用一行数组来进行动规。
+        但是此时内层循环需要从大到小进行！！否则内层循环如果从小到大计算（i-1，j-1）位置的值就被覆盖了，覆盖后
+     会变成（i，j-1）位置的值
+     */
+    public int numDistinct_1dim(String s, String t) {
+        int m = s.length(),n = t.length();
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        for (int i = 1; i <= m; i++) {
+            for (int j = n; j >= 1; j--) {
+                char sc = s.charAt(i - 1);
+                char tc = t.charAt(j - 1);
+                if (sc==tc){
+                    dp[j] += dp[j-1];
+                }
+            }
+        }
+        return dp[n];
+    }
+
+    /*72.编辑距离问题的泛化
+    求解编辑的最小代价。其中insert、delete、change的含义
+        insert：str1中插入一个字符的代价
+        delete：str1中删除一个字符的代价
+        change：str1中改变一个字符的代价
+     */
+    public int minDistance_(String word1,String word2){
+        return minDistance(word1,word2,1,1,1);
+    }
+
+    private int minDistance(String word1, String word2, int insert, int delete, int change) {
+        int m = word1.length(),n = word2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        dp[0][0] = 0;
+        /*step2：base case的情况
+            第一行：word1是空串，word2不是空串。因此word1需要插入指定数量的字符才能实现等同；————操作
+        的代价为 i*insert
+            第一列：word1不是空串，word2是空串。因此word1需要删除所有的字符才能实现和word2相等————操
+        作的代价 i*delete
+        * */
+        for (int i = 1; i <= n; i++) {
+            dp[0][i] = i*insert;
+        }
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] = i*delete;
+        }
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char c1 = word1.charAt(i - 1);
+                char c2 = word2.charAt(j - 1);
+                /*情况1：当前位置的字符相等，不需要额外的操作，结果转移到dp[i-1][j-1]*/
+                if (c1==c2){
+                    dp[i][j] = dp[i-1][j-1];
+                }else {
+                    /*情况2：说明当前位置的字符不相等。此时可以采取三种操作
+                        word1删除掉最后的字符，因此等价于"dp[i-1][j]+delete"————取决于word1到最后之前的串和word2中
+                    j位置之前的串匹配的代价（简单点说，就是word1不使用最后一个字符，让剩下的字符操作到word2）；
+                        word1的末尾插入word2的最后一个字符，因此等价于"dp[i][j-1]+insert"————取决于word1的当前所有
+                    到word2除最后一个位置的匹配代价 + word1插入字符的代价
+                        word1的末尾的字符改的和word2的最后一个字符相同，因此等价于"dp[i-1][j-1]+change"————即最后一
+                    个字符匹配完成，看之前的那部分匹配的代价 + word1最后一个字符change的代价
+                        */
+                    dp[i][j] = Math.min(Math.min(dp[i-1][j]+delete,dp[i][j-1]+insert),dp[i-1][j-1]+change);
+                }
+            }
+        }
+        return dp[m][n];
+    }
 }
