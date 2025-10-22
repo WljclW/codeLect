@@ -7,6 +7,12 @@ import javax.sql.rowset.FilteredRowSet;
 import java.io.File;
 import java.util.*;
 
+/**
+ * 1~2————215、53、手撕快排、5、92、1143、93、
+ * 3——————151、78、322、8
+ * 4——————39、470、122、
+ * 5——————112、113、179、718、手撕堆排序、14
+ */
 /**codetop 1~5的全量——————=========1~5使用这个文件
  * err：5、20、215、92、105、234、283、39
  * undo：46的最优解、88、415、72题优化空间、1143空间优化的最优解、93、69、8、151、468、718
@@ -291,9 +297,7 @@ public class All1_5 {
      * 马拉车算法 可以实现将时间复杂度降为O(N)，但是空间复杂度高于“中心扩散法”，空间复杂度为O(N)。
      */
     public String longestPalindrome(String s) {
-        /*step1：特殊情况的考虑*/
         if (s == null || s.length() == 0) return "";
-        /*step2：StringBuilder预处理字符串并构造出新字符串。做法————给原字符串所有的间隔（包括开始位置和结束位置）都加“#”*/
         StringBuilder sb = new StringBuilder("#");
         for (char c : s.toCharArray()) {
             sb.append(c).append("#");
@@ -301,41 +305,28 @@ public class All1_5 {
         String str = sb.toString();
         int n = str.length();
 
-        int[] p = new int[n]; //声明int数组用于存放每一个位置的回文半径
-        int center = 0, right = 0; /*center表示当前的回文中心；right表示当前最远的回文半径。*/
-        int start = 0, maxLen = 0; /*这是返回结果的关键信息。start表示“最长回文子串”的开始位置，maxLen表示“最长回文子串”的长度*/
-        /*step3：for循环依次研究每一个位置*/
+        int[] p = new int[n];
+        int center = 0, right = 0;
+        int start = 0, maxLen = 0;
         for (int i = 0; i < n; i++) {
-            /*3.1 这一步就是“马拉车算法”的核心精髓。。具体的做法如下————
-                      （1）计算出i位置关于“目前回文中心”center的对称位置。
-                      （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
             int mirror = 2 * center - i;
-            if (i < right) { /**err：i小于“回文串的最右边界”，会误写成mirror*/
-                p[i] = Math.min(right - i, p[mirror]); /**得到i位置回文半径的最小值，i位置的回文串还可能往两边扩————3.2干的活*/
+            if (i < right) {
+                p[i] = Math.min(right - i, p[mirror]);
             }
 
-            /*3.2   尝试向两边继续扩展，看看位置i是否能得到更长的回文子串。
-                    这一步具体的做法呢，如下————
-                        ①声明两个指针l,r分别为i位置的左右；
-                        ②只要l和r不越界 并且 l和r位置的字符相等，就“增加p[i]”、移动l和r指针*/
             int l = i - p[i] - 1, r = i + p[i] + 1;
             while (l >= 0 && r < n && str.charAt(l) == str.charAt(r)) {
                 p[i]++;
                 l--;
                 r++;
             }
-            /*3.3 更新“最远回文右边界”。
-             *   “最远回文右边界”right 和 “当前的回文中心”center 是成对起作用的，因此更新right的时候就要更新center。
-             *   为什么说是“成对起作用”的呢？？因为right和i比较能加速p[i]计算；center用于计算位置i关于回文中心的对称位置*/
             if (i + p[i] > right) {
                 center = i;
                 right = i + p[i];
             }
-            /*3.4 更新最长回文子串。
-             *   “最长回文子串”maxLen 和 “回文子串的开始位置”start也是成对出现的，因此更新maxLen的时候呀需要更新start。*/
             if (p[i] > maxLen) {
-                maxLen = p[i]; /**回文半径就是最长的长度*/
-                start = (i - maxLen) / 2; /**？？？*/
+                maxLen = p[i];
+                start = (i - maxLen) / 2;
             }
         }
         return s.substring(start, start + maxLen);
@@ -644,32 +635,16 @@ public class All1_5 {
     /*92. 反转链表 II
 给你单链表的头指针 head 和两个整数 left 和 right ，其中 left <= right 。请你反转从位置 left 到位置 right 的链表节点，返回 反转后的链表 。*/
     /*解法2：常规的数节点，然后反转*/
-    /**
-     *【关键问题————捋清楚找哪一个节点；以及对应的i应该取的范围】
-     *      捋清楚链表数节点的问题————
-     *    1.在i从0开始情况下，i<m。指针会从开始的地方走m步！！
-     *    2. 题目中left是第left个节点，因此要从head之前的节点开始走，走left步，指针会指向left节点！但
-     * 是由于我们实际需要来到left节点的前一个节点（需要做一些操作，比如：记录left前面的节点 以及 从left
-     * 节点开始翻转链表），因此这里“i<left-1”。
-     *    3. 题目中right指的也是第right个节点，因此从head前面的节点开始，走right步后指针会指向第right
-     * 个节点！由于我们需要特殊处理第right个节点 以及 记录第right+1个节点，所以这里“i<right”。
-     */
     public ListNode reverseBetween(ListNode head, int left, int right) {
-        /**err：计数是从0开始，因此两个指针 都从 dummy开始数！！第几个节点则走多少步。。
-                比如：如果for循环的条件是”...i<5..“，则i会来到dummy后面的第5个节点，由于dummy是head的前
-            一个节点，因此”dummy后面的第5个节点“就是原始链表的第5个节点。
-                明白上面的计数，然后回到这个题，①我们想让slow指向“left前面的节点”，也就是想来到”第left-1个
-            节点“，因此第一个for循环”i<letf-1“；②我们想让fast指向“right节点”，也就是想来到”第right个节点“，
-            因此第二个for循环条件是”i<right“.*/
+
         ListNode dummy = new ListNode(-1, head),slow = dummy,fast = dummy;
-        for (int i = 0; i < left - 1; i++) { /**err：slow要来到left的前一个节点，因此满足“i<left-1”*/
+        for (int i = 0; i < left - 1; i++) {
             slow = slow.next;
         }
-        for (int i = 0; i < right; i++) { /**err：fast要来到right节点，因此“i<right”*/
+        for (int i = 0; i < right; i++) {
             fast = fast.next;
         }
-        /*其实就是“翻转从slow.next到fast的这段链表”，整体局面分为三部分“slow节点———>slow.next到fast翻转的结
-          果————>restStart开始的剩余部分链表”，因此翻转完成后拼接上即可*/
+
         ListNode start = slow.next;
         ListNode restStart = fast.next;
         fast.next = null;
@@ -1620,17 +1595,17 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     转换：通过跳过前置零来读取该整数，直到遇到非数字字符或到达字符串的结尾。如果没有读取数字，则结果为0。
     舍入：如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231 的整数应该被舍入为 −231 ，大于 231 − 1 的整数应该被舍入为 231 − 1 。
     返回整数作为最终结果。*/
-    /**【重要的说明】
+    /**【重要的说明】————解析到第一个非数字的字符(!isDigit(ch))，就直接break返回，后面的就不用管了
      1. 解析数字时，对于不是数字的字符怎么处理？？
-     这个题的一个重要隐含条件：解析到第一个不是数字的位置就停止解析。如果开始的位置就不是数字，直接返回0
+     ❗❗❗❗❗❗这个题的一个重要隐含条件：解析到第一个不是数字的位置就停止解析。如果开始的位置就不是数字，直接返回0
      同时，题目也明确的说明了最后得到的结果要在int范围内————
      如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。
      2. 判断是否越界的逻辑是重点。为什么下面的判断越界逻辑是对的？
      声明：最大正数：2147483647；最小负数：-2147483648
-     例子1===》输入："-2147483649"。最后一位累加前，res = 214748364、当前 digit = 9、
+     ①例子1===》输入："-2147483649"。最后一位累加前，res = 214748364、当前 digit = 9、
      判断 (Integer.MAX_VALUE - 9)/10 = (2147483647-9)/10 = 214748363，
      res = 214748364 > 214748363 → 越界 → 返回 Integer.MIN_VALUE ✅
-     例子2===》输入：“-2147483648”。最后一位累加前，res = 214748364、当前 digit = 8、
+     ②例子2===》输入：“-2147483648”。最后一位累加前，res = 214748364、当前 digit = 8、
      判断 (Integer.MAX_VALUE - 8)/10 = (2147483647-8)/10 = 214748363，
      res = 214748364 > 214748363→ 越界 → 返回 Integer.MIN_VALUE ✅
      【补充】类似的道理可以参考69题的”mySqrt_best“方法实现，69题中的mid*mid可能超出int范围，因此直接计算不
@@ -2289,6 +2264,11 @@ int getMin() 获取堆栈中的最小元素。*/
 
     /*221最大正方形
     在一个由 '0' 和 '1' 组成的二维矩阵内，找到只包含 '1' 的最大正方形，并返回其面积。
+     */
+    /**
+     【第一行 或者 第一列】 第一行或者第一列时1的位置就是1，否则时0；
+     【矩阵中间的位置】 如果matrix的该位置时‘1’，则取决于左上角三个位置dp值的最小值；否则matrix该位置的值
+     是0，则该位置的dp值也是0
      */
     public int maximalSquare(char[][] matrix) {
         int res = 0;

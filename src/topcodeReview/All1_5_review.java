@@ -147,7 +147,7 @@ public class All1_5_review {
 //    }
 
 
-    /**chatgpt给出的代码如下*/
+    /**chatgpt给出的代码如下，但是下面的方法还不如直接使用方法 reverseWords____，直接倒着台南佳单词，都不用反转了*/
 //    public String reverseWords(String s) {
 //        String trim = s.trim();
 //        String s1 = reverString(trim);
@@ -192,6 +192,17 @@ public class All1_5_review {
 //        StringBuilder sb = new StringBuilder(s);
 //        return sb.reverse().toString();
 //    }
+    /*更简单的方法，甚至不用反转单词。直接倒着添加单词，添加到结果*/
+//    public String reverseWords____(String s) {
+//        String[] words = s.trim().split("\\s+");
+//        StringBuilder sb = new StringBuilder();
+//        for (int i = words.length - 1; i >= 0; i--) {
+//            sb.append(words[i]);
+//            if (i != 0) sb.append(" ");
+//        }
+//        return sb.toString();
+//    }
+
 //
     /**
      *=================================================5=====================================
@@ -222,6 +233,50 @@ public class All1_5_review {
 //
 //    }
 
+
+    //93
+    List<String> resRestoreIpAddresses;
+    public List<String> restoreIpAddresses(String s) {
+        StringBuilder path = new StringBuilder(s);
+        resRestoreIpAddresses = new LinkedList<>();
+        restoreIpAddresses(path,0,0);
+        return resRestoreIpAddresses;
+    }
+
+    private void restoreIpAddresses(StringBuilder path, int startIndex, int dotNum) {
+        if (dotNum==3){
+            if (isValid(path,startIndex,path.length()-1)){
+                resRestoreIpAddresses.add(new String(path));
+            }
+            return;
+        }
+
+        for (int i = startIndex; i < path.length() - 1; i++) {
+            if (isValid(path,startIndex,i)){
+                path.insert(startIndex+1,'.');
+                dotNum++;
+                restoreIpAddresses(path,startIndex+2,dotNum);
+                dotNum--;
+                path.deleteCharAt(startIndex+1);
+            }else {
+                break;
+            }
+        }
+    }
+
+    private boolean isValid(StringBuilder path, int left, int right) {
+        if (left>right) return false;
+        if (path.charAt(left)=='0' && left!=right) return false;
+        int res = 0;
+        for (int i = left; i < right; i++) {
+            int cur = path.charAt(i) - '0';
+            res = res*10 + cur;
+            if (res>255){
+                return false;
+            }
+        }
+        return true;
+    }
 
 
 }
