@@ -1709,7 +1709,7 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         // 如果 s3 的长度不等于 s1 和 s2 长度之和，直接返回 false
         if (s3.length() != m + n) return false;
 
-        // 初始化动态规划表 dp，dp[i][j] 表示 s1 的前 i 个字符和 s2 的前 j 个字符是否能组成 s3 的前 i+j 个字符
+        // 初始化动态规划表 dp，
         boolean[][] dp = new boolean[m + 1][n + 1];
 
         // 初始状态：两个空字符串可以组成一个空字符串
@@ -1735,10 +1735,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
         for (int i = 1; i <= m; i++) {
             for (int j = 1; j <= n; j++) {
-                // 状态转移方程：
-                // 1. 如果 s1 的第 i 个字符等于 s3 的第 i+j 个字符，则 dp[i][j] 取决于 dp[i-1][j]
-                // 2. 如果 s2 的第 j 个字符等于 s3 的第 i+j 个字符，则 dp[i][j] 取决于 dp[i][j-1]
-                // 只要有一种情况成立，dp[i][j] 就为 true
                 dp[i][j] = (dp[i - 1][j] && s1.charAt(i - 1) == s3.charAt(i + j - 1))
                         || (dp[i][j - 1] && s2.charAt(j - 1) == s3.charAt(i + j - 1));
             }

@@ -1874,7 +1874,7 @@ public class codetop_unskilled_6_10 {
         return String.valueOf(num).charAt(index)-'0';
     }
 
-    /*10
+    /*10.正则表达式匹配
     给你一个字符串 s 和一个字符模式 p，请实现支持 . 和 * 的正则表达式匹配：
         . 匹配任意单个字符。
         * 匹配零个或多个前面的那一个元素。
@@ -1914,9 +1914,13 @@ public class codetop_unskilled_6_10 {
                 if (sc==pc || pc =='.'){
                     dp[i][j] = dp[i-1][j-1];
                 } else if (pc == '*') {
-                    /*情况1——匹配0次：模式串p中的“字母*”并不匹配s串中的任何字符*/
+                    /**10题与44题最大的区别，在于pc是*的情况，此时必须要看*号之前的那个字符*/
+                    /*情况1——匹配0次，模式串p中的“字母*”并不匹配s串中的任何字符*/
                     dp[i][j] = dp[i][j-2];
-                    /*情况2——匹配多次：*/
+                    /*情况2——匹配多次*/
+                    /**10题中，*号要想匹配，必须满足*前面的字符和s子串的最后一个字符是相同的，否则不能匹配；
+                     区别于44题，44题中，*号可以匹配任意长度的字符，不需要看*前面的字符是什么
+                     */
                     char pre = p.charAt(j - 2); //拿到“*”前面的那个字符
                     if (pre=='.' || pre==sc){ //如果“*”前面的字符是“.”或者等于sc，则说明“*”前面的那个字符可以匹配s中的字符
                         dp[i][j] = dp[i][j] || dp[i-1][j];
@@ -2016,7 +2020,8 @@ public class codetop_unskilled_6_10 {
              如果 p[j-1] == '*'==========>dp[i][j] = dp[i][j-1] || dp[i-1][j]
                     含义：由于匹配串的最后一位是*号，因此匹配串的*号可以匹配一次或者0次。
                 如果匹配0次，就取决于dp[i][j-1]即相当于p的最后一位不参与忽略它的存在；如
-                果匹配多次，则s的最后一位可以匹配忽略它，取决于dp[i-1][j]
+                果匹配多次，则s的最后一位可以匹配忽略它（表示s的最后一位可以匹配成功），取
+                决于dp[i-1][j]
           解释：
             ①dp[i][j-1]：* 匹配空串；因为*匹配空串，因此dp[i][j] = dp[i][j-1]。
                 ❗：注意匹配一次或者多次不是dp[i-1][j-1]，因为匹配一个字符后*号还可以继续匹
@@ -2051,9 +2056,18 @@ public class codetop_unskilled_6_10 {
                           }
     */
     public boolean isMatch_44(String s, String p) {
+        /*step1：dp数组的声明 以及 初始值设置*/
         int m = s.length(), n = p.length();
         boolean[][] dp = new boolean[m + 1][n + 1];
         dp[0][0] = true;
+        /*step2：base case
+            第一行的初始化————第一行的时候表示s是空串，则p能匹配成功的情况，当且仅当当前位置是*号 并且 当前位置之前
+        可以成功的匹配空串。。。换言之只要从i=1开始，有一个位置不是*号，则后面的就不用看了，肯定的都是false，举个形象
+        的例子，比如：s=”“,p="****3***"，则dp[0][5]、dp[0][6]、dp[0][7]....都是false，也就是说从3位置开始，后
+        面的就不能匹配成功空串了
+            第一列的初始化————第一列表示p是空串，但是s是由数据的，此时都不能匹配成功。因为匹配串是空的。。。由于boolean数
+        组的默认值就是false，因此第一列的初始化可以省略
+        * */
         for (int i = 1; i <= n; i++) {
             dp[0][i] = dp[0][i - 1] && p.charAt(i - 1) == '*';
         }
@@ -2084,54 +2098,56 @@ public class codetop_unskilled_6_10 {
         如果不可能让所有橘子都腐烂，返回 -1。
      */
     public int orangesRotting(int[][] grid) {
-        int m = grid.length,n = grid[0].length;
+        int m = grid.length, n = grid[0].length;
         LinkedList<int[]> queue = new LinkedList<>();
         int fresh = 0;
         /*step1：包括2个内容，一是把所有腐烂的位置添加到queue、二是将计算新鲜的橘子有多少个*/
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                if (grid[i][j]==2){
-                    queue.offer(new int[]{i,j});
-                } else if (grid[i][j]==1){
+                if (grid[i][j] == 2) {
+                    queue.offer(new int[]{i, j});
+                } else if (grid[i][j] == 1) {
                     fresh++;
                 }
             }
         }
         /*step2：如果开始的时候新鲜的橘子数量就是0，说明不需要耗费时间————直接返回0*/
-        if (fresh==0) return 0;
+        if (fresh == 0) return 0;
 
         int minute = 0;
-        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
         /*step3：根据腐烂橘子的位置，进行扩散，每扩散一轮需要更新花费的时间minute*/
-        while (!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             int size = queue.size();
             minute++;    /**err：这里应该是有问题的，判断是否还需要进行的标准应该是“queue不是空 并且 新鲜橘子的数量fresh大于0”*/
             for (int i = 0; i < size; i++) {
                 /**有一个疑问：为什么对于腐烂的橘子，研究一遍就能直接出队列？？
-                    解释：因为一个腐烂的橘子，经过一分钟已经把周围的橘子都变腐烂了，因此只需要从4周已经腐烂的橘子继续
+                 解释：因为一个腐烂的橘子，经过一分钟已经把周围的橘子都变腐烂了，因此只需要从4周已经腐烂的橘子继续
                  感染下去。。。所以每一个腐烂的橘子只需要研究一次，它的任务就完成了，因为被它传染的橘子会继续传染下去，
-                 因此研究一次后腐烂的橘子就需要弹出队列
-                */
+                 因此研究一次后腐烂的橘子就需要弹出队列。
+                 反之，如果它不出队，则下一次从它再次向周围感染橘子，花费的时间肯定比它四周橘子出发感染下去的花费时
+                 间更长
+                 */
                 int[] cur = queue.poll();
                 //for循环尝试从cur位置向4个方向扩散，碰到正常的橘子就变腐烂
-                for (int[] d:dirs){
-                    int x = cur[0]+d[0],y = cur[1]+d[1];
-                    /*做三个事：如果得到的某个方位不越界，并且新位置的橘子是好的橘子，就让它变腐烂；新鲜橘子
-                        的数量-1；将腐烂橘子的位置添加进queue*/
-                    if (x>=0&&x<m&&y>=0&&y<n&&grid[x][y]==1){
-                        grid[x][y] =2;
+                for (int[] d : dirs) {
+                    int x = cur[0] + d[0], y = cur[1] + d[1];
+                    /*做三个事：如果得到的某个方位不越界，并且新位置的橘子是好的橘子（因为0是空格，1才是新鲜的橘子），就让
+                    它变腐烂（即grid对应位置的值变为2）；新鲜橘子的数量-1；将腐烂橘子的位置添加进queue*/
+                    if (x >= 0 && x < m && y >= 0 && y < n && grid[x][y] == 1) {
+                        grid[x][y] = 2;
                         fresh--;
-                        queue.offer(new int[]{x,y});
+                        queue.offer(new int[]{x, y});
                     }
                 }
             }
         }
-        return fresh==0?minute:-1;
+        return fresh == 0 ? minute : -1;
     }
 
 
-        /*97. 交错字符串
+    /*97. 交错字符串
     给定三个字符串 s1、s2、s3，请你帮忙验证 s3 是否是由 s1 和 s2 交错 组成的。
 
     两个字符串 s 和 t 交错 的定义与过程如下，其中每个字符串都会被分割成若干 非空 子字符串：
@@ -2144,18 +2160,33 @@ public class codetop_unskilled_6_10 {
     * */
     /*解法1：网友解法。官方有滚动数组优化的解法*/
     public boolean isInterleave(String s1, String s2, String s3) {
+        /*step1：获取长度并进行前置判断*/
         int m = s1.length(), n = s2.length();
         if (m + n != s3.length()) return false;
-
+        /*step2：dp[i][j] 表示 s1 的前 i 个字符和 s2 的前 j 个字符是否能组成 s3 的前 i+j 个字符。
+            ① 其中dp[0][0]的含义表示三个串此时都是空串，因此s3可以由s1和s2拼接来
+        * */
         boolean[][] dp = new boolean[m + 1][n + 1];
         dp[0][0] = true;
-        for (int i = 1; i <= n; i++) {
+        /*step3：base case的计算
+        情况1：如果s1是空串，则此时就是依次看s2的前i个字符的子串 是不是 等同于s3的前i个字符（即”dp中第一行“数据的初始化）
+        情况2：如果s2是空串，此时就需要依次看s1的前i个字符的子串，是不是 等同于s3的前i个字符（即”dp中第一列数据的初始化“）
+        * */
+        for (int i = 1; i <= n; i++) {  //代表s1是空的情况
             dp[0][i] = dp[0][i - 1] && s2.charAt(i - 1) == s3.charAt(i - 1);
         }
-        for (int i = 1; i <= m; i++) {
+        /*也可以使用下面的写法*/
+//        for (int j = 1; j <= n; j++) {
+//            if (s2.charAt(j - 1) == s3.charAt(j - 1)) {
+//                dp[0][j] = dp[0][j - 1];
+//            } else {
+//                break; // 如果字符不匹配，后续也无法匹配，直接退出循环
+//            }
+//        }
+        for (int i = 1; i <= m; i++) { //代表s2是空的情况
             dp[i][0] = dp[i - 1][0] && s1.charAt(i - 1) == s3.charAt(i - 1);
         }
-
+        /*step4：研究剩下的所有位置*/
         for (int i = 1; i <= m; i++) {
             for (int j = 1; j <= n; j++) {
                 /**
@@ -2163,13 +2194,17 @@ public class codetop_unskilled_6_10 {
                     dp[i][j]代表的是“第一个字符串前i个字符”和“第二个字符串前j个字符”的某种匹配关系，因此
                  当前研究的字符其实是“s1.charAt(i-1)”和“s2.charAt(j-1)”。
                  */
-                char s3c = s3.charAt(i + j - 2);   //这里应该是-2吧
+                char s3c = s3.charAt(i + j - 1);   //这里应该是-2吧？？应该是-1
                 /*
                     “dp[i - 1][j] && s1.charAt(i - 1) == s3c”代表：①s1的“0、1、2....i-2”这个子串 和 s2的“0、
                 1、2、.....j-1”这个子串 可以拼成s3的前面的子串；②并且s1的第i个字符(即当前研究的字符)和s3当前研究的字
                 符是一样的，因此dp[i][j]是true；
                     “dp[i][j - 1] && s2.charAt(j - 1) == s3c”也是同理
                  */
+                // 状态转移方程：
+                // 1. 如果 s1 的第 i 个字符等于 s3 的第 i+j 个字符，则 dp[i][j] 取决于 dp[i-1][j]
+                // 2. 如果 s2 的第 j 个字符等于 s3 的第 i+j 个字符，则 dp[i][j] 取决于 dp[i][j-1]
+                // 只要有一种情况成立，dp[i][j] 就为 true
                 dp[i][j] = (dp[i - 1][j] && s1.charAt(i - 1) == s3c) ||
                         (dp[i][j - 1] && s2.charAt(j - 1) == s3c);
             }
