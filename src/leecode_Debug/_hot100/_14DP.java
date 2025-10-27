@@ -523,7 +523,7 @@ public class _14DP {
 //                else{
 //                    dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
 //                }
-                res = Math.max(dp[i][j],res);
+                res = Math.max(dp[i][j],res); /**err：最长公共子数组可能在中间位置取到，因此需要在计算过程中更新res。。而不能直接返回右下角位置dp[m][n]！！！*/
             }
 
         return res;

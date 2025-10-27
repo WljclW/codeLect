@@ -289,6 +289,12 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                       （1）计算出i位置关于“目前回文中心”center的对称位置。
                       （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
             int mirror = 2 * center - i;
+            /**err：注意这个if条件不能缺。否则报错————
+             java.lang.ArrayIndexOutOfBoundsException: Index -1 out of bounds for length 11
+             at line 16, Solution.longestPalindrome
+             at line 56, __DriverSolution__.__helper__
+             at line 86, __Driver__.main
+             */
             if (i < right) { /**说明：理论上这里不带等于，但是写成“if (i <= right)”结果也不错*/
                 p[i] = Math.min(right - i, p[mirror]); /**得到i位置回文半径的最小值，i位置的回文串还可能往两边扩————3.2干的活*/
             }
@@ -300,7 +306,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             int l = i - p[i] - 1, r = i + p[i] + 1;
             while (l >= 0 && r < n && str.charAt(l) == str.charAt(r)) {
                 p[i]++;
-                l--;
+                l--; /**err：此时是向两边扩散，因此left--，right++*/
                 r++;
             }
             /*3.3 更新“最远回文右边界”（如果需要更新的话）。
@@ -768,6 +774,15 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return res;
     }
 
+    /*更简化的写法*/
+    public int maxProfit1(int[] prices) {
+        int res = 0;
+        for (int i = 1; i < prices.length; i++) {
+            res += Math.max(0,prices[i]-prices[i-1]);
+        }
+        return res;
+    }
+
 
     //179
     /**
@@ -815,6 +830,22 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             sb.append(s);
         }
         return sb.toString();
+    }
+
+    /**下面是另外的写法*/
+    public String largestNumber1(int[] nums) {
+        String[] strings = new String[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            strings[i] = String.valueOf(nums[i]);
+        }
+        Arrays.sort(strings,(a,b)->(b+a).compareTo(a+b));
+
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < strings.length; i++) {
+            if (res.length()==0&&"0".equals(strings[i])) continue;
+            res.append(strings[i]);
+        }
+        return res.length()==0?"0":res.toString();
     }
 
 

@@ -196,7 +196,7 @@ public class _15DP_dims {
         int[] dp = new int[n + 1];
         for (int i = 1; i <= m; i++) {
             int prev = 0; //①、对应 dp[i-1][j-1]
-            dp[0] = 0;
+            dp[0] = 0; /**对比于72题，这一步可以省略*/
             for (int j = 1; j <= n; j++) {
                 int tmp = dp[j]; //②、暂存 dp[i-1][j]，因为它马上要被覆盖
                 char c1 = text1.charAt(i - 1);
@@ -356,10 +356,10 @@ public class _15DP_dims {
         /*step3：遍历研究其余位置*/
         /**可以看到，在“一行数组+局部变量”的dp形式中。“prev“相当于“二维中的dp[i-1][j-1]”*/
         for (int i = 1; i <= m; i++) {
-            int prev = dp[0];
-            dp[0] = i;
+            int prev = dp[0]; /**要更新dp[0]了，因此先记录一下*/
+            dp[0] = i; /**相当于二维中第一列（word2此时是空串）的值，word2是空串，此时的编辑距离就是word1的长度*/
             for (int j = 1; j <= n; j++) {
-                int tmp = dp[j];
+                int tmp = dp[j]; /**下面要更新dp[j]了，因此也是先记录一下*/
                 char c1 = word1.charAt(i - 1);
                 char c2 = word2.charAt(j - 1);
                 if (c1==c2){

@@ -490,12 +490,14 @@ public class All1_5 {
      *      原因：nums1中的数存在前面的m个位置，所以如果从开始合并的话，nums1中的数可能会被污染，此时就要
      *   借助额外的数组空间暂存结果。。。比如：nums2[0]<nums1[0] 并且 nums2[0]<nums1[0]，此时nums2
      *   最开始的两个数需要copy到nums1，那nums1原来的数应该存到哪里去？？综上，最好使用倒序合并
+     *【注意】
+     *      1. 由于是倒序合并，因此需要把“较大的那个数”先放入nums1！！
      */
     public void merge(int[] nums1, int m, int[] nums2, int n) {
         int p1 = m-1,p2 = n-1;
         int cur = m+n-1;
         while (p1>=0&&p2>=0){
-            nums1[cur--] = nums1[p1]>nums2[p2]?nums1[p1--]:nums2[p2--];
+            nums1[cur--] = nums1[p1]>nums2[p2]?nums1[p1--]:nums2[p2--]; /**err：谁大先放谁，因为是倒序合并*/
         }
 
         while (p2>=0){

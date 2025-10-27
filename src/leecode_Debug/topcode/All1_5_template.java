@@ -707,7 +707,7 @@ int getMin() 获取堆栈中的最小元素。*/
 //    }
 
 
-    /*90对称二叉树
+    /*101对称二叉树
     给你一个二叉树的根节点 root ， 检查它是否轴对称。
      */
 //    public boolean isSymmetric(TreeNode root) {

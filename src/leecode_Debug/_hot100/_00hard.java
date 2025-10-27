@@ -101,7 +101,7 @@ public class _00hard {
         nums[cur] = tmp;
     }
 
-    /**简化版的写法如下*/
+    /**简化版的写法如下————区别在于for循环内嵌套while循环持续交换*/
     public int firstMissingPositive1(int[] nums) {
         for (int i = 0; i < nums.length; i++) {
             /**

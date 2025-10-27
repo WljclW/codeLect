@@ -197,6 +197,10 @@ public class _07binarytree {
         return maxDiameter;
     }
 
+    /**  其实这个题的辅助函数就是计算以root为根的树的高度
+     同时
+        在这个过程中更新答案
+     */
     private int dfs(TreeNode root) {
         if (root==null) return 0;
         int left = dfs(root.left);

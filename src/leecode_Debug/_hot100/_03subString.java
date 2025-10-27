@@ -76,10 +76,13 @@ public class _03subString {
             *   第二步：如果window中字符c的数量 等于 need中字符c的数量，则说明c这个字符通过校验，因此valid++*/
             if (need.containsKey(c)){
                 window.put(c,window.getOrDefault(c,0)+1);
-                /**err：map.get比较值相等的时候必须使用“.intValue()”方法才可以，跟“最小栈”题目是类似的
+                /**err：
+                 *    1. map.get比较值相等的时候必须使用“.intValue()”方法才可以，跟“最小栈”题目是类似的
                  * 道理。。
                  *      这里如果不使用“.intValue()”会导致倒数第二个测试用例过不了！！，因为数太大了，超过
-                 * 了Integer缓存的整数范围。*/
+                 * 了Integer缓存的整数范围。
+                 *    2. 只有在相等的时候才会更新valid！！
+                 * */
                 if (window.get(c).intValue()==need.get(c).intValue()){
                     valid++;
                 }
@@ -219,15 +222,15 @@ public class _03subString {
      * 错误原因2：
      *      出现在“char c1 = s.charAt(left);”没有更新left。报错的信息————
      *      都不用提交，运行是第一个用例报错，如下：
-     输入
-     s =
-     "ADOBECODEBANC"
-     t =
-     "ABC"
-     输出
-     "ADOBEC"
-     预期结果
-     "BANC"
+                 输入
+                 s =
+                 "ADOBECODEBANC"
+                 t =
+                 "ABC"
+                 输出
+                 "ADOBEC"
+                 预期结果
+                 "BANC"
      *             */
 //    public String minWindow(String s, String t) {
 //        HashMap<Character, Integer> need = new HashMap<>();

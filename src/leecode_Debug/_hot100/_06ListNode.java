@@ -307,7 +307,7 @@ public class _06ListNode {
 
     /*19.
     * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。*/
-    /**    🔺强烈建议使用官方解,即方法removeNthFromEnd1
+    /**    🔺强烈建议使用官方解,即方法removeNthFromEnd1~~~~~~~
      * 【解题关键&&官方解精髓】开始时slow指向虚拟头dummy节点；
      *                       开始时fast指向head 并且 fast先走n步（注意slow和fast的开始位置不一样）
      *                      （最后fast指向null的时候，slow正好指向倒数第n+1个节点）
@@ -783,6 +783,9 @@ public class _06ListNode {
     }
 
     private ListNode merge(ListNode[] lists, int l, int r) {
+        /**err：终止条件必须写对。
+            如果写成“if (left>right) return null;”报错：java.lang.StackOverflowError
+         */
         if (l==r) return lists[l];
         /*如果上面的if条件中没有“lists.length == 0”，就必须有下面的话。否则会报错：
         * java.lang.ArrayIndexOutOfBoundsException: Index 0 out of bounds for length 0
@@ -842,6 +845,14 @@ public class _06ListNode {
     void put(int key, int value) 如果关键字 key 已经存在，则变更其数据值 value ；如果不存在，则向缓存中插入该组 key-value 。如果插入操作导致关键字数量超过 capacity ，则应该 逐出 最久未使用的关键字。
     函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
     * */
+
+    /**
+     【注】
+        1. 构造器中初始化head和tail不能使用下面的方法
+             DouNode head = new DouNode();
+             DouNode tail = new DouNode();
+            此时全局的head、tail依然是null
+     */
     class LRUCache {
         /*
         1. LRU中每一个节点的结构
@@ -1031,7 +1042,7 @@ public class _06ListNode {
           果————>restStart开始的剩余部分链表”，因此翻转完成后拼接上即可*/
         ListNode start = slow.next;
         ListNode restStart = fast.next;
-        fast.next = null;
+        fast.next = null; /**err：没有这一句提交会报错：Error - Found cycle in the ListNode*/
 
         slow.next = reverse1(start);
         start.next = restStart;

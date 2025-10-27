@@ -157,7 +157,10 @@ public class codetop_5 {
 
 
 
-    /*83*/
+    /*83
+    删除排序链表中的重复元素
+给定一个已排序的链表的头 head ， 删除所有重复的元素，使每个元素只出现一次 。返回 已排序的链表 。
+    * */
     /**
      * 【建议】建议使用双指针的解法，见方法deleteDuplicates_83。。。
      * 【注意区分82】这个题会保留一个相同值的节点，82题会删除所有值相等的节点。造成的区别：
@@ -209,6 +212,20 @@ public class codetop_5 {
         slow.next = null; /**err：如果没有这句话，初始的测试用例中，有测试用例是错的*/
 
         return head; /*这个题返回head是没有问题的，因为相同的节点会保留一个，因此head一定是保留的！！*/
+    }
+
+    /**双指针的另一种写法*/
+    public ListNode deleteDuplicates_(ListNode head) {
+        if (head==null||head.next==null) return head;
+        ListNode slow = head,fast = head.next;
+        while (fast!=null){
+            while (fast!=null&&fast.val==slow.val){
+                fast = fast.next;
+            }
+            slow.next = fast;
+            slow = slow.next;
+        }
+        return head;
     }
 
 
@@ -701,6 +718,11 @@ public class codetop_5 {
      *   是当前计算新带来的，因此要加到以前的进位信息res[i+j]上
      *【解题思路】声明一个len1+len2长度的数组，来存放计算出来的每一位。第一个数index=i的数和第二个数index=j的
      *      数相乘后的结果应该放在结果中的i+j+1的位置。
+     *【错误】
+     *      1. 两个数相乘是每一位数都会进行相乘，因此需要使用双层循环！
+     *      2. 每一位置的计算“int curSum = digit1 * digit2 + multiRes[i + j + 1]”————即nums1和nums2对应位置的数相乘再
+     *  加res中index=i+j+1位置本来就有的数。nums1的i位置 和 nums2的j位置 相乘的结果应该在res的index=i+j+1位置。
+     *
      */
     public String multiply(String num1, String num2) {
         if ("0".equals(num1) || "0".equals(num2)) return "0"; /**err：没有不行。没有的话，如果结果是0，会输出""，两个数相乘再怎么也得有个数*/

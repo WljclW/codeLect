@@ -227,6 +227,7 @@ public class _11stack {
         LinkedList<Integer> stack_digit = new LinkedList<>();
         LinkedList<String> stack_str = new LinkedList<>();
         for (Character c : s.toCharArray()) {
+            /**err：“c >= '0'”等于号不能少，因为有一个例子是“"100[leetcode]"”，所以要包括字符0*/
             if (c >= '0' && c <= '9') //①碰到数字，计算multi。【注意】闭区间['0','9']。
                 digit = 10 * digit + Integer.parseInt(c + "");
             else if (c == '[') { //碰到左括号
