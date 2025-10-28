@@ -1019,11 +1019,11 @@ public class codetop_5 {
     public List<List<Integer>> pathSum_3(TreeNode root, int targetSum) {
         resPathSum_3 = new LinkedList<>();
         LinkedList<Integer> path = new LinkedList<>();
-        dfs(root,targetSum,path);
+        dfs1(root,targetSum,path);
         return resPathSum_3;
     }
 
-    private void dfs(TreeNode root, int targetSum, LinkedList<Integer> path) {
+    private void dfs1(TreeNode root, int targetSum, LinkedList<Integer> path) {
         if (root==null) return;
         path.add(root.val);
         if (root.left==null&&root.right==null&&targetSum==root.val){

@@ -351,15 +351,19 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      * ==============================1~5 page====================================================================================
      * ==================================================================================================================
      */
-    //215
-    /*
+    /*215. 数组中的第K个最大元素
+    给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
+    请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+    你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
+     */
+    /**
+     TODO:理解chatgpt给出的三种解法
     方法1：调用Arrays.sort()进行完整的排序。时间复杂度——O(n log n)，空间复杂度O(1).
     方法2：借助优先级队列。只要优先级队列的数字超过k，就弹出。
             时间复杂度——O(n logK),空间复杂度——O(k)
             适合处理数据流或 n 很大但 k 较小的情况。
     方法3：快排思想的排序。
      */
-    //215
     /*解法1：借助优先级队列。保证优先级队列中只有k个元素，最后弹出即可*/
     public int findKthLargest(int[] nums, int k) {
         /**
@@ -381,7 +385,9 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     *   此时的复杂度分析：
     *       时间复杂度：O(N)
     *       空间复杂度：O(1)（原地操作，递归栈深度 O(log n)）。
+    * 【注意】部分用例会超时，尤其是数组中重复数很多的时候！
     * */
+    /**注意：随即快排的这种解法会导致个别用例超时（43/44用例超时，几乎都是重复的1）！！！*/
     public int findKthLargest_quickSort(int[] nums, int k) {
         int n = nums.length;
         return quickSort(nums, 0, n - 1, n - k);
@@ -403,33 +409,16 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
     private int partion(int[] nums, int l, int r) {
+        int cur = l;
         for (int i = l; i < r; i++) {
             if (nums[i] < nums[r]) {
-                swap(nums, l++, i);
+                swap(nums, cur++, i);
             }
         }
-        swap(nums, l, r);
-        return l;
+        swap(nums, cur, r);
+        return cur;
     }
 
-    /**
-     * chatgpt给出的partion，与上面的写法相比：多了一个变量的声明
-     */
-//    private int partition(int[] nums, int left, int right, int pivotIndex) {
-//        int pivot = nums[pivotIndex];
-//        swap(nums, pivotIndex, right); // 把 pivot 放到末尾
-//        int storeIndex = left;
-//
-//        for (int i = left; i < right; i++) {
-//            if (nums[i] < pivot) {
-//                swap(nums, storeIndex, i);
-//                storeIndex++;
-//            }
-//        }
-//
-//        swap(nums, storeIndex, right); // 把 pivot 放到正确位置
-//        return storeIndex;
-//    }
     private void swap(int[] nums, int l, int r) {
         int tmp = nums[l];
         nums[l] = nums[r];
@@ -437,8 +426,131 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
 
-    /*
-    *K神快排的写法，这种写法就不会超时，为什么？？
+    /**
+     chatgpt给出的第一个版本，下面是迭代版本的写法。就不会超时了~~
+     思考思考为什么？？
+     */
+    public int findKthLargest_chatgpt1(int[] nums, int k) {
+        int left = 0, right = nums.length - 1, target = nums.length - k;
+        Random rand = new Random();
+        while (left <= right) {
+            int pivotIndex = left + rand.nextInt(right - left + 1);
+            int index = partition1(nums, left, right, pivotIndex);
+            if (index == target) return nums[index];
+            else if (index < target) left = index + 1;
+            else right = index - 1;
+        }
+        return -1;
+    }
+
+    private int partition1(int[] nums, int left, int right, int pivotIndex) {
+        int pivot = nums[pivotIndex];
+        swap_chatgpt(nums, pivotIndex, right);
+        int cur = left;
+        for (int i = left; i < right; i++) {
+            if (nums[i] < pivot) swap_chatgpt(nums, cur++, i);
+        }
+        swap_chatgpt(nums, cur, right);
+        return cur;
+    }
+
+    private void swap_chatgpt(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
+    }
+
+
+    /**
+     chatgpt给出的第二个版本的代码。————Hoare 分区法（推荐）
+     为什么采用这种分区方法就不会超时，为什么？？
+     */
+    public int findKthLargest_chatgpt2(int[] nums, int k) {
+        if (nums.length==1 || k==0) return nums[0];
+        return findKthLargest(nums,0,nums.length-1,k);
+    }
+
+    public int findKthLargest(int[] nums, int left, int right, int k) {
+        if (left==right) return nums[left];
+        int pivotIndex = left + new Random().nextInt(0,right-left+1);
+        swap_chatgpt(nums,pivotIndex,right);
+
+        pivotIndex = partitionHoare(nums, left, right);
+        if (pivotIndex >= nums.length - k)
+            return findKthLargest(nums, left, pivotIndex, k);
+        else
+            return findKthLargest(nums, pivotIndex + 1, right, k);
+    }
+
+
+    private int partitionHoare(int[] nums, int left, int right) {
+        int pivot = nums[left + (right - left) / 2];
+        int i = left - 1, j = right + 1;
+        while (true) {
+            do { i++; } while (nums[i] < pivot);
+            do { j--; } while (nums[j] > pivot);
+            if (i >= j) return j;
+            swap_chatgpt(nums, i, j);
+        }
+    }
+
+    /**
+     chatgpt给出的第三个版本代码————三向划分
+     */
+    public int findKthLargest_chatgpt3(int[] nums, int k) {
+        int left = 0, right = nums.length - 1;
+        int target = nums.length - k; // 第 k 大的索引（升序排列后）
+
+        Random random = new Random();
+
+        while (left <= right) {
+            // 1. 随机选择 pivot
+            int pivotIndex = left + random.nextInt(right - left + 1);
+            int pivot = nums[pivotIndex];
+
+            // 2. 三向划分
+            int[] range = partition3Way(nums, left, right, pivot);
+            int lt = range[0], gt = range[1];
+
+            // 3. 根据 pivot 区间调整搜索范围
+            if (target < lt) {
+                right = lt - 1;      // 目标在左半部分
+            } else if (target > gt) {
+                left = gt + 1;       // 目标在右半部分
+            } else {
+                return nums[lt];     // 目标在 pivot 区间内
+            }
+        }
+
+        return -1; // 理论不会走到这
+    }
+
+    /**
+      三向划分（Dutch National Flag）,使得区间被分为：
+                [left, lt-1] < pivot
+                [lt, gt] == pivot
+                [gt+1, right] > pivot
+     */
+    private int[] partition3Way(int[] nums, int left, int right, int pivot) {
+        int lt = left;    // 小于 pivot 的区域边界
+        int i = left;     // 当前扫描指针
+        int gt = right;   // 大于 pivot 的区域边界
+
+        while (i <= gt) {
+            if (nums[i] < pivot) {
+                swap_chatgpt(nums, lt++, i++);
+            } else if (nums[i] > pivot) {
+                swap_chatgpt(nums, i, gt--);
+            } else {
+                i++;
+            }
+        }
+        return new int[]{lt, gt};
+    }
+
+
+    /**
+        K神快排的写法，这种写法就不会超时，为什么？？
     * */
     private int quickSelect(List<Integer> nums, int k) {
         // 随机选择基准数

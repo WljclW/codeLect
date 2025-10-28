@@ -466,7 +466,7 @@ public class _10binarySearch {
         nums[mid]>=nums[l]：说明mid的左边一定是有序的。
       因此，也可以使用下面的代码。
     * */
-    public int search(int[] nums, int target) {
+    public int search_another(int[] nums, int target) {
         int left = 0,right = nums.length-1;
         while (left<=right){
             int mid = left+(right-left)/2;

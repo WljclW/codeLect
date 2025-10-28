@@ -11,51 +11,6 @@ import java.util.*;
  * 10.27
  */
 public class All1_5_template {
-    /*215. 数组中的第K个最大元素
-    给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
-    请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
-    你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
-     */
-    public static void main(String[] args) {
-        All1_5_template s = new All1_5_template();
-        s.findKthLargest(new int[]{3,2,3,1,2,4,5,5,6},4);
-    }
-
-
-    public int findKthLargest(int[] nums, int k) {
-        k %= nums.length;
-        if (nums.length==1 || k==nums.length) return nums[0];
-        return findKthLargest(nums,0,nums.length-1,k);
-    }
-
-    public int findKthLargest(int[] nums, int left, int right, int k) {
-        if (left==right) return nums[left];
-        int pivotIndex = left + new Random().nextInt(0,right-left+1);
-        swap1(nums,pivotIndex,right);
-        pivotIndex = partition1(nums,left,right);
-        if (pivotIndex==nums.length-k) return nums[pivotIndex];
-        if (pivotIndex> nums.length-k)
-            return findKthLargest(nums,left,pivotIndex-1,k);
-        else
-            return findKthLargest(nums,pivotIndex+1,right,k);
-    }
-
-    public int partition1(int[] nums, int left, int right) {
-        int cur = left;
-        for (int i = left; i < right; i++) {
-            if (nums[cur]<=nums[right]) {
-                swap1(nums,cur++,i);
-            }
-        }
-        swap1(nums,cur,right);
-        return cur;
-    }
-
-    public void swap1(int[] nums, int i, int j) {
-        int temp = nums[i];
-        nums[i] = nums[j];
-        nums[j] = temp;
-    }
     /**
      * ============================================2=========================
      * ============================================2=========================
