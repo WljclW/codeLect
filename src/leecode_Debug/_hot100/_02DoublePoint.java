@@ -14,7 +14,8 @@ public class _02DoublePoint {
     *    研究到的位置
     * */
     /**
-     * 【建议】使用解法moveZeroes1、moveZeroes2。直接采用交换的方式，这样就不用对cur后面的位置再赋值了
+     * 【建议】使用解法moveZeroes1、moveZeroes2（moveZeroes2更符合自己的想法）。直接采用交换的方式，这样就不用
+     * 对cur后面的位置再赋值了
      * */
     public void moveZeroes(int[] nums) {
         int left = 0;
@@ -50,11 +51,26 @@ public class _02DoublePoint {
     public void moveZeroes2(int[] nums) {
         int left = 0,cur = 0;
         while (cur<nums.length){
+            /**情况1：如果cur位置的数不是0，则交换到left的位置*/
             if (nums[cur]!=0){
                 swap1(nums,left++,cur);
             }
+            /**情况2：说明cur位置的数就是0，此时仅仅需要移动cur指针。
+                【说明】由于if块中交换后没有移动cur指针，因此这个“cur++”不用写在else块中。。因此见下面的注释说明，两种while
+             循环的写法
+             */
             cur++;
         }
+        /**while循环的写法与下面的写法是等价的*/
+        /*
+        while (cur<nums.length){
+            if (nums[cur]!=0){
+                swap1(nums,left++,cur++);
+            }else{
+                cur++;
+            }
+        }
+         */
     }
 
     private void swap1(int[] nums, int l, int r) {

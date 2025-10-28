@@ -216,11 +216,38 @@ public class _01completeBag {
         return dp[amount]==Integer.MAX_VALUE?-1:dp[amount];
     }
 
+    /*可以改进成下面的版本*/
+    public int coinChange_1(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        /*step1：dp数组初始化为一个不可能的最大值*/
+        Arrays.fill(dp,amount+1);
+        /*step2：dp[0]表示需要凑够0元，只能使用coins[0]。此时的最少硬币数量就是0，压根就不用任何一块硬币*/
+        dp[0] = 0;
+        /*step3：dp的初始化，由于此时只有coins[0]，因此只能凑出来coins[0]面值的整数倍*/
+        for (int i = coins[0]; i <= amount; i++) {
+            if (i%coins[0]==0) dp[i] = i/coins[0];
+        }
+        /*step4：普遍位置的计算*/
+        for (int i = 1; i < coins.length; i++) {
+            for (int j = coins[i]; j <= amount; j++) {
+                if (dp[j-coins[i]]!=amount+1){
+                    /*
+                        1. 当前计算到j位置，根据内层for循环可知是从左往右计算，因此j左边的位置已经更新过
+                    了。因为右边的“dp[j-coins[i]]”索引“j-coins[i]”<j，因此使用的是最新值；
+                        2. 右边的dp[j]此时还是旧值，因此右边的dp[j]是上一行的值*/
+                    dp[j] = Math.min(dp[j-coins[i]]+1,dp[j]); /*右边dp[j]等价于二维中的dp[i-1][j]，右边的dp[j-coins[i]]等价于二维中dp[i][j-coins[i]]*/
+                }
+            }
+        }
+        return dp[amount]==amount+1?-1:dp[amount];
+    }
+
     /*一维最简的写法*/
     public int coinChange_3(int[] coins, int amount) {
         int[] dp = new int[amount + 1];
         Arrays.fill(dp,amount+1);
         dp[0] = 0;
+        /**dp数组的初始化过程写在 双层for循环中*/
         for (int i = 0; i < coins.length; i++) {
             for (int j = coins[i]; j <=amount; j++) {
                 dp[j] = Math.min(dp[j-coins[i]]+1,dp[j]);

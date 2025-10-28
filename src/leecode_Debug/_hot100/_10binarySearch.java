@@ -138,6 +138,15 @@ public class _10binarySearch {
     你必须设计并实现时间复杂度为 O(log n) 的算法解决此问题。
     * */
     /**
+     *【重要说明】方法“searchRange_02”中的注释指出了寻找两种边界的代码区别！！————
+     *      区别1：如果nums[mid]==target，指针如何移动？
+     *          如果寻找左边界，则应该移动right指针，因为我们想尽量的往左再找找；
+     *          反之
+     *          如果寻找右边界，则应该移动left指针，因为我们想最大限度的往右边找找。
+     *      区别2：最后应该返回哪一个指针？
+     *          如果寻找左边界，则相等的时候right=mid-1,因此最终right位置必然小于target，所以需要返回left;
+     *          反之
+     *          如果寻找右边界，则相等的时候left=mid+1,因此最终left位置必然大于target，所以需要返回right;
      * 解法1（见方法searchRange）：分别求出左右边界————
      *      区别1：相等时指针的移动。对于nums[mid]>target 以及 nums[mid]<target 的情况，指针的变化
      *  都是一样的，唯一的区别在于nums[mid]==target的时候：
@@ -221,7 +230,7 @@ public class _10binarySearch {
             }else if (nums[mid]>target){
                 r=mid-1;
             }else {
-                l = mid+1;
+                l = mid+1; //”nums[mid]=target“的时候需要移动左指针
             }
         }
         /**
@@ -287,7 +296,7 @@ public class _10binarySearch {
     * */
     public int[] searchRange_02(int[] nums, int target) {
         int left = searchL(nums, target);
-        if (left==nums.length||nums[left]!=target){
+        if (left==nums.length||nums[left]!=target){ /**if条件满足就说明数组中没有target这个数*/
             return new int[]{-1,-1};
         }
         int right = searchR(nums, target);
@@ -360,18 +369,18 @@ public class _10binarySearch {
      * */
     /*
     ==================错误点1
-    输入
-        nums =
-        [3,1]
-        target =
-        1
-    输出
-        -1
-    预期结果
-        1
+            输入
+                nums =
+                [3,1]
+                target =
+                1
+            输出
+                -1
+            预期结果
+                1
         原因：“if (nums[mid] >= nums[0])”或者“if (nums[mid] >= nums[l])”————左边是有序的，不能漏掉等于。
     * */
-    /*写法1：不推荐*/
+    /*写法1：不推荐（不要使用nums[0]，用nums[left]的通用性更好）*/
     public int search(int[] nums, int target) {
         int l = 0, r = nums.length - 1;
         while (l <= r) {    /**闭区间搜索，这里应该必须带”等号“*/
@@ -445,6 +454,37 @@ public class _10binarySearch {
                     l = mid+1;
                 }else {
                     r = mid-1;
+                }
+            }
+        }
+        return -1;
+    }
+
+
+    /*上面的方法中，判断mid左边还是右边有序的时候用的是“nums[mid]>=nums[l]”，用“nums[mid]>nums[right]”也是可以的。
+        nums[mid]>nums[right]：说明mid的左边一定是有序的；
+        nums[mid]>=nums[l]：说明mid的左边一定是有序的。
+      因此，也可以使用下面的代码。
+    * */
+    public int search(int[] nums, int target) {
+        int left = 0,right = nums.length-1;
+        while (left<=right){
+            int mid = left+(right-left)/2;
+            if (nums[mid]==target) return mid;
+            /**
+             * 这里是需要和最后一个数比较？？还是需要和第一个数比较？？？这个题都是可以的
+             */
+            if (nums[mid]>nums[right]){
+                if (nums[left]<=target&&target<nums[mid]){ /**注：这个条件中如果nums[left]换成nums[0]就错了*/
+                    right = mid-1;
+                }else {
+                    left = mid+1;
+                }
+            }else {
+                if (nums[mid]<target&&target<=nums[right]){
+                    left = mid+1;
+                }else {
+                    right = mid-1;
                 }
             }
         }

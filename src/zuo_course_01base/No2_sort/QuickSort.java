@@ -156,7 +156,7 @@ public class QuickSort {
      */
     public static void quickSort3(int[] arr,int l,int r){
         /*step1：base-case的考虑*/
-        if (l>=r) return; /**err：如果写成“if (l==r) return;”，是错误的，必须是“>=”。。。说明某些时候l不存在等于r的时候，直接来到了l>r*/
+        if (l>=r) return; /**err：如果写成“if (l==r) return;”，是错误的，必须是“>=”或者“>”。。。说明某些时候l不存在等于r的时候，直接来到了l>r*/
         /*step2：产生一个索引；并将这个数交换到索引为r的位置*/
         int pivotIndex = l + new Random().nextInt(r - l + 1);
         swap3(arr,pivotIndex,r);

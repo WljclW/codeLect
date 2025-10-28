@@ -304,9 +304,19 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
              *          答：因为题中说了"每一个数可以无限次被选取！！！（即这一轮选了，下一轮也能继续选）"。也
              *     正因为下一次递归依然从i开始，因此必须要有"if(target<0) return;"这句逻辑，否则就会出现StackOverflow！！
              *     ————即这个题使用递归达到重复选择每一个数的目的！！
+             【如果错写成“combinationSumTrace(candidates,i+1,target,path);”】第一个case，第二个case都会报错————
+                             输入
+                             candidates =
+                             [2,3,6,7]
+                             target =
+                             7
+                             输出
+                             [[7]]
+                             预期结果
+                             [[2,2,3],[7]]
              * */
 //            combinationSumTrace(candidates,index,target,path);
-            combinationSumTrace(candidates,i,target,path); /**err：递归时需要从i开始，而不是i+1，更不是index*/
+            combinationSumTrace(candidates,i,target,path); /**err(反复错)：递归时需要从i开始，而不是i+1，更不是index*/
             target += candidates[i];
             path.removeLast();
         }

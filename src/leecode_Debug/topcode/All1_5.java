@@ -23,6 +23,9 @@ import java.util.*;
  *  表的数量以及翻转的位置等相关注释有问题
  *      _hot100._06ListNode#isPalindrome(leecode_Debug.top100.ListNode)这个题上面的注释中也是错误的，尤
  *  其是翻转后半部分后两半链表的形态————根源：这是单链表，一个节点的后继必然是相同的节点
+ *
+ *  2025.10.28
+ *      162，470表达式的理解，8. 字符串转换整数 (atoi)，69 求解平方根，82，33，912 快排，113，，
  */
 /*源文件————codetop_unskilled_1_5
     215、53、5、92、1143、151、78、322、8、39、470、112、718、14、手撕快排
@@ -242,19 +245,23 @@ public class All1_5 {
 
 
     /*
-    手撕快排
+    912，手撕快排
      */
-    public void quickSort(int[] arr,int left,int right){
-        if (left>=right) return;
-        int pivotIndex = left + new Random().nextInt(right - left + 1);
+    public void quickSort(int[] arr,int left,int right) {
+        if (left>=right) return; /**err：快排中这里的条件必须是“left>=right”或者“left>right”.如果仅仅有等号是不对的*/
+        /**如果上面的if写成“if (left==right) return;”，912题提交时下面这行会报错————
+         java.lang.IllegalArgumentException: bound must be greater than origin
+         at line 236, java.base/jdk.internal.util.random.RandomSupport.checkRange
+         at line 678, java.base/java.util.random.RandomGenerator.nextInt
+         */
+        int pivotIndex = left + new Random().nextInt(0, right - left + 1);
         swap1(arr,pivotIndex,right);
-        pivotIndex = partion(arr,left,right);
-
+        pivotIndex = partion1(arr,left,right);
         quickSort(arr,left,pivotIndex-1);
         quickSort(arr,pivotIndex+1,right);
     }
 
-    private int partion(int[] arr, int left, int right) {
+    private int partion1(int[] arr, int left, int right) {
         int cur = left;
         for (int i = left; i < right; i++) {
             if (arr[i]<arr[right]){
@@ -266,7 +273,7 @@ public class All1_5 {
     }
 
     private void swap1(int[] arr, int pivotIndex, int right) {
-        int tmp = arr[pivotIndex];
+        int tmp  =arr[pivotIndex];
         arr[pivotIndex] = arr[right];
         arr[right] = tmp;
     }
@@ -1528,7 +1535,9 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     }
 
     /**
-     *【易错点】mid*mid可能超出int的范围，因此必须要用long类型表示
+     *【易错点】
+     *      错误点1. mid*mid可能超出int的范围，因此必须要用long类型表示。需要使用“long curVal = (long)mid*mid”
+     *      错误点2. 这个题的left左边界定为0不合适，应该定为1
      *【解的本质】查找”某数的平方“小于等于x的右边界，即”最大的 满足平方小于等于x“的数..
      *      基于这句话的本质，是不是同样也可以理解成”求解平方大于x的左边界“的那个数-1？？？（应该是可以的）
      *【优化】0和1的平方根的特殊考虑；右边界初始化为x/2。
@@ -1559,8 +1568,14 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
                 err：下面的语句必须使用“long square = (long) mid * mid;”，由于大数的平方可能导致超出int的范
              围，因此必须使用long类型。
                 使用“long square =  mid * mid;”也是错误的！！！
+             【⚠重要】
+                1. 语句①：long curVal = (long)mid*mid、语句②：long curVal = mid*mid 的区别————
+                    语句①：(long)mid会先把mid转换为long类型；然后再相乘；最后的结果是long类型；并且赋值给long类
+                型的curVal（即不会出现越界现象）
+                    语句②：mid*mid的结果化石int类型，如果超过MAX_VALUE就会溢出不会转换为long类型；最后仅仅是把
+                结果赋值给一个long类型的变量curVal。
              */
-            long square = (long) mid * mid;
+            long square = (long) mid * mid; /**err：要先把一个mid转换为long类型再计算！！！！！！错了多次*/
 
             if (square == x) {
                 return mid; //如果是等于的话直接返回
@@ -1574,6 +1589,11 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         return ans;
     }
 
+    /*下面是另外的一种写法。这种避免溢出的方式与“题目8. 字符串转换整数 (atoi)”有异曲同工之妙。
+     【补充说明】
+          如果left误初始化为0，则方法“mySqrt1”的代码依然没问题，但是下面的代码就不对，因为下面的代码中mid出现在分
+      母的位置，因此mid变为0会出现问题————用例报错“java.lang.ArithmeticException: / by zero”
+    * */
     public int mySqrt_best(int x) {
         if (x <= 1) return x;
         int left = 1, right = x / 2;
@@ -1636,12 +1656,18 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
             int digit = ch - '0';
 
             // 4. 溢出判断
+            /**
+             【注意】
+                1. 如果没有提前计算digit，如下的写法：
+                     if (res>(Integer.MAX_VALUE-c+'0')/10) return sign==1?Integer.MAX_VALUE:Integer.MIN_VALUE;
+                注意表达式“Integer.MAX_VALUE-c+'0'”去掉括号要变号，因此不再是“c-‘0’”了
+             */
             if (res > (Integer.MAX_VALUE - digit) / 10) { /**err：溢出判断是精髓*/
                 return (sign == 1) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
             }
 
             res = res * 10 + digit;
-            index++;
+            index++; /**err：需要更新index变量，否则运行代码报错“超出时间限制”，没有任何一个通过的用例*/
         }
 
         return res * sign;
@@ -2137,11 +2163,6 @@ int getMin() 获取堆栈中的最小元素。*/
 
 
     /*104
-
-     */
-
-
-    /*470
 
      */
 
