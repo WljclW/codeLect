@@ -785,6 +785,9 @@ public class _06ListNode {
     private ListNode merge(ListNode[] lists, int l, int r) {
         /**err：终止条件必须写对。
             如果写成“if (left>right) return null;”报错：java.lang.StackOverflowError
+            1. 注意这里的终止条件要区别于快排。快排中是对区间内的元素进行排序，因此”left>=right“直接返回，且快排是没有返回值
+         的，想要返回值直接返回原始数组就行。。。。这个题是合并区间内的链表，是有返回值的，因此终止条件是”left==right“———区间
+         内只有一个链表，直接返回
          */
         if (l==r) return lists[l];
         /*如果上面的if条件中没有“lists.length == 0”，就必须有下面的话。否则会报错：

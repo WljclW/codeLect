@@ -1,6 +1,8 @@
 package topcodeReview;
 
 import leecode_Debug.top100.ListNode;
+import leecode_Debug.top100.TreeNode;
+
 import java.util.*;
 
 /**
@@ -23,6 +25,7 @@ public class All1_5_template {
     手撕快排
      */
     public void quickSort(int[] arr,int left,int right) {
+        if (left>=right) return;
         int pivotIndex = left + new Random().nextInt(0, right - left + 1);
         swap1(arr,pivotIndex,right);
 
@@ -35,7 +38,7 @@ public class All1_5_template {
         int cur = left;
         for (int i = left; i < right; i++) {
             if (arr[i]<arr[right]){
-                swap1(arr,cur,i);
+                swap1(arr,cur++,i);
             }
         }
         swap1(arr,cur,right);
@@ -151,6 +154,10 @@ public class All1_5_template {
     }
 
     private ListNode mergeKLists(ListNode[] lists, int left, int right) {
+        /*测试一下改成下面的代码对吗
+            if (left>right) return null;
+            if (left==right) return lists[left];
+         */
         if (left==right) return lists[left]; /**问一下chatgpt，为什么不能写成“if (left>right) return null;”*/
         int mid = left+(right-left)/2;
         ListNode leftNode = mergeKLists(lists, left, mid);
@@ -215,9 +222,42 @@ public class All1_5_template {
      */
     /*148.排序链表
      * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
-//    public ListNode sortList(ListNode head) {
-//
-//    }
+    public ListNode sortList(ListNode head) {
+        if (head==null||head.next==null) return head;
+        ListNode midPrev = findMidPrev(head);
+        ListNode nextStart = midPrev.next;
+        midPrev.next = null;
+
+        ListNode left = sortList(head);
+        ListNode right = sortList(nextStart);
+
+        return mergeTwo11(left,right);
+    }
+
+    private ListNode mergeTwo11(ListNode left, ListNode right) {
+        ListNode dummy = new ListNode(-1),cur = dummy;
+        while (left!=null&&right!=null){
+            if (left.val<right.val){
+                cur.next = left;
+                left = left.next;
+            }else {
+                cur.next = right;
+                right = right.next;
+            }
+            cur =cur.next;
+        }
+        cur.next = left==null?right:left;
+        return dummy.next;
+    }
+
+    private ListNode findMidPrev(ListNode head) {
+        ListNode slow = head,fast = head.next;
+        while (fast!=null&&fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
 
     /*69. x 的平方根
 给你一个非负整数 x ，计算并返回 x 的 算术平方根 。
@@ -253,9 +293,28 @@ public class All1_5_template {
 转换：通过跳过前置零来读取该整数，直到遇到非数字字符或到达字符串的结尾。如果没有读取数字，则结果为0。
 舍入：如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231 的整数应该被舍入为 −231 ，大于 231 − 1 的整数应该被舍入为 231 − 1 。
 返回整数作为最终结果。*/
-//    public int myAtoi(String s) {
-//
-//    }
+    public int myAtoi(String s) {
+        int index = 0;
+        while (index<s.length()&&s.charAt(index)==' '){
+            index++;
+        }
+        if (index==s.length()) return 0;
+
+        int sign  =1;
+        if (s.charAt(index)=='-'||s.charAt(index)=='+'){
+            sign = s.charAt(index)=='-'?-1:1;
+            index++;
+        }
+
+        int res = 0;
+        while (index<s.length()){
+            char c = s.charAt(index);
+            if (!Character.isDigit(c)) return res;
+            if (res>(Integer.MAX_VALUE-c-'0')/10) return sign==1?Integer.MAX_VALUE:Integer.MIN_VALUE;
+            res = res*10 + c-'0';
+        }
+        return res;
+    }
 
 
     /*322. 零钱兑换
@@ -279,15 +338,6 @@ public class All1_5_template {
         }
         return dp[amount]==amount+1?-1:dp[amount];
     }
-
-    //    /*105.
-//     * 从前序 和 中序 构造出二叉树*/
-    /**
-     * 分析一下时间复杂度=======================
-     * 分析一下时间复杂度=======================
-     * 分析一下时间复杂度=======================
-     */
-
 
     /*151. 反转字符串中的单词
 给你一个字符串 s ，请你反转字符串中 单词 的顺序。
@@ -315,9 +365,40 @@ public class All1_5_template {
 如果数组中不存在目标值 target，返回 [-1, -1]。
 
 你必须设计并实现时间复杂度为 O(log n) 的算法解决此问题。*/
-//    public int[] searchRange(int[] nums, int target) {
-//
-//    }
+    public int[] searchRange(int[] nums, int target) {
+        int left = findLeft(nums,target);
+        if (left==nums.length||nums[left]!=target) return new int[]{-1,-1};
+        int right = findRight(nums,target);
+        return new int[]{left,right};
+    }
+
+    private int findRight(int[] nums, int target) {
+        int left = 0,right = nums.length-1;
+        while (left<=right){
+            int mid = left+(right-left)/2;
+            if (nums[mid]>target){
+                right = mid-1;
+            }else {
+                left = mid+1;
+            }
+        }
+        return right;
+    }
+
+    private int findLeft(int[] nums, int target) {
+        int left = 0,right = nums.length-1;
+        while (left<=right){
+            int mid = left+(right-left)/2;
+            if(nums[mid]<target){
+                left = mid+1;
+            }else {
+                right = mid-1;
+            }
+        }
+        return left;
+    }
+
+
     /*39组合总和
     给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
 
@@ -325,9 +406,26 @@ public class All1_5_template {
 
     对于给定的输入，保证和为 target 的不同组合数少于 150 个。
      */
-//    public List<List<Integer>> combinationSum(int[] candidates, int target) {
-//
-//    }
+    List<List<Integer>> resCombinationSum;
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        resCombinationSum =new LinkedList<>();
+        dfsCombinationSum(candidates,target,0,new LinkedList<Integer>());
+        return resCombinationSum;
+    }
+
+    private void dfsCombinationSum(int[] candidates, int target, int index, LinkedList<Integer> path) {
+        if (target==0){
+            resCombinationSum.add(new LinkedList<>(path));
+        }
+        if (target<0 || index==candidates.length){
+            return;
+        }
+        for (int i = index; i < candidates.length; i++) {
+            path.add(candidates[i]);
+            dfsCombinationSum(candidates,target-candidates[i],i+1,path);
+            path.removeLast();
+        }
+    }
 
 
 
@@ -364,12 +462,31 @@ public class All1_5_template {
 
 你必须实现时间复杂度为 O(log n) 的算法来解决此问题。
      */
+
+    /**
+     * 下面的代码应该是错误的
+     *      因为”nums[mid]>=nums[mid+1“的时候nums[mid]可能就是峰值；
+     *      带等于、不带等于的区别？？？
+     */
+//    public int findPeakElement(int[] nums) {
+//        int left = 0,right =  nums.length-1;
+//        while (left<right){
+//            int mid = left+(right-left)/2;
+//            if (nums[mid]>=nums[mid+1]){
+//                right = mid-1;
+//            }else {
+//                left = mid+1;
+//            }
+//        }
+//        return left;
+//    }
+
     public int findPeakElement(int[] nums) {
         int left = 0,right =  nums.length-1;
         while (left<right){
             int mid = left+(right-left)/2;
-            if (nums[mid]>=nums[mid+1]){
-                right = mid-1;
+            if (nums[mid]>=nums[mid+1]){ /**按照峰值的定义，这里最好不带等于。带等于对不对？？*/
+                right = mid;
             }else {
                 left = mid+1;
             }
@@ -386,18 +503,54 @@ public class All1_5_template {
 每一层的 宽度 被定义为该层最左和最右的非空节点（即，两个端点）之间的长度。将这个二叉树视作与满二叉树结构相同，两端点间会出现一些延伸到这一层的 null 节点，这些 null 节点也计入长度。
 
 题目数据保证答案将会在  32 位 带符号整数范围内。*/
-//    public int widthOfBinaryTree(TreeNode root) {
-//
-//    }
+    public int widthOfBinaryTree(TreeNode root) {
+        int res = 0;
+        if (root==null) return res;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        LinkedList<Integer> integers = new LinkedList<>();
+        queue.offer(root);
+        integers.offer(0);
+        int first = -1,last = -1;
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode cur = queue.poll();
+                Integer curVal = integers.poll();
+                if (i==0) first = curVal;
+                if (i==size-1) last = curVal;
+                if (cur.left!=null){
+                    queue.offer(cur.left);
+                    integers.offer(2*curVal);
+                }
+                if (cur.right!=null){
+                    queue.offer(cur.right);
+                    integers.offer(2*curVal+1);
+                }
+            }
+            res = Math.max(last-first+1,res);
+        }
+        return res;
+    }
 
 
     /*113. 路径总和 II
 给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
 
 叶子节点 是指没有子节点的节点。*/
-//    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
-//
-//    }
+    List<List<Integer>> resPathSum;
+    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
+        resPathSum  =new LinkedList<>();
+        dfsPathSum(root,targetSum,new LinkedList<Integer>());
+        return resPathSum;
+    }
+
+    private void dfsPathSum(TreeNode root, int targetSum, LinkedList<Integer> path) {
+        if (root==null) return;
+        if (root.left==null&&root.right==null&&targetSum==root.val) resPathSum.add(new LinkedList<>(path));
+        path.add(root.val);
+        dfsPathSum(root.left,targetSum-root.val,path);
+        path.removeLast();
+    }
 
 
     /*227. 基本计算器 II
@@ -417,9 +570,22 @@ public class All1_5_template {
 给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
 请注意 ，必须在不复制数组的情况下原地对数组进行操作。
      */
-//    public void moveZeroes(int[] nums) {
-//
-//    }
+    public void moveZeroes(int[] nums) {
+        int left = 0,cur = 0;
+        while (cur<nums.length){
+            if (nums[cur]!=0){
+                swap2(nums,left++,cur++);
+            }else {
+                cur++;
+            }
+        }
+    }
+
+    private void swap2(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r]  =tmp;
+    }
 
 
 
