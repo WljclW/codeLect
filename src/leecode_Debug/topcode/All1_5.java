@@ -25,7 +25,8 @@ import java.util.*;
  *  其是翻转后半部分后两半链表的形态————根源：这是单链表，一个节点的后继必然是相同的节点
  *
  *  2025.10.28
- *      162，470表达式的理解，8. 字符串转换整数 (atoi)，69 求解平方根，82，33，912 快排，113，215，
+ *      162，470表达式的理解，8. 字符串转换整数 (atoi)，69 求解平方根，82，33，912 快排，113，215，93，
+ *   151，227，468
  */
 /*源文件————codetop_unskilled_1_5
     215、53、5、92、1143、151、78、322、8、39、470、112、718、14、手撕快排
@@ -1084,9 +1085,6 @@ public class All1_5 {
 给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过
     在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
     * */
-    /**
-     *下面的代码问题比较大~~~~
-     */
     List<String> resRestoreIpAddresses;
     public List<String> restoreIpAddresses(String s) {
         resRestoreIpAddresses = new LinkedList<>();
@@ -1105,7 +1103,7 @@ public class All1_5 {
             if (isValidIP(s.substring(index,i))){
                 path.insert(i+pointNum,'.');
                 restoreIpAddresses(s,i,path,pointNum+1);
-                path.deleteCharAt(i+pointNum); /**err：这里的索引已经不能这么计算了，因此*/
+                path.deleteCharAt(i+pointNum);
             }
         }
     }
@@ -1977,7 +1975,6 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 
     /*78. 子集
 给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
-
 解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。*/
     List<List<Integer>> resSubsets;
     public List<List<Integer>> subsets(int[] nums) {
@@ -1990,7 +1987,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     private void dfs6(int[] nums, int index, LinkedList<Integer> path) {
         //        if (index==nums.length) return; //写在这里是错误的！
         resSubsets.add(new LinkedList<>(path));
-        /**err：不加这一句就可以，并不会发生StackOverflow！！但是如果加了这一句，则——————
+        /**err：不加注释掉的这一句就可以，并不会发生StackOverflow！！但是如果加了这一句，则——————
          *      这一句必须在“resSubsets.add(new LinkedList<>(path));”的后面，不然结果会
          *  少很多，一句话概况少了多少，凡是包含nums最后一个元素的 子集，结果都没有。
          *      进一步解释为什么？因为如果index==nums.length，根据for循环逻辑可知，一定是
@@ -2909,7 +2906,9 @@ int getMin() 获取堆栈中的最小元素。*/
     }
 
     private boolean isIPV6(String queryIP) {
-        String[] split = queryIP.split(":", -1);
+        /**注意：这里分割的时候必须使用带参数-1的分割方法。否则"2001:0db8:85a3:0:0:8A2E:0370:7334:"这
+        样的字符串分割后只有八部分，理论上应该是9个，最后一个是""。但是没有参数-1的话最后的""会被删除！！*/
+        String[] split = queryIP.split(":", -1); /**err：参数-1是必须的*/
         if (split.length!=8) return false;
         String hexDigits = "0123456789ABCDEF";
         for (String part:split){

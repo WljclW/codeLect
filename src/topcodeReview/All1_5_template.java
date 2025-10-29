@@ -1,8 +1,5 @@
 package topcodeReview;
 
-import leecode_Debug.top100.ListNode;
-import leecode_Debug.top100.TreeNode;
-
 import java.util.*;
 
 /**
@@ -11,75 +8,6 @@ import java.util.*;
  * 10.27
  */
 public class All1_5_template {
-    /**
-     * ============================================2=========================
-     * ============================================2=========================
-     * ============================================2=========================
-     * ============================================2=========================
-     */
-    /*
-    143重排链表
-    给定一个单链表 L 的头节点 head ，单链表 L 表示为：
-    L0 → L1 → … → Ln - 1 → Ln
-    请将其重新排列后变为：
-    L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
-    不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
-     */
-
-    /**
-     * 这个题最后组装链表的时候绕进去了============
-     * 这个题最后组装链表的时候绕进去了============
-     * 这个题最后组装链表的时候绕进去了============
-     * 这个题最后组装链表的时候绕进去了============
-     */
-    public void reorderList(ListNode head) {
-        ListNode mid = findMid1(head);
-        ListNode start = mid.next;
-        mid.next = null;
-        ListNode head2 = reverse3(start);
-
-        ListNode cur2 = head2,cur1 = head;
-        while (cur2!=null){
-            ListNode next1 = cur1.next;
-            ListNode next2 = cur2.next;
-            cur1.next = cur2;
-            cur2.next = next1;
-
-            cur1 = next1;
-            cur2 = next2;
-        }
-    }
-
-    private ListNode reverse3(ListNode head) {
-        ListNode pre =null,cur = head;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
-
-    private ListNode findMid1(ListNode head) {
-        ListNode slow = head,fast = head;
-        while (fast!=null&&fast.next!=null){
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-        return slow;
-    }
-
-    /*93. 复原 IP 地址
-    有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
-例如："0.1.2.201" 和 "192.168.1.1" 是 有效 IP 地址，但是 "0.011.255.245"、"192.168.1.312" 和
-    "192.168@1.1" 是 无效 IP 地址。
-给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过
-    在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
-    * */
-//    public List<String> restoreIpAddresses(String s) {
-//
-//    }
     /**
      * =======================================3================================
      * =======================================3================================
@@ -132,9 +60,56 @@ xi 是一个 十六进制字符串 ，可以包含数字、小写英文字母( '
 在 xi 中允许前导零。
 例如 "2001:0db8:85a3:0000:0000:8a2e:0370:7334" 和 "2001:db8:85a3:0:0:8A2E:0370:7334" 是有效的 IPv6 地址，而 "2001:0db8:85a3::8A2E:037j:7334" 和 "02001:0db8:85a3:0000:0000:8a2e:0370:7334" 是无效的 IPv6 地址。
      */
-//    public String validIPAddress(String queryIP) {
-//
-//    }
+    public static void main(String[] args) {
+        All1_5_template all15Template = new All1_5_template();
+        all15Template.validIPAddress("2001:0db8:85a3:0:0:8A2E:0370:7334:");
+    }
+
+    public String validIPAddress(String queryIP) {
+        if (queryIP.contains(".")){
+            String[] split = queryIP.split("\\.",-1);
+            return isIPV4(split);
+        }
+        if (queryIP.contains(":")){
+            String[] split = queryIP.split(":",-1);
+            return isIPV6(split);
+        }
+        return "Neither";
+    }
+
+    private String isIPV6(String[] split) {
+        if (split.length == 8){
+            for (int i = 0; i < split.length; i++) {
+                if (split[i].length()<=4&&split[i].length()>0){
+                    for (char c:split[i].toCharArray()){
+                        if ((c>='0' && c<='9')||(c>='a'&&c<='z')||(c>='A'&&c<='Z')){
+                            continue;
+                        }else {
+                            return "Neither";
+                        }
+                    }
+                    return "IPv6";
+                }else {
+                    break;
+                }
+            }
+        }
+        return "Neither";
+    }
+
+    private String isIPV4(String[] split) {
+        if (split.length!=4)
+            return "Neither";
+        for (int i = 0; i < split.length; i++) {
+            String s = split[i];
+            if (!(s.length()==1 ||
+                    (s.length()==2&&Integer.valueOf(s)>=10) ||
+                    (s.length()==3&&Integer.valueOf(s)>=100&&Integer.valueOf(s)<=255)
+                ))
+                return "Neither";
+        }
+        return "IPv4";
+    }
 
 
 }

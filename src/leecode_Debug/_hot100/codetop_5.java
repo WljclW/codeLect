@@ -14,49 +14,6 @@ import java.util.*;
  * 堆排序
  */
 public class codetop_5 {
-    /*93
-    有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
-
-例如："0.1.2.201" 和 "192.168.1.1" 是 有效 IP 地址，但是 "0.011.255.245"、"192.168.1.312" 和 "192.168@1.1" 是 无效 IP 地址。
-给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
-    * */
-    StringBuilder sb;
-    List<String> res;
-    public List<String> restoreIpAddresses(String s) {
-        sb = new StringBuilder(s);
-        res = new LinkedList<>();
-        traceback(s,0,0);
-        return res;
-    }
-
-    private void traceback(String s, int index, int pointNum) {
-        if (pointNum == 3 && isValid(s.substring(index))) {
-            res.add(new String(sb));
-            return;
-        }
-        if (pointNum==3){ /**err：这里必须加这一句，因为前面的if是两个条件，可以发现如果pointNum等于3但是不符合条件会走到这里，就会导致栈溢出*/
-            return;
-        }
-        for (int i = index; i < s.length(); i++) {
-            if (isValid(s.substring(index, i + 1))) {
-                sb.insert(i+1 + pointNum, '.');
-                traceback(s, i+1, pointNum + 1); /**这里不执行pointNum+=1行不行*/
-                sb.deleteCharAt(i+1 + pointNum);
-            }
-        }
-    }
-
-    private boolean isValid(String substring) {
-        if (substring.length()==0) return false;
-        if (substring.length() != 1 && substring.charAt(0) == '0') {
-            return false;
-        }
-        if (substring.length() > 3 || (substring.length() == 3 && Integer.valueOf(substring) > 255)) {
-            return false;
-        }
-        return true;
-    }
-
     /*
     82
     给定一个已排序的链表的头 head ， 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回 已排序的链表 。
@@ -582,7 +539,7 @@ public class codetop_5 {
     不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
      */
     /**
-     * 【建议】建议使用解法reorderList1，代码逻辑更清晰
+     * 【建议】建议使用解法reorderList3，代码逻辑更清晰
      * 【解题的关键】
      *      找到链表中间节点、翻转链表、合并两个链表
      *      ①反转链表时最好从slow.next进行翻转；同时注意slow。next=null，否则链表会出现环
@@ -597,55 +554,15 @@ public class codetop_5 {
      *      其实，这个题之所以能从中间节点的下一位开始翻转的底层细节原理：如果链表的节点数是偶数，则中间的两个节点比如上面的“2——>3”在重排
      *  链表之后就位于结果的最后面，并且顺序不变，因此翻转3这个节点之后的链表就可以了！！————本质原因
      * */
-    /*第一种写法。*/
-    public void reorderList(ListNode head) {
-        if (head==null||head.next==null) return;
-        ListNode mid = findMid(head);
-        ListNode head2 = reverse(mid);
-        while (head2!=null){
-            ListNode head2Next = head2.next;
-            ListNode headNext = head.next;
-            head.next = head2;
-            head2.next = headNext;
-            head = headNext;
-            head2 = head2Next;
-        }
-        head.next = null;
-    }
-
-    /*反转链表的原始代码，hot100*/
-    private ListNode reverse(ListNode mid) {
-        ListNode pre = null,cur = mid;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
-
-    /*找中间节点的代码。奇数个会来到最中间的节点；偶数个会来到中间两个的后一个节点*/
-    private ListNode findMid(ListNode head) {
-        ListNode slow = head,fast = head;
-        while (fast!=null&&fast.next!=null){
-            slow = slow.next;
-            fast  =fast.next.next;
-        }
-        return slow;
-    }
-
-
-
-    /*第二种写法，建议*/
+    /*第一种写法，建议*/
     public void reorderList1(ListNode head) {
-        if (head==null||head.next==null||head.next.next==null) return;
+        if (head==null||head.next==null) return;
         /*step1：找到链表的中间节点。常规做法*/
         ListNode mid = findMid(head);
         /*step2：翻转后半部分的链表
         * 【说明】下面的方式翻转链表之后，后半部分链表以head2开头，比前一半链表的节点数少一个节点（如果原
         * 来链表的节点数是奇数）或者少两个节点（如果原来链表的节点数是偶数）*/
-        ListNode head2 = reverse(mid.next); /**err：注意是从slow.next，因此严格来说并不是翻转后半部分链表，而是从后半部分的第二个节点开始翻转*/
+        ListNode head2 = rever2(mid.next); /**err：注意是从slow.next，因此严格来说并不是翻转后半部分链表，而是从后半部分的第二个节点开始翻转*/
         mid.next = null; /**err：注意需要将前半部分的最后一个节点置为null，否则会出现环*/
         /*step3：合并反转后的链表*/
         merge(head,head2);
@@ -668,11 +585,11 @@ public class codetop_5 {
     }
 
 
-    /*第三种写法，建议使用下面的写法*/
+    /*第二种写法，建议使用下面的写法*/
     public void reorderList2(ListNode head) {
-        ListNode mid = findMiddle1(head);
+        ListNode mid = findMid(head);
         ListNode start = mid.next;
-        mid.next =  null; /**这里如果置为null的话后面在合并的时候就不用出了循环指定head.next=null了，应该是*/
+        mid.next =  null; /**err：这种写法中这一步是不能少的*/
         ListNode head2 = rever2(start);
         while (head2!=null){
             ListNode next1 = head.next;
@@ -696,13 +613,82 @@ public class codetop_5 {
     }
 
     /*常规的寻找中间节点的做法*/
-    private ListNode findMiddle1(ListNode head) {
+    private ListNode findMid(ListNode head) {
         ListNode slow = head,fast = head;
         while (fast!=null&&fast.next!=null){
             slow = slow.next;
             fast = fast.next.next;
         }
         return slow;
+    }
+
+    /**
+     第三种写法，不用特别的找到哪个中间节点以及和前面的节点断开。。。
+        step1：常规的寻找到中间节点，返回即可（不用将next置为null等操作）
+        step2：常规的反转链表的操作，头节点是step1得到的中间节点
+        step3：合并step2反转得到的头节点 以及 原始头节点的两半链表
+     */
+    public void reorderList3(ListNode head) {
+        if (head==null||head.next==null) return; /**这个特例的判断没有也是ok的*/
+        ListNode mid = findMid1(head); //step1：找到链表的中间节点
+        ListNode head2 = reverse1(mid); //step2：反转以“step1返回的中间节点”后面的那部分链表
+        merge2(head,head2); //step3：合并以head、head2为头的两个链表
+    }
+
+    private void merge2(ListNode head, ListNode head2) {
+        ListNode cur = head;
+        ListNode cur2 = head2;
+        while (cur2!=null&&cur2.next!=null){ /**注意：这里的两个条件，一个都不能少*/
+            /*①先记录一下两半链表中，当前位置的下一个节点*/
+            ListNode next1 = cur.next;
+            ListNode next2 = cur2.next;
+            /*②完成节点的连接：cur——>cur2———>cur.next（即next1）*/
+            cur.next = cur2;
+            cur2.next = next1;
+            /*③调整当前研究位置：cur来到next1（即初始时记录的cur.next）;cur2来到next2（即初始时记录的cur2.next）*/
+            cur = next1;
+            cur2 = next2;
+        }
+    }
+
+    /*常规的翻转链表的方法*/
+    private ListNode reverse1(ListNode head) {
+        ListNode pre = null,cur = head;
+        while (cur!=null){
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+
+    /*常规的寻找中间节点的方法（奇数——>中间节点；偶数——>中间偏后的节点）*/
+    private ListNode findMid1(ListNode head) {
+        ListNode slow = head,fast = head;
+        while (fast!=null &&fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+
+    /*合并链表的代码对比如下“328 奇偶链表”的代码*/
+    public ListNode oddEvenList(ListNode head) {
+        if (head==null||head.next==null||head.next.next==null) return head;
+        ListNode odd = head,even = head.next;
+        ListNode evenHead = head.next;
+        while (even!=null&&even.next!=null){
+            /**拆分的时候相对简单一点，只需要设置好while条件，然后拆分即可*/
+            odd.next = odd.next.next;
+            odd = odd.next;
+
+            even.next = even.next.next;
+            even = even.next;
+        }
+        odd.next = evenHead;
+        return head;
     }
 
 

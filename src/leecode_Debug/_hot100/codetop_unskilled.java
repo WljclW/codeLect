@@ -33,44 +33,6 @@ public class codetop_unskilled {
 //    }
 
 
-    /**
-     * 复原IP地址，为什么不对？？
-     */
-    List<String> res;
-
-    public List<String> restoreIpAddresses(String s) {
-        res = new LinkedList<>();
-        StringBuilder sb = new StringBuilder(s);
-        restoreIpAddresses(s, sb, 0, 0);
-        return res;
-    }
-
-    private void restoreIpAddresses(String s, StringBuilder sb, int index, int num) {
-        if (index >= s.length()) {
-            return;
-        }
-        if (num == 3 && isValid(s.substring(index))) {
-            res.add(new String(sb));
-            return;
-        }
-        if (num == 3) return;
-        for (int i = index + 1; i < s.length(); i++) {
-            if (isValid(s.substring(index, i))) {
-                sb.insert(i + num, '.');
-                restoreIpAddresses(s, sb, i + 1, num + 1);
-                sb.deleteCharAt(i + num);
-            }
-        }
-    }
-
-    private boolean isValid(String substring) {
-        if (substring.length() > 3) return false;
-        if (substring.length() > 1 && substring.startsWith("0")) return false;
-        if (Integer.valueOf(substring) <= 255) return true;
-        return false;
-    }
-
-
     public String reverseWords(String s) {
         String str = s.trim();
         StringBuilder sb = new StringBuilder(str);
@@ -764,36 +726,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             }
         }
         return res;
-    }
-
-
-    //93
-    List<String> resRestoreIpAddresses;
-    public List<String> restoreIpAddresses_(String s) {
-        resRestoreIpAddresses = new LinkedList<>();
-        StringBuilder sb = new StringBuilder(s);
-        dfs(s, sb, 0, 0);
-        return resRestoreIpAddresses;
-    }
-
-    private void dfs(String s, StringBuilder sb, int index, int num) {
-        if (num == 3 && isValid1(s.substring(index))) {
-            resRestoreIpAddresses.add(new String(sb));
-        }
-        for (int i = index + 1; i < s.length(); i++) {
-            if (isValid1(s.substring(index, i))) {
-                sb.insert(i + num, '.'); /**这里到底应该在什么位置插入字符？以及形参的index代表的是s的索引还是sb的索引？这两者是要协调的搭配的，对应关系是怎样的？？*/
-                dfs(s, sb, i, num + 1);
-                sb.deleteCharAt(i + num);
-            }
-        }
-    }
-
-    private boolean isValid1(String substring) {
-        if (substring.length() == 1) return true;
-        if (substring.length() == 2 && substring.charAt(0) != '0') return true;
-        if (substring.length() == 3 && substring.charAt(0) != '0' && Integer.valueOf(substring) <= 255) return true;
-        return false;
     }
 
 

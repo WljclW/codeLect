@@ -129,81 +129,6 @@ public class All1_5_review {
 //    public List<String> restoreIpAddresses(String s) {
 //
 //    }
-
-    /**
-     * =======================================3================================
-     * =======================================3================================
-     * =======================================3================================
-     * =======================================3================================
-     * =======================================3================================
-     */
-    /*151. 反转字符串中的单词
-    给你一个字符串 s ，请你反转字符串中 单词 的顺序。
-    单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
-    返回 单词 顺序颠倒且 单词 之间用单个空格连接的结果字符串。
-    注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。*/
-//    public String reverseWords(String s) {
-//
-//    }
-
-
-    /**chatgpt给出的代码如下，但是下面的方法还不如直接使用方法 reverseWords____，直接倒着台南佳单词，都不用反转了*/
-//    public String reverseWords(String s) {
-//        String trim = s.trim();
-//        String s1 = reverString(trim);
-//        String[] s2 = s1.split("\\s+"); // ✅ 用正则去除多余空格
-//        StringBuilder sb = new StringBuilder();
-//        for (String str : s2) {
-//            sb.append(reverString(str)).append(" ");
-//        }
-//        sb.deleteCharAt(sb.length() - 1);
-//        return sb.toString();
-//    }
-//
-//    private String reverString(String s) {
-//        return new StringBuilder(s).reverse().toString();
-//    }
-//
-//    /**
-//     split("\\s+") 会按“至少一个空白字符”去拆分字符串，并自动去掉多余的空白。
-//         String s1 = "  hello   world  ";
-//         String[] s2 = s1.split("\\s+");
-//             拆出来结果：
-//                 s2[0] = "hello"
-//                 s2[1] = "world"
-//     如果写 split(" ")：
-//            " hello world ".split(" ")会得到：["", "", "hello", "", "", "world"] 里面有空字符串。
-//     */
-//    /*下面的代码是自己写的，可能会出错*/
-//    public String reverseWords_(String s) {
-//        String trim = s.trim();
-//        String s1 = reverString1(trim);
-//        String[] s2 = s1.split(" ");
-//        StringBuilder sb = new StringBuilder();
-//        for (String str:s2){
-//            sb.append(reverString1(str));
-//            sb.append(" ");
-//        }
-//        sb.deleteCharAt(sb.length()-1);
-//        return sb.toString();
-//    }
-//
-//    private String reverString1(String s) {
-//        StringBuilder sb = new StringBuilder(s);
-//        return sb.reverse().toString();
-//    }
-    /*更简单的方法，甚至不用反转单词。直接倒着添加单词，添加到结果*/
-//    public String reverseWords____(String s) {
-//        String[] words = s.trim().split("\\s+");
-//        StringBuilder sb = new StringBuilder();
-//        for (int i = words.length - 1; i >= 0; i--) {
-//            sb.append(words[i]);
-//            if (i != 0) sb.append(" ");
-//        }
-//        return sb.toString();
-//    }
-
-//
     /**
      *=================================================5=====================================
      *=================================================5=====================================
@@ -232,53 +157,6 @@ public class All1_5_review {
 //    public String validIPAddress(String queryIP) {
 //
 //    }
-
-
-    //93
-    List<String> resRestoreIpAddresses;
-    public List<String> restoreIpAddresses(String s) {
-        StringBuilder path = new StringBuilder(s);
-        resRestoreIpAddresses = new LinkedList<>();
-        restoreIpAddresses(path,0,0);
-        return resRestoreIpAddresses;
-    }
-
-    private void restoreIpAddresses(StringBuilder path, int startIndex, int dotNum) {
-        if (dotNum==3){
-            if (isValid(path,startIndex,path.length()-1)){
-                resRestoreIpAddresses.add(new String(path));
-            }
-            return;
-        }
-
-        for (int i = startIndex; i < path.length() - 1; i++) {
-            if (isValid(path,startIndex,i)){
-                path.insert(startIndex+1,'.');
-                dotNum++;
-                restoreIpAddresses(path,startIndex+2,dotNum);
-                dotNum--;
-                path.deleteCharAt(startIndex+1);
-            }else {
-                break;
-            }
-        }
-    }
-
-    private boolean isValid(StringBuilder path, int left, int right) {
-        if (left>right) return false;
-        if (path.charAt(left)=='0' && left!=right) return false;
-        int res = 0;
-        for (int i = left; i < right; i++) {
-            int cur = path.charAt(i) - '0';
-            res = res*10 + cur;
-            if (res>255){
-                return false;
-            }
-        }
-        return true;
-    }
-
-
 }
 
 
