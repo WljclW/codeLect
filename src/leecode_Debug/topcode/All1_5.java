@@ -2934,5 +2934,57 @@ int getMin() 获取堆栈中的最小元素。*/
         return true;
     }
 
+    /*判断的流程————
+        1. 按照”.“进行分割，如果不是4段，直接返回false；
+        2. for循环研究每一段part：
+           2.1 如果part的长度是0 或者 part的长度大于4，返回false；
+           2.2 如果part的长度大于1，但是part的第一个位置是‘0’，返回false;
+           2.3 使用for循环计算part的每一个字符：
+               如果某一个字符不是数字，直接返回false;
+               计算当前遇到的数val
+               退出for循环说明数计算完了，如果这个数小于0 或者 这个数大于255，直接返回false。
+           退出大的for循环说明：在part的数量合法的前提下，每一个part都通过了校验，返回true.
+    * */
+    private boolean isIPV4_1(String queryIP) {
+        String[] parts = queryIP.split("\\.", -1);
+        if (parts.length!=4) return false;
+        for (String part:parts){
+            if (part.length()==0 || part.length()>3) return false;
+            if (part.length()>1 && part.charAt(0)=='0') return false;
+            int val = 0;
+            for (char c:part.toCharArray()){
+                if (!Character.isDigit(c)) return false;
+                val = val*10 + c-'0';
+            }
+            if (val<0 || val>255) return false;
+        }
+        return true;
+    }
+
+
+    /*判断的流程————
+        1. 按照”:“进行分割，如果不是8段，直接返回false;
+        2. for循环研究每一部分
+           2.1 如果part的长度等于0 或者part的长度大于4===>false
+           2.2 for循环判断part的每一个字符，使用三个布尔变量存储”是不是小写字母“、”是不是大写
+         字母“、”是不是数字“。如果三个布尔变量都是false，返回false，说明该字母不合法。
+        3. 退出for循环说明所有的part都是合法的，返回true。
+     */
+    private boolean isIPV6_1(String queryIP) {
+        String[] parts = queryIP.split(":", -1);
+        if (parts.length!=8) return false;
+        for (String part:parts){
+            if (part.length()==0 || part.length()>4) return false;
+            for (char c:part.toCharArray()){
+                boolean isLow = (c>='a'&&c<='e');
+                boolean isBig = (c>='A'&&c<='E');
+                boolean isDig = (c>='0'&&c<='9');
+                if (!(isLow || isBig || isDig))
+                    return false;
+            }
+        }
+        return true;
+    }
+
 
 }
