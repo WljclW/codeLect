@@ -2897,7 +2897,7 @@ int getMin() 获取堆栈中的最小元素。*/
     public String validIPAddress(String queryIP) {
         /*step1：先根据包括"."还是":"来决定校验IPV4还是IPV6*/
         if (queryIP.chars().filter(ch->ch=='.').count()==3){
-            return isIPV4(queryIP)?"IPv4":"Neither";
+            return isIPV4_1(queryIP)?"IPv4":"Neither";
         }
         if (queryIP.chars().filter(ch->ch==':').count()==7){
             return isIPV6(queryIP)?"IPv6":"Neither";
@@ -2922,6 +2922,8 @@ int getMin() 获取堆栈中的最小元素。*/
         return true;
     }
 
+    /**下面的写法是错误的。这个题不能用“Integer.valueOf”来转换字符串维整数。因为含有“3s4”这样的内容*/
+    /*
     private boolean isIPV4(String queryIP) {
         String[] split = queryIP.split(".", -1);
         if (split.length!=4) return false;
@@ -2933,11 +2935,13 @@ int getMin() 获取堆栈中的最小元素。*/
         }
         return true;
     }
+    */
+
 
     /*判断的流程————
-        1. 按照”.“进行分割，如果不是4段，直接返回false；
+        1. 按照”.“进行分割，如果parts不是4段，直接返回false；
         2. for循环研究每一段part：
-           2.1 如果part的长度是0 或者 part的长度大于4，返回false；
+           2.1 如果part的长度是0 或者 part的长度大于3，返回false；
            2.2 如果part的长度大于1，但是part的第一个位置是‘0’，返回false;
            2.3 使用for循环计算part的每一个字符：
                如果某一个字符不是数字，直接返回false;
