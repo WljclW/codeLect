@@ -254,6 +254,7 @@ public class All1_5 {
          java.lang.IllegalArgumentException: bound must be greater than origin
          at line 236, java.base/jdk.internal.util.random.RandomSupport.checkRange
          at line 678, java.base/java.util.random.RandomGenerator.nextInt
+         【原因】right-left可能得到-1，因此会导致“nextInt方法的第二参数是0，该方法要求 第二个参数必须大于第一个参数”
          */
         int pivotIndex = left + new Random().nextInt(0, right - left + 1);
         swap1(arr,pivotIndex,right);
