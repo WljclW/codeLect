@@ -421,6 +421,9 @@ public class _10binarySearch {
         while (left <= right) {
             int mid = left + (right - left) / 2;
             if (nums[mid] == target) return mid;
+            /**这里必须使用“>=”，因为有一个测试用例是“[3,1]，target=1”。
+             如果不带等于会返回-1，结果是错误的，应该返回1
+             */
             if (nums[mid] >= nums[left]) { /**说明左边肯定是有序的*/
                 if (target >= nums[left] && target < nums[mid]) {
                     right = mid - 1;
@@ -438,33 +441,13 @@ public class _10binarySearch {
         return -1;
     }
 
-    public int search_3(int[] nums, int target) {
-        int l = 0,r = nums.length-1;
-        while (l<=r){
-            int mid = l+(r-l)/2;
-            if (target==nums[mid]) return mid;
-            if (nums[mid]>=nums[l]){
-                if (target>=nums[l]&&target<nums[mid]){
-                    r = mid-1;
-                }else {
-                    l = mid+1;
-                }
-            }else {
-                if (target>nums[mid]&&target<=nums[r]){
-                    l = mid+1;
-                }else {
-                    r = mid-1;
-                }
-            }
-        }
-        return -1;
-    }
-
-
-    /*上面的方法中，判断mid左边还是右边有序的时候用的是“nums[mid]>=nums[l]”，用“nums[mid]>nums[right]”也是可以的。
-        nums[mid]>nums[right]：说明mid的左边一定是有序的；
-        nums[mid]>=nums[l]：说明mid的左边一定是有序的。
-      因此，也可以使用下面的代码。
+    /*上面的方法中，判断mid左边还是右边有序的时候用的是“nums[mid]>=nums[left]”，用“nums[mid]>nums[right]”也是可以的。
+        1.nums[mid]>nums[right]：说明mid的左边一定是有序的；
+        2.nums[mid]>=nums[left]：说明mid的左边一定是有序的。（注意：这里带等于）
+        3.nums[mid]<nums[right]：说明mid的右边一定是有序的。
+        4.nums[mid]<nums[left]：说明mid的右边一定是有序的。
+      因此，也可以使用下面的代码。总之：
+        1和2写法是等价的，3和4写法是等价的（见方法search1）。在代码中可以互相替代
     * */
     public int search_another(int[] nums, int target) {
         int left = 0,right = nums.length-1;
@@ -485,6 +468,33 @@ public class _10binarySearch {
                     left = mid+1;
                 }else {
                     right = mid-1;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /*基于上面的写法进行发散，其实使用“nums[mid]<nums[right]”也是可以实现的*/
+    /**小于右边界的版本*/
+    public int search1(int[] nums, int target) {
+        int left = 0,right = nums.length-1;
+        while (left<=right){
+            int mid = left+(right-left)/2;
+            if (target==nums[mid]) return mid;
+            /**这里不带“等号”是可以的。
+                同理，使用“nums[mid]<nums[left]”也是OK的
+             */
+            if (nums[mid]<nums[right]){ /*小于右边界 比较的版本,小于右边界说明mid右侧是有序的*/
+                if (target>nums[mid]&&target<=nums[right]){
+                    left = mid+1;
+                }else {
+                    right = mid-1;
+                }
+            }else { /*否则说明左边是有序的*/
+                if (target>=nums[left]&&target<nums[mid]){
+                    right = mid-1;
+                }else {
+                    left =mid+1;
                 }
             }
         }

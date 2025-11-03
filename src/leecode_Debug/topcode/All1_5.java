@@ -1512,7 +1512,8 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      【关键问题】
             1. 0、1的特殊处理，平方根是它自身。
             2. 二分查找过程中————
-                ①如果计算mid*mid，可能会发生int溢出的现象，因此如果计算mid*mid必须使用long来保存；
+                ①如果计算mid*mid，可能会发生int溢出的现象，因此如果计算mid*mid必须使用long来保存，此时需
+              要使用这种写法“long square = (long) mid * mid”；
                 ②可以使用“mid与x/mid比较大小”的方式来进行，就规避了这种风险。如果mid>x/mid，此时
               的mid必然偏大了，因此right=mid-1;反之，left=mid+1。
             综上，这个题的解法，建议使用 mySqrt_best
@@ -1618,8 +1619,8 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     返回整数作为最终结果。*/
     /**【重要的说明】————解析到第一个非数字的字符(!isDigit(ch))，就直接break返回，后面的就不用管了
      1. 解析数字时，对于不是数字的字符怎么处理？？
-     ❗❗❗❗❗❗这个题的一个重要隐含条件：解析到第一个不是数字的位置就停止解析。如果开始的位置就不是数字，直接返回0
-     同时，题目也明确的说明了最后得到的结果要在int范围内————
+     ❗❗❗❗❗❗这个题的一个重要隐含条件：解析到第一个不是数字的位置就停止解析，返回当前解析到的结果。如果开始的位
+     置就不是数字，直接返回0。同时，题目也明确的说明了最后得到的结果要在int范围内————
      如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。
      2. 判断是否越界的逻辑是重点。为什么下面的判断越界逻辑是对的？
      声明：最大正数：2147483647；最小负数：-2147483648
@@ -1633,7 +1634,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      方便，但是比较”mid“和”x/mid“的大小可以避免这种溢出情况
      */
     public int myAtoi(String s) {
-        int index = 0, n = s.length();
+        int index = 0 /*index表示当前来到的位置*/, n = s.length();
         // 1. 跳过空格
         while (index < n && s.charAt(index) == ' ') index++;
         if (index == n) return 0;
@@ -1650,7 +1651,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         int res = 0;
         while (index < n) {
             char ch = s.charAt(index);
-            if (!Character.isDigit(ch)) break;
+            if (!Character.isDigit(ch)) break; /*如果index位置不是数字就停止解析，跳出while循环*/
 
             int digit = ch - '0';
 

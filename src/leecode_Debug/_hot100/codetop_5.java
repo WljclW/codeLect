@@ -760,7 +760,7 @@ public class codetop_5 {
         int l = 0,r = nums.length-1;
         while (l < r) { /**err：要找峰值，由于一定存在，因此最后指针的位置就是峰值位置（不用带等号）*/
             int mid = l + (r - l) / 2;
-            if (nums[mid] >= nums[mid + 1]) { /**err：这里带不带等于都是可以的。但是按照原理来讲，最好不带*/
+            if (nums[mid] >= nums[mid + 1]) { /**err：这里带不带等于都是可以的。但是按照原理来讲，最好不带。（其实相等的时候朝哪一个方向进行都可以）*/
                 /**err：沿着大数一边走必然能遇到峰值，并且nums[mid]可能就是峰值，因此“r=mid-1”是错误的，可能
                  错过峰值！！！
                     如果使用“r=mid-1”，就错误过峰值，比如提交时case2报错————
@@ -926,7 +926,7 @@ public class codetop_5 {
 //
 //    private void dfsPathSum(TreeNode root, int targetSum, LinkedList<Integer> path) {
 //        if (root==null) return;
-    /**错误的地方集中在这里*/
+    /**错误的地方集中在这里，这里直接使用path创建会导致最后一个节点没有被加进去*/
 //        if (root.left==null&&root.right==null&&targetSum==root.val;
 //            resPathSum.add(new LinkedList<>(path));
 //        path.add(root.val);
@@ -962,7 +962,7 @@ public class codetop_5 {
         pathSumBack(root.right, targetSum);
         /*step4：撤销选择*/
         pathPathSum.removeLast();
-        targetSum += root.val; /**看着后面没有再调用过这句，是不是这一句可以省略？？*/
+        targetSum += root.val; /**看着后面没有再调用过这句，是不是这一句可以省略？？省略是可以的，但是写上也不错！*/
     }
 
     /*下面是另一种写法*/
@@ -990,7 +990,7 @@ public class codetop_5 {
                     在找到一条符合要求的路径后，我们确实可以“终止这一条递归路径”，但必须先回溯干
               净，保证 path 状态正确，才能 return。如果直接 return，就破坏了递归的对称性。如果
              想在这里return，必须先回溯状态，然后再return，正确应该写成下面的（完整的写法见pathSum_3）————
-                     path.removeLast(); //①回溯状态（因为之前root.val已经添加进path了）
+                     path.removeLast(); //①先回溯状态（因为之前root.val已经添加进path了）
                      return; //②然后才能return
              */
 //            return;  /**err：这里return是错误的*/
