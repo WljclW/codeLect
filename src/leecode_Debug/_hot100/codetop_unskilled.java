@@ -349,7 +349,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     *       空间复杂度：O(1)（原地操作，递归栈深度 O(log n)）。
     * 【注意】部分用例会超时，尤其是数组中重复数很多的时候！
     * */
-    /**注意：随即快排的这种解法会导致个别用例超时（43/44用例超时，几乎都是重复的1）！！！*/
+    /**注意：随即快排的这种解法会导致个别用例超时（43/44用例超时，这个用例nums几乎都是重复的1）！！！*/
     public int findKthLargest_quickSort(int[] nums, int k) {
         int n = nums.length;
         return quickSort(nums, 0, n - 1, n - k);
@@ -389,8 +389,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 
     /**
-     chatgpt给出的第一个版本，下面是迭代版本的写法。就不会超时了~~
-     思考思考为什么？？
+     chatgpt给出的第一个版本，下面是迭代版本的写法。还是会超时了~~
      */
     public int findKthLargest_chatgpt1(int[] nums, int k) {
         int left = 0, right = nums.length - 1, target = nums.length - k;
@@ -435,7 +434,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     public int findKthLargest(int[] nums, int left, int right, int k) {
         if (left==right) return nums[left];
         int pivotIndex = left + new Random().nextInt(0,right-left+1);
-        swap_chatgpt(nums,pivotIndex,right);
+        swap_chatgpt2(nums,pivotIndex,right);
 
         pivotIndex = partitionHoare(nums, left, right);
         if (pivotIndex >= nums.length - k)
@@ -444,16 +443,32 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             return findKthLargest(nums, pivotIndex + 1, right, k);
     }
 
-
+    /*下面是Hoare分区的详细原理————
+    do { i++; } while (nums[i] < pivot);
+        从左向右找到第一个 不小于 pivot 的元素（即 nums[i] >= pivot），并停下，i 指向该元素。
+    do { j--; } while (nums[j] > pivot);
+        从右向左找到第一个 不大于 pivot 的元素（即 nums[j] <= pivot），并停下，j 指向该元素。
+    如果 i >= j：说明左右指针已经相遇或交错，划分完成，返回 j（注意返回 j，不是 i）。
+    否则 i < j，说明 nums[i] 在右半区、nums[j] 在左半区（相对 pivot），将它们交换 swap(nums, i, j)，然后继续循环。
+    这种做法保证被交换的两个元素都放到了各自正确的半区。
+    * */
     private int partitionHoare(int[] nums, int left, int right) {
-        int pivot = nums[left + (right - left) / 2];
+        /**pivot取中间的数 或者 末尾的数都是可以的*/
+//        int pivot = nums[left + (right - left) / 2];
+        int pivot = nums[right];
         int i = left - 1, j = right + 1;
         while (true) {
             do { i++; } while (nums[i] < pivot);
             do { j--; } while (nums[j] > pivot);
             if (i >= j) return j;
-            swap_chatgpt(nums, i, j);
+            swap_chatgpt2(nums, i, j);
         }
+    }
+
+    private void swap_chatgpt2(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
     }
 
     /**
@@ -500,14 +515,20 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
         while (i <= gt) {
             if (nums[i] < pivot) {
-                swap_chatgpt(nums, lt++, i++);
+                swap_chatgpt3(nums, lt++, i++);
             } else if (nums[i] > pivot) {
-                swap_chatgpt(nums, i, gt--);
+                swap_chatgpt3(nums, i, gt--);
             } else {
                 i++;
             }
         }
         return new int[]{lt, gt};
+    }
+
+    private void swap_chatgpt3(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
     }
 
 
