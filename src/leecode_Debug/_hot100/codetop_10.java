@@ -258,6 +258,11 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         for (int i = 0; i < size - k - 1; i++) { /**err：注意每个节点向右移动k，因此要从前往后数size-k个节点，而不是数k个节点！！之所以是“ i < size - k - 1”，是因为开始就在head，但是计数是0*/
             cur = cur.next;
         }
+        /*【说明】上面的for循环和下面的for循环是等价的！！
+        for (int i = 1; i < size - k; i++) {
+            cur = cur.next;
+        }
+        * */
         /*step4：先记录下cur.next，这是要返回的头；然后cur.next=null————断开cur节点和后面节点的连接*/
         ListNode res = cur.next;
         cur.next = null;
@@ -1581,10 +1586,14 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                  的字符，由于只有一个字符，因此s也是回文的。
                     ②l和r不相等，这就是一般情况。
             */
+            /**TODO 转换为小写字母的方法，”toLowerCase“如果参数时数字字符会不会报错??
+             答：不会。”Character.toLowerCase('9')“的结果是'9'，并不会报异常 或 报错。
+             */
             if (Character.toLowerCase(s.charAt(l))!=Character.toLowerCase(s.charAt(r))){
                 return false;
             }
             /*step4：经过上一步的判断以后，需要更新指针*/
+            /**err：如果不移动指针，提交时用例“超出时间限制”*/
             l++;
             r--;
         }

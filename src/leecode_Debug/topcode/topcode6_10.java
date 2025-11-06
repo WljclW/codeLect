@@ -187,28 +187,6 @@ public class topcode6_10 {
         return res;
     }
 
-    //61
-    public ListNode rotateRight(ListNode head, int k) {
-        if (head==null||head.next==null||k==0) return head;
-        int size = 1;
-        ListNode cur = head;
-        while (cur.next!=null){
-            cur = cur.next;
-            size++;
-        }
-        ListNode tail = cur;
-        tail.next = head;
-
-        cur = head;
-        k %= size;
-        for (int i = 0; i < size-k-1; i++) {
-            cur = cur.next;
-        }
-        ListNode res = cur.next;
-        cur.next = null;
-        return res;
-    }
-
     //47
     List<List<Integer>> resPermuteUnique;
     boolean[] used;
@@ -319,93 +297,6 @@ public class topcode6_10 {
         return left+1;
     }
 
-
-    //114
-    /**递归的写法呢？？怎么解？？？*/
-    public void flatten(TreeNode root) {
-        if (root==null) return;
-        Stack<TreeNode> stack = new Stack<>();
-        stack.push(root);
-        TreeNode cur = null;
-        while (!stack.isEmpty()){
-            TreeNode curNode = stack.pop();
-            if (cur==null) cur = curNode;
-            else {
-                cur.right = curNode;
-                cur.left = null;
-                cur = curNode.right;
-            }
-            if (cur.right!=null){
-                stack.push(cur.right);
-            }
-            if (cur.left!=null){
-                stack.push(cur.left);
-            }
-        }
-    }
-
-
-    //59
-    public int[][] generateMatrix(int n) {
-        int[][] res = new int[n][n];
-
-
-        return res;
-    }
-
-
-    //145
-    public List<Integer> postorderTraversal(TreeNode root) {
-        LinkedList<Integer> res = new LinkedList<>();
-        if (root==null) return res;
-        Stack<TreeNode> stack = new Stack<>();
-        stack.push(root);
-        while (!stack.isEmpty()){
-            TreeNode cur = stack.pop();
-            res.add(cur.val);
-            if (cur.left!=null){
-                stack.push(cur.left);
-            }
-            if (cur.right!=null){
-                stack.push(cur.right);
-            }
-        }
-        Collections.reverse(res);
-        return res;
-    }
-
-    public List<Integer> postorderTraversal_digui(TreeNode root) {
-        LinkedList<Integer> res = new LinkedList<>();
-        dfsPostorder(root,res);
-        return res;
-    }
-
-    private void dfsPostorder(TreeNode root, LinkedList<Integer> res) {
-        if (root==null) return;
-        dfsPostorder(root.left,res);
-        dfsPostorder(root.right,res);
-        res.add(root.val);
-    }
-
-    //75
-    public void sortColors(int[] nums) {
-        int left = 0,cur = 0,right = nums.length-1;
-        while (cur<=right){
-            if (nums[cur]==1){
-                cur++;
-            }else if (nums[cur]<1){
-                swap(nums,left++,cur++);
-            }else {
-                swap(nums,cur,right--);
-            }
-        }
-    }
-
-    private void swap(int[] nums, int l, int r) {
-        int tmp = nums[l];
-        nums[l] = nums[r];
-        nums[r] = tmp;
-    }
 
     //287
     public int findDuplicate(int[] nums) {
@@ -528,48 +419,6 @@ public class topcode6_10 {
 //        }
 //    }
 
-    //LCR 174
-    public int findTargetNode(TreeNode root, int cnt) {
-        Stack<TreeNode> stack = new Stack<>();
-        while (root!=null||!stack.isEmpty()){
-            if (root!=null){
-                stack.push(root);
-                root = root.right;
-            }else {
-                TreeNode cur = stack.pop();
-                if (--cnt==0) return cur.val;
-                root = cur.left;
-            }
-        }
-        return -1;
-    }
-
-    //135
-    public int candy(int[] ratings) {
-        int[] res = new int[ratings.length];
-        Arrays.fill(res,1);
-        for (int i = 1; i < ratings.length; i++) {
-            if (ratings[i]>ratings[i-1]) res[i] = res[i-1]+1;
-        }
-
-        for (int i = ratings.length-2; i >=0 ; i--) {
-            if (ratings[i]>ratings[i+1])
-                res[i] = Math.max(res[i],res[i+1]+1);
-        }
-        return Arrays.stream(res).sum();
-    }
-
-    //442
-    public List<Integer> findDuplicates(int[] nums) {
-        LinkedList<Integer> res = new LinkedList<>();
-        for (int num:nums){
-            int cur = Math.abs(num);
-            if (nums[cur-1]>0) nums[cur-1]*=-1;
-            else res.add(cur);
-        }
-        return res;
-    }
-
     //LCR 161
     public int maxSales(int[] sales) {
         int res = sales[0];
@@ -592,7 +441,9 @@ public class topcode6_10 {
         return sec;
     }
 
-    //445
+    /*445.两数相加 II
+       两个链表代表的数相加，两个数正序存放——————即高位在前
+   */
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         if (l1==null||l2==null) return l1==null?l2:l1;
         ListNode rL1 = rever(l1);
@@ -630,20 +481,6 @@ public class topcode6_10 {
             cur = next;
         }
         return pre;
-    }
-
-
-    //45
-    public int jump(int[] nums) {
-        int step = 0,maxPosition =0,bound =0;
-        for (int i = 0; i < nums.length - 1; i++) {
-            bound = Math.max(bound,i+nums[i]);
-            if (i==maxPosition){
-                maxPosition = bound;
-                step++;
-            }
-        }
-        return step;
     }
 
     //LCR 121
@@ -696,26 +533,6 @@ public class topcode6_10 {
             }
         }
         return -1;
-    }
-
-    //125
-    public boolean isPalindrome(String s) {
-        int l=0,r=s.length()-1;
-        while (l<r){
-            char c1 = s.charAt(l);
-            char c2 = s.charAt(r);
-            if (!Character.isLetterOrDigit(c1)){
-                l++;
-            }else if (!Character.isLetterOrDigit(c2)){
-                r--;
-            }else if (Character.toLowerCase(c1)!=Character.toLowerCase(c2)){
-                return false;
-            }else {
-                l++;
-                r--;
-            }
-        }
-        return true;
     }
 
 

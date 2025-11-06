@@ -536,7 +536,7 @@ public class _06ListNode {
     */
     /**
      *【常见错误】
-     *      1. 第三部结束链表的拆分以后需要将原始链表的next置为null，否则会报如下的错误：
+     *      1. 第三步结束链表的拆分以后需要将原始链表的next置为null，否则会报如下的错误：
      *   Next pointer of node with label 1 from the original list was modified.
      */
     public Node copyRandomList1(Node head) {

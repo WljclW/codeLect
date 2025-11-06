@@ -70,7 +70,7 @@ public class _13tanXin {
     }
 
 
-    /*45.
+    /*45.跳跃游戏 II
     * 给定一个长度为 n 的 0 索引整数数组 nums。初始位置为 nums[0]。
     每个元素 nums[i] 表示从索引 i 向后跳转的最大长度。换句话说，如果你在 nums[i] 处，你
     * 可以跳转到任意 nums[i + j] 处:
@@ -103,6 +103,21 @@ public class _13tanXin {
                 step++;
                 bound = maxPosition;
             }
+        }
+        return step;
+    }
+
+    /*while循环的写法*/
+    public int jump_(int[] nums) {
+        int right = 0,bound =0;
+        int cur = 0,step = 0;
+        while (cur<nums.length-1){
+            right = Math.max(right,cur+nums[cur]);
+            if (cur==bound){
+                step++;
+                bound = right;
+            }
+            cur++;
         }
         return step;
     }

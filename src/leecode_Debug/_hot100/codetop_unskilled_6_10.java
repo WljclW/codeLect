@@ -549,6 +549,31 @@ public class codetop_unskilled_6_10 {
         return true;
     }
 
+    /**另一种写法*/
+    public boolean isCompleteTree_(TreeNode root) {
+        if (root==null) return true;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        boolean hasNull = false;
+        while (!queue.isEmpty()){
+            TreeNode cur = queue.poll();
+            if (cur.left!=null){
+                if (hasNull) return false;
+                queue.offer(cur.left);
+            }else {
+                hasNull  =true;
+            }
+
+            if (cur.right!=null){
+                if (hasNull) return false;
+                queue.offer(cur.right);
+            }else {
+                hasNull = true;
+            }
+        }
+        return true;
+    }
+
     /*LCR 155. 将二叉搜索树转化为排序的双向链表
 将一个 二叉搜索树 就地转化为一个 已排序的双向循环链表 。
 对于双向循环列表，你可以将左右孩子指针作为双向循环链表的前驱和后继指针，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
@@ -968,9 +993,9 @@ public class codetop_unskilled_6_10 {
                    方案2：当前字符(即index=i-1的字符)单独及逆行解码。前提条件————当前的这一位数位于区间(0,9]，如果不在这个
                         区间，则不行
              */
-            if (c2!='0') dp[i] += dp[i-1]; //①i位置的值依赖于 i-1位置的值
+            if (c2!='0') dp[i] += dp[i-1]; //①i位置的值不是0，因此可以单独进行解码
             int val = (c1-'0')*10+c2-'0';
-            if (val>=10&&val<=26) dp[i] += dp[i-2]; //②i位置的值依赖于 i-2位置的值
+            if (val>=10&&val<=26) dp[i] += dp[i-2]; //②i位置的值 和 i-1位置的值 组合起来位于[10,26]，因此可以组合起来解码
         }
         return dp[s.length()];
     }
@@ -1281,7 +1306,7 @@ public class codetop_unskilled_6_10 {
             boolean isEnd;
         }
 
-        private final TrieNode root;
+        private final TrieNode root; /**标识整个“前缀树”的根节点*/
 
         public Trie() {
             root = new TrieNode();
@@ -1343,7 +1368,7 @@ public class codetop_unskilled_6_10 {
 
 
 
-    /*225
+    /*225. 用队列实现栈
     要求用 队列（Queue） 来实现一个 栈（Stack），支持以下操作：
         push(x) – 压入元素 x
         pop() – 弹出栈顶元素

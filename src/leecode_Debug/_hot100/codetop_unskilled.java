@@ -997,8 +997,8 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
          里添加的时候应该是倒序的关系，反过来添加即“拿到cur[1]对应的list然后把cur[0]加进去”
         */
         for (int[] p : prerequisites) { /**err：最绕的是这个for循环的内容*/
-            int index = p[0], ele = p[1];
-            graph.get(ele).add(index); /**这里容易写错，需要捋清楚添加的顺序~~~*/
+            int index = p[0], preCourse = p[1];
+            graph.get(preCourse).add(index); /**这里容易写错，需要捋清楚添加的顺序~~~*/
             indegree[index]++;
         }
 
@@ -1365,62 +1365,35 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return isSameTree(root.left, subRoot.left) && isSameTree(root.right, subRoot.right);
     }
 
-
-    //59
+    /*59 螺旋矩阵Ⅱ
+        给定参数n，产生一个矩阵，顺时针填写1，2，.....
+     */
     public int[][] generateMatrix(int n) {
+        int cur = 1;
+        int left=0,top=0,right=n-1,bottom=n-1;
         int[][] res = new int[n][n];
-        int num = 1;
-        int top = 0, bottom = n - 1;
-        int left = 0, right = n - 1;
-        while (num <= n * n) {
+        while (cur<=n*n){ /**这里写成”while(true)“也没问题！！！*/
             for (int i = left; i <= right; i++) {
-                res[top][i] = num++;
+                res[top][i] = cur++;
             }
-            top++;
+            if (++top>bottom) break;
 
             for (int i = top; i <= bottom; i++) {
-                res[i][right] = num++;
+                res[i][right] = cur++;
             }
-            right--;
+            if (--right<left) break;
 
-            for (int i = right; i >= left; i++) {
-                res[bottom][i] = num++;
+            for (int i = right; i >= left; i--) {
+                res[bottom][i] = cur++;
             }
-            bottom--;
+            if (--bottom<top) break;
 
-            for (int i = bottom; i >= top; i++) {
-                res[i][left] = num++;
+            for (int i = bottom; i >= top; i--) {
+                res[left][i] = cur++;
             }
-            left++;
+            if (++left>right) break;
         }
         return res;
-    }
-
-
-    //91
-    public int numDecodings(String s) {
-        if (s == null || s.length() == 0) return 0;
-        int n = s.length();
-        int[] dp = new int[n + 1];
-        /*base case：需要初始化两个。其中dp[0]作为启动的参数、dp[1]是判断第一个字符是不是0(如果第一个字
-            符是0，说白了这个字符串是不能被解码的。因为0不能解码并且它前面也没有字符不能组成“10”、“20”的样
-            子)*/
-        dp[0] = 1;
-        dp[1] = s.charAt(0) == '0' ? 1 : 0;
-        for (int i = 2; i <= n; i++) {
-            char cur = s.charAt(i - 1);
-            char curPrev = s.charAt(i - 2);
-            /*
-             根据1位数进行解码 和 2位数解码，更新dp[i].
-                   方案1：和前面的数合起来进行解码。前提条件————是不是能和前面的数组成[10,26]中的一个数，不在这个范围就不行
-                   方案2：当前字符(即index=i-1的字符)单独及逆行解码。前提条件————当前的这一位数位于区间(0,9]，如果不在这个
-                        区间，则不行
-             */
-            int twoDigit = (curPrev - '0') * 10 + cur - '0';
-            if (twoDigit >= 10 && twoDigit <= 26) dp[i] += dp[i - 2]; //方案1
-            if (cur != '0') dp[i] += dp[i - 1]; //方案2
-        }
-        return dp[n];
     }
 
 

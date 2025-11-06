@@ -536,31 +536,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
      */
 
 
-
-        /*114.
-    * 给你二叉树的根结点 root ，请你将它展开为一个单链表：
-    展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
-    展开后的单链表应该与二叉树 先序遍历 顺序相同。*/
-    public void flatten(TreeNode root) {
-        if (root==null) return;
-        Stack<TreeNode> stack = new Stack<>();
-        stack.push(root);
-        TreeNode res = null;
-        while (!stack.isEmpty()){
-            TreeNode cur = stack.pop();
-            if (cur.right!=null) stack.push(cur.right);
-            if (cur.left!=null) stack.push(cur.left);
-            if (res==null){
-                res = cur;
-            }else {
-                res.right = cur;
-                res.left = null;
-                res = res.right;
-            }
-        }
-    }
-
-
     /*
      518. 零钱兑换 II
     * */
@@ -576,90 +551,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 //    public boolean isSubStructure(TreeNode A, TreeNode B) {
 //
 //    }
-
-
-
-    /*59 螺旋矩阵Ⅱ
-        给定参数n，产生一个矩阵，顺时针填写1，2，.....
-     */
-    public int[][] generateMatrix(int n) {
-        int[][] res = new int[n][n];
-        int i = 1;
-        int top = 0,bottom = n-1;
-        int left = 0,right = n-1;
-        while (i<=n){
-            for (int j = left; j <=right; j++) {
-                res[top][j] = i++;
-            }
-            top++;
-            /**这里用不用额外的判断i的值？？？？？*/
-            for (int j = top; j <=bottom; j++) {
-                res[j][right] = i++;
-            }
-            right--;
-            for (int j = right; j >=left; j--) {
-                res[bottom][j] = i++;
-            }
-            bottom--;
-            for (int j = bottom; j >=top ; j--) {
-                res[j][left] = i++;
-            }
-            left++;
-        }
-        return res;
-    }
-
-
-
-
-    /*
-    91. 解码方法
-    一条包含字母 A-Z 的消息通过以下映射进行了 编码 ：
-
-    "1" -> 'A'
-
-    "2" -> 'B'
-
-    ...
-
-    "25" -> 'Y'
-
-    "26" -> 'Z'
-
-    然而，在 解码 已编码的消息时，你意识到有许多不同的方式来解码，因为有些编码被包含在其它编码当中（"2" 和 "5" 与 "25"）。
-
-    例如，"11106" 可以映射为：
-
-    "AAJF" ，将消息分组为 (1, 1, 10, 6)
-    "KJF" ，将消息分组为 (11, 10, 6)
-    消息不能分组为  (1, 11, 06) ，因为 "06" 不是一个合法编码（只有 "6" 是合法的）。
-    注意，可能存在无法解码的字符串。
-
-    给你一个只含数字的 非空 字符串 s ，请计算并返回 解码 方法的 总数 。如果没有合法的方式解码整个字符串，返回 0。
-
-    题目数据保证答案肯定是一个 32 位 的整数。
-     */
-    public int numDecodings(String s) {
-        if (s==null||s.length()==0||s.charAt(0)=='0') return 0;
-        int[] dp = new int[s.length()];
-        dp[0] = 1;
-        for (int i = 2; i < s.length(); i++) {
-            char c = s.charAt(i);
-            char cPrev = s.charAt(i - 1);
-            if (c=='0'){
-                if (cPrev>0&&cPrev<='2'){
-                    dp[i] = dp[i-2];
-                }else {
-                    return 0;
-                }
-            }else {
-                int curVal = cPrev-'0'*10+c;
-                if (curVal<=26) dp[i] = dp[i-1]+dp[i-2];
-                else dp[i] = dp[i-1];
-            }
-        }
-        return dp[s.length()-1];
-    }
 
 
 
@@ -698,42 +589,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
         Collections.reverse(res);
         return res;
-    }
-
-
-
-
-    /*75.
-    * 给定一个包含红色、白色和蓝色、共 n 个元素的数组 nums ，原地 对它们进行排序，使
-    * 得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
-    我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
-    必须在不使用库内置的 sort 函数的情况下解决这个问题。*/
-    /*
-    * 【注意】cur位置小于1的时候，left和cur指针都需要++。。。否则会报错，如下：
-    *       输入
-            nums =
-            [2,0,2,1,1,0]
-            输出
-            [1,1,2,2,0,0]
-            预期结果
-            [0,0,1,1,2,2]
-    * */
-    public void sortColors(int[] nums) {
-        int left = 0,cur = 0,right = nums.length-1;
-        while (cur<=right){
-            if (nums[cur]==0){
-                swap1(nums,left++,cur++);
-            }else if (nums[cur]==2){
-                swap1(nums,cur,right--);
-            }else
-                cur++;
-        }
-    }
-
-    private void swap1(int[] nums, int l, int r) {
-        int tmp = nums[l];
-        nums[l] = nums[r];
-        nums[r]  =tmp;
     }
 
 
@@ -816,25 +671,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
         }
 
         return Arrays.stream(res).sum();
-    }
-
-
-    /*442
-    给你一个长度为 n 的整数数组 nums ，其中 nums 的所有整数都在范围 [1, n] 内，且每个整数出现 最多两次 。请你找出所有出现 两次 的整数，并以数组形式返回。
-
-你必须设计并实现一个时间复杂度为 O(n) 且仅使用常量额外空间（不包括存储输出所需的空间）的算法解决此问题。
-    * */
-    public List<Integer> findDuplicates(int[] nums) {
-        LinkedList<Integer> res = new LinkedList<>();
-        for (int i = 0; i < nums.length; i++) {
-            int cur = Math.abs(nums[i]);
-            if (nums[cur-1]<0){
-                res.add(cur);
-            }else {
-                nums[cur-1] *= -1;
-            }
-        }
-        return res;
     }
 
 
