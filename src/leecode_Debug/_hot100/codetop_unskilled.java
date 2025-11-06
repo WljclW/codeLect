@@ -325,6 +325,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             时间复杂度——O(n logK),空间复杂度——O(k)
             适合处理数据流或 n 很大但 k 较小的情况。
     方法3：快排思想的排序。
+     TODO:借助这个题继续思考，“Hoare分区的快排版本”怎么写？
      */
     /*解法1：借助优先级队列。保证优先级队列中只有k个元素，最后弹出即可*/
     public int findKthLargest(int[] nums, int k) {
@@ -461,6 +462,9 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             do { i++; } while (nums[i] < pivot);
             do { j--; } while (nums[j] > pivot);
             if (i >= j) return j;
+            /*【注】这里交换之后i和j的值没有变，表面上看会死循环，其实不会。。。原因：
+                由于整体是“while(true)”，因此还会进入循环；由于是“do-while”循环，因此会先改变i和j的值，因此不会造成死循环
+             */
             swap_chatgpt2(nums, i, j);
         }
     }

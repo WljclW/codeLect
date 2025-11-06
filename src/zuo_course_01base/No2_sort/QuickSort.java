@@ -8,6 +8,20 @@ import java.util.Random;
 /**
  * 快速排序3.0，也就是常规说法的快速排序
  *    思路：每一次随机选择一个数，将其他的数按照这个数分为三部分。
+ * 【建议的写法】见方法 quickSort3
+ * 【补充说明】
+    1. 其实关于快排的写法，分区时有不同的做法————
+         Lomuto 分区原理概述（其实就是下面partion方法的逻辑）
+             假定 pivot 是子数组的 最后一个元素 (nums[right])，因为在quickSort中已经将随机选择的数交换到right的位置了
+             双指针：
+                 flag：指向 小于 pivot 的元素区域的右边界（下一次碰到“小于pivot”的元素应该放在flag位置）
+                 i：for循环，遍历 [left, right - 1] 所有元素。如果 nums[i] < pivot，将该值和 nums[flag] 交换，并flag++
+                 遍历结束后，将 pivot 放到 flag 位置（即其正确位置）
+         Hoare 分区原理
+    2. ①并且下面的写法几乎都是“Lomuto分区”的写法。但是“215. 数组中的第K个最大元素”使用“Lomuto分区”的做法会超时，因为那个例子
+         几乎都是1（换言之重复元素很多），因此会做很多无用的交换。
+       ②“快排 Hoare分区”版本的代码见方法 quickSortHoare。
+       ③两种版本快排的代码，在主方法中的写法没有区别，分为四步；唯一的区别在于分区方法的实现 partition。
  * */
 public class QuickSort {
     /**
@@ -157,11 +171,14 @@ public class QuickSort {
     public static void quickSort3(int[] arr,int l,int r){
         /*step1：base-case的考虑*/
         if (l>=r) return; /**err：如果写成“if (l==r) return;”，是错误的，必须是“>=”或者“>”。。。说明某些时候l不存在等于r的时候，直接来到了l>r*/
-        /*step2：产生一个索引；并将这个数交换到索引为r的位置*/
+        /*step2：产生一个索引；并将这个数交换到索引为r的位置（即这组的最后一个位置）*/
         int pivotIndex = l + new Random().nextInt(r - l + 1);
         swap3(arr,pivotIndex,r);
-        /**/
+        /*step3：执行partion3将step2中的那个数放在正确的位置 并且 返回这个正确的位置赋值给pivotIndex。使得————
+            它左边的那些数都比它小，它右边的那些数都比它大。
+        **/
         pivotIndex = partion3(arr,l,r);
+        /*step4：排序pivotIndex左边的那些数、排序pivotIndex右边的那些数*/
         quickSort3(arr,l,pivotIndex-1);
         quickSort3(arr,pivotIndex+1,r);
     }
@@ -177,9 +194,9 @@ public class QuickSort {
      *           快排的时候就不需要了，根据大小关系和索引完成交换！(双指针解法，类似于“颜色分类/荷兰国旗”问题)
      */
     private static int partion3(int[] arr, int l, int r) {
-        int flag = l;
+        int flag = l; /*flag：下一次碰到的数m小于arr[r]时，m应该被交换到哪一个位置*/
         for (int i = l; i < r; i++) {
-            if (arr[i]<arr[r]){
+            if (arr[i]<=arr[r]){ /**写成“<=”就能保证是稳定的排序*/
                 swap(arr,flag++,i);
             }
         }
@@ -213,5 +230,48 @@ public class QuickSort {
         }
         swap(arr,l,r); //把基准值放在正确的位置
         return l; //返回l
+    }
+
+    /**
+     * ======================================快排的Hoare版本==================================================
+     * ======================================快排的Hoare版本==================================================
+     * ======================================快排的Hoare版本==================================================
+     * ======================================快排的Hoare版本==================================================
+     * ======================================快排的Hoare版本==================================================
+     * ======================================快排的Hoare版本==================================================
+     * */
+    private static final Random random = new Random();
+
+    /*快排的主方法：与“快排Lomuto版本”的主方法代码没区别*/
+    public void quickSortHoare(int[] nums, int left, int right) {
+        /*step1：base-case*/
+        if (left >= right) return;
+        /*step2：随机选择枢轴并交换到 right 位置。*/
+        int pivotIndex = left + random.nextInt(right - left + 1);
+        swap_hoare(nums, right, pivotIndex);
+        /*step3：找出切割的位置*/
+        int partitionIndex = hoarePartition(nums, left, right);
+        /*step4：递归的排序左右两半*/
+        quickSort(nums, left, partitionIndex);
+        quickSort(nums, partitionIndex + 1, right);
+    }
+
+    /*TODO:两种快排版本 代码的区别所在————即区别在于如何根据随机选择的数进行分区操作*/
+    private int hoarePartition(int[] nums, int left, int right) {
+        int pivot = nums[right]; // 枢轴已被交换到 right
+        int i = left - 1, j = right + 1;
+
+        while (true) {
+            do { i++; } while (nums[i] < pivot);
+            do { j--; } while (nums[j] > pivot);
+            if (i >= j) return j;
+            swap_hoare(nums, i, j);
+        }
+    }
+
+    private void swap_hoare(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
     }
 }

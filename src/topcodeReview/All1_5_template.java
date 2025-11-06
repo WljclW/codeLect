@@ -24,6 +24,20 @@ public class All1_5_template {
         return String.join(" ",arr);
     }
 
+
+    public String reverseWords1(String s) {
+        StringBuilder res = new StringBuilder();
+        s = s.trim();
+        int i = s.length()-1,j = i;
+        while (i>=0){
+            while (i>=0&&s.charAt(i)!=' ') i--;
+            res.append(s.substring(i+1,j+1)).append(' ');
+            while (i>=0&&s.charAt(i)==' ') i--;
+            j = i;
+        }
+        return res.toString();
+    }
+
     /*227. 基本计算器 II
 给你一个字符串表达式 s ，请你实现一个基本计算器来计算并返回它的值。
 
