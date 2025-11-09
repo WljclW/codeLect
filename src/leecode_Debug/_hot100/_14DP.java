@@ -153,7 +153,7 @@ public class _14DP {
 
        完全平方数 是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数
        * 自乘的积。例如，1、4、9 和 16 都是完全平方数，而 3 和 11 不是。*/
-    public int numSquares(int n) {
+    public int numSquares_(int n) {
         int[] dp = new int[n + 1];
         Arrays.fill(dp,n+1);
         dp[0] = 0; /*dp0的初始值是0*/
@@ -166,17 +166,23 @@ public class _14DP {
         return dp[n];
     }
 
-    /**另一个版本的写法，有点类似于coins change问题。。如何理解？？*/
-    public int numSquares1(int n) {
-        var f = new int[n + 1];
-        Arrays.fill(f, Integer.MAX_VALUE);
-        f[0] = 0;
-        for (int i = 1; i * i <= n; i++) {
-            for (int j = i * i; j <= n; j++) {
-                f[j] = Math.min(f[j], f[j - i * i] + 1);
+    /**另一个版本的写法，有点类似于coins change问题。。如何理解？？
+     详细的理解如下————
+        要凑成的数n当作是背包的容量，所有的完全平方数看作是物体的空间如1、4、9、16....因此在这种情况下，题目所求
+     的即是凑出n这么多空间，至少需要的物品数量（每个物品所占的空间是完全平方数）。
+        1. 外层的i循环枚举物品。枚举到什么程度呢？？i*i<=n————即单个物品的空间不能超过n。
+        2. 内层的j循环枚举背包的空间。由于当前的物品占用空间是i*i，因此j要从i*i开始枚举
+     */
+    public int numSquares(int n) {
+        int[] dp = new int[n + 1];
+        Arrays.fill(dp,n);
+        dp[0] = 0; /**dp[0]应该是要初始化为0，否则的话下面的决策过程”Math.min(dp[j],dp[j-i*i]+1);“就永远都是最大值了*/
+        for (int i = 1; i*i <= n; i++) { /**”一个i就相当于之前的一个物品的质量/空间 nums[i]“*/
+            for (int j = i*i; j <= n; j++) {
+                dp[j] = Math.min(dp[j],dp[j-i*i]+1);
             }
         }
-        return f[n];
+        return dp[n];
     }
 
 

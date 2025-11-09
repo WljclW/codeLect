@@ -216,34 +216,6 @@ public class topcode6_10 {
         }
     }
 
-
-    //40
-    List<List<Integer>> resCombinationSum2;
-    boolean[] usedCombinationSum2;
-    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
-        resCombinationSum2 = new LinkedList<>();
-        usedCombinationSum2 = new boolean[candidates.length];
-        LinkedList<Integer> path = new LinkedList<>();
-        Arrays.sort(candidates);
-        combinationSum2Back(candidates,target,path,0);
-        return resCombinationSum2;
-    }
-
-    private void combinationSum2Back(int[] candidates, int target, LinkedList<Integer> path, int index) {
-        if (target==0) resCombinationSum2.add(new LinkedList<>(path));
-        if (target<0) return;
-        for (int i = index; i < candidates.length; i++) {
-            if (i>0&&candidates[i-1]==candidates[i]&&!usedCombinationSum2[i]) continue;
-            target -= candidates[i];
-            usedCombinationSum2[i]=true;
-            path.add(candidates[i]);
-            combinationSum2Back(candidates,target,path,i+1);
-            target += candidates[i];
-            usedCombinationSum2[i] = false;
-            path.removeLast();
-        }
-    }
-
     //55
     public boolean canJump(int[] nums) {
         int bound = 0;
@@ -336,74 +308,10 @@ public class topcode6_10 {
         return root;
     }
 
-
-    //96
-    public int numTrees(int n) {
-        int[] dp = new int[n + 1];
-        dp[0] = 1;
-        dp[1] = 1;
-        for (int i = 2; i <=n; i++) {
-            for (int j = 1; j <=i; j++) {
-                dp[i] += dp[j-1]*dp[i-j];
-            }
-        }
-        return dp[n];
-    }
-
-    //189
-    public void rotate(int[] nums, int k) {
-        k%=nums.length;
-        if (k==0) return;
-        reve(nums,0,nums.length-1);
-        reve(nums,0,k-1);
-        reve(nums,k,nums.length-1);
-    }
-
-    private void reve(int[] nums, int l, int r) {
-        while (l<r){
-            int tmp = nums[l];
-            nums[l] = nums[r];
-            nums[r] = tmp;
-            l++;
-            r--;
-        }
-    }
-
     //678
 //    public boolean checkValidString(String s) {
 //
 //    }
-
-
-    //400
-    public int findNthDigit(int n) {
-        int digit = 1,min = 1;
-        while (n>digit*min*9){
-            n-=digit*min*9;
-            digit++;
-            min *= 10;
-        }
-        int num = min+(n-digit)/digit;
-        return String.valueOf(num).charAt((n-1)%digit)-'0';
-    }
-
-
-
-    //134
-    public int canCompleteCircuit(int[] gas, int[] cost) {
-        int curTotal  =0,total = 0;
-        int res = 0;
-        for (int i = 0; i < gas.length; i++) {
-            curTotal += (gas[i]-cost[i]);
-            total += (gas[i]-cost[i]);
-            if (curTotal<0){
-                res = i+1;
-                curTotal = 0;
-            }
-        }
-        return total<0?-1:res;
-    }
-
 
     //611
 //    public int triangleNumber(int[] nums) {
@@ -500,23 +408,6 @@ public class topcode6_10 {
         return false;
     }
 
-    //328
-    public ListNode oddEvenList(ListNode head) {
-        if (head==null||head.next==null||head.next.next==null) return head;
-        ListNode oddHead = head;
-        ListNode evenHead = head.next,evenCur = evenHead;
-        while (evenCur!=null&&evenCur.next!=null){
-            oddHead.next = oddHead.next.next;
-            oddHead = oddHead.next;
-
-            evenCur.next = evenCur.next.next;
-            evenCur = evenCur.next;
-        }
-        oddHead.next = evenHead;
-
-        return head;
-    }
-
     //230
     public int kthSmallest(TreeNode root, int k) {
         Stack<TreeNode> stack = new Stack<>();
@@ -535,75 +426,6 @@ public class topcode6_10 {
         return -1;
     }
 
-
-    //85
-    public int maximalRectangle(char[][] matrix) {
-        int m =matrix.length,n =matrix[0].length;
-        int res  =0;
-        int[] height = new int[n];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (matrix[i][j]!='0'){
-                    height[j]++;
-                }else {
-                    height[j] = 0;
-                }
-            }
-            res = Math.max(res,getArea(height));
-        }
-        return res;
-    }
-
-    private int getArea(int[] height) {
-        Stack<Integer> stack = new Stack<>();
-        int res = 0;
-        for (int i = 0; i < height.length + 1; i++) {
-            int curHeight = (i==height.length)?0:height[i];
-            while (!stack.isEmpty()&&curHeight<height[stack.peek()]){
-                Integer curIndex = stack.pop();
-                int left = stack.isEmpty()?-1:stack.peek();
-                int curArea = height[curIndex]*(i-left-1);
-                res = Math.max(res,curArea);
-            }
-            stack.push(i);
-        }
-        return res;
-    }
-
-    //LCR 144
-    public TreeNode flipTree(TreeNode root) {
-        if (root==null) return root;
-        TreeNode left = flipTree(root.left);
-        TreeNode right = flipTree(root.right);
-        root.left = right;
-        root.right = left;
-        return root;
-    }
-
-
-    public TreeNode flipTree_cengxu(TreeNode root) {
-        if (root==null) return root;
-        LinkedList<TreeNode> deque = new LinkedList<>();
-        TreeNode res = root;
-        deque.offer(root);
-        while (!deque.isEmpty()){
-            int size = deque.size();
-            for (int i = 0; i < size; i++) {
-                TreeNode cur = deque.poll();
-                swap(cur);
-                if (cur.left!=null) deque.offer(cur.left);
-                if (cur.right!=null) deque.offer(cur.right);
-            }
-        }
-        return res;
-    }
-
-    private void swap(TreeNode cur) {
-        TreeNode tmp = cur.left;
-        cur.left = cur.right;
-        cur.right = tmp;
-    }
-
     //264
 //    public int nthUglyNumber(int n) {
 //        int p1=1,p2=1,p3=1;
@@ -620,75 +442,6 @@ public class topcode6_10 {
 //        return res;
 //    }
 
-    //1004
-    public int longestOnes(int[] nums, int k) {
-        int left = 0,cur =0;
-        int zeroCount = 0;
-        int res =0;
-        while (cur<nums.length){
-            if (nums[cur++]==0) zeroCount++;
-            while (zeroCount>k){
-                if (nums[left++]==0){
-                    zeroCount--;
-                }
-            }
-            res = Math.max(res,cur-left);
-        }
-        return res;
-    }
-
-    //63
-    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
-        int m = obstacleGrid.length,n = obstacleGrid[0].length;
-        int[][] dp = new int[m][n];
-        if (obstacleGrid[0][0]==1) return 0;
-        dp[0][0] = 1;
-        for (int i = 1; i < n; i++) {
-            dp[0][i] = obstacleGrid[0][i]==1?0:dp[0][i-1];
-        }
-        for (int i = 1; i < m; i++) {
-            dp[i][0] = obstacleGrid[i][0]==1?0:dp[i-1][0];
-        }
-        for (int i = 1; i < m; i++) {
-            for (int j = 1; j < n; j++) {
-                if (obstacleGrid[i][j]==0){
-                    dp[i][j] = dp[i-1][j]+dp[i][j-1];
-                }else {
-                    dp[i][j] =0;
-                }
-            }
-        }
-        return dp[m-1][n-1];
-    }
-
-    //316
-    public String removeDuplicateLetters(String s) {
-        int[] flags = new int[26];
-        boolean[] used = new boolean[26];
-        for (int i = 0; i < s.length(); i++) {
-            flags[s.charAt(i)-'a'] = i;
-        }
-
-        Stack<Integer> stack = new Stack<>();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (!used[c-'a']){
-                while (!stack.isEmpty()&&flags[s.charAt(stack.peek())-'a']>i&&c<s.charAt(stack.peek())){
-                    Integer index = stack.pop();
-                    used[s.charAt(index)-'a'] = false;
-                }
-                used[c-'a'] = true;
-                stack.push(i);
-            }
-        }
-
-        StringBuilder res = new StringBuilder();
-        for (int index:stack){
-            res.append(s.charAt(index));
-        }
-        return res.toString();
-    }
-
     //链表求和
     public ListNode addTwoNumbers_(ListNode l1, ListNode l2) {
         ListNode dummy = new ListNode(-1),cur = dummy;
@@ -704,49 +457,6 @@ public class topcode6_10 {
             if (l2!=null) l2=l2.next;
         }
         return dummy.next;
-    }
-
-    //71
-    public String simplifyPath(String path) {
-        String[] split = path.split("/");
-        Stack<String> stack = new Stack<>();
-        for (int i = 0; i < split.length; i++) {
-            if ("".equals(split[i])||".".equals(split[i]))
-                continue;
-            else if ("..".equals(split[i])){
-                if (!stack.isEmpty()) stack.pop();
-            }
-            else
-                stack.push(split[i]);
-        }
-
-        if (stack.isEmpty()) return "/";
-        StringBuilder res = new StringBuilder();
-        for(String str:stack){
-            res.append("/").append(str);
-        }
-        return res.toString();
-    }
-
-    /**下面的代码是错误的，为什么？？*/
-    public String simplifyPath_error(String path) {
-        String[] split = path.split("/");
-        Stack<String> stack = new Stack<>();
-        for (int i = 0; i < split.length; i++) {
-            if ("".equals(split[i])||".".equals(split[i]))
-                continue;
-            else if ("..".equals(split[i]))
-                if (!stack.isEmpty()) stack.pop(); /**这里的if块必须加“{}”包起来，否则答案是错的*/
-            else
-                stack.push(split[i]);
-        }
-
-        if (stack.isEmpty()) return "/";
-        StringBuilder res = new StringBuilder();
-        for(String str:stack){
-            res.append("/").append(str);
-        }
-        return res.toString();
     }
 
     //416

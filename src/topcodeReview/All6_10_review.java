@@ -16,6 +16,9 @@ import java.util.*;
  *    
  * err：75、287、402、50、329、295、384、400、611、26
  *      279、LCR 146. 螺旋遍历二维数组、63、279、
+ *
+ * err：279、120. 三角形最小路径和、384.打乱数组、LCR 187. 破冰游戏、
+ *      400.第N个数字、50. Pow(x, n)、516. 最长回文子序列、、、、
  */
 public class All6_10_review {
     /*739.每日温度
@@ -1120,27 +1123,9 @@ boolean empty() 如果栈是空的，返回 true ；否则，返回 false 。
 
    测试用例保证答案小于等于 2 * 109。
     */
-    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
-        int m = obstacleGrid.length, n = obstacleGrid[0].length;
-        int[][] dp = new int[m][n];
-        for (int i = 0; i < n; i++) {
-            if (obstacleGrid[0][i]==1) break;
-            dp[0][i] = 1;
-        }
-        for (int i = 0; i < m; i++) {
-            if (obstacleGrid[i][0]==1) break;
-            dp[i][0] = 1;
-        }
-
-        for (int i = 1; i < m; i++) {
-            for (int j = 1; j < n; j++) {
-                if (obstacleGrid[i][j] != 1) {
-                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
-                }
-            }
-        }
-        return dp[m - 1][n - 1];
-    }
+//    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+//
+//    }
 
 
     /*395. 至少有 K 个重复字符的最长子串

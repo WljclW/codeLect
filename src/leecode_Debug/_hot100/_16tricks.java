@@ -83,6 +83,7 @@ public class _16tricks {
     你设计的解决方案必须 不修改 数组 nums 且只用常量级 O(1) 的额外空间。
     * */
     /**
+     *【关键】第一步找相等位置使用“do-while循环”；然后使用“while循环”找入环节点
      *【注意】
      *      1. 这个题要求不能修改数组!!
      *      2. 【注】这个题数组是n+1个数，但是数值是[1,n]，因此数值作为下标是不会越界的
@@ -135,11 +136,11 @@ public class _16tricks {
 
         // 阶段 2：找到入口点（重复数）
         slow = nums[0];
-        while (slow != fast) {
+        while (slow != fast) { /**err：为什么这里需要使用while？为什么使用"do-while"就错了*/
             slow = nums[slow];
             fast = nums[fast];
         }
-        return slow;
+        return slow; /**这里是不是要使用nums获取slow对应的数？？还是说直接返回slow，需要直接返回slow*/
     }
 
 

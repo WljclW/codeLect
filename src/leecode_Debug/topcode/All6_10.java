@@ -1008,26 +1008,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 //    }
 
 
-
-
-    /*96. 不同的二叉搜索树
-    给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。
-     */
-    public int numTrees(int n) {
-        if (n<=2) return n;
-        int[] dp = new int[n+1];
-        dp[0] = 1; /**err：必须要初始化dp[0]，否则初始的测试用例有错。。。比如3个节点，左子树两个、右子树没节点，此时有dp[2]*dp[0]种可能，如果不初始化dp[0]得到的就是0*/
-        dp[1] = 1;
-        dp[2] = 2;
-        for (int i = 3; i <=n; i++) {
-            for (int j = 1; j <=i; j++) {
-                dp[i] += dp[j-1]*dp[i-j];
-            }
-        }
-        return dp[n];
-    }
-
-
     /*LCR 187. 破冰游戏
     社团共有 num 位成员参与破冰游戏，编号为 0 ~ num-1。成员们按照编号顺序围绕圆桌而坐。社长抽
     取一个数字 target，从 0 号成员起开始计数，排在第 target 位的成员离开圆桌，且成员离开后从下
@@ -1039,27 +1019,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
 
 
-    /*9. 回文数
-    给你一个整数 x ，如果 x 是一个回文整数，返回 true ；否则，返回 false 。
-
-    回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。
-
-    例如，121 是回文，而 123 不是。*/
-
-
-
-    /* 384
-        实现一个支持以下操作的类：
-
-        Solution(int[] nums) —— 用整数数组初始化对象
-
-        reset() —— 重置数组到最初状态并返回
-
-        shuffle() —— 返回数组随机打乱后的结果
-     */
-
-
-
     /*120
     给定一个三角形 triangle ，找出自顶向下的最小路径和。
 
@@ -1068,36 +1027,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 //    public int minimumTotal(List<List<Integer>> triangle) {
 
 //    }
-
-
-
-
-    /*189.
-     * 给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。
-     * */
-    /**
-     *【说明】这里必须将k对nums.length取余，否则提交时用例报错————
-              nums =
-              [-1]
-              k =
-              2
-     */
-    public void rotate(int[] nums, int k) {
-        k %= nums.length;    /**err：务必对k进行取余*/
-        reverse2(nums,0,nums.length-1);
-        reverse2(nums,0,k-1); /**是不是索引应该是这种样子？？是。前k个数因此，索引是闭区间[0,k-1]*/
-        reverse2(nums,k,nums.length-1);
-    }
-
-    private void reverse2(int[] nums, int l, int r) {
-        while (l<r){
-            int tmp = nums[l];
-            nums[l] = nums[r];
-            nums[r] = tmp;
-            l++;
-            r--;
-        }
-    }
 
 
 
@@ -1161,62 +1090,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
                     left++;
                 }
             }
-        }
-        return res;
-    }
-
-
-
-    /*400
-    给你一个整数 n ，请你在无限的整数序列 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ...] 中找出并返回第 n 位上的数字。
-     */
-    public int findNthDigit(int n) {
-        int digit =1;
-        int start = 1;
-        while (n>9*digit*start){
-            n -= 9*digit*start;
-            start*= 10;
-            digit++;
-        }
-        int i = start + (n - 1) / digit;  /**这样写对不对？？？*/
-        int index = (n-1)%digit;
-        return (int) String.valueOf(i).charAt(index)-'0';
-    }
-
-
-    /*85
-    给定一个仅包含 0 和 1 、大小为 rows x cols 的二维二进制矩阵，找出只包含 1 的最大矩形，并返回其面积。
-     */
-    public int maximalRectangle(char[][] matrix) {
-        int m = matrix.length,n = matrix[0].length;
-        int[] height = new int[n];
-        int res = 0;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (matrix[i][j]=='1'){
-                    height[j]++;
-                }else {
-                    height[j] = 0;
-                }
-            }
-            int curVal = gerArea(height);
-            res = Math.max(res,curVal);
-        }
-        return res;
-    }
-
-    private int gerArea(int[] height) {
-        Stack<Integer> stack = new Stack<>();
-        int res = 0;
-        for (int i = 0; i < height.length + 1; i++) {
-            int curHeight = i==height.length?0:height[i];
-            while (!stack.isEmpty()&&curHeight<height[stack.peek()]){
-                Integer curIndex = stack.pop();
-                int left = stack.isEmpty()?-1:stack.peek();
-                int curVal = height[curIndex]*(i-left-1);
-                res = Math.max(curVal,res);
-            }
-            stack.push(i);
         }
         return res;
     }

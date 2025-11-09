@@ -921,9 +921,9 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     请注意，偶数组和奇数组内部的相对顺序应该与输入时保持一致。
     你必须在 O(1) 的额外空间复杂度和 O(n) 的时间复杂度下解决这个问题。
      */
-    public ListNode oddEvenList(ListNode head) {
-        return null;
-    }
+//    public ListNode oddEvenList(ListNode head) {
+//
+//    }
 
     /*135
     n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的评分。

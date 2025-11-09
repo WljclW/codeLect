@@ -675,6 +675,14 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     List<List<String>> resSolveNQueens = new ArrayList<>();
     public List<List<String>> solveNQueens(int n) {
         char[][] chessBoard = new char[n][n];
+        /**【注意】"Arrays.fill"方法是填充一维数组！！如果使用“Arrays.fill(chessBoard,'.');”执行时会
+         报下面的错误————
+                 java.lang.ArrayStoreException: java.lang.Character
+                 at line 3427, java.base/java.util.Arrays.fill
+                 at line 7, Solution.solveNQueens
+                 at line 56, __DriverSolution__.__helper__
+                 at line 86, __Driver__.main
+         */
         for (int i=0;i<n;i++){ /**err：必须进行初始化*/
             Arrays.fill(chessBoard[i],'.');
         }
@@ -1075,6 +1083,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
        注意：解集不能包含重复的组合。（但是candidates可能会有重复的数）
     * */
     /**
+     * 【建议的解法】见
      * 【区分”全排列Ⅱ“】
      *    1. 二者的本质区别是因为：
      *          全排列Ⅱ要求每一个path中都不能有重复的数；
@@ -1125,6 +1134,34 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
             usedCombinationSum2[i] = false;
             sumCombinationSum2 -= candidates[i];
             pathCombinationSum2.removeLast();
+        }
+    }
+
+    List<List<Integer>> resCombinationSum2_;
+    boolean[] usedCombinationSum2_;
+    public List<List<Integer>> combinationSum2_(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        usedCombinationSum2_ = new boolean[candidates.length];
+        resCombinationSum2_ = new LinkedList<>();
+        LinkedList<Integer> path = new LinkedList<>();
+        combinationSum2(candidates,target,path,0);
+        return resCombinationSum2_;
+    }
+
+    private void combinationSum2(int[] candidates, int target, LinkedList<Integer> path, int index) {
+        if (target==0) resCombinationSum2_.add(new LinkedList<>(path));
+        if (target<0 || index==candidates.length) return;  /**err：target<0 的条件不能缺少*/
+        /**这个题下面的if提交后部分用例超时————"超出时间限制   124 / 176 个通过的测试用例"*/
+//        if (index==candidates.length) return;
+        for (int i = index; i < candidates.length; i++) {
+            if (i>0&&candidates[i]==candidates[i-1]&&!usedCombinationSum2_[i-1]) continue;
+            usedCombinationSum2_[i] = true;
+            target -= candidates[i];
+            path.add(candidates[i]);
+            combinationSum2(candidates,target,path,i+1);
+            target += candidates[i];
+            path.removeLast();
+            usedCombinationSum2_[i] = false;
         }
     }
 
