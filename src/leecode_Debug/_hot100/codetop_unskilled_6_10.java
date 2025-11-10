@@ -745,14 +745,17 @@ public class codetop_unskilled_6_10 {
     }
 
     /*LCR 143 子结构判断
-
+    给定两棵二叉树 tree1 和 tree2，判断 tree2 是否以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
+注意，空树 不会是以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
      */
     /**
      *【复杂度分析】
         时间：最坏情况要对 A 的每个节点调用一次 match，match 最坏遍历 B 所有节点，所以 O(|A|*|B|)。
         空间：递归深度 O(h)，h 为树高。
      */
-    /*方法1：DFS递归的写法*/
+    /*方法1：DFS递归的写法
+        A、A.left、A.right分别匹配，有一个匹配成功即返回true
+    * */
     public boolean isSubStructure(TreeNode A, TreeNode B) {
         if (A==null&&B==null) return true; /**【注】chatgpt说不要这一句就可以，空树不是任何树的子树*/
         if (A==null||B==null) return false;
@@ -761,44 +764,48 @@ public class codetop_unskilled_6_10 {
                 isSubStructure(A.right,B);
     }
 
-    private boolean match(TreeNode A, TreeNode B) {
+    private boolean match(TreeNode A, TreeNode B) { /*递归的写法判断是不是匹配*/
         /*base case:
             B == null 在 match 中返回 true：因为 match 的语义是“B 的所有节点是否能在 A 对应位置上被匹配”。如果 B 已经
         走完（所有子节点都验证完），说明匹配成功（即 B 的结构已全部匹配），所以返回 true。
             A == null 而 B != null 返回 false：说明 A 的这条路径结束了，但 B 还有节点需要匹配，无法满足。
+            A.val != B.val 返回 false，说明遍历到这个节点发现匹配不上了，因此返回false
         * */
-        if (B==null) return true;
-        if (A==null) return false;
-        if (A.val!=B.val) return false;
-        return match(A.left,B.left)&&match(A.right,B.right);
+        if (B == null) return true;
+        if (A == null) return false;
+        if (A.val != B.val) return false;
+        return match(A.left, B.left) && match(A.right, B.right);
     }
 
 
     /*方法2：将上面的递归改成迭代的写法
-        外层用一个栈遍历 A 的每个节点。内层用另一个栈匹配 B 的每个节点。
-    这样就完全不依赖递归调用栈，适合处理特别深的大树。
+        主方法完成以A为根的树的遍历，如果发现某个节点和B的值相等，则调用”isMatch“看看是不是能完成B的匹配
+        外层用一个栈遍历 A 的每个节点。内层用另一个栈匹配 B 的每个节点。这样就完全不依赖递归调用栈，适合处
+    理特别深的大树。
     */
     /**
      【复杂度分析】
          时间复杂度：和递归版一样，最坏 O(|A| * |B|)。
          空间复杂度：O(h1 + h2)，h1 为遍历 A 用的栈深度，h2 为匹配 B 时用的栈深度，总体受树高限制。
+     【方法的作用】
+        层序遍历A树，如果发现某个节点和B的值相等，则从这个节点开始调用isMatch看看是不是能和B匹配上
      */
-    public boolean isSubStructure_diedai(TreeNode A, TreeNode B) { //实现层序遍历A的每一个节点
-        if (A==null||B==null) return false;
+    public boolean isSubStructure_diedai(TreeNode A, TreeNode B) {
+        if (A == null || B == null) return false;
         LinkedList<TreeNode> queue = new LinkedList<>();
         queue.offer(A);
-        while (!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             /**与层序遍历的区别1：研究每一层节点之前不用获取queue的size。*/
             TreeNode cur = queue.poll();
             /**与层序遍历的区别2：添加逻辑————如果发现和B的value相同，则使用”isMatch“方法判断是不是可以匹配成功*/
-            if (cur.val==B.val&&isMatch(cur,B)) return true;
-            if (cur.left!=null) queue.offer(cur.left);
-            if (cur.right!=null) queue.offer(cur.right);
+            if (cur.val == B.val && isMatch(cur, B)) return true;
+            if (cur.left != null) queue.offer(cur.left);
+            if (cur.right != null) queue.offer(cur.right);
         }
         return false;
     }
 
-    private boolean isMatch(TreeNode A, TreeNode B) {
+    private boolean isMatch(TreeNode A, TreeNode B) { /*A,B两棵树同步进行层序遍历*/
         LinkedList<TreeNode[]> queue = new LinkedList<>();
         queue.offer(new TreeNode[]{A,B});
         while (!queue.isEmpty()){
@@ -831,21 +838,27 @@ public class codetop_unskilled_6_10 {
 //    private boolean isMatch1(TreeNode a, TreeNode b) {
 //        if (a==null&&b==null) return true;
 //        if (b==null) return true;
+    /**应该是有问题的，这里直接通过”a.val“获取a的值，但是没有判断它不是空*/
 //        return a.val==b.val&&
 //                isMatch1(a.left,b.left)&&
 //                isMatch1(a.right,b.right);
 //    }
 //
 //
-    /*572
+    /*572. 另一个树的子树
     给你两棵二叉树 root 和 subRoot 。检验 root 中是否包含和 subRoot 具有相同结构和节点值的子树。如果存在，返回 true ；否则，返回 false 。
-    二叉树 tree 的一棵子树包括 tree 的某个节点和这个节点的所有后代节点。tree 也可以看做它自身的一棵子树。
+二叉树 tree 的一棵子树包括 tree 的某个节点和这个节点的所有后代节点。tree 也可以看做它自身的一棵子树。
     * */
     /**
      【题目的理解】
          题目与“子结构”题（LCR 143）相似，递归和迭代的写法和非递归也是类似的代码几乎没啥区别。。。但这个题判
      断条件更严格————root中的某一个子树 和 subRoot必须一摸一样，即subRoot是null的时候root子树对应的节点也
      必须是null...但是LCR 143就不是，143中root的子树包含subRoot的结构就可以，两个子树不要求完全相等
+     【复杂度分析】
+         解法1：递归。
+          复杂度：时间复杂度O(mn)，空间复杂度O(h)。。。。其中m，n分别是root、subRoot的节点数；h是递归的深度
+         解法2：最优的解法应该是序列化出来(对于null节点也需要记录)，转换成求解子串存在与否的问题，使用KMP算法求解。
+         复杂度：时间复杂度O(m+n)，空间复杂度O(m+n)————空间复杂度主要体现在存储序列化结果
      */
     /*解法1：递归的写法*/
     public boolean isSubtree(TreeNode root, TreeNode subRoot) {
@@ -1534,6 +1547,7 @@ public class codetop_unskilled_6_10 {
 //        return res;
 //    }
 
+    /**写法1：先使用双层for循环更新完两个数组；然后再遍历一遍”长度“数组更新答案*/
     public int findNumberOfLIS(int[] nums) {
         int maxLen = 0;
         /*step1：初始化两个数组————dp以及cnt
@@ -1577,33 +1591,64 @@ public class codetop_unskilled_6_10 {
         return res;
     }
 
-    /*另一种写法：在遍历的过程中进行res的计算。。。
-    【说明】容易写错，因此不建议使用这个方法*/
-    public int findNumberOfLIS1(int[] nums) {
-        int maxLen = 0,res = 0;
+    /**写法2：在一遍遍历的过程中更新全局要返回的答案*/
+    public int findNumberOfLIS_(int[] nums) {
+        /*step1：声明两个数组
+              dp数组用于存放“以nums[i]结尾的最长递增子序列的长度”；
+              count数组用于存放“以nums[i]结尾的最长递增子序列的数量”。
+              比如：以nums[8]结尾的最长递增子序列的长度是5，则dp[8]=5；同时以nums[8]结
+           尾且长度是5的子序列一共有4种，则count[8]=4。
+         */
         int[] dp = new int[nums.length];
-        int[] num = new int[nums.length];
         Arrays.fill(dp,1);
-        Arrays.fill(num,1);
+        int[] count = new int[nums.length];
+        Arrays.fill(count,1);
+        /*step2：声明两个变量
+             maxLen————最长递增子序列的长度
+             num存放————长度为maxLen的递增子序列一共有多少种
+         */
+        int maxLen = 0,num = 0;
+        /*step3：计算dp以及count数组
+            对于任意的位置i，j从0位置开始，看看nums[i]放在nums[j]后面能不能形成一个更长
+         的递增子序列
+         */
         for (int i = 0; i < nums.length; i++) {
             for (int j = 0; j < i; j++) {
+                /*双重循环的核心
+                    【核心的话】因为j<i，所有可以得出：“如果nums[j]<nums[i]，则nums[i]可以放
+                 在nums[j]的后面形成一个更长的递增子序列”
+                    此时，可能会有两种情况————
+                        情况1：如果dp[j]+1>dp[i]，说明nums[i]放在nums[j]后面以后形成的递增子
+                    序列长度超过了目前已经发现的“以nums[i]结尾的最长递增子序列”。则说明对于nums[i]
+                    而言，找到了一个更长的递增子序列，那此时最长递增子序列长度是多少呢？？这样长度的
+                    递增子序列又有多少呢？？首先最长递增子序列的长度就是dp[j]+1————即把nums[i]放在
+                    nums[j]后面即可。。这样递增子序列的长度是多少呢？应该就是count[j]，因为nums[i]
+                    放在nums[j]后面形成递增子序列，但是以nums[j]结尾的子序列有count[j]种，因此以nums[i]
+                    结尾的最长递增子序列也有count[j]种
+                        情况2：如果dp[j]+1=dp[i]，则更新以nums[i]即为最长递增子序列的样本数
+                 */
                 if (nums[j]<nums[i]){
                     if (dp[j]+1>dp[i]){
-                        num[i] = num[j];
                         dp[i] = dp[j]+1;
+                        count[i] = count[j]; /**【注】这里不要初始化为1*/
                     }else if (dp[j]+1==dp[i]){
-                        num[i] += num[j];
+                        count[i] += count[i];
                     }
                 }
             }
+            /*step4：更新maxLen 以及 num.
+                情况1：如果dp[i]是最大的，则更新maxLen = dp[i];并且num更新为count[i]
+                情况2：如果正好dp[i]=maxLen，则将count[i]累加到num。说明最长递增子序列
+             的数量增加了。
+             */
             if (dp[i]>maxLen){
                 maxLen = dp[i];
-                res = num[i];
-            }else if (dp[i]==maxLen){
-                res += num[i];
+                num = count[i];
+            } else if (dp[i] == maxLen) {
+                num += count[i];
             }
         }
-        return res;
+        return num;
     }
 
 
@@ -1644,6 +1689,38 @@ public class codetop_unskilled_6_10 {
 
 每一步只能移动到下一行中相邻的结点上。相邻的结点 在这里指的是 下标 与 上一层结点下标 相同或者等于 上一层结点下标 + 1 的两个结点。也就是说，如果正位于当前行的下标 i ，那么下一步可以移动到下一行的下标 i 或 i + 1 。
      */
+    /**
+     * 可以将空间优化到O(N),时间复杂度为O(n^2)
+      【关键一句话】从最后一行倒着遍历；每一行内从前往后遍历
+      【建议的解法】见方法 minimumTotal_ （这样写 初始化 和 双层for循环计算过程 很清晰！）
+      【关键】需要从最后一行倒着遍历。最后返回dp[0]。原因解释————
+          第m行的i位置能移动到第m+1行的i位置和i+1位置；第m行的i+1位置能移动到第m+1行的i+1位置和i+2位置。
+          比如“第m行的i位置能移动到第m+1行的i位置和i+1位置”，此时如果是从第一行往下面的行遍历，dp[i]和dp[i+1]
+          就可能会被更新，更新后会发现dp[i+1]存的就是第m+1行的信息；但是继续计算时“第m行的i+1位置能移动到第m+1
+          行的i+1位置和i+2位置”需要使用到第m行的dp[i+1]信息，但是在前一步的时候这个信息被覆盖了！！
+          结论：空间优化为O(N)时，遍历顺序必须时从最后一行倒着遍历。（从最后一行遍历，但是同一行内从前往后遍
+          历就可以）
+      【补充说明】
+          1. 一定必须从最后一行倒着遍历？
+            答：不一定，从第一行开始往后遍历也没问题，见方法 minimumTotal__ 以及 minimumTotal___，因此从第0行开始
+          正着遍历 或者 从最后一行倒着遍历，都是ok的，并且空间复杂度都能优化到O(N)。
+     */
+    public int minimumTotal_(List<List<Integer>> triangle) {
+        List<Integer> lastRow = triangle.get(triangle.size() - 1);
+        int[] dp = new int[lastRow.size()];
+        for (int i = 0; i < lastRow.size(); i++) {
+            dp[i] = lastRow.get(i);
+        }
+
+        for (int i = triangle.size() - 2; i >= 0; i--) {
+            List<Integer> curRow = triangle.get(i);
+            for (int j = 0; j <= i; j++) {
+                dp[i] = Math.min(dp[i], dp[i - 1]) + curRow.get(j);
+            }
+        }
+        return dp[0];
+    }
+
 
     /**
      【关键】
@@ -1667,9 +1744,60 @@ public class codetop_unskilled_6_10 {
         return dp[0];
     }
 
+    public int minimumTotal__(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int[][] dp = new int[n][n];
+        dp[0][0] = triangle.get(0).get(0);
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j <= i; j++) {
+                int val = triangle.get(i).get(j);
+                if (j == 0) dp[i][j] = dp[i - 1][j] + val; // 第一列
+                else if (j == i) dp[i][j] = dp[i - 1][j - 1] + val; // 最后一列
+                else dp[i][j] = Math.min(dp[i - 1][j - 1], dp[i - 1][j]) + val;
+            }
+        }
+
+        int ans = Integer.MAX_VALUE;
+        for (int j = 0; j < n; j++) {
+            ans = Math.min(ans, dp[n - 1][j]);
+        }
+        return ans;
+    }
+
+    /**从上往下研究每一行，并且空间复杂度为O(N)*/
+    public int minimumTotal___(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int[] dp = new int[n];
+        dp[0] = triangle.get(0).get(0);
+
+        for (int i = 1; i < n; i++) {
+            List<Integer> row = triangle.get(i);
+            // 倒序更新，防止覆盖
+            for (int j = i; j >= 0; j--) { /**从上往下遍历时，每一行必须倒序更新*/
+                int val = row.get(j);
+                if (j == 0) {
+                    dp[j] = dp[j] + val; // 第一列，只能来自上一行的 dp[0]
+                } else if (j == i) {
+                    dp[j] = dp[j - 1] + val; // 最后一列，只能来自上一行的 dp[j-1]
+                } else {
+                    dp[j] = Math.min(dp[j - 1], dp[j]) + val;
+                }
+            }
+        }
+
+        int ans = Integer.MAX_VALUE;
+        for (int j = 0; j < n; j++) {
+            ans = Math.min(ans, dp[j]);
+        }
+        return ans;
+    }
 
 
-            /*207.课程表
+
+
+
+    /*207.课程表
     你这个学期必须选修 numCourses 门课程，记为 0 到 numCourses - 1 。
     在选修某些课程之前需要一些先修课程。 先修课程按数组 prerequisites 给出，其中 prerequisites[i] = [ai, bi] ，表示如果要学习课程 ai 则 必须 先学习课程  bi 。
     例如，先修课程对 [0, 1] 表示：想要学习课程 0 ，你需要先完成课程 1 。
@@ -2010,6 +2138,10 @@ public class codetop_unskilled_6_10 {
     给定一个字符串 s 和一个模式 p，p 中可以包含普通字符、?（匹配任意单个字符）和 *（匹配任意长度字符串，包括空串）。判断 p 是否能匹配整个 s。
      */
     /**
+     【第一说明】二维的dp中位置（i,j）依赖于（i-1,j-1）、（i,j-1）、（i-1,j），因此这个依赖关系和”编辑距离“这种题的依赖关系是一样的。。所
+     以简化到1维的时候和”编辑距离“也有相似的写法
+     **/
+    /**
      【基础说明】
         1. dp数组的含义：我们设 dp[i][j] 表示s[0..i-1] 是否可以被 p[0..j-1] 匹配。
         2. 状态转移：
@@ -2062,9 +2194,9 @@ public class codetop_unskilled_6_10 {
         /*step2：base case
             第一行的初始化————第一行的时候表示s是空串，则p能匹配成功的情况，当且仅当当前位置是*号 并且 当前位置之前
         可以成功的匹配空串。。。换言之只要从i=1开始，有一个位置不是*号，则后面的就不用看了，肯定的都是false，举个形象
-        的例子，比如：s=”“,p="****3***"，则dp[0][5]、dp[0][6]、dp[0][7]....都是false，也就是说从3位置开始，后
-        面的就不能匹配成功空串了
-            第一列的初始化————第一列表示p是空串，但是s是由数据的，此时都不能匹配成功。因为匹配串是空的。。。由于boolean数
+        的例子，比如：s=”“,p="****3***"，则dp[0][5]、dp[0][6]、dp[0][7]....都是false，也就是说从3位置（index=4）开
+        始，后面的就不能匹配成功空串了
+            第一列的初始化————第一列表示p是空串，但是s是有数据的，此时都不能匹配成功。因为匹配串是空的。。。由于boolean数
         组的默认值就是false，因此第一列的初始化可以省略
         * */
         for (int i = 1; i <= n; i++) {
@@ -2076,9 +2208,15 @@ public class codetop_unskilled_6_10 {
                 char sc = s.charAt(i - 1);
                 char pc = p.charAt(j - 1);
                 if (sc == pc || pc == '?') {
+                    /*if：当前的位置可以匹配成功，因此取决于前面的匹配结果*/
                     dp[i][j] = dp[i - 1][j - 1];
                 } else if (pc == '*') {
-                    dp[i][j] = dp[i - 1][j] || dp[i][j - 1];
+                    /*else-if：匹配串p的当前位置是*，可以匹配0次或者多次。
+                    dp[i-1][j]：s除去当前位置，p串包括现在的位置————表示匹配1次 或者 多次
+                    dp[i][j-1]：s串包括当前位置，p串除去当前位置————表示匹配0次
+                    * */
+                    dp[i][j] = dp[i - 1][j] ||
+                            dp[i][j - 1];
                 }
             }
         }

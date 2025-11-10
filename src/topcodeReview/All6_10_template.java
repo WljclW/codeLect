@@ -1,8 +1,10 @@
 package topcodeReview;
 
+import leecode_Debug._hot100.codetop_10;
 import leecode_Debug.top100.ListNode;
 import leecode_Debug.top100.TreeNode;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -255,9 +257,48 @@ public class All6_10_template {
 
     特别地，我们希望可以 就地 完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中最小元素的指针。
      */
-//    public Node treeToDoublyList(Node root) {
-//
-//    }
+    class Node {
+        public int val;
+        public Node left;
+        public Node right;
+
+        public Node() {}
+
+        public Node(int _val) {
+            val = _val;
+        }
+
+        public Node(int _val, Node _left, Node _right) {
+            val = _val;
+            left = _left;
+            right = _right;
+        }
+    }
+    public Node treeToDoublyList(Node root) {
+        if (root==null) return null;
+        Node res = null,curRes = null;
+        Stack<Node> stack = new Stack<>();
+        while (root!=null||!stack.isEmpty()){
+            if (root!=null){
+                stack.push(root);
+                root = root.left;
+            }else {
+                /**思考，在下面的过程中，哪一个节点是最后一个节点呢？？*/
+                Node cur = stack.pop();
+                if (res == null) {
+                    res = cur;
+                    curRes = cur;
+                } else {
+                    curRes.right = cur;
+                    cur.left = curRes;
+                    curRes = curRes.right;
+                }
+            }
+        }
+        curRes.right = res;
+        res.left = curRes;
+        return res;
+    }
 
 
 
@@ -274,22 +315,88 @@ public class All6_10_template {
 //        }
 //    }
 
-            /*LCR 143. 子结构判断
+    /*LCR 143. 子结构判断
     给定两棵二叉树 tree1 和 tree2，判断 tree2 是否以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
 注意，空树 不会是以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
      */
-//    public boolean isSubStructure(TreeNode A, TreeNode B) {
-//
-//    }
+    public boolean isSubStructure(TreeNode A, TreeNode B) {
+        if (A==null || B==null) return false;
+        return dfs(A,B);
+    }
+
+    private boolean dfs(TreeNode a, TreeNode b) {
+        LinkedList<TreeNode> queue1 = new LinkedList<>();
+        queue1.offer(a);
+        while (!queue1.isEmpty()){
+            TreeNode cur1 = queue1.poll();
+            if (cur1==null) continue;
+            if (cur1.val==b.val&&isMatch143(cur1,b)){
+                return true;
+            }
+            queue1.offer(cur1.left);
+            queue1.offer(cur1.right);
+        }
+        return false;
+    }
+
+    private boolean isMatch143(TreeNode cur1, TreeNode cur2) {
+        if (cur2 == null) return true;
+        if (cur1 == null) return false;
+        return cur1.val == cur2.val && isMatch143(cur1.left, cur2.left) && isMatch143(cur1.right, cur2.right);
+    }
 
         /*572. 另一个树的子树
     给你两棵二叉树 root 和 subRoot 。检验 root 中是否包含和 subRoot 具有相同结构和节点值的子树。如果存在，返回 true ；否则，返回 false 。
 
 二叉树 tree 的一棵子树包括 tree 的某个节点和这个节点的所有后代节点。tree 也可以看做它自身的一棵子树。
     * */
-//    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-//
-//    }
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if(root==null&&subRoot==null) return true;
+        if (root==null||subRoot==null) return false;
+        return isMatch572(root,subRoot)||
+                isSubtree(root.left,subRoot)||
+                isSubtree(root.right,subRoot);
+    }
+    private boolean isMatch572(TreeNode root, TreeNode subRoot) {
+        if (root==null&&subRoot==null) return true;
+        if (root==null||subRoot==null) return false;
+        return root.val==subRoot.val&&
+                isMatch572(root.left,subRoot.left)&&
+                isMatch572(root.right,subRoot.right);
+    }
+
+
+    public boolean isSubtree_572(TreeNode root, TreeNode subRoot) {
+        if (root==null&&subRoot==null) return true;
+        if (root==null||subRoot==null) return false;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            TreeNode cur = queue.poll();
+            if (cur.val==subRoot.val&&isMatch_572(cur,subRoot)) return true;
+            if (cur.left!=null) queue.offer(cur.left);
+            if (cur.right!=null) queue.offer(cur.right);
+        }
+        return false;
+    }
+
+    private boolean isMatch_572(TreeNode cur, TreeNode subRoot) {
+        LinkedList<TreeNode[]> queue = new LinkedList<>();
+        TreeNode[] now = {cur, subRoot};
+        queue.offer(now);
+        while (!queue.isEmpty()){
+            TreeNode[] curPair = queue.poll();
+            TreeNode ori = curPair[0];
+            TreeNode test = curPair[1];
+            if (ori==null&&test==null) continue;
+            if (ori==null||test==null) return false;
+            if (ori.val!=test.val) return false;
+            queue.offer(new TreeNode[]{ori.left,test.left});
+            queue.offer(new TreeNode[]{ori.right,test.right});
+        }
+        return true;
+    }
+
     /**
      *=====================8==================================
      *=====================8==================================
@@ -403,6 +510,12 @@ public class All6_10_template {
     public int minimumTotal(List<List<Integer>> triangle) {
         int size = triangle.get(triangle.size() - 1).size();
         int[] dp = new int[size];
+
+        /**自己写的代码，没有赋初始值，是有问题的。。。看看问题的表现是什么*/
+//        for (int j = 0; j < size; j++) {
+//            dp[j] = triangle.get(triangle.size() - 1).get(j);
+//        }
+
         for (int i = triangle.size()-2; i >=0; i--) {
             for (int j = 0; j < triangle.get(i).size(); j++) {
                 int curVal = triangle.get(i).get(j);
@@ -425,9 +538,54 @@ public class All6_10_template {
     例如，如果 cards =[1,2,1,2] ，则表达式 “12 + 12” 无效。
     如果可以得到这样的表达式，其计算结果为 24 ，则返回 true ，否则返回 false 。
      */
-//    public boolean judgePoint24(int[] cards) {
-//
-//    }
+    private static double TARGET = 24.0;
+    private static double EPSILON = 1e-6;
+    public boolean judgePoint24(int[] cards) {
+        LinkedList<Double> nums = new LinkedList<>();
+        for (int num:cards) nums.add((double)num);
+        return dfs(nums);
+    }
+
+    private boolean dfs(LinkedList<Double> nums) {
+        int n = nums.size();
+        if (n==1){
+            return Math.abs(nums.get(0)-TARGET)<EPSILON;
+        }
+        /**i，j表示选取的两个数的索引。补充说明————
+            1. 其中j从i+1开始，因此就意味着不会选取重复的数字对（并且代码中的”if (i==j) continue“可以省略！！）
+         */
+        for (int i = 0; i < n; i++) {
+            for (int j = i+1; j < n; j++) {
+                if (i==j) continue; //如果索引相等，不允许
+                LinkedList<Double> next = new LinkedList<>();
+                /*把除了i,j位置的其他数添加到next数组*/
+                for (int k = 0; k < n; k++) {
+                    if (k!=i && k!=j) next.add(nums.get(k));
+                }
+                /*val就是位置i、位置j操作后的所有可能的结果*/
+                for (double val:compute24(nums.get(i),nums.get(j))){
+                    next.add(val);
+                    if (dfs(next)) return true;
+                    next.removeLast();
+                }
+            }
+        }
+        return false;
+    }
+
+    /*compute24计算位置i、位置j位置的数加减乘除的结果。*/
+    private List<Double> compute24(Double a, Double b) {
+        LinkedList<Double> res = new LinkedList<>();
+        res.add(a+b);
+        res.add(a*b);
+        /**减法不满足交换律，因此需要添加两种可能*/
+        res.add(a-b);
+        res.add(b-a);
+        /**除法也不满足交换律，因此需要添加两种可能*/
+        if (b>EPSILON) res.add(a/b);   /**【注意】需要实验一下”不使用 if (b>EPSILON)行不行“*/
+        if (a>EPSILON) res.add(b/a);
+        return res;
+    }
 
 
     /*44.通配符匹配
@@ -436,14 +594,11 @@ public class All6_10_template {
     '*' 可以匹配任意字符序列（包括空字符序列）。
     判定匹配成功的充要条件是：字符模式必须能够 完全匹配 输入字符串（而不是部分匹配）。
      */
-    /**
-     【说明】二维的dp中位置（i,j）依赖于（i-1,j-1）、（i,j-1）、（i-1,j），因此这个依赖关系和”编辑距离“这种题的依赖关系是一样的。。所
-        以简化到1维的时候和”编辑距离“也有相似的写法
-     **/
     public boolean isMatch(String s, String p) {
         int m = s.length(),n = p.length();
         boolean[][] dp = new boolean[m + 1][n + 1];
         dp[0][0] = true;
+        /*只需要初始化第一行。因为第一列的含义”s串不是空，匹配串p是空的“，这很明显不能匹配成功，永远是false*/
         for (int i = 1; i <= n; i++) {
             dp[0][i] = dp[0][i-1]&&p.charAt(i-1)=='*';
         }
@@ -455,12 +610,12 @@ public class All6_10_template {
                 if (sc==pc||pc=='?'){
                     dp[i][j] |= dp[i-1][j-1];
                 } else if (pc == '*') {
-                    dp[i][j] |= dp[i][j-1];
-                    dp[i][j] |= dp[i-1][j];
+                    dp[i][j] |= dp[i][j-1]; /*匹配0次的话*/
+                    dp[i][j] |= dp[i-1][j]; /*匹配至少1次的话*/
                 }
             }
         }
-        return dp[m+1][n+1];
+        return dp[m][n];
     }
 
 
@@ -492,6 +647,7 @@ public class All6_10_template {
         return prev[n];
     }
 
+    /**一行数组的写法 和 ”编辑距离“的写法是一样的。3处重点的代码再方法中注释*/
     public boolean isMatch__(String s, String p) {
         int m = s.length(),n = p.length();
         boolean[] dp = new boolean[n + 1];
@@ -501,17 +657,20 @@ public class All6_10_template {
         }
 
         for (int i = 1; i <= m; i++) {
+            /*重点代码1：再进入内层for循环之前使用prev记录dp[0]；然后再更新dp[0]*/
             boolean prev = dp[0];
-            dp[0] = false;
+            dp[0] = false; //第一列除了dp[0][0]都是false，因此无脑赋值
             for (int j = 1; j <= n; j++) {
                 char sc = s.charAt(i - 1);
                 char pc = p.charAt(j - 1);
+                /*重点代码2：在更新dp[j]之前需要使用tmp变量记录*/
                 boolean tmp = dp[j];
                 if (sc==pc||pc=='?'){
                     dp[j] |= prev;
                 } else if (pc=='*') {
                     dp[j] |= dp[j-1];
                 }
+                /*重点代码3：本轮计算完成后需要把tmp重新赋值回prev*/
                 prev = tmp;
             }
         }
@@ -542,15 +701,22 @@ public class All6_10_template {
     * */
 //    public boolean isInterleave(String s1, String s2, String s3) {
 //        int m = s1.length(),n = s2.length();
-//        if (m+n != s3.length()) return false;
+//        if (m+n!=s3.length()) return false;
 //        boolean[][] dp = new boolean[m + 1][n + 1];
 //        dp[0][0] = true;
+//        for (int i = 1; i <= n; i++) {
+//            dp[0][i] = dp[0][i-1] && s2.substring(i-1,i).equals(s3.substring(i-1,i));
+//        }
+//        for (int i = 0; i <= m; i++) {
+//            dp[i][0] = dp[i-1][0] && s1.substring(i-1,i).equals(s3.substring(i-1,i));
+//        }
+//
 //        for (int i = 1; i <= m; i++) {
 //            for (int j = 1; j <= n; j++) {
 //                char c1 = s1.charAt(i - 1);
-//                char c2 = s2.charAt(j - 1);
-//                char c3 = s3.charAt(i+j-2);
-//                if (c1==c3){
+//                char c2 = s2.charAt(i - 1);
+//                char c3 = s3.charAt(i + j - 2);
+//                if (c1==c3||c2==c3){
 //                    dp[i][j] |= dp[]
 //                }
 //            }
@@ -578,7 +744,37 @@ public class All6_10_template {
 
 注意 这个数列必须是 严格 递增的。
      */
-//    public int findNumberOfLIS__(int[] nums) {
-//
-//    }
+    public int findNumberOfLIS(int[] nums) {
+        int[] longth = new int[nums.length]; /*”以nums[i]结尾的最长递增子序列的长度“*/
+        int[] num = new int[nums.length]; /*”以nums[i]结尾的长度为longth[i]的递增子序列的数量“*/
+        Arrays.fill(longth,1);
+        Arrays.fill(num,1);
+        int length = 1,res =0;
+
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[j]<nums[i]){
+                    if (longth[j]+1>longth[i]){
+                        longth[i] = longth[j]+1;
+                        num[i] = nums[j];  /**这里不能简单的赋值为1*/
+                    } else if (longth[j]+1==longth[i]) {
+                        num[i] += nums[j];
+                    }
+                    /*到了这里说明"以nums[i]结尾的最长子序列长度、数量"都知道了，因此下面尝试更新全局信息。
+                     【补充说明】
+                          写法1. 这里仅仅是更新的全局的”最长子序列长度“这个信息。所以出了双层for循环需要统计一下”这种长度递增子序列“的总数量
+                          写法2. 在双层for循环中，不仅仅更新longth、num数组的信息，同时更新所有的全局信息，见方法
+                     */
+                    length = Math.max(length,longth[i]);
+                }
+            }
+        }
+
+        for (int i = 0; i < longth.length; i++) {
+            if (longth[i]==length){
+                res += num[i];
+            }
+        }
+        return res;
+    }
 }

@@ -1343,28 +1343,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return true;
     }
 
-
-    //572
-
-    /**
-     * 解法1：递归。
-     * 复杂度：时间复杂度O(mn)，空间复杂度O(h)。。。。其中m，n分别是root、subRoot的节点数；h是递归的深度
-     * 解法2：最优的解法应该是序列化出来(对于null节点也需要记录)，转换成求解子串存在与否的问题，使用KMP算法求解。
-     * 复杂度：时间复杂度O(m+n)，空间复杂度O(m+n)————空间复杂度主要体现在存储序列化结果
-     */
-    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        if (root == null) return false;
-        if (isSameTree(root, subRoot)) return true;
-        return isSameTree(root.left, subRoot) || isSameTree(root.right, subRoot);
-    }
-
-    private boolean isSameTree(TreeNode root, TreeNode subRoot) {
-        if (root == null && subRoot == null) return true;
-        if (root == null || subRoot == null) return false;
-        if (root.val != subRoot.val) return false;
-        return isSameTree(root.left, subRoot.left) && isSameTree(root.right, subRoot.right);
-    }
-
     /*59 螺旋矩阵Ⅱ
         给定参数n，产生一个矩阵，顺时针填写1，2，.....
      */
@@ -1673,34 +1651,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
     }
 
-
-    //120
-    /**
-     * 可以将空间优化到O(N),时间复杂度为O(n^2)
-     * 【关键】需要从最后一行倒着遍历。最后返回dp[0]。原因解释————
-     * 第m行的i位置能移动到第m+1行的i位置和i+1位置；第m行的i+1位置能移动到第m+1行的i+1位置和i+2位置。
-     * 比如“第m行的i位置能移动到第m+1行的i位置和i+1位置”，此时如果是从第一行往下面的行遍历，dp[i]和dp[i+1]
-     * 就可能会被更新，更新后会发现dp[i+1]存的就是第m+1行的信息；但是继续计算时“第m行的i+1位置能移动到第m+1
-     * 行的i+1位置和i+2位置”需要使用到第m行的dp[i+1]信息，但是在前一步的时候这个信息被覆盖了！！
-     * 结论：空间优化为O(N)时，遍历顺序必须时从最后一行倒着遍历。（从最后一行遍历，但是同一行内从前往后遍
-     * 历就可以）
-     */
-    public int minimumTotal(List<List<Integer>> triangle) {
-        List<Integer> lastRow = triangle.get(triangle.size() - 1);
-        int[] dp = new int[lastRow.size()];
-        for (int i = 0; i < lastRow.size(); i++) {
-            dp[i] = lastRow.get(i);
-        }
-
-        for (int i = triangle.size() - 2; i >= 0; i--) {
-            List<Integer> curRow = triangle.get(i);
-            for (int j = 0; j <= i; j++) {
-                dp[i] = Math.min(dp[i], dp[i - 1]) + curRow.get(j);
-            }
-        }
-        return dp[0];
-    }
-
     //264
     /**
      * 下面的代码是错误的
@@ -1762,65 +1712,5 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             queue.offer(intervals[i]);
         }
         return queue.size();
-    }
-
-    //673
-    public int findNumberOfLIS(int[] nums) {
-        /*step1：声明两个数组
-              dp数组用于存放“以nums[i]结尾的最长递增子序列的长度”；
-              count数组用于存放“以nums[i]结尾的最长递增子序列的数量”。
-              比如：以nums[8]结尾的最长递增子序列的长度是5，则dp[8]=5；同时以nums[8]结
-           尾且长度是5的子序列一共有4种，则count[8]=4。
-         */
-        int[] dp = new int[nums.length];
-        Arrays.fill(dp,1);
-        int[] count = new int[nums.length];
-        Arrays.fill(count,1);
-        /*step2：声明两个变量
-             maxLen————最长递增子序列的长度
-             num存放————长度为maxLen的递增子序列一共有多少种
-         */
-        int maxLen = 0,num = 0;
-        /*step3：计算dp以及count数组
-            对于任意的位置i，j从0位置开始，看看nums[i]放在nums[j]后面能不能形成一个更长
-         的递增子序列
-         */
-        for (int i = 0; i < nums.length; i++) {
-            for (int j = 0; j < i; j++) {
-                /*双重循环的核心
-                    【核心的话】因为j<i，所有可以得出：“如果nums[j]<nums[i]，则nums[i]可以放
-                 在nums[j]的后面形成一个更长的递增子序列”
-                    此时，可能会有两种情况————
-                        情况1：如果dp[j]+1>dp[i]，说明nums[i]放在nums[j]后面以后形成的递增子
-                    序列长度超过了目前已经发现的“以nums[i]结尾的最长递增子序列”。则说明对于nums[i]
-                    而言，找到了一个更长的递增子序列，那此时最长递增子序列长度是多少呢？？这样长度的
-                    递增子序列又有多少呢？？首先最长递增子序列的长度就是dp[j]+1————即把nums[i]放在
-                    nums[j]后面即可。。这样递增子序列的长度是多少呢？应该就是count[j]，因为nums[i]
-                    放在nums[j]后面形成递增子序列，但是以nums[j]结尾的子序列有count[j]种，因此以nums[i]
-                    结尾的最长递增子序列也有count[j]种
-                        情况2：如果dp[j]+1=dp[i]，则更新以nums[i]即为最长递增子序列的样本数
-                 */
-                if (nums[j]<nums[i]){
-                    if (dp[j]+1>dp[i]){
-                        dp[i] = dp[j]+1;
-                        count[i] = count[j]; /**【注】这里不要初始化为1*/
-                    }else if (dp[j]+1==dp[i]){
-                        count[i] += count[i];
-                    }
-                }
-            }
-            /*step4：更新maxLen 以及 num.
-                情况1：如果dp[i]是最大的，则更新maxLen = dp[i];并且num更新为count[i]
-                情况2：如果正好dp[i]=maxLen，则将count[i]累加到num。说明最长递增子序列
-             的数量增加了。
-             */
-            if (dp[i]>maxLen){
-                maxLen = dp[i];
-                num = count[i];
-            } else if (dp[i] == maxLen) {
-                num += count[i];
-            }
-        }
-        return num;
     }
 }
