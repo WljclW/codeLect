@@ -18,7 +18,8 @@ import java.util.*;
  *      279、LCR 146. 螺旋遍历二维数组、63、279、
  *
  * err：279、120. 三角形最小路径和、384.打乱数组、LCR 187. 破冰游戏、
- *      400.第N个数字、50. Pow(x, n)、516. 最长回文子序列、LCR 143 子结构判断、572. 另一个树的子树、、
+ *      400.第N个数字、50. Pow(x, n)、516. 最长回文子序列、LCR 143 子结构判断、572. 另一个树的子树、
+ *      7.整数反转、LCR 155. 将二叉搜索树转化为排序的双向链表、679。24 点游戏、498.对角线遍历、、、、
  */
 public class All6_10_review {
     /*739.每日温度
@@ -285,17 +286,17 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
     如果没有归还的书可以取出，返回 -1 。
      */
 //    class CQueue {
-////        public CQueue() {
-////
-////        }
+//        public CQueue() {
 //
-////        public void appendTail(int value) {
-////
-////        }
+//        }
 //
-////        public int deleteHead() {
-////
-////        }
+//        public void appendTail(int value) {
+//
+//        }
+//
+//        public int deleteHead() {
+//
+//        }
 //    }
 
 

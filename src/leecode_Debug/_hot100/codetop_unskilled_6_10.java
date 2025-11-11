@@ -469,7 +469,7 @@ public class codetop_unskilled_6_10 {
      *【关键】必须先在step2进行校验，校验后才能在step3更新res。
      *【说明】
      *      1. 在计算的过程中会发现————
-     *        ①负数除以一个正数，不论是求整除还是求余结果都是负数，比如：
+     *        ①（这个结论比较重要，因为一般除数都是正数）负数除以一个正数，不论是求整除还是求余结果都是负数，比如：
      *          int x = -19;======> x%2 = -1
      *                      ======> x/2 = -9
      *        ②负数除以一个负数，求余的结果是负数，但是求整除的结果是正数，比如：
@@ -502,21 +502,21 @@ public class codetop_unskilled_6_10 {
 
     /**
      说明：由于初始的数是x，即输入的 -2147483648<=x<=2147483647，所以翻转后的最后一位是1或2并不会
-     导致溢出。。因此其实下面的写法中res是不存在“等于Integer.MAX_VALUE/10”或者“等于Integer.MIN_VALUE/10”的
+     导致溢出。。因此其实下面的写法中 根本不存在“res==Integer.MAX_VALUE/10”或者“res=Integer.MIN_VALUE/10”的
      可能的，具体原因如下————
             情况1：如果最终不会越界int，则res必然符合要求。
             情况2：如果最终会越界int，则res越界之前的部分一定是“大于Integer.MAX_VALUE/10”或者“小于Integer.MIN_VALUE/10”
-        的。
+        的。————不存在等于的情况
         综上，整个题目的代码可以简化为下面的形式
      */
     public int reverse_(int x) {
         int res = 0;
-        while (x!=0){ /**【注】结束的标志是x==0，而不是x<0（每一轮就将x除10留下整数部分）*/
-            int digit = x%10;
+        while (x != 0) { /**【注】结束的标志是x==0，而不是x<0（每一轮就将x除10留下整数部分）*/
+            int digit = x % 10; /**根据注释中的”【说明】“可知如果x是负数，digit永远是负数，因此从开始更新res就永远都是负数*/
             x /= 10;
-            if (res>Integer.MAX_VALUE/10) return 0; /*判断越界可以简化为这里的形式*/
-            if (res<Integer.MIN_VALUE/10) return 0;
-            res = res*10 + digit;
+            if (res > Integer.MAX_VALUE / 10) return 0; /*判断越界可以简化为这里的形式*/
+            if (res < Integer.MIN_VALUE / 10) return 0;
+            res = res * 10 + digit;
         }
         return res;
     }
@@ -1516,7 +1516,8 @@ public class codetop_unskilled_6_10 {
             step2：然后遍历dp数组，如果dp[i]等于最长长度，则将cnt[i]累加到返回值。
             [说明]不建议在计算dp数组和cnt的过程中就计算结果，容易出错~~
      【注意】
-        1. dp数组中dp[i]表示以nums[i]结尾的最长递增子序列的长度。
+        1. dp数组中dp[i]表示以nums[i]结尾的最长递增子序列的长度。。。这样的定义和
+     ”300 最长递增子序列“最优解中dp的定义是有区别的！！！！【重要区别】
         2. 但是这样的长度有多少呢？这个是需要知道的，因为我们需要计算“最长递增子序列
      的数量”，因此这个值在后面会用到。比如：nums[i]<nums[i+m]，因此会有有一个递增子
      序列，这样长度的子序列有多少个呢？？？答：以nums[i]结尾的最长递增子序列的个数就是
@@ -1552,7 +1553,8 @@ public class codetop_unskilled_6_10 {
         int maxLen = 0;
         /*step1：初始化两个数组————dp以及cnt
             dp数组：dp[i]的含义————以nums[i]结尾的最长递增子序列的长度。
-            cnt数组：cnt[i]的含义————以nums[i]结尾的最长递增子序列的方案数。
+            cnt数组：cnt[i]的含义————以nums[i]结尾的最长递增子序列的方案数————即以nums[i]结
+         尾的长度为dp[i]的最长递增子序列的方案数。
             初始时，两个数组的元素值都是1，因为“以nums[i]结尾的最长递增子序列”的长度至少
         是1，此时的子序列仅仅包含nums[i]自身————即dp数组的任何一个值至少是1；“以nums[i]
         结尾的最长递增子序列”的种类数此时也是1，因为仅仅包含nums[i]自身————即cnt数组的任何
@@ -1684,7 +1686,7 @@ public class codetop_unskilled_6_10 {
 
 
 
-        /*120
+        /*120. 三角形最小路径和
     给定一个三角形 triangle ，找出自顶向下的最小路径和。
 
 每一步只能移动到下一行中相邻的结点上。相邻的结点 在这里指的是 下标 与 上一层结点下标 相同或者等于 上一层结点下标 + 1 的两个结点。也就是说，如果正位于当前行的下标 i ，那么下一步可以移动到下一行的下标 i 或 i + 1 。
@@ -1704,6 +1706,9 @@ public class codetop_unskilled_6_10 {
           1. 一定必须从最后一行倒着遍历？
             答：不一定，从第一行开始往后遍历也没问题，见方法 minimumTotal__ 以及 minimumTotal___，因此从第0行开始
           正着遍历 或者 从最后一行倒着遍历，都是ok的，并且空间复杂度都能优化到O(N)。
+          2. dp的题目中，以下的题目最好从最后一行倒着填表！！
+                （1）516. 最长回文子序列。必须要倒着填表，因为第i行依赖于第i+1行
+                （2）120. 三角形最小路径和。不是必须从最后一行倒着填，但是倒着填代码好写
      */
     public int minimumTotal_(List<List<Integer>> triangle) {
         List<Integer> lastRow = triangle.get(triangle.size() - 1);

@@ -1,10 +1,7 @@
 package topcodeReview;
 
-import leecode_Debug._hot100.codetop_10;
-import leecode_Debug.top100.ListNode;
 import leecode_Debug.top100.TreeNode;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -170,9 +167,55 @@ public class All6_10_template {
     /*498.对角线遍历
         给你一个大小为 m x n 的矩阵 mat ，请以对角线遍历的顺序，用一个数组返回这个矩阵中的所有元素。
      */
-//    public int[] findDiagonalOrder(int[][] mat) {
-//
-//    }
+    /**【模拟法】
+        1. i、j变量表示当前研究的位置，dir表示走向（dir=1表示向右上方移动，dir=-1表示向左下方移动）
+        2. 如果正在向右上方（即dir=1）移动，有三种情况————
+                情况1：i==0。即来到了第一行，此时从右边的元素接着研究（即j++,dir=-1）;
+                情况2：j==n-1.即来到了最后一列，此时从下边的元素接着研究（即i++,dir=-1）;
+                情况3：其他的普遍位置（i--,j++,dir不变）
+           如果正在向左下方（即dir=-1）移动，也有三种情况————
+                情况1：i==m-1.即来到最后一行，此时应该从右边的元素继续研究（即j++，dir=1）;
+                情况2：j==0。即来到了第一列，此时应该从下边的元素继续研究（即i++，dir=1）;
+                情况3：其他的普遍位置（i++,j--,dir不变）
+          【关键点、易错点】
+                1. dir=1时，向右上方移动，此时有一个特殊位置即右上角的位置（i=0,j=n-1），到了这个位置
+          应该向下移继续，因此这个位置应该当作最后一列的位置处理————因此dir=1时的三种情况，应该先判断”j==n-1“
+                2. dir=-1时，向左下方移动，此时也有一个特殊位置即左下角的位置（i=m-1,j=0），到了这个
+          位置应该向右移，因此这个位置应该当作最后一行的位置处理————因此dir=-1时的三种情况，应该先判断”i==m-1“
+                综上，应该先判断是不是到最后一列、最后一行这种情况~~~~
+     */
+    public int[] findDiagonalOrder(int[][] mat) {
+        int m = mat.length, n = mat[0].length;
+        int[] res = new int[m * n];
+        int i = 0, j = 0, dir = 1;
+        for (int k = 0; k < m * n; k++) {
+            res[k] = mat[i][j];
+            if (dir == 1) {
+                if (i == 0) { /**应该要先判断j==n-1，这么写肯定会报”索引越界异常“*/
+                    j++;
+                    dir = -1;
+                } else if (j == n - 1) {
+                    i++;
+                    dir = -1;
+                } else {
+                    i--;
+                    j++;
+                }
+            } else {
+                if (j == 0) { /**应该先判断i==m-1，如果先判断j==0肯定会报”索引越界异常“*/
+                    i++;
+                    dir = 1;
+                } else if (i == m - 1) {
+                    j++;
+                    dir = 1;
+                } else {
+                    i++;
+                    j--;
+                }
+            }
+        }
+        return res;
+    }
 
 
     /*
@@ -185,19 +228,29 @@ public class All6_10_template {
 
     如果没有归还的书可以取出，返回 -1 。
      */
-//    class CQueue {
-//        public CQueue() {
-//
-//        }
-//
-//        public void appendTail(int value) {
-//
-//        }
-//
-//        public int deleteHead() {
-//
-//        }
-//    }
+    /**本质上就是”用栈来实现队列“*/
+    class CQueue {
+        Stack<Integer> inStack;
+        Stack<Integer> outStack;
+        public CQueue() {
+            inStack = new Stack<>();
+            outStack =new Stack<>();
+        }
+
+        public void appendTail(int value) {
+            inStack.push(value);
+        }
+
+        public int deleteHead() {
+            if (inStack.isEmpty()&&outStack.isEmpty()) return -1;
+            if (outStack.isEmpty()){
+                while (!inStack.isEmpty()){
+                    outStack.push(inStack.pop());
+                }
+            }
+            return outStack.pop();
+        }
+    }
 
 
     /**
@@ -285,6 +338,7 @@ public class All6_10_template {
             }else {
                 /**思考，在下面的过程中，哪一个节点是最后一个节点呢？？*/
                 Node cur = stack.pop();
+                root = cur.right;  /**实验：忘了写这一句会发生什么？？？？*/
                 if (res == null) {
                     res = cur;
                     curRes = cur;
@@ -293,6 +347,7 @@ public class All6_10_template {
                     cur.left = curRes;
                     curRes = curRes.right;
                 }
+
             }
         }
         curRes.right = res;
@@ -306,14 +361,14 @@ public class All6_10_template {
         给定一个 32 位有符号整数 x，返回将其数字部分反转后的结果。
     如果反转后 超过 32 位有符号整数范围 [-2^31, 2^31 - 1]，返回 0
      */
-//    public int reverse(int x) {
-//        int res = 0;
-//        while (x!=0){
-//            int digit = x%10;
-//            x /= 10;
-//
-//        }
-//    }
+    public int reverse(int x) {
+        int res = 0;
+        while (x!=0){
+            int digit = x%10;
+            res = res*10 + digit;
+        }
+        return res;
+    }
 
     /*LCR 143. 子结构判断
     给定两棵二叉树 tree1 和 tree2，判断 tree2 是否以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
@@ -453,6 +508,35 @@ public class All6_10_template {
 //    }
 
 
+    int maxLength = 0;
+    int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+    public int longestIncreasingPath(int[][] matrix) {
+        int m = matrix.length,n = matrix[0].length;
+        int[][] memo = new int[m][n];
+        for (int[] cur:memo){
+            Arrays.fill(cur,-1);
+        }
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                longestIncreasingPath(matrix,memo,0,0);
+            }
+        }
+        return maxLength;
+    }
+
+    private int longestIncreasingPath(int[][] matrix, int[][] memo, int i, int j) {
+        if (memo[i][j]!=-1) return memo[i][j];
+        memo[i][j] = 1;
+        for (int[] dir:dirs){
+            int x = i+dir[0],y=j+dir[1];
+            if (x>0&&x<matrix.length&&j>0&&j<matrix[0].length&&matrix[i][j]<matrix[x][y]){
+                memo[i][j] = Math.max(memo[i][j],memo[i][j]+1);
+            }
+        }
+        return memo[i][j];
+    }
+
+
 
         /*450.删除二叉搜索树中的节点
     给定一个二叉搜索树的根节点 root 和一个值 key，删除二叉搜索树中的 key 对应的节点，并保证二叉搜索树的性质不变。返回二叉搜索树（有可能被更新）的根节点的引用。
@@ -506,6 +590,7 @@ public class All6_10_template {
     /**这个题只能从最后一行倒着计算吗？？？
         1. 从最后一行倒着往上计算；每一行从左往右依次计算；
         2. 能不能从第一行开始计算？？如果能的话，每一行如何计算？？
+            答：可以。如果从第一行往后面的行填充，则必须从每行的最后一个位置倒着填
      */
     public int minimumTotal(List<List<Integer>> triangle) {
         int size = triangle.get(triangle.size() - 1).size();
@@ -538,6 +623,21 @@ public class All6_10_template {
     例如，如果 cards =[1,2,1,2] ，则表达式 “12 + 12” 无效。
     如果可以得到这样的表达式，其计算结果为 24 ，则返回 true ，否则返回 false 。
      */
+    /**
+     1. 通过这个题体会一下”回溯法中“，具体每一次的操作如何做？每一轮的回溯都是尝试，但是具体怎么尝试，是不
+     同题目的区别所在。比如这个题所做的尝试就是：
+        ①、每一轮通过i、j指针选出两个变量，这两个变量就是”加减乘除“的对象；因为选出两个数是随机的，因此理论上所
+     有的两个数组合都有被选的可能！！
+        ②、①中”两个数减价乘除“会有不同的结果，这里就尝试将每一个结果添加进next，然后dfs递归下去，看看这种情况
+     能不能成功。
+        举个例子：开始的数据为cards={1,2,3,4}.然后选出的i=0,j=1————即对应1和2两个数。此时步骤如下：
+            第一个for循环：把除了”1，2“两个数的其他数添加进next列表，此时next={3，4};
+            第二个for循环：compute24 计算的结果为列表”{3,2,-1,1,0.5,2}“。遍历这其中的每一个元素val，对于每
+        一个val做如下的操作：
+                ①选择：将val添加进next列表
+                ②继续递归：继续递归下去看看是不是可以得到24
+                ③回溯：将val从next数组移除，继续研究 compute24 返回列表的下一个元素
+     */
     private static double TARGET = 24.0;
     private static double EPSILON = 1e-6;
     public boolean judgePoint24(int[] cards) {
@@ -548,22 +648,25 @@ public class All6_10_template {
 
     private boolean dfs(LinkedList<Double> nums) {
         int n = nums.size();
-        if (n==1){
-            return Math.abs(nums.get(0)-TARGET)<EPSILON;
+        if (n == 1) {
+            return Math.abs(nums.get(0) - TARGET) < EPSILON;
         }
         /**i，j表示选取的两个数的索引。补充说明————
-            1. 其中j从i+1开始，因此就意味着不会选取重复的数字对（并且代码中的”if (i==j) continue“可以省略！！）
+         1. 其中j从i+1开始，因此就意味着不会选取重复的数字对（并且代码中的”if (i==j) continue“可以省略！！）
          */
         for (int i = 0; i < n; i++) {
-            for (int j = i+1; j < n; j++) {
-                if (i==j) continue; //如果索引相等，不允许
+            for (int j = i + 1; j < n; j++) {
+                if (i == j) continue; //如果索引相等，不允许
                 LinkedList<Double> next = new LinkedList<>();
-                /*把除了i,j位置的其他数添加到next数组*/
+                /* for循环会把”除了选出两个数以外的其他数“添加进next数组；*/
                 for (int k = 0; k < n; k++) {
-                    if (k!=i && k!=j) next.add(nums.get(k));
+                    if (k != i && k != j) next.add(nums.get(k));
                 }
-                /*val就是位置i、位置j操作后的所有可能的结果*/
-                for (double val:compute24(nums.get(i),nums.get(j))){
+                /*val就是位置i、位置j操作后的所有可能的结果。
+                    第二个for循环会研究”选出两个数的所有操作结果“，分别添加进next数组；然后dfs递归；最后回撤销next数
+                组的更新
+                * */
+                for (double val : compute24(nums.get(i), nums.get(j))) {
                     next.add(val);
                     if (dfs(next)) return true;
                     next.removeLast();
@@ -576,14 +679,58 @@ public class All6_10_template {
     /*compute24计算位置i、位置j位置的数加减乘除的结果。*/
     private List<Double> compute24(Double a, Double b) {
         LinkedList<Double> res = new LinkedList<>();
+        /**"加法、乘法"是满足交换律的，因此添加一种就可以*/
+        res.add(a + b);
+        res.add(a * b);
+        /**减法不满足交换律，因此需要添加两种可能*/
+        res.add(a - b);
+        res.add(b - a);
+        /**除法也不满足交换律，因此需要添加两种可能*/
+        if (b > EPSILON) res.add(a / b);   /**【注意】需要实验一下”不使用 if (b>EPSILON)行不行“*/
+        if (a > EPSILON) res.add(b / a);
+        return res;
+    }
+
+    /*自己实现的写法~
+    * */
+    private static double EPS =1e-8;
+    private static double Tar = 24.0;
+    public boolean judgePoint24_own(int[] cards) {
+        LinkedList<Double> all = new LinkedList<>();
+        for (int num:cards){
+            all.add((double)num);
+        }
+        return dfsss(cards,all);
+    }
+
+    private boolean dfsss(int[] cards, LinkedList<Double> all) {
+        for (int i = 0; i < all.size(); i++) {
+            for (int j = i+1; j < all.size(); j++) {
+                if (all.size()==1&&Math.abs(all.get(0)-Tar)<EPS) return true;
+                LinkedList<Double> next = new LinkedList<>();
+                for (int k = 0; k < all.size(); k++) {
+                    if (k!=i&&k!=j) next.add(all.get(k));
+                }
+
+                for (double val:compute111(all.get(i),all.get(j))){
+                    next.add(val);
+                    if (dfsss(cards,next)) return true;
+                    next.removeLast();
+                }
+            }
+        }
+        return false;
+    }
+
+    private List<Double> compute111(Double a, Double b) {
+        LinkedList<Double> res = new LinkedList<>();
         res.add(a+b);
         res.add(a*b);
-        /**减法不满足交换律，因此需要添加两种可能*/
         res.add(a-b);
         res.add(b-a);
-        /**除法也不满足交换律，因此需要添加两种可能*/
-        if (b>EPSILON) res.add(a/b);   /**【注意】需要实验一下”不使用 if (b>EPSILON)行不行“*/
-        if (a>EPSILON) res.add(b/a);
+        /**下面的代码没有判断除数会怎样？？？？*/
+        res.add(a/b);
+        res.add(b/a);
         return res;
     }
 
@@ -684,9 +831,28 @@ public class All6_10_template {
 每次操作，你可以取一枚没有碎的鸡蛋并把它从任一楼层 x 扔下（满足 1 <= x <= n）。如果鸡蛋碎了，你就不能再次使用它。如果某枚鸡蛋扔下后没有摔碎，则可以在之后的操作中 重复使用 这枚鸡蛋。
 请你计算并返回要确定 f 确切的值 的 最小操作次数 是多少？
      */
-//    public int superEggDrop(int k, int n) {
-//
-//    }
+    /**最优解的解释————
+     1. 逆向思维：与其问“n 层楼最少要多少步”，不如问：如果我们可以扔 m 次，有 k 个鸡蛋，最多能测多少层？因此有如下的转换————
+         dp数组的含义：dp[k][m] 表示 k 个鸡蛋，扔 m 次，最多能测试多少层
+         dp的状态转移：当我从某一层扔下去：
+             如果碎了：能测 dp[k-1][m-1] 层；
+             如果没碎：能测 dp[k][m-1] 层；
+             再加上当前这一层本身 +1。
+     */
+    public int superEggDrop(int K, int N) {
+        // dp[k][m] 表示 k 个鸡蛋，m 次操作最多能测的楼层数
+        int[] dp = new int[K + 1];
+        int m = 0;
+        // 不断增加尝试次数 m，直到能测完所有 N 层
+        while (dp[K] < N) {
+            m++;
+            for (int k = K; k >= 1; k--) {
+                /**最大的疑问：最多能测多少层，不应该是取最值吗？？为什么这里是加和？？？*/
+                dp[k] = dp[k - 1] + dp[k] + 1;
+            }
+        }
+        return m;
+    }
 
     /*97. 交错字符串
     给定三个字符串 s1、s2、s3，请你帮忙验证 s3 是否是由 s1 和 s2 交错 组成的。
