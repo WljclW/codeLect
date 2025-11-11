@@ -80,19 +80,6 @@ public class All6_10_template {
 给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
 * */
-    public int findMin(int[] nums) {
-        int left = 0,right = nums.length-1;
-        while (left<right){
-            int mid = left+(right-left)/2;
-            if (nums[mid]<nums[right]){
-                right = mid;
-            }else {
-                left = mid+1;
-            }
-        }
-        return nums[left];
-    }
-
     /**标记的方法为什么是错误的？？？？？*/
     public int findMin__(int[] nums) {
         int left = 0,right = nums.length-1;
@@ -107,6 +94,28 @@ public class All6_10_template {
             }
         }
         return nums[ans];
+    }
+
+    /**下面的代码确是对的，为什么？？看着也没啥区别*/
+    public int findMin_(int[] nums) {
+
+        int min = nums[nums.length-1];
+
+        int left = 0, right = nums.length - 1;
+        while(left <= right){
+            int mid = left + (right - left) / 2;
+
+
+            if(nums[mid] < min){
+                min = nums[mid];
+                right = mid - 1;
+            }
+
+            else {
+                left = mid + 1;
+            }
+        }
+        return min;
     }
 
 
@@ -162,97 +171,6 @@ public class All6_10_template {
 //    public int maxProfit(int[] prices) {
 //
 //    }
-
-
-    /*498.对角线遍历
-        给你一个大小为 m x n 的矩阵 mat ，请以对角线遍历的顺序，用一个数组返回这个矩阵中的所有元素。
-     */
-    /**【模拟法】
-        1. i、j变量表示当前研究的位置，dir表示走向（dir=1表示向右上方移动，dir=-1表示向左下方移动）
-        2. 如果正在向右上方（即dir=1）移动，有三种情况————
-                情况1：i==0。即来到了第一行，此时从右边的元素接着研究（即j++,dir=-1）;
-                情况2：j==n-1.即来到了最后一列，此时从下边的元素接着研究（即i++,dir=-1）;
-                情况3：其他的普遍位置（i--,j++,dir不变）
-           如果正在向左下方（即dir=-1）移动，也有三种情况————
-                情况1：i==m-1.即来到最后一行，此时应该从右边的元素继续研究（即j++，dir=1）;
-                情况2：j==0。即来到了第一列，此时应该从下边的元素继续研究（即i++，dir=1）;
-                情况3：其他的普遍位置（i++,j--,dir不变）
-          【关键点、易错点】
-                1. dir=1时，向右上方移动，此时有一个特殊位置即右上角的位置（i=0,j=n-1），到了这个位置
-          应该向下移继续，因此这个位置应该当作最后一列的位置处理————因此dir=1时的三种情况，应该先判断”j==n-1“
-                2. dir=-1时，向左下方移动，此时也有一个特殊位置即左下角的位置（i=m-1,j=0），到了这个
-          位置应该向右移，因此这个位置应该当作最后一行的位置处理————因此dir=-1时的三种情况，应该先判断”i==m-1“
-                综上，应该先判断是不是到最后一列、最后一行这种情况~~~~
-     */
-    public int[] findDiagonalOrder(int[][] mat) {
-        int m = mat.length, n = mat[0].length;
-        int[] res = new int[m * n];
-        int i = 0, j = 0, dir = 1;
-        for (int k = 0; k < m * n; k++) {
-            res[k] = mat[i][j];
-            if (dir == 1) {
-                if (i == 0) { /**应该要先判断j==n-1，这么写肯定会报”索引越界异常“*/
-                    j++;
-                    dir = -1;
-                } else if (j == n - 1) {
-                    i++;
-                    dir = -1;
-                } else {
-                    i--;
-                    j++;
-                }
-            } else {
-                if (j == 0) { /**应该先判断i==m-1，如果先判断j==0肯定会报”索引越界异常“*/
-                    i++;
-                    dir = 1;
-                } else if (i == m - 1) {
-                    j++;
-                    dir = 1;
-                } else {
-                    i++;
-                    j--;
-                }
-            }
-        }
-        return res;
-    }
-
-
-    /*
-    LCR 125. 图书整理 II
-    读者来到图书馆排队借还书，图书管理员使用两个书车来完成整理借还书的任务。书车中的书从下往上叠加存放，图书管理员每次只能拿取书车顶部的书。排队的读者会有两种操作：
-
-    push(bookID)：把借阅的书籍还到图书馆。
-    pop()：从图书馆中借出书籍。
-    为了保持图书的顺序，图书管理员每次取出供读者借阅的书籍是 最早 归还到图书馆的书籍。你需要返回 每次读者借出书的值 。
-
-    如果没有归还的书可以取出，返回 -1 。
-     */
-    /**本质上就是”用栈来实现队列“*/
-    class CQueue {
-        Stack<Integer> inStack;
-        Stack<Integer> outStack;
-        public CQueue() {
-            inStack = new Stack<>();
-            outStack =new Stack<>();
-        }
-
-        public void appendTail(int value) {
-            inStack.push(value);
-        }
-
-        public int deleteHead() {
-            if (inStack.isEmpty()&&outStack.isEmpty()) return -1;
-            if (outStack.isEmpty()){
-                while (!inStack.isEmpty()){
-                    outStack.push(inStack.pop());
-                }
-            }
-            return outStack.pop();
-        }
-    }
-
-
     /**
      * ===================================7=====================================
      * ===================================7=====================================
@@ -302,74 +220,6 @@ public class All6_10_template {
         }
     }
 
-    /*
-    LCR 155. 将二叉搜索树转化为排序的双向链表
-    将一个 二叉搜索树 就地转化为一个 已排序的双向循环链表 。
-
-    对于双向循环列表，你可以将左右孩子指针作为双向循环链表的前驱和后继指针，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
-
-    特别地，我们希望可以 就地 完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中最小元素的指针。
-     */
-    class Node {
-        public int val;
-        public Node left;
-        public Node right;
-
-        public Node() {}
-
-        public Node(int _val) {
-            val = _val;
-        }
-
-        public Node(int _val, Node _left, Node _right) {
-            val = _val;
-            left = _left;
-            right = _right;
-        }
-    }
-    public Node treeToDoublyList(Node root) {
-        if (root==null) return null;
-        Node res = null,curRes = null;
-        Stack<Node> stack = new Stack<>();
-        while (root!=null||!stack.isEmpty()){
-            if (root!=null){
-                stack.push(root);
-                root = root.left;
-            }else {
-                /**思考，在下面的过程中，哪一个节点是最后一个节点呢？？*/
-                Node cur = stack.pop();
-                root = cur.right;  /**实验：忘了写这一句会发生什么？？？？*/
-                if (res == null) {
-                    res = cur;
-                    curRes = cur;
-                } else {
-                    curRes.right = cur;
-                    cur.left = curRes;
-                    curRes = curRes.right;
-                }
-
-            }
-        }
-        curRes.right = res;
-        res.left = curRes;
-        return res;
-    }
-
-
-
-    /*7.整数反转
-        给定一个 32 位有符号整数 x，返回将其数字部分反转后的结果。
-    如果反转后 超过 32 位有符号整数范围 [-2^31, 2^31 - 1]，返回 0
-     */
-    public int reverse(int x) {
-        int res = 0;
-        while (x!=0){
-            int digit = x%10;
-            res = res*10 + digit;
-        }
-        return res;
-    }
-
     /*LCR 143. 子结构判断
     给定两棵二叉树 tree1 和 tree2，判断 tree2 是否以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
 注意，空树 不会是以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
@@ -399,59 +249,6 @@ public class All6_10_template {
         if (cur1 == null) return false;
         return cur1.val == cur2.val && isMatch143(cur1.left, cur2.left) && isMatch143(cur1.right, cur2.right);
     }
-
-        /*572. 另一个树的子树
-    给你两棵二叉树 root 和 subRoot 。检验 root 中是否包含和 subRoot 具有相同结构和节点值的子树。如果存在，返回 true ；否则，返回 false 。
-
-二叉树 tree 的一棵子树包括 tree 的某个节点和这个节点的所有后代节点。tree 也可以看做它自身的一棵子树。
-    * */
-    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        if(root==null&&subRoot==null) return true;
-        if (root==null||subRoot==null) return false;
-        return isMatch572(root,subRoot)||
-                isSubtree(root.left,subRoot)||
-                isSubtree(root.right,subRoot);
-    }
-    private boolean isMatch572(TreeNode root, TreeNode subRoot) {
-        if (root==null&&subRoot==null) return true;
-        if (root==null||subRoot==null) return false;
-        return root.val==subRoot.val&&
-                isMatch572(root.left,subRoot.left)&&
-                isMatch572(root.right,subRoot.right);
-    }
-
-
-    public boolean isSubtree_572(TreeNode root, TreeNode subRoot) {
-        if (root==null&&subRoot==null) return true;
-        if (root==null||subRoot==null) return false;
-        LinkedList<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()){
-            TreeNode cur = queue.poll();
-            if (cur.val==subRoot.val&&isMatch_572(cur,subRoot)) return true;
-            if (cur.left!=null) queue.offer(cur.left);
-            if (cur.right!=null) queue.offer(cur.right);
-        }
-        return false;
-    }
-
-    private boolean isMatch_572(TreeNode cur, TreeNode subRoot) {
-        LinkedList<TreeNode[]> queue = new LinkedList<>();
-        TreeNode[] now = {cur, subRoot};
-        queue.offer(now);
-        while (!queue.isEmpty()){
-            TreeNode[] curPair = queue.poll();
-            TreeNode ori = curPair[0];
-            TreeNode test = curPair[1];
-            if (ori==null&&test==null) continue;
-            if (ori==null||test==null) return false;
-            if (ori.val!=test.val) return false;
-            queue.offer(new TreeNode[]{ori.left,test.left});
-            queue.offer(new TreeNode[]{ori.right,test.right});
-        }
-        return true;
-    }
-
     /**
      *=====================8==================================
      *=====================8==================================
@@ -581,191 +378,12 @@ public class All6_10_template {
         return res;
     }
 
-
-    /*120. 三角形最小路径和
-    给定一个三角形 triangle ，找出自顶向下的最小路径和。
-
-    每一步只能移动到下一行中相邻的结点上。相邻的结点 在这里指的是 下标 与 上一层结点下标 相同或者等于 上一层结点下标 + 1 的两个结点。也就是说，如果正位于当前行的下标 i ，那么下一步可以移动到下一行的下标 i 或 i + 1 。
-     */
-    /**这个题只能从最后一行倒着计算吗？？？
-        1. 从最后一行倒着往上计算；每一行从左往右依次计算；
-        2. 能不能从第一行开始计算？？如果能的话，每一行如何计算？？
-            答：可以。如果从第一行往后面的行填充，则必须从每行的最后一个位置倒着填
-     */
-    public int minimumTotal(List<List<Integer>> triangle) {
-        int size = triangle.get(triangle.size() - 1).size();
-        int[] dp = new int[size];
-
-        /**自己写的代码，没有赋初始值，是有问题的。。。看看问题的表现是什么*/
-//        for (int j = 0; j < size; j++) {
-//            dp[j] = triangle.get(triangle.size() - 1).get(j);
-//        }
-
-        for (int i = triangle.size()-2; i >=0; i--) {
-            for (int j = 0; j < triangle.get(i).size(); j++) {
-                int curVal = triangle.get(i).get(j);
-                dp[j] = Math.min(dp[j],dp[j+1]) + curVal;
-            }
-        }
-        return dp[0];
-    }
-
-    /*679。24 点游戏
-    给定一个长度为4的整数数组 cards 。你有 4 张卡片，每张卡片上都包含一个范围在 [1,9] 的数字。您应该使用运算符 ['+', '-', '*', '/'] 和括号 '(' 和 ')' 将这些卡片上的数字排列成数学表达式，以获得值24。
-
-    你须遵守以下规则:
-
-    除法运算符 '/' 表示实数除法，而不是整数除法。
-    例如， 4 /(1 - 2 / 3)= 4 /(1 / 3)= 12 。
-    每个运算都在两个数字之间。特别是，不能使用 “-” 作为一元运算符。
-    例如，如果 cards =[1,1,1,1] ，则表达式 “-1 -1 -1 -1” 是 不允许 的。
-    你不能把数字串在一起
-    例如，如果 cards =[1,2,1,2] ，则表达式 “12 + 12” 无效。
-    如果可以得到这样的表达式，其计算结果为 24 ，则返回 true ，否则返回 false 。
-     */
-    /**
-     1. 通过这个题体会一下”回溯法中“，具体每一次的操作如何做？每一轮的回溯都是尝试，但是具体怎么尝试，是不
-     同题目的区别所在。比如这个题所做的尝试就是：
-        ①、每一轮通过i、j指针选出两个变量，这两个变量就是”加减乘除“的对象；因为选出两个数是随机的，因此理论上所
-     有的两个数组合都有被选的可能！！
-        ②、①中”两个数减价乘除“会有不同的结果，这里就尝试将每一个结果添加进next，然后dfs递归下去，看看这种情况
-     能不能成功。
-        举个例子：开始的数据为cards={1,2,3,4}.然后选出的i=0,j=1————即对应1和2两个数。此时步骤如下：
-            第一个for循环：把除了”1，2“两个数的其他数添加进next列表，此时next={3，4};
-            第二个for循环：compute24 计算的结果为列表”{3,2,-1,1,0.5,2}“。遍历这其中的每一个元素val，对于每
-        一个val做如下的操作：
-                ①选择：将val添加进next列表
-                ②继续递归：继续递归下去看看是不是可以得到24
-                ③回溯：将val从next数组移除，继续研究 compute24 返回列表的下一个元素
-     */
-    private static double TARGET = 24.0;
-    private static double EPSILON = 1e-6;
-    public boolean judgePoint24(int[] cards) {
-        LinkedList<Double> nums = new LinkedList<>();
-        for (int num:cards) nums.add((double)num);
-        return dfs(nums);
-    }
-
-    private boolean dfs(LinkedList<Double> nums) {
-        int n = nums.size();
-        if (n == 1) {
-            return Math.abs(nums.get(0) - TARGET) < EPSILON;
-        }
-        /**i，j表示选取的两个数的索引。补充说明————
-         1. 其中j从i+1开始，因此就意味着不会选取重复的数字对（并且代码中的”if (i==j) continue“可以省略！！）
-         */
-        for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                if (i == j) continue; //如果索引相等，不允许
-                LinkedList<Double> next = new LinkedList<>();
-                /* for循环会把”除了选出两个数以外的其他数“添加进next数组；*/
-                for (int k = 0; k < n; k++) {
-                    if (k != i && k != j) next.add(nums.get(k));
-                }
-                /*val就是位置i、位置j操作后的所有可能的结果。
-                    第二个for循环会研究”选出两个数的所有操作结果“，分别添加进next数组；然后dfs递归；最后回撤销next数
-                组的更新
-                * */
-                for (double val : compute24(nums.get(i), nums.get(j))) {
-                    next.add(val);
-                    if (dfs(next)) return true;
-                    next.removeLast();
-                }
-            }
-        }
-        return false;
-    }
-
-    /*compute24计算位置i、位置j位置的数加减乘除的结果。*/
-    private List<Double> compute24(Double a, Double b) {
-        LinkedList<Double> res = new LinkedList<>();
-        /**"加法、乘法"是满足交换律的，因此添加一种就可以*/
-        res.add(a + b);
-        res.add(a * b);
-        /**减法不满足交换律，因此需要添加两种可能*/
-        res.add(a - b);
-        res.add(b - a);
-        /**除法也不满足交换律，因此需要添加两种可能*/
-        if (b > EPSILON) res.add(a / b);   /**【注意】需要实验一下”不使用 if (b>EPSILON)行不行“*/
-        if (a > EPSILON) res.add(b / a);
-        return res;
-    }
-
-    /*自己实现的写法~
-    * */
-    private static double EPS =1e-8;
-    private static double Tar = 24.0;
-    public boolean judgePoint24_own(int[] cards) {
-        LinkedList<Double> all = new LinkedList<>();
-        for (int num:cards){
-            all.add((double)num);
-        }
-        return dfsss(cards,all);
-    }
-
-    private boolean dfsss(int[] cards, LinkedList<Double> all) {
-        for (int i = 0; i < all.size(); i++) {
-            for (int j = i+1; j < all.size(); j++) {
-                if (all.size()==1&&Math.abs(all.get(0)-Tar)<EPS) return true;
-                LinkedList<Double> next = new LinkedList<>();
-                for (int k = 0; k < all.size(); k++) {
-                    if (k!=i&&k!=j) next.add(all.get(k));
-                }
-
-                for (double val:compute111(all.get(i),all.get(j))){
-                    next.add(val);
-                    if (dfsss(cards,next)) return true;
-                    next.removeLast();
-                }
-            }
-        }
-        return false;
-    }
-
-    private List<Double> compute111(Double a, Double b) {
-        LinkedList<Double> res = new LinkedList<>();
-        res.add(a+b);
-        res.add(a*b);
-        res.add(a-b);
-        res.add(b-a);
-        /**下面的代码没有判断除数会怎样？？？？*/
-        res.add(a/b);
-        res.add(b/a);
-        return res;
-    }
-
-
     /*44.通配符匹配
     给你一个输入字符串 (s) 和一个字符模式 (p) ，请你实现一个支持 '?' 和 '*' 匹配规则的通配符匹配：
     '?' 可以匹配任何单个字符。
     '*' 可以匹配任意字符序列（包括空字符序列）。
     判定匹配成功的充要条件是：字符模式必须能够 完全匹配 输入字符串（而不是部分匹配）。
      */
-    public boolean isMatch(String s, String p) {
-        int m = s.length(),n = p.length();
-        boolean[][] dp = new boolean[m + 1][n + 1];
-        dp[0][0] = true;
-        /*只需要初始化第一行。因为第一列的含义”s串不是空，匹配串p是空的“，这很明显不能匹配成功，永远是false*/
-        for (int i = 1; i <= n; i++) {
-            dp[0][i] = dp[0][i-1]&&p.charAt(i-1)=='*';
-        }
-
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
-                char sc = s.charAt(i - 1);
-                char pc = p.charAt(j - 1);
-                if (sc==pc||pc=='?'){
-                    dp[i][j] |= dp[i-1][j-1];
-                } else if (pc == '*') {
-                    dp[i][j] |= dp[i][j-1]; /*匹配0次的话*/
-                    dp[i][j] |= dp[i-1][j]; /*匹配至少1次的话*/
-                }
-            }
-        }
-        return dp[m][n];
-    }
-
-
     /**两个一维数组 滚动的写法*/
     public boolean isMatch_(String s, String p) {
         int m = s.length(),n = p.length();
@@ -783,8 +401,9 @@ public class All6_10_template {
                 if (pc==sc||pc=='?'){
                     cur[j] = prev[j-1];
                 }else if (pc=='*'){
-                    cur[j] |= cur[j-1];
-                    cur[j] |= prev[j];
+//                    cur[j] |= cur[j-1];
+//                    cur[j] |= prev[j];
+                    cur[j] = cur[j-1] || prev[j];
                 }
             }
             boolean[] tmp = prev;
@@ -903,44 +522,4 @@ public class All6_10_template {
 //    public int longestSubstring(String s, int k) {
 //
 //    }
-
-
-        /*673. 最长递增子序列的个数
-给定一个未排序的整数数组 nums ， 返回最长递增子序列的个数 。
-
-注意 这个数列必须是 严格 递增的。
-     */
-    public int findNumberOfLIS(int[] nums) {
-        int[] longth = new int[nums.length]; /*”以nums[i]结尾的最长递增子序列的长度“*/
-        int[] num = new int[nums.length]; /*”以nums[i]结尾的长度为longth[i]的递增子序列的数量“*/
-        Arrays.fill(longth,1);
-        Arrays.fill(num,1);
-        int length = 1,res =0;
-
-        for (int i = 0; i < nums.length; i++) {
-            for (int j = 0; j < i; j++) {
-                if (nums[j]<nums[i]){
-                    if (longth[j]+1>longth[i]){
-                        longth[i] = longth[j]+1;
-                        num[i] = nums[j];  /**这里不能简单的赋值为1*/
-                    } else if (longth[j]+1==longth[i]) {
-                        num[i] += nums[j];
-                    }
-                    /*到了这里说明"以nums[i]结尾的最长子序列长度、数量"都知道了，因此下面尝试更新全局信息。
-                     【补充说明】
-                          写法1. 这里仅仅是更新的全局的”最长子序列长度“这个信息。所以出了双层for循环需要统计一下”这种长度递增子序列“的总数量
-                          写法2. 在双层for循环中，不仅仅更新longth、num数组的信息，同时更新所有的全局信息，见方法
-                     */
-                    length = Math.max(length,longth[i]);
-                }
-            }
-        }
-
-        for (int i = 0; i < longth.length; i++) {
-            if (longth[i]==length){
-                res += num[i];
-            }
-        }
-        return res;
-    }
 }

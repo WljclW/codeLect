@@ -1204,33 +1204,89 @@ void put(int key, int value) - 如果键 key 已存在，则变更其值；如�
         return curRowMaxArea;
     }
 
-
-    /*44
-    给你一个输入字符串 (s) 和一个字符模式 (p) ，请你实现一个支持 '?' 和 '*' 匹配规则的通配符匹配：
-    '?' 可以匹配任何单个字符。
-    '*' 可以匹配任意字符序列（包括空字符序列）。
-    判定匹配成功的充要条件是：字符模式必须能够 完全匹配 输入字符串（而不是部分匹配）。
-     */
-//    public boolean isMatch(String s, String p) {
-//
-//    }
-
-    /*679
+    /*679。24 点游戏
     给定一个长度为4的整数数组 cards 。你有 4 张卡片，每张卡片上都包含一个范围在 [1,9] 的数字。您应该使用运算符 ['+', '-', '*', '/'] 和括号 '(' 和 ')' 将这些卡片上的数字排列成数学表达式，以获得值24。
 
-你须遵守以下规则:
+    你须遵守以下规则:
 
-除法运算符 '/' 表示实数除法，而不是整数除法。
-例如， 4 /(1 - 2 / 3)= 4 /(1 / 3)= 12 。
-每个运算都在两个数字之间。特别是，不能使用 “-” 作为一元运算符。
-例如，如果 cards =[1,1,1,1] ，则表达式 “-1 -1 -1 -1” 是 不允许 的。
-你不能把数字串在一起
-例如，如果 cards =[1,2,1,2] ，则表达式 “12 + 12” 无效。
-如果可以得到这样的表达式，其计算结果为 24 ，则返回 true ，否则返回 false 。
+    除法运算符 '/' 表示实数除法，而不是整数除法。
+    例如， 4 /(1 - 2 / 3)= 4 /(1 / 3)= 12 。
+    每个运算都在两个数字之间。特别是，不能使用 “-” 作为一元运算符。
+    例如，如果 cards =[1,1,1,1] ，则表达式 “-1 -1 -1 -1” 是 不允许 的。
+    你不能把数字串在一起
+    例如，如果 cards =[1,2,1,2] ，则表达式 “12 + 12” 无效。
+    如果可以得到这样的表达式，其计算结果为 24 ，则返回 true ，否则返回 false 。
      */
-//    public boolean judgePoint24(int[] cards) {
-//
-//    }
+    /**
+     1. 通过这个题体会一下”回溯法中“，具体每一次的操作如何做？每一轮的回溯都是尝试，但是具体怎么尝试，是不
+     同题目的区别所在。比如这个题所做的尝试就是：
+     ①、每一轮通过i、j指针选出两个变量，这两个变量就是”加减乘除“的对象；因为选出两个数是随机的，因此理论上所
+     有的两个数组合都有被选的可能！！
+     ②、①中”两个数减价乘除“会有不同的结果，这里就尝试将每一个结果添加进next，然后dfs递归下去，看看这种情况
+     能不能成功。
+     举个例子：开始的数据为cards={1,2,3,4}.然后选出的i=0,j=1————即对应1和2两个数。此时步骤如下：
+     第一个for循环：把除了”1，2“两个数的其他数添加进next列表，此时next={3，4};
+     第二个for循环：compute24 计算的结果为列表”{3,2,-1,1,0.5,2}“。遍历这其中的每一个元素val，对于每
+     一个val做如下的操作：
+     ①选择：将val添加进next列表
+     ②继续递归：继续递归下去看看是不是可以得到24
+     ③回溯：将val从next数组移除，继续研究 compute24 返回列表的下一个元素
+     */
+    private static double TARGET = 24.0;
+    private static double EPSILON = 1e-6;
+    public boolean judgePoint24(int[] cards) {
+        LinkedList<Double> nums = new LinkedList<>();
+        for (int num:cards) nums.add((double)num);
+        return dfs(nums);
+    }
+
+    private boolean dfs(LinkedList<Double> nums) {
+        int n = nums.size();
+        /**err：base case的判断，得子双层for循环之外！！！
+         【注】double判断相等的标准是“和target差的绝对值小于一个误差EPSILON”
+         */
+        if (n == 1) {
+            return Math.abs(nums.get(0) - TARGET) < EPSILON;
+        }
+        /**i，j表示选取的两个数的索引。补充说明————
+         1. 其中j从i+1开始，因此就意味着不会选取重复的数字对（并且代码中的”if (i==j) continue“可以省略！！）
+         */
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+//                if (i == j) continue; //如果索引相等，不允许
+                LinkedList<Double> next = new LinkedList<>();
+                /*第一个for循环： f把“除了选出两个数以外 的其他数”添加进next数组；*/
+                for (int k = 0; k < n; k++) {
+                    if (k != i && k != j) next.add(nums.get(k));
+                }
+                /*第二个for循环：val就是位置i、位置j操作后的所有可能的结果。
+                    第二个for循环会研究”选出两个数的所有操作结果“，分别添加进next数组；然后dfs递归；最后回
+                撤销next列表的更新
+                * */
+                for (double val : compute24(nums.get(i), nums.get(j))) {
+                    next.add(val);
+                    if (dfs(next)) return true;
+                    next.removeLast();
+                }
+            }
+        }
+        return false;
+    }
+
+    /*compute24计算位置i、位置j位置的数加减乘除的结果。*/
+    private List<Double> compute24(Double a, Double b) {
+        LinkedList<Double> res = new LinkedList<>();
+        /**"加法、乘法"是满足交换律的，因此添加一种就可以*/
+        res.add(a + b);
+        res.add(a * b);
+        /**减法不满足交换律，因此需要添加两种可能*/
+        res.add(a - b);
+        res.add(b - a);
+        /**除法也不满足交换律，因此需要添加两种可能*/
+        if (b > EPSILON) res.add(a / b);   /**【注意】“不使用 if (b>EPSILON)”也是可以的*/
+        if (a > EPSILON) res.add(b / a);
+        return res;
+    }
 
 
     /*400
@@ -2005,6 +2061,39 @@ void put(int key, int value) - 如果键 key 已存在，则变更其值；如�
             }
         }
         return dp[n];
+    }
+
+    /*LCR 125. 图书整理 II
+    读者来到图书馆排队借还书，图书管理员使用两个书车来完成整理借还书的任务。书车中的书从下往上叠加存放，图书管理员每次只能拿取书车顶部的书。排队的读者会有两种操作：
+
+    push(bookID)：把借阅的书籍还到图书馆。
+    pop()：从图书馆中借出书籍。
+    为了保持图书的顺序，图书管理员每次取出供读者借阅的书籍是 最早 归还到图书馆的书籍。你需要返回 每次读者借出书的值 。
+
+    如果没有归还的书可以取出，返回 -1 。
+     */
+    /**本质上就是”用栈来实现队列“*/
+    class CQueue {
+        Stack<Integer> inStack;
+        Stack<Integer> outStack;
+        public CQueue() {
+            inStack = new Stack<>();
+            outStack =new Stack<>();
+        }
+
+        public void appendTail(int value) {
+            inStack.push(value);
+        }
+
+        public int deleteHead() {
+            if (inStack.isEmpty()&&outStack.isEmpty()) return -1;
+            if (outStack.isEmpty()){
+                while (!inStack.isEmpty()){
+                    outStack.push(inStack.pop());
+                }
+            }
+            return outStack.pop();
+        }
     }
 
 

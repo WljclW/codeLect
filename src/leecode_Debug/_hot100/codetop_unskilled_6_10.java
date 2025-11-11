@@ -462,10 +462,11 @@ public class codetop_unskilled_6_10 {
      */
 
 
-    /*7
+    /*7.整数反转
         给定一个 32 位有符号整数 x，返回将其数字部分反转后的结果。如果反转后超出了 32 位有符号整数的范围 [-2^31, 2^31 - 1]，则返回 0
      */
     /**
+     *【强烈建议】强烈建议使用解法 reverse_
      *【关键】必须先在step2进行校验，校验后才能在step3更新res。
      *【说明】
      *      1. 在计算的过程中会发现————
@@ -583,6 +584,9 @@ public class codetop_unskilled_6_10 {
 对于双向循环列表，你可以将左右孩子指针作为双向循环链表的前驱和后继指针，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
 特别地，我们希望可以 就地 完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中最小元素的指针。
  */
+    /**
+     【强烈建议】建议使用解法 treeToDoublyList
+     */
     class NodeNode {
         public int val;
         public NodeNode left;
@@ -673,7 +677,7 @@ public class codetop_unskilled_6_10 {
     public NodeNode treeToDoublyList(NodeNode root) {
         if (root == null) return root;
         Stack<NodeNode> stack = new Stack<>();
-        NodeNode prev = null; /**prev记录的是已经连接部分的链表的最后一个节点*/
+        NodeNode prev = null; /**prev记录的是已经连接部分的链表的最后一个节点————即实时操作的指针*/
         NodeNode head = null; /**head仅仅是记录头节点*/
         while (root != null || !stack.isEmpty()) {
             if (root != null) {
@@ -681,18 +685,20 @@ public class codetop_unskilled_6_10 {
                 root = root.left;
             } else {
                 NodeNode cur = stack.pop();
-                if (prev == null) head = cur; /**err：这里是记录头节点，其实就是中序遍历的最小值节点*/
-                else {
+                if (prev == null){
+                    head = cur; /**err：这里是记录头节点，其实就是中序遍历的最小值节点*/
+                    prev = cur;
+                } else {
                     prev.right = cur;
                     cur.left = prev; /**err：真正要做的是“把当前节点的left指针指向prev节点，而不是修改prev节点的左指针”*/
+                    prev = prev.right;
                 }
-                prev = cur;
-                root = cur.right;
+                root = cur.right; /**err：记得更新root走cur的右子树*/
             }
         }
         /*最后记得首尾相接，构成循环链表*/
+        prev.right = head; /**prev指针指向已经连接链表的最后一个节点，因此出了while循环时prev指向的就是中序遍历的最后一个节点*/
         head.left = prev;
-        prev.right = head;
         return prev;
     }
 
@@ -850,6 +856,7 @@ public class codetop_unskilled_6_10 {
 二叉树 tree 的一棵子树包括 tree 的某个节点和这个节点的所有后代节点。tree 也可以看做它自身的一棵子树。
     * */
     /**
+     【总述】这个题要求“树长的一模一样”，是null的时候都得是null！
      【题目的理解】
          题目与“子结构”题（LCR 143）相似，递归和迭代的写法和非递归也是类似的代码几乎没啥区别。。。但这个题判
      断条件更严格————root中的某一个子树 和 subRoot必须一摸一样，即subRoot是null的时候root子树对应的节点也
@@ -863,7 +870,7 @@ public class codetop_unskilled_6_10 {
     /*解法1：递归的写法*/
     public boolean isSubtree(TreeNode root, TreeNode subRoot) {
         if (root==null&&subRoot==null) return true;
-        if (root==null) return false;
+        if (root==null||subRoot==null) return false;
         return isSameTree(root,subRoot)||
                 isSameTree(root.left,subRoot)||
                 isSameTree(root.right,subRoot);
@@ -879,8 +886,8 @@ public class codetop_unskilled_6_10 {
 
     /*解法2：迭代法的实现*/
     public boolean isSubtree_diedai(TreeNode root, TreeNode subRoot) {
-        if (subRoot==null) return true;
-        if (root==null) return false;
+        if (subRoot==null&&subRoot==null) return true;
+        if (root==null||subRoot==null) return false;
 
         LinkedList<TreeNode> queue = new LinkedList<>();
         queue.offer(root);
@@ -900,7 +907,8 @@ public class codetop_unskilled_6_10 {
         while (!queue.isEmpty()){
             TreeNode[] cur = queue.poll();
             TreeNode rootNode = cur[0],subRootNode = cur[1];
-            if (rootNode==null&&subRootNode==null) return true;
+            /**err：这里如果return true，就是错误的。第二个用例过不了.*/
+            if (rootNode==null&&subRootNode==null) continue;
             if (rootNode==null||subRootNode==null) return false;
             if (rootNode.val!=subRootNode.val) return false;
             queue.offer(new TreeNode[]{rootNode.left,subRootNode.left});
@@ -909,28 +917,87 @@ public class codetop_unskilled_6_10 {
         return true;
     }
 
-    /**
-     *下面的代码需要提交一下看对不对
+
+    /*498.对角线遍历
+        给你一个大小为 m x n 的矩阵 mat ，请以对角线遍历的顺序，用一个数组返回这个矩阵中的所有元素。
      */
-//    public boolean isSubtree1(TreeNode root, TreeNode subRoot) {
-//        if (root==null&&subRoot==null) return true;
-//        if (root==null) return false;
-//        return isMatch1(root,subRoot)||
-//                isSubtree1(root.left,subRoot)||
-//                isSubtree1(root.right,subRoot);
-//    }
-//
-//    private boolean isMatch1(TreeNode root, TreeNode subRoot) {
-//        if (root==null&&subRoot==null) return true;
-//        if (root==null||subRoot==null) return false;
-//        return root.val==subRoot.val&&
-//                isMatch1(root.left,subRoot.left)&&
-//                isMatch1(root.right,subRoot.right);
-//    }
-//
-//
-//
-//
+    /**【模拟法】
+     1. i、j变量表示当前研究的位置，dir表示走向（dir=1表示向右上方移动，dir=-1表示向左下方移动）
+     2. 如果正在向右上方（即dir=1）移动，有三种情况————
+     情况1：i==0。即来到了第一行，此时从右边的元素接着研究（即j++,dir=-1）;
+     情况2：j==n-1.即来到了最后一列，此时从下边的元素接着研究（即i++,dir=-1）;
+     情况3：其他的普遍位置（i--,j++,dir不变）
+     如果正在向左下方（即dir=-1）移动，也有三种情况————
+     情况1：i==m-1.即来到最后一行，此时应该从右边的元素继续研究（即j++，dir=1）;
+     情况2：j==0。即来到了第一列，此时应该从下边的元素继续研究（即i++，dir=1）;
+     情况3：其他的普遍位置（i++,j--,dir不变）
+     【关键点、易错点】
+     1. dir=1时，向右上方移动，此时有一个特殊位置即右上角的位置（i=0,j=n-1），到了这个位置
+     应该向下移继续，因此这个位置应该当作最后一列的位置处理————因此dir=1时的三种情况，应该先判断”j==n-1“
+     2. dir=-1时，向左下方移动，此时也有一个特殊位置即左下角的位置（i=m-1,j=0），到了这个
+     位置应该向右移，因此这个位置应该当作最后一行的位置处理————因此dir=-1时的三种情况，应该先判断”i==m-1“
+     综上，应该先判断是不是到最后一列、最后一行这种情况~~~~
+     */
+    public int[] findDiagonalOrder(int[][] mat) {
+        int m = mat.length, n = mat[0].length;
+        int[] res = new int[m * n];
+        int i = 0, j = 0, dir = 1;
+        for (int k = 0; k < m * n; k++) {
+            res[k] = mat[i][j];
+            if (dir == 1) {
+                /*下面的判断顺序会导致类似错误“java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3”
+                因为如果此时(i,j)来到右上角的位置（0，n-1），会发现i==0，因此执行j++，j变成了n，发生越界！
+                if (i == 0) {
+                    j++;
+                    dir = -1;
+                } else if (j == n - 1) {
+                    i++;
+                    dir = -1;
+                } else {
+                    i--;
+                    j++;
+                }
+                 */
+                if (j == n - 1) {
+                    i++;
+                    dir = -1;
+                }else if (i == 0) { /**应该要先判断j==n-1，这么写肯定会报”索引越界异常“*/
+                    j++;
+                    dir = -1;
+                } else {
+                    i--;
+                    j++;
+                }
+            } else {
+                /*下面的判断顺序会导致类似错误“java.lang.ArrayIndexOutOfBoundsException: Index 2 out of bounds for length 2”
+                因为如果此时(i,j)来到左下角的位置（m-1，0），会发现j==0，因此执行i++，i变成了m，发生越界！
+                if (j == 0) {
+                    i++;
+                    dir = 1;
+                } else if (i == m - 1) {
+                    j++;
+                    dir = 1;
+                } else {
+                    i++;
+                    j--;
+                }
+                 */
+                if (i == m - 1) {
+                    j++;
+                    dir = 1;
+                }else if (j == 0) { /**应该先判断i==m-1，如果先判断j==0肯定会报”索引越界异常“*/
+                    i++;
+                    dir = 1;
+                } else {
+                    i++;
+                    j--;
+                }
+            }
+        }
+        return res;
+    }
+
+
     /*
      91. 解码方法
      一条包含字母 A-Z 的消息通过以下映射进行了 编码 ：
@@ -1578,12 +1645,17 @@ public class codetop_unskilled_6_10 {
                     }
                 }
             }
+            /*到了这里说明"以nums[i]结尾的最长子序列长度、数量"都知道了，因此下面尝试更新全局信息。
+                     【补充说明】
+                          写法1. 这里仅仅是更新的全局的”最长子序列长度“这个信息。所以出了双层for循环需要统计一下”这种长度递增子序列“的总数量
+                          写法2. 在双层for循环中，不仅仅更新longth、num数组的信息，同时更新所有的全局信息，见方法 findNumberOfLIS_
+             */
             //更新整个过程中遇到的“最长递增子序列的长度”。。经过内层的for循环会计算出i位置的dp值以及cnt值
             maxLen = Math.max(maxLen,dp[i]);
         }
         /*step3：遍历dp数组，如果nums[i]结尾的最长递增子序列的长度等于maxLen。
             说明：以nums[i]结尾的最长递增子序列的长度就是“整个数组的最长递增子序列长度”，因此需要将
-        以nums[i]结尾的最长递增子序列的种类数累加到res，这个种类数是多少呢？？就是cnt[i]！！*/
+        以nums[i]结尾的最长递增子序列的方案数累加到res，这个方案数是多少呢？？就是cnt[i]！！*/
         int res  =0;
         for (int i = 0; i < cnt.length; i++) {
             if (dp[i]==maxLen){
@@ -1694,7 +1766,7 @@ public class codetop_unskilled_6_10 {
     /**
      * 可以将空间优化到O(N),时间复杂度为O(n^2)
       【关键一句话】从最后一行倒着遍历；每一行内从前往后遍历
-      【建议的解法】见方法 minimumTotal_ （这样写 初始化 和 双层for循环计算过程 很清晰！）
+      【建议的解法】见方法 minimumTotal_ 或者 minimumTotal_own（这样写 初始化 和 双层for循环计算过程 很清晰！）
       【关键】需要从最后一行倒着遍历。最后返回dp[0]。原因解释————
           第m行的i位置能移动到第m+1行的i位置和i+1位置；第m行的i+1位置能移动到第m+1行的i+1位置和i+2位置。
           比如“第m行的i位置能移动到第m+1行的i位置和i+1位置”，此时如果是从第一行往下面的行遍历，dp[i]和dp[i+1]
@@ -1721,6 +1793,24 @@ public class codetop_unskilled_6_10 {
             List<Integer> curRow = triangle.get(i);
             for (int j = 0; j <= i; j++) {
                 dp[i] = Math.min(dp[i], dp[i - 1]) + curRow.get(j);
+            }
+        }
+        return dp[0];
+    }
+
+    public int minimumTotal_own(List<List<Integer>> triangle) {
+        int size = triangle.get(triangle.size() - 1).size();
+        int[] dp = new int[size];
+
+        /**自己写的代码，没有赋初始值，是有问题的。。。看看问题的表现是什么*/
+        for (int j = 0; j < size; j++) {
+            dp[j] = triangle.get(triangle.size() - 1).get(j);
+        }
+
+        for (int i = triangle.size()-2; i >=0; i--) {
+            for (int j = 0; j < triangle.get(i).size(); j++) {
+                int curVal = triangle.get(i).get(j);
+                dp[j] = Math.min(dp[j],dp[j+1]) + curVal;
             }
         }
         return dp[0];
@@ -1797,9 +1887,6 @@ public class codetop_unskilled_6_10 {
         }
         return ans;
     }
-
-
-
 
 
     /*207.课程表
@@ -2201,7 +2288,7 @@ public class codetop_unskilled_6_10 {
         可以成功的匹配空串。。。换言之只要从i=1开始，有一个位置不是*号，则后面的就不用看了，肯定的都是false，举个形象
         的例子，比如：s=”“,p="****3***"，则dp[0][5]、dp[0][6]、dp[0][7]....都是false，也就是说从3位置（index=4）开
         始，后面的就不能匹配成功空串了
-            第一列的初始化————第一列表示p是空串，但是s是有数据的，此时都不能匹配成功。因为匹配串是空的。。。由于boolean数
+            第一列的初始化————第一列表示p是空串，但是s是有数据的，此时压根就不可能匹配成功。因为匹配串是空的。。。由于boolean数
         组的默认值就是false，因此第一列的初始化可以省略
         * */
         for (int i = 1; i <= n; i++) {
