@@ -1098,8 +1098,11 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
 
-    //数组中的逆序对
+    /*LCR 170 数组中的逆序对总数
+    在股票交易中，如果前一天的股价高于后一天的股价，则可以认为存在一个「交易逆序对」。请设计一个程序，输入一段时间内的股票交易记录 record，返回其中存在的「交易逆序对」总数。
+     */
     /**
+     【强烈建议】使用写法 reversePairs1
      * 逆序对的关键：满足 i < j 且 nums[i] > nums[j] 的数对。在归并时，左半部分 [left..mid] 和右半部
      * 分 [mid+1..right] 都已经是有序的。统计逆序对的关键就在 合并过程中。
      */
@@ -1112,7 +1115,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      */
     /*写法1：官方的写法*/
     public int reversePairs(int[] nums) {
-        if (nums == null || nums.length == 0) return 0;
+        if (nums == null || nums.length <= 1) return 0;
         int[] temp = new int[nums.length];
         return mergeSortAndCount(nums, 0, nums.length - 1, temp);
     }
@@ -1135,7 +1138,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         int cur = left;
         int curCount = 0;
         while (p1 <= mid && p2 <= right) {
-            if (nums[p1] < nums[p2]) {
+            if (nums[p1] <= nums[p2]) { /**err：只有“nums[p1]>nums[p2]”严格大于的时候才算逆序对！！“严格大于”很关键，因此这里需要带等于*/
                 temp[cur++] = nums[p1++];
             } else {
                 /**
@@ -1179,8 +1182,8 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      修改的res仅仅是自己拷贝的那一份，reversePairs方法中定义的res并不会发生改变！！
         修改的思路分为三种（这三种思路不仅仅体现在这里，在回溯的题目、二叉树递归的题目中也有体现）————
             第一种：定义全局int变量来更新；
-            第二种：扩展的方法直接返回int类型；
-            第三种：由于java是值传递，因此考虑传递引用类型（比如这个题的话可以使用int数组）
+            第二种：扩展的方法直接返回int类型；（见方法 reversePairs1）
+            第三种：由于java是值传递，因此考虑传递引用类型（比如这个题的话可以使用int数组,见方法 reversePairs2）
      */
 //        mergerSort(record,0,record.length-1,res);
 //        return res;
@@ -1217,16 +1220,16 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     /*修改写法2：*/
     public int reversePairs1(int[] record) {
-        return mergeSort(record, 0, record.length - 1);
+        if(record==null||record.length<=1) return 0;
+        return mergeSort(record,0,record.length-1);
     }
 
     private int mergeSort(int[] record, int left, int right) {
-        if (left >= right) return 0;
-        int mid = left + (right - left) / 2;
-        int res = mergeSort(record, left, mid)
-                + mergeSort(record, mid + 1, right)
-                + merge(record, left, mid, right);
-        return res;
+        if (left>=right) return 0;
+        int mid = left+(right-left)/2;
+        int leftNum = mergeSort(record, left, mid);
+        int rightNum = mergeSort(record, mid + 1, right);
+        return leftNum+rightNum+merge(record,left,mid,right);
     }
 
     private int merge(int[] record, int left, int mid, int right) {
@@ -1234,7 +1237,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         int index = 0, count = 0;
         int p1 = left, p2 = mid + 1;
         while (p1 <= mid && p2 <= right) {
-            if (record[p1] > record[p2]) {
+            if (record[p1] > record[p2]) { /**"严格大于"时才计算逆序对。*/
                 count += (mid - p1 + 1);
                 tmp[index++] = record[p2++];
             } else {
@@ -1247,7 +1250,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         for (int i = 0; i < tmp.length; i++) record[left + i] = tmp[i];
         return count;
     }
-
 
     /*修改写法3：引用传递*/
     public int reversePairs2(int[] record) {
@@ -1280,6 +1282,66 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         while (p2 <= right) tmp[index++] = record[p2++];
 
         for (int i = 0; i < tmp.length; i++) record[left + i] = tmp[i];
+    }
+
+    /**全局变量的写法。
+        思路：使用归并排序数组，过程中记录逆序对数量~
+     */
+    /**reversePairs1 和 reversePairs3 两种写法的对比
+     【两种写法的比较】
+     维度	    你的这份写法（局部统计）	                    上一份写法（全局变量）
+     计数方式	每层递归返回当前区间的逆序对数，累加子问题的结果	使用全局变量 res 在递归过程中累积计数
+     函数返回值	每次 mergeSort 都返回 int	mergeSort           无返回值，只更新全局变量
+     变量作用域	局部统计，函数调用独立，不依赖全局状态	        依赖全局变量 res（共享状态）
+     代码可复用性	✅ 高（更纯粹，无副作用）	                    ⚠️ 较低（依赖全局变量）
+     性能表现	⚙️ 理论上一样（O(n log n)）	                ⚙️ 理论上一样（O(n log n)）
+     微观性能差异	略慢（多一次返回值相加）	                    略快（直接累加）
+
+     【可维护性的比较】
+     特性	    全局变量写法	        返回值写法
+     线程安全	❌ 不安全（共享状态）	✅ 安全（无共享）
+     逻辑清晰	中等（依赖外部状态）	✅ 更清晰（函数自洽）
+     调试便利	较难（全局状态不直观）	✅ 容易（局部调试独立）
+     扩展性	    一般	✅               高（纯函数式）
+     */
+    int resReversePairs3 = 0;
+    public int reversePairs3(int[] record) {
+        if (record.length<=1) return 0;
+        mergeSort11(record,0,record.length-1);
+        return resReversePairs3;
+    }
+
+    private void mergeSort11(int[] record, int left, int right) {
+        if (left>=right) return;
+        int mid = left+(right-left)/2;
+        mergeSort11(record,left,mid);
+        mergeSort11(record,mid+1,right);
+        merge111(record,left,mid,right);
+    }
+
+    /**
+     【关键】只有在两边数组合并的时候才会涉及到逆序对，因此仅仅在”合并两半“的时候统计逆序对的数量，更新全局的答案应该就是ok的
+     */
+    private void merge111(int[] record, int left, int mid, int right) {
+        int[] tmp = new int[right - left + 1];
+        int cur = 0;
+        int i = left,j = mid+1;
+        while (i<=mid&&j<=right){
+            if (record[i]>record[j]){
+                tmp[cur++] = record[j++];
+                resReversePairs3 += (mid-i+1);
+            }else {
+                tmp[cur++]  =record[i++];
+            }
+        }
+        /**下面的两个步骤中，还涉及res的更新吗？？？
+         TODO：这里的思想也有点绕。。得看”站在什么角度“思考问题。有点类似于”有效三角形的数量“这个题目
+         */
+        while (i<=mid) tmp[cur++]=record[i++];
+        while (j<=right) tmp[cur++]=record[j++];
+        for(int k=0;k<tmp.length;k++){
+            record[left+k] = tmp[k];
+        }
     }
 
 

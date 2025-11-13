@@ -174,112 +174,6 @@ public class All6_10_template {
      * ===================================7=====================================
      * ===================================7=====================================
      */
-
-    /*LCR 170 数组中的逆序对总数
-    在股票交易中，如果前一天的股价高于后一天的股价，则可以认为存在一个「交易逆序对」。请设计一个程序，输入一段时间内的股票交易记录 record，返回其中存在的「交易逆序对」总数。
-     */
-    /**
-     【两种写法的比较】
-     维度	    你的这份写法（局部统计）	                    上一份写法（全局变量）
-     计数方式	每层递归返回当前区间的逆序对数，累加子问题的结果	使用全局变量 res 在递归过程中累积计数
-     函数返回值	每次 mergeSort 都返回 int	mergeSort           无返回值，只更新全局变量
-     变量作用域	局部统计，函数调用独立，不依赖全局状态	        依赖全局变量 res（共享状态）
-     代码可复用性	✅ 高（更纯粹，无副作用）	                    ⚠️ 较低（依赖全局变量）
-     性能表现	⚙️ 理论上一样（O(n log n)）	                ⚙️ 理论上一样（O(n log n)）
-     微观性能差异	略慢（多一次返回值相加）	                    略快（直接累加）
-
-     【可维护性的比较】
-     特性	    全局变量写法	        返回值写法
-     线程安全	❌ 不安全（共享状态）	✅ 安全（无共享）
-     逻辑清晰	中等（依赖外部状态）	✅ 更清晰（函数自洽）
-     调试便利	较难（全局状态不直观）	✅ 容易（局部调试独立）
-     扩展性	    一般	✅               高（纯函数式）
-     */
-    int res = 0;
-    public int reversePairs(int[] record) {
-        if (record.length<=1) return 0;
-        mergeSort11(record,0,record.length-1);
-        return res;
-    }
-
-    private void mergeSort11(int[] record, int left, int right) {
-        if (left>=right) return;
-        int mid = left+(right-left)/2;
-        mergeSort11(record,left,mid);
-        mergeSort11(record,mid+1,right);
-        merge111(record,left,mid,right);
-    }
-
-    /**
-     【关键】只有在两边数组合并的时候才会涉及到逆序对，因此仅仅在”合并两半“的时候统计逆序对的数量，更新全局的答案应该就是ok的
-     */
-    private void merge111(int[] record, int left, int mid, int right) {
-        int[] tmp = new int[right - left + 1];
-        int cur = 0;
-        int i = left,j = mid+1;
-        while (i<=mid&&j<=right){
-            if (record[i]>record[j]){
-                tmp[cur++] = record[j++];
-                res += (mid-i+1);
-            }else {
-                tmp[cur++]  =record[i++];
-            }
-        }
-        /**下面的两个步骤中，还涉及res的更新吗？？？
-         TODO：这里的思想也有点绕。。得看”站在什么角度“思考问题。有点类似于”有效三角形的数量“这个题目
-         */
-        while (i<=mid) tmp[cur++]=record[i++];
-        while (j<=right) tmp[cur++]=record[j++];
-        for(int k=0;k<tmp.length;k++){ /**是不是错误的原因在于这里？？？*/
-            record[left+k] = tmp[k];
-        }
-    }
-
-    /**
-     下面的解法是使用”方法带返回值“的方式实现
-     **/
-    public int reversePairs_(int[] record) {
-        if(record==null||record.length<=1) return 0;
-        return reversePairs_(record,0,record.length-1);
-    }
-
-    private int reversePairs_(int[] record, int left, int right) {
-        if (left>=right) return 0;
-        int mid = left+(right-left)/2;
-        int leftNum = reversePairs_(record, left, mid);
-        int rightNum = reversePairs_(record, mid + 1, right);
-        return leftNum+rightNum+mergeTwo1(record,left,mid,right);
-    }
-
-    private int mergeTwo1(int[] record, int left, int mid, int right) {
-        int[] tmp = new int[right - left + 1];
-        int res =0;
-        int index = 0;
-        int i = left,j = mid+1;
-        while (i<=mid&&j<=right){
-            if (record[i]>record[j]){
-                res += (mid-i+1);
-                tmp[index++] = record[j++];
-            }else {
-                tmp[index++] = record[i++];
-            }
-        }
-        while (i<=mid) tmp[index++] = record[i++];
-        while (j<=right) tmp[index++] = record[j++];
-
-        for (int k = 0; k < tmp.length; k++) {
-            record[left+k] = tmp[k];
-        }
-
-        return res;
-    }
-
-    private void swapaa(int[] record, int l, int r) {
-        int tmp = record[l];
-        record[l] = record[r];
-        record[r] = tmp;
-    }
-
     /*LCR 143. 子结构判断
     给定两棵二叉树 tree1 和 tree2，判断 tree2 是否以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
 注意，空树 不会是以 tree1 的某个节点为根的子树具有 相同的结构和节点值 。
@@ -569,75 +463,6 @@ public class All6_10_template {
      * ==============================9==============================
      * ==============================9==============================
      */
-    /*44.通配符匹配
-    给你一个输入字符串 (s) 和一个字符模式 (p) ，请你实现一个支持 '?' 和 '*' 匹配规则的通配符匹配：
-    '?' 可以匹配任何单个字符。
-    '*' 可以匹配任意字符序列（包括空字符序列）。
-    判定匹配成功的充要条件是：字符模式必须能够 完全匹配 输入字符串（而不是部分匹配）。
-     */
-    /**两个一维数组 滚动的写法*/
-    public boolean isMatch_(String s, String p) {
-        int m = s.length(),n = p.length();
-        boolean[] prev = new boolean[n + 1];
-        boolean[] cur = new boolean[n + 1];
-        prev[0] = true;
-        for (int i = 1; i <= n; i++) {
-            prev[i] = prev[i-1]&&p.charAt(i-1)=='*';
-        }
-
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
-                char sc = s.charAt(i - 1);
-                char pc = p.charAt(j - 1);
-                if (pc==sc||pc=='?'){
-                    cur[j] = prev[j-1];
-                }else if (pc=='*'){
-                    /**验证下面的两种写法有没有区别*/
-//                    cur[j] |= cur[j-1];
-//                    cur[j] |= prev[j];
-                    cur[j] = cur[j-1] || prev[j];
-                }else {
-                    cur[j] = false; /**11.13新补充了这个else分支*/
-                }
-            }
-            boolean[] tmp = prev;
-            prev = cur;
-            cur = tmp;
-        }
-        return prev[n];
-    }
-
-    /**一行数组的写法 和 ”编辑距离“的写法是一样的。3处重点的代码再方法中注释*/
-    public boolean isMatch__(String s, String p) {
-        int m = s.length(),n = p.length();
-        boolean[] dp = new boolean[n + 1];
-        dp[0] = true;
-        for (int i = 1; i <= n; i++) {
-            dp[i] = dp[i-1]&&p.charAt(i-1)=='*';
-        }
-
-        for (int i = 1; i <= m; i++) {
-            /*重点代码1：再进入内层for循环之前使用prev记录dp[0]；然后再更新dp[0]*/
-            boolean prev = dp[0];
-            dp[0] = false; //第一列除了dp[0][0]都是false，因此无脑赋值
-            for (int j = 1; j <= n; j++) {
-                char sc = s.charAt(i - 1);
-                char pc = p.charAt(j - 1);
-                /*重点代码2：在更新dp[j]之前需要使用tmp变量记录*/
-                boolean tmp = dp[j];
-                if (sc==pc||pc=='?'){
-                    dp[j] |= prev;
-                } else if (pc=='*') {
-                    dp[j] |= dp[j-1];
-                }
-                /*重点代码3：本轮计算完成后需要把tmp重新赋值回prev*/
-                prev = tmp;
-            }
-        }
-        return dp[n];
-    }
-
-
     /*887. 鸡蛋掉落
     给你 k 枚相同的鸡蛋，并可以使用一栋从第 1 层到第 n 层共有 n 层楼的建筑。
 已知存在楼层 f ，满足 0 <= f <= n ，任何从 高于 f 的楼层落下的鸡蛋都会碎，从 f 楼层或比它低的楼层落下的鸡蛋都不会破。
@@ -710,6 +535,7 @@ public class All6_10_template {
 
     如果不存在这样的子字符串，则返回 0。
      */
+    /**下面的代码是错误的！！！*/
     public int longestSubstring(String s, int k) {
         return dfsss(s,k,0,s.length());
     }
@@ -748,7 +574,7 @@ public class All6_10_template {
         求需要多少分钟，才能让所有新鲜橘子都腐烂。
         如果不可能让所有橘子都腐烂，返回 -1。
      */
-    /**验证一下下面的解法对不对*/
+    /**验证一下下面的解法对不对，，是错误的*/
     int ressss = 0;
     public int orangesRotting(int[][] grid) {
         LinkedList<int[]> queue = new LinkedList<>();
@@ -786,4 +612,25 @@ public class All6_10_template {
             }
         }
     }
+
+//    private void dfsOrangesRottings(int[][] grid, LinkedList<int[]> queue, int cnt) {
+//        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+//        while (!queue.isEmpty()){
+//            int size = queue.size();
+//            boolean hasRot = false;
+////            ressss++;
+//            for (int i = 0; i < size; i++) {
+//                int[] cur = queue.poll();
+//                for (int[] dir:dirs){
+//                    int x = dir[0]+cur[0],y = dir[1]+cur[1];
+//                    if (x>0&&x<grid.length&&y>0&&y<grid[0].length&&grid[x][y]==1){
+//                        grid[x][y] = 2;
+//                        hasRot = true;
+//                        queue.offer(new int[]{x,y});
+//                    }
+//                }
+//            }
+//            if (hasRot) ressss++;
+//        }
+//    }
 }
