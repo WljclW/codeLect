@@ -2,6 +2,7 @@ package topcodeReview;
 
 import leecode_Debug.top100.TreeNode;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -86,7 +87,7 @@ public class All6_10_template {
         int ans = 0;
         while (left<=right){
             int mid = left+(right-left)/2;
-            if (nums[mid]<nums[right]){
+            if (nums[mid]<nums[right]){ /**是不是因为这里少了等于？？还是说这个题ans必须标记最小值，标记最小值的索引就是错误的写法*/
                 ans = mid;
                 right = mid-1;
             }else {
@@ -98,20 +99,14 @@ public class All6_10_template {
 
     /**下面的代码确是对的，为什么？？看着也没啥区别*/
     public int findMin_(int[] nums) {
-
-        int min = nums[nums.length-1];
-
+        int min = nums[nums.length - 1];
         int left = 0, right = nums.length - 1;
-        while(left <= right){
+        while (left <= right) {
             int mid = left + (right - left) / 2;
-
-
-            if(nums[mid] < min){
+            if (nums[mid] < min) {
                 min = nums[mid];
                 right = mid - 1;
-            }
-
-            else {
+            } else {
                 left = mid + 1;
             }
         }
@@ -183,6 +178,23 @@ public class All6_10_template {
     /*LCR 170 数组中的逆序对总数
     在股票交易中，如果前一天的股价高于后一天的股价，则可以认为存在一个「交易逆序对」。请设计一个程序，输入一段时间内的股票交易记录 record，返回其中存在的「交易逆序对」总数。
      */
+    /**
+     【两种写法的比较】
+     维度	    你的这份写法（局部统计）	                    上一份写法（全局变量）
+     计数方式	每层递归返回当前区间的逆序对数，累加子问题的结果	使用全局变量 res 在递归过程中累积计数
+     函数返回值	每次 mergeSort 都返回 int	mergeSort           无返回值，只更新全局变量
+     变量作用域	局部统计，函数调用独立，不依赖全局状态	        依赖全局变量 res（共享状态）
+     代码可复用性	✅ 高（更纯粹，无副作用）	                    ⚠️ 较低（依赖全局变量）
+     性能表现	⚙️ 理论上一样（O(n log n)）	                ⚙️ 理论上一样（O(n log n)）
+     微观性能差异	略慢（多一次返回值相加）	                    略快（直接累加）
+
+     【可维护性的比较】
+     特性	    全局变量写法	        返回值写法
+     线程安全	❌ 不安全（共享状态）	✅ 安全（无共享）
+     逻辑清晰	中等（依赖外部状态）	✅ 更清晰（函数自洽）
+     调试便利	较难（全局状态不直观）	✅ 容易（局部调试独立）
+     扩展性	    一般	✅               高（纯函数式）
+     */
     int res = 0;
     public int reversePairs(int[] record) {
         if (record.length<=1) return 0;
@@ -198,6 +210,9 @@ public class All6_10_template {
         merge111(record,left,mid,right);
     }
 
+    /**
+     【关键】只有在两边数组合并的时候才会涉及到逆序对，因此仅仅在”合并两半“的时候统计逆序对的数量，更新全局的答案应该就是ok的
+     */
     private void merge111(int[] record, int left, int mid, int right) {
         int[] tmp = new int[right - left + 1];
         int cur = 0;
@@ -218,6 +233,51 @@ public class All6_10_template {
         for(int k=0;k<tmp.length;k++){ /**是不是错误的原因在于这里？？？*/
             record[left+k] = tmp[k];
         }
+    }
+
+    /**
+     下面的解法是使用”方法带返回值“的方式实现
+     **/
+    public int reversePairs_(int[] record) {
+        if(record==null||record.length<=1) return 0;
+        return reversePairs_(record,0,record.length-1);
+    }
+
+    private int reversePairs_(int[] record, int left, int right) {
+        if (left>=right) return 0;
+        int mid = left+(right-left)/2;
+        int leftNum = reversePairs_(record, left, mid);
+        int rightNum = reversePairs_(record, mid + 1, right);
+        return leftNum+rightNum+mergeTwo1(record,left,mid,right);
+    }
+
+    private int mergeTwo1(int[] record, int left, int mid, int right) {
+        int[] tmp = new int[right - left + 1];
+        int res =0;
+        int index = 0;
+        int i = left,j = mid+1;
+        while (i<=mid&&j<=right){
+            if (record[i]>record[j]){
+                res += (mid-i+1);
+                tmp[index++] = record[j++];
+            }else {
+                tmp[index++] = record[i++];
+            }
+        }
+        while (i<=mid) tmp[index++] = record[i++];
+        while (j<=right) tmp[index++] = record[j++];
+
+        for (int k = 0; k < tmp.length; k++) {
+            record[left+k] = tmp[k];
+        }
+
+        return res;
+    }
+
+    private void swapaa(int[] record, int l, int r) {
+        int tmp = record[l];
+        record[l] = record[r];
+        record[r] = tmp;
     }
 
     /*LCR 143. 子结构判断
@@ -315,6 +375,8 @@ public class All6_10_template {
         }
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
+                /**这里错了！！！对于matrix中的每一个位置，需要使用“longestIncreasingPath(int[][], int[][], int, int)”计算
+                 该位置的最长递增长度*/
                 longestIncreasingPath(matrix,memo,0,0);
             }
         }
@@ -333,6 +395,108 @@ public class All6_10_template {
         return memo[i][j];
     }
 
+    int[][] dirs_ = {{1,0},{-1,0},{0,1},{0,-1}};
+    int res_ = 0;
+    public int longestIncreasingPath_(int[][] matrix) {
+        int m = matrix.length,n = matrix[0].length;
+        int[][] memo = new int[m][n];
+        for (int[] row:memo){
+            Arrays.fill(row,-1);
+        }
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                dfs(matrix,memo,i,j);
+            }
+        }
+        return res_;
+    }
+
+    private int dfs(int[][] matrix, int[][] memo, int i, int j) {
+        if (memo[i][j]!=-1) return memo[i][j];
+        memo[i][j] = 1;
+        for (int[] cur:dirs_){
+            int x = cur[0]+i,y = cur[1]+j;
+            /**chatgpt说这里应该检查“i,j”是否越界，而不是检查“x,y”是不是越界，应该是错误的*/
+            if (x>0&&x<matrix.length&&j>0&&j<matrix[0].length&&matrix[i][j]<matrix[x][y]){
+                memo[i][j] = Math.max(memo[i][j],memo[x][y]+1);
+            }
+        }
+        res_ = Math.max(res_,memo[i][j]);
+        return memo[i][j];
+    }
+
+
+    int[][] direct = {{1,0},{-1,0},{0,1},{0,-1}};
+    public int longestIncreasingPath___(int[][] matrix) {
+        int m = matrix.length,n = matrix[0].length;
+        int[][] memo = new int[m][n];
+        int res = 0;
+        for (int[] cur:memo){
+            Arrays.fill(cur,-1);
+        }
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                /**dfs函数有返回值，在主方法中更新res*/
+                res = Math.max(res,dfsLongestIncreasingPath(matrix,memo,i,j));
+            }
+        }
+        return res;
+    }
+
+    private int dfsLongestIncreasingPath(int[][] matrix, int[][] memo, int i, int j) {
+        if (memo[i][j]!=-1) return memo[i][j];
+        memo[i][j] = 1;
+        for (int[] cur:direct){
+            int x = i+cur[0],y = j+cur[1];
+            if (x>0&&x<matrix.length&&j>0&&j<matrix[0].length&&matrix[x][y]>matrix[i][j]){
+                memo[i][j] = Math.max(memo[i][j],dfsLongestIncreasingPath(matrix,memo,x,y));
+            }
+        }
+        return memo[i][j];
+    }
+
+
+    /**
+     * 329能不能修改成“动态规划”的版本呢？？确认一下下面的版本有没有问题!!
+     【思想】
+        1. “递归、回溯遍历”计算答案的解法 改成 “动态规划”的解法，最最最关键、核心的问题（或者说前提条件）————确保每到达
+     一个位置，所有它依赖位置的答案已经计算出来了！！（这一点很重要，要求熟记于心）但是前提是对于任何一个节点它的依赖位置
+     是明确的。
+        2. 换到此题，每一个位置（i，j）可能依赖于四周的四个位置，从这个角度看，是不能进行dp的，没有任何一种遍历方式能满足
+     这个二要求。。。下面的longestIncreasingPath__是基于这样的思想，任何一个位置的dp。一定依赖于比他小的位置的dp，因此
+     在计算所有位置的dp时，先对matrix的所有值排序，保证计算顺序
+           ——————因此，DP的写法中，重要的是”所有位置计算顺序的确定“。这种“计算顺序”，可能是像“编辑距离”、“爬楼梯”等在二
+     维表中明确的位置依赖关系，也可能是像这个题一样在二维表中无法确定明确的依赖位置，需要结合matrix该位置的值来判断
+     */
+    public int longestIncreasingPath__(int[][] matrix) {
+        int m = matrix.length,n = matrix[0].length;
+        List<int[]> cells = new ArrayList<>();
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                cells.add(new int[]{i, j});
+        /*cells中添加所有的位置数组；这一步按照matrix中该位置的值进行排序。
+        因此最终cells中的数组，就是matrix元素升序排序后的位置顺序
+        */
+        cells.sort((a,b) -> matrix[a[0]][a[1]] - matrix[b[0]][b[1]]);
+
+        int[][] dp = new int[m][n];
+        int ans = 1;
+        for (int[] c : cells) {
+            int i = c[0], j = c[1];
+            dp[i][j] = 1;
+            for (int[] dir : dirs) {
+                int x = i + dir[0], y = j + dir[1];
+                if (x >= 0 && x < m && y >= 0 && y < n && matrix[x][y] < matrix[i][j]) {
+                    dp[i][j] = Math.max(dp[i][j], dp[x][y] + 1);
+                }
+            }
+            ans = Math.max(ans, dp[i][j]);
+        }
+        return ans;
+    }
+
+
 
 
         /*450.删除二叉搜索树中的节点
@@ -343,9 +507,27 @@ public class All6_10_template {
     首先找到需要删除的节点；
     如果找到了，删除它。
      */
-//    public TreeNode deleteNode(TreeNode root, int key) {
-//
-//    }
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (root == null) return root;
+
+        if (key < root.val) {
+            return deleteNode(root.left, key);
+        } else if (key > root.val) {
+            return deleteNode(root.right, key);
+        } else {
+            if (root.left == null) return root.right;
+            if (root.right == null) return root.left;
+
+            TreeNode minNode = findMin(root.right);
+            root.val = minNode.val;
+            return deleteNode(root.right, minNode.val);
+        }
+    }
+
+    private TreeNode findMin(TreeNode root) {
+        while (root.left!=null) root = root.left;
+        return root;
+    }
 
 
     /*
@@ -356,9 +538,30 @@ public class All6_10_template {
 '*' 匹配零个或多个前面的那一个元素
 所谓匹配，是要涵盖 整个 字符串 s 的，而不是部分字符串。
      */
-//    public boolean isMatch(String s, String p) {
-//
-//    }
+    public boolean isMatch(String s, String p) {
+        int m = s.length(),n = p.length();
+        boolean[][] dp = new boolean[m + 1][n + 1];
+        dp[0][0] = true;
+        for (int i = 2; i <= n; i++) {
+            dp[0][i] = dp[0][i-2]&&p.charAt(i-1)=='*';
+        }
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char sc = s.charAt(i - 1);
+                char pc = p.charAt(j - 1);
+                if (sc==pc||pc=='.'){
+                    dp[i][j] = dp[i-1][j-1];
+                } else if (pc == '*') {
+                    char pcPrev = p.charAt(j - 2);
+                    dp[i][j] = dp[i][j-2];
+                    if (pcPrev==sc){ /**这里少考虑了 pcPrev 是字符‘。’的情况，对不对？？验证一下*/
+                        dp[i][j] |= dp[i-1][j];
+                    }
+                }
+            }
+        }
+        return dp[m][n];
+    }
     /**
      * ==============================9==============================
      * ==============================9==============================
@@ -366,18 +569,6 @@ public class All6_10_template {
      * ==============================9==============================
      * ==============================9==============================
      */
-    /*
-    LCR 187. 破冰游戏
-社团共有 num 位成员参与破冰游戏，编号为 0 ~ num-1。成员们按照编号顺序围绕圆桌而坐。社长抽取一个数字 target，从 0 号成员起开始计数，排在第 target 位的成员离开圆桌，且成员离开后从下一个成员开始计数。请返回游戏结束时最后一位成员的编号。
-     */
-    public int iceBreakingGame(int num, int target) {
-        int res = 0;
-        for (int i = 1; i < num; i++) {
-            res = (res+1+target)%i;
-        }
-        return res;
-    }
-
     /*44.通配符匹配
     给你一个输入字符串 (s) 和一个字符模式 (p) ，请你实现一个支持 '?' 和 '*' 匹配规则的通配符匹配：
     '?' 可以匹配任何单个字符。
@@ -401,9 +592,12 @@ public class All6_10_template {
                 if (pc==sc||pc=='?'){
                     cur[j] = prev[j-1];
                 }else if (pc=='*'){
+                    /**验证下面的两种写法有没有区别*/
 //                    cur[j] |= cur[j-1];
 //                    cur[j] |= prev[j];
                     cur[j] = cur[j-1] || prev[j];
+                }else {
+                    cur[j] = false; /**11.13新补充了这个else分支*/
                 }
             }
             boolean[] tmp = prev;
@@ -490,20 +684,17 @@ public class All6_10_template {
 //        boolean[][] dp = new boolean[m + 1][n + 1];
 //        dp[0][0] = true;
 //        for (int i = 1; i <= n; i++) {
-//            dp[0][i] = dp[0][i-1] && s2.substring(i-1,i).equals(s3.substring(i-1,i));
+//            dp[0][i] = dp[0][i-1]&&s2.charAt(i-1)==s3.charAt(i-1);
 //        }
-//        for (int i = 0; i <= m; i++) {
-//            dp[i][0] = dp[i-1][0] && s1.substring(i-1,i).equals(s3.substring(i-1,i));
+//        for (int i = 1; i <= m; i++) {
+//            dp[i][0] = dp[i-1][0]&&s1.charAt(i-1)==s3.charAt(i-1);
 //        }
 //
 //        for (int i = 1; i <= m; i++) {
 //            for (int j = 1; j <= n; j++) {
 //                char c1 = s1.charAt(i - 1);
-//                char c2 = s2.charAt(i - 1);
-//                char c3 = s3.charAt(i + j - 2);
-//                if (c1==c3||c2==c3){
-//                    dp[i][j] |= dp[]
-//                }
+//                char c2 = s2.charAt(j - 1);
+//
 //            }
 //        }
 //    }
@@ -519,7 +710,80 @@ public class All6_10_template {
 
     如果不存在这样的子字符串，则返回 0。
      */
-//    public int longestSubstring(String s, int k) {
-//
-//    }
+    public int longestSubstring(String s, int k) {
+        return dfsss(s,k,0,s.length());
+    }
+
+    /*作用：返回[left，right)这段子串满足题目要求的最长合法子串*/
+    private int dfsss(String s, int k, int left, int right) {
+        if (right - left < k) return 0; /*这一步相当于剪枝优化*/
+
+        int[] flags = new int[26];
+        for (int i = left; i < right; i++) {
+            flags[s.charAt(left) - 'a']++;
+        }
+        /*遍历[left,right)的所有字符————
+            如果某位置的字符出现的次数小于k，说明该位置的字符不可能在结果中，需要递归它的左右两半，返回左右两半的最大值
+        */
+        for (int i = left; i < right; i++) {
+            /**只研究出现次数不够k的字母*/
+            if (flags[s.charAt(i) - 'a'] < k) {
+                /*下面两行是跳过所有不足K的字符。相当于回溯的剪枝————因此没有的话整体的逻辑也是对的*/
+                int j = i + 1;
+                while (j < right && flags[s.charAt(j) - 'a'] < k) j++;
+                return Math.max(dfsss(s, k, left, i), dfsss(s, k, j, right));
+            }
+        }
+        return right - left;
+    }
+
+
+    /*994 腐烂的橘子 (Rotting Oranges)
+    在一个 m x n 的网格中，每个单元格有三种值：
+        0 表示空格
+        1 表示新鲜橘子
+        2 表示腐烂橘子
+
+        每过 1 分钟，所有腐烂橘子都会让上下左右四个方向的新鲜橘子变腐烂。
+        求需要多少分钟，才能让所有新鲜橘子都腐烂。
+        如果不可能让所有橘子都腐烂，返回 -1。
+     */
+    /**验证一下下面的解法对不对*/
+    int ressss = 0;
+    public int orangesRotting(int[][] grid) {
+        LinkedList<int[]> queue = new LinkedList<>();
+        int cnt  =0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j]==2){
+                    queue.offer(new int[]{i,j});
+                } else if (grid[i][j] == 1) {
+                    cnt++;
+                }
+            }
+        }
+        /**由于 dfsOrangesRottings 中并不会递归的调用，因此这里 dfsOrangesRottings的逻辑 直接写在 方
+         法orangesRotting内就可以*/
+        dfsOrangesRottings(grid,queue,cnt);
+        return ressss;
+    }
+
+    private void dfsOrangesRottings(int[][] grid, LinkedList<int[]> queue, int cnt) {
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+        while (cnt>0&&!queue.isEmpty()){
+            int size = queue.size();
+            ressss++;
+            for (int i = 0; i < size; i++) {
+                int[] cur = queue.poll();
+                for (int[] dir:dirs){
+                    int x = dir[0]+cur[0],y = dir[1]+cur[1];
+                    if (x>0&&x<grid.length&&y>0&&y<grid[0].length&&grid[x][y]==1){
+                        cnt--;
+                        grid[x][y] = 2;
+                        queue.offer(new int[]{x,y});
+                    }
+                }
+            }
+        }
+    }
 }
