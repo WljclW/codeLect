@@ -579,6 +579,62 @@ public class codetop_unskilled_6_10 {
         return true;
     }
 
+    public boolean isCompleteTree__(TreeNode root) {
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        boolean hasNull = false;
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode cur = queue.poll();
+            if (cur == null) {
+                hasNull = true;
+            } else {
+                if (hasNull) return false;
+                queue.offer(cur.left);
+                queue.offer(cur.right);
+            }
+        }
+        return true;
+    }
+
+    /*写法2：不使用if-else*/
+    public boolean isCompleteTree1(TreeNode root) {
+        if (root == null) return true;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        boolean hasNull = false;
+        while (!queue.isEmpty()) {
+            TreeNode cur = queue.poll();
+            if (cur == null) {
+                hasNull = true;
+                continue;
+            }
+            if (hasNull) {
+                return false;
+            }
+            queue.offer(cur.left);
+            queue.offer(cur.right);
+        }
+        return true;
+    }
+
+
+    /*写法3：*/
+    public boolean isCompleteTree2(TreeNode root) {
+        if (root==null) return true;
+        boolean hasNull = false;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            /**这种类型的题目并不需要关注某一层有多少节点，只要queue不是空就进行循环即可*/
+            TreeNode cur = queue.poll();
+            if (cur==null) hasNull = true;
+            if (hasNull&&cur!=null) return false;
+            queue.offer(cur.left);
+            queue.offer(cur.right);
+        }
+        return true;
+    }
+
     /*LCR 155. 将二叉搜索树转化为排序的双向链表
 将一个 二叉搜索树 就地转化为一个 已排序的双向循环链表 。
 对于双向循环列表，你可以将左右孩子指针作为双向循环链表的前驱和后继指针，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
@@ -2420,20 +2476,21 @@ public class codetop_unskilled_6_10 {
      */
     /**【多源BFS】
      【思想】整体的思想类似于力扣”课程表“。。。。。这种题目往往需要使用队列，并且整体的思路类似如下：
-            step1：把满足某种要求的位置（一维 或者 二维）入队列。条件：这些位置往往是不需要额外操作就能到达的位置，举个
-        例子，比如”课程表“中没有前置课程的课程即入度为0的课程、再比如这个题目中腐烂的橘子（不需要额外的操作即可进行扩散）
+            step1：把满足某种要求的位置（一维索引 或者 二维位置）入队列。条件：这些位置往往是不需要额外操作就能到达的位
+        置，举个例子，比如”课程表“中没有前置课程的课程即入度为0的课程、再比如这个题目中腐烂的橘子（不需要额外的操作即可进
+        行扩散）
             step2：①只要满足某个要求，就不断的从队列弹出东西。举例子：比如”课程表“题目中只要队列中还有东西即当前可以直接
-        学习的课程（这些课程满足要么它没有前置课程，要么它所有的前置课程已经学习完成）；再比如本题中只要队列不为空（即还有
-        腐烂的橘子） 并且 fresh>0（即还有新鲜的橘子），就不停的弹出元素进行扩散腐烂过程。
+        学习的课程（这些课程满足要么它没有前置课程，要么它所有的前置课程已经学习完成）；再比如本题中只要队列不为空，就不停的
+        弹出元素进行扩散腐烂过程。
                   ②操作①以后会发现某些位置变得也符合要求了，因此加入到队列。比如：”课程表“题目中某一个课程的所有前置课
         程都学习完成了，该课程加入到队列。再比如这个题中某个位置的橘子由不腐烂变成腐烂了，该位置加入到队列（下一轮就可以从
-        这个位置向四周感染了）。
+        这个位置向四周继续感染了）。
      */
     public int orangesRotting(int[][] grid) {
         int m = grid.length, n = grid[0].length;
         LinkedList<int[]> queue = new LinkedList<>();
         int fresh = 0;
-        /*step1：包括2个内容，一是把所有腐烂的位置添加到queue（这种思想类似于”课程表“题目）、二是将计算新鲜的橘子有多少个*/
+        /*step1：包括2个内容，一是把所有腐烂橘子的位置添加到queue（这种思想类似于”课程表“题目）、二是计算新鲜的橘子有多少个*/
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 if (grid[i][j] == 2) {
@@ -2449,9 +2506,10 @@ public class codetop_unskilled_6_10 {
         int minute = 0;
         int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
-        /*step3：根据腐烂橘子的位置，进行扩散，每"扩散一轮"需要更新花费的时间minute..."扩散一轮"的含
-        义————把当前队列中所有腐烂的位置出队列，并感染它的四个相邻位置。。因此“minute”以及“hasRot”变
-        量的更新应该是在“while内的for循环结束之后进行的”*/
+        /*step3：根据腐烂橘子的位置，进行扩散，每"扩散一轮"可能需要更新花费的时间minute（注：不是无脑
+        更新，只有这一轮碰到新鲜的橘子才会更新minute）..."扩散一轮"的含义————把当前队列中所有腐烂的位
+        置出队列，并感染它的四个相邻位置。。因此“minute”以及“hasRot”变量的更新应该是在“while内的for
+        循环结束之后进行的”*/
         while (!queue.isEmpty()) {
             int size = queue.size();
             /**err：这里直接更新minute，应该是有问题的，判断是否还需要进行的标准应该是“queue不是空 并且 新鲜橘子的数量fresh大于0”*/
@@ -2462,7 +2520,7 @@ public class codetop_unskilled_6_10 {
                  解释：因为一个腐烂的橘子，经过一分钟已经把周围的橘子都变腐烂了，因此只需要从4周已经腐烂的橘子继续
                  感染下去。。。所以每一个腐烂的橘子只需要研究一次，它的任务就完成了，因为被它传染的橘子会继续传染下去，
                  因此研究一次后腐烂的橘子就需要弹出队列。
-                 反之，如果它不出队，则下一次从它再次向周围感染橘子，花费的时间肯定比它四周橘子出发感染下去的花费时
+                 反之，如果它不出队，则下一次从它再次向周围感染橘子，花费的时间 肯定比 它四周橘子出发感染下去的花费时
                  间更长
                  */
                 int[] cur = queue.poll();
@@ -2479,10 +2537,10 @@ public class codetop_unskilled_6_10 {
                     }
                 }
             }
-            // 只有当本轮确实有新橘子腐烂时，时间才 +1
+            // 只有当本轮确实有新橘子腐烂时（出了for循环以后），时间才 +1
             if (hasRot) minute++;
         }
-        return fresh == 0 ? minute : -1;
+        return fresh == 0 ? minute : -1; //队列为空后，如果fresh不是0，说明有些橘子到不了，是不能被腐烂的（即四周是空格子即grid该位置是0）
     }
 
 

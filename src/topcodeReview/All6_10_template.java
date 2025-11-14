@@ -81,13 +81,20 @@ public class All6_10_template {
 给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
 * */
+
+    public static void main(String[] args) {
+        All6_10_template all610Template = new All6_10_template();
+        System.out.println(all610Template.findMin__(new int[]{4, 5, 6, 7, 0, 1, 2}));
+        System.out.println(all610Template.findMin_(new int[]{4, 5, 6, 7, 0, 1, 2}));
+    }
+
     /**标记的方法为什么是错误的？？？？？*/
     public int findMin__(int[] nums) {
         int left = 0,right = nums.length-1;
         int ans = 0;
         while (left<=right){
             int mid = left+(right-left)/2;
-            if (nums[mid]<nums[right]){ /**是不是因为这里少了等于？？还是说这个题ans必须标记最小值，标记最小值的索引就是错误的写法*/
+            if (nums[mid]<=nums[right]){ /**是不是因为这里少了等于？？还是说这个题ans必须标记最小值，标记最小值的索引就是错误的写法*/
                 ans = mid;
                 right = mid-1;
             }else {
@@ -103,7 +110,7 @@ public class All6_10_template {
         int left = 0, right = nums.length - 1;
         while (left <= right) {
             int mid = left + (right - left) / 2;
-            if (nums[mid] < min) {
+            if (nums[mid] < min) { /**那进一步，这里带等于行不行？？*/
                 min = nums[mid];
                 right = mid - 1;
             } else {
@@ -535,7 +542,7 @@ public class All6_10_template {
 
     如果不存在这样的子字符串，则返回 0。
      */
-    /**下面的代码是错误的！！！*/
+    /**下面的代码是错误的！！！（已修改，需要重新提交看看对不对，应该对的）*/
     public int longestSubstring(String s, int k) {
         return dfsss(s,k,0,s.length());
     }
@@ -546,7 +553,7 @@ public class All6_10_template {
 
         int[] flags = new int[26];
         for (int i = left; i < right; i++) {
-            flags[s.charAt(left) - 'a']++;
+            flags[s.charAt(i) - 'a']++;    /**11.14：这种写法错误的原因是不是因为这里的i错写成了left*/
         }
         /*遍历[left,right)的所有字符————
             如果某位置的字符出现的次数小于k，说明该位置的字符不可能在结果中，需要递归它的左右两半，返回左右两半的最大值
@@ -591,7 +598,7 @@ public class All6_10_template {
         /**由于 dfsOrangesRottings 中并不会递归的调用，因此这里 dfsOrangesRottings的逻辑 直接写在 方
          法orangesRotting内就可以*/
         dfsOrangesRottings(grid,queue,cnt);
-        return ressss;
+        return cnt==0?ressss:-1;
     }
 
     private void dfsOrangesRottings(int[][] grid, LinkedList<int[]> queue, int cnt) {
@@ -613,6 +620,8 @@ public class All6_10_template {
         }
     }
 
+    /**应该做如下的修改，但是不能在主方法返回，因为 dfsOrangesRottings 方法改变的cnt是自己的局部变量，主方法中
+     cnt 的值不受影响*/
 //    private void dfsOrangesRottings(int[][] grid, LinkedList<int[]> queue, int cnt) {
 //        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
 //        while (!queue.isEmpty()){
@@ -624,6 +633,7 @@ public class All6_10_template {
 //                for (int[] dir:dirs){
 //                    int x = dir[0]+cur[0],y = dir[1]+cur[1];
 //                    if (x>0&&x<grid.length&&y>0&&y<grid[0].length&&grid[x][y]==1){
+//                        cnt--;
 //                        grid[x][y] = 2;
 //                        hasRot = true;
 //                        queue.offer(new int[]{x,y});
@@ -633,4 +643,43 @@ public class All6_10_template {
 //            if (hasRot) ressss++;
 //        }
 //    }
+
+
+    /**===========================================腐烂橘子做如下的修改===========================*/
+    /**下面的写法大概率是错误的。原因：
+        “更新时间“的时机和条件是什么？？
+     */
+    public int orangesRotting__(int[][] grid) {
+        int[][] directs = {{1,0},{-1,0},{0,1},{0,-1}};
+        int m = grid.length,n = grid[0].length;
+        int rotNum = 0;
+        int minute = 0;
+        LinkedList<int[]> queue = new LinkedList<>();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j]==2){
+                    queue.offer(new int[]{i,j});
+                }else if (grid[i][j]==1){
+                    rotNum++;
+                }
+            }
+        }
+
+        while (rotNum>0&&!queue.isEmpty()){
+            int size = queue.size();
+            minute++;
+            for (int i = 0; i < size; i++) {
+                int[] cur = queue.poll();
+                for (int[] direct:directs){
+                    int x = cur[0]+direct[0],y = cur[1]+direct[1];
+                    if (x>=0&&x<m&&y>=0&&y<n&&grid[x][y]==1){
+                        grid[x][y] = 2;
+                        queue.offer(new int[]{x,y});
+                        rotNum--;
+                    }
+                }
+            }
+        }
+        return rotNum==0?minute:-1;
+    }
 }

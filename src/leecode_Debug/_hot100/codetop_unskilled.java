@@ -1344,67 +1344,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
     }
 
-
-
-
-    //958
-    public boolean isCompleteTree(TreeNode root) {
-        LinkedList<TreeNode> queue = new LinkedList<>();
-        boolean hasNull = false;
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            TreeNode cur = queue.poll();
-            if (cur == null) {
-                hasNull = true;
-            } else {
-                if (hasNull) return false;
-                queue.offer(cur.left);
-                queue.offer(cur.right);
-            }
-        }
-        return true;
-    }
-
-
-    /*写法2：不使用if-else*/
-    public boolean isCompleteTree1(TreeNode root) {
-        if (root == null) return true;
-        LinkedList<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        boolean hasNull = false;
-        while (!queue.isEmpty()) {
-            TreeNode cur = queue.poll();
-            if (cur == null) {
-                hasNull = true;
-                continue;
-            }
-            if (hasNull) {
-                return false;
-            }
-            queue.offer(cur.left);
-            queue.offer(cur.right);
-        }
-        return true;
-    }
-
-
-    /*写法3：*/
-    public boolean isCompleteTree2(TreeNode root) {
-        if (root==null) return true;
-        boolean hasNull = false;
-        LinkedList<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()){
-            /**这种类型的题目并不需要关注某一层有多少节点，只要queue不是空就进行循环即可*/
-            TreeNode cur = queue.poll();
-            if (cur==null) hasNull = true;
-            if (hasNull&&cur!=null) return false;
-            queue.offer(cur.left);
-            queue.offer(cur.right);
-        }
-        return true;
-    }
-
     /*59 螺旋矩阵Ⅱ
         给定参数n，产生一个矩阵，顺时针填写1，2，.....
      */
@@ -1572,7 +1511,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         int max = 1; //初始化为1（初始化位0其实结果也是对的），递增子路径至少包含自己，因此长度至少为1。。。这里不用考虑matrix是空的情况
         for (int[] d : dirs) {
             int x = i + d[0], y = j + d[1];
-            if (x >= 0 && x < matrix.length && y >= 0 && y < matrix[0].length && matrix[i][j] < matrix[x][y]) { /**err：比较之前先判断x和y不能越界*/
+            if (x >= 0 && x < matrix.length && y >= 0 && y < matrix[0].length && matrix[i][j] < matrix[x][y]) { /**err：比较之前先判断x和y不能越界....最后一个条件使用"matrix[i][j] > matrix[x][y]"应该也是OK的*/
                 /**
                  当前位置(i,j)的dp值取决于4个方向的最大值，记录为max，最后需要返回。
                  【疑问】为什么不是加？？而是取最大值？？
