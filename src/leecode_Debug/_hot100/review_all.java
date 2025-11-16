@@ -182,9 +182,9 @@ public class review_all {
     假设 nums 只有 一个重复的整数 ，返回 这个重复的数 。
     你设计的解决方案必须 不修改 数组 nums 且只用常量级 O(1) 的额外空间。
     * */
-    public int findDuplicate(int[] nums) {
-        return 0;
-    }
+//    public int findDuplicate(int[] nums) {
+//
+//    }
 
     /*300.
     * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
@@ -430,9 +430,9 @@ public class review_all {
 //    }
 
     //31
-    public void nextPermutation(int[] nums) {
-
-    }
+//    public void nextPermutation(int[] nums) {
+//
+//    }
 
 
     /*129

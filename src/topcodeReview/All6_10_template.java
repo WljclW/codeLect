@@ -237,169 +237,6 @@ public class All6_10_template {
 //
 //    }
 
-
-        /*329.矩阵中的最长递增路径
-    给定一个 m x n 整数矩阵 matrix ，找出其中 最长递增路径 的长度。
-对于每个单元格，你可以往上，下，左，右四个方向移动。 你 不能 在 对角线 方向上移动或移动到 边界外（即不允许环绕）。
-     */
-    /**这种形式写dp应该是错误的*/
-//    public int longestIncreasingPath(int[][] matrix) {
-//        int[][] directs = {{1,0},{-1,0},{0,1},{0,-1}};
-//        int res = 0;
-//        int m = matrix.length,n = matrix[0].length;
-//        int[][] dp = new int[m][n];
-//        for (int i = 0; i < m; i++) {
-//            for (int j = 0; j < n; j++) {
-//                if (i==0||j==0) dp[i][j] = 1;
-//                else {
-//                    for (int[] cur:directs){
-//                        int x = i+cur[0];
-//                        int y = j+cur[1];
-//                        if (matrix[i][j]>matrix[x][y])
-//                            dp[i][j] = Math.max(dp[x][y]+1,dp[i][j]);
-//                    }
-//                }
-//                res = Math.max(dp[i][j],res);
-//            }
-//        }
-//        return res;
-//    }
-
-
-    int maxLength = 0;
-    int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
-    public int longestIncreasingPath(int[][] matrix) {
-        int m = matrix.length,n = matrix[0].length;
-        int[][] memo = new int[m][n];
-        for (int[] cur:memo){
-            Arrays.fill(cur,-1);
-        }
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                /**这里错了！！！对于matrix中的每一个位置，需要使用“longestIncreasingPath(int[][], int[][], int, int)”计算
-                 该位置的最长递增长度*/
-                longestIncreasingPath(matrix,memo,0,0);
-            }
-        }
-        return maxLength;
-    }
-
-    private int longestIncreasingPath(int[][] matrix, int[][] memo, int i, int j) {
-        if (memo[i][j]!=-1) return memo[i][j];
-        memo[i][j] = 1;
-        for (int[] dir:dirs){
-            int x = i+dir[0],y=j+dir[1];
-            if (x>0&&x<matrix.length&&j>0&&j<matrix[0].length&&matrix[i][j]<matrix[x][y]){
-                memo[i][j] = Math.max(memo[i][j],memo[i][j]+1);
-            }
-        }
-        return memo[i][j];
-    }
-
-    int[][] dirs_ = {{1,0},{-1,0},{0,1},{0,-1}};
-    int res_ = 0;
-    public int longestIncreasingPath_(int[][] matrix) {
-        int m = matrix.length,n = matrix[0].length;
-        int[][] memo = new int[m][n];
-        for (int[] row:memo){
-            Arrays.fill(row,-1);
-        }
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                dfs(matrix,memo,i,j);
-            }
-        }
-        return res_;
-    }
-
-    private int dfs(int[][] matrix, int[][] memo, int i, int j) {
-        if (memo[i][j]!=-1) return memo[i][j];
-        memo[i][j] = 1;
-        for (int[] cur:dirs_){
-            int x = cur[0]+i,y = cur[1]+j;
-            /**chatgpt说这里应该检查“i,j”是否越界，而不是检查“x,y”是不是越界，应该是错误的*/
-            if (x>0&&x<matrix.length&&j>0&&j<matrix[0].length&&matrix[i][j]<matrix[x][y]){
-                memo[i][j] = Math.max(memo[i][j],memo[x][y]+1);
-            }
-        }
-        res_ = Math.max(res_,memo[i][j]);
-        return memo[i][j];
-    }
-
-
-    int[][] direct = {{1,0},{-1,0},{0,1},{0,-1}};
-    public int longestIncreasingPath___(int[][] matrix) {
-        int m = matrix.length,n = matrix[0].length;
-        int[][] memo = new int[m][n];
-        int res = 0;
-        for (int[] cur:memo){
-            Arrays.fill(cur,-1);
-        }
-
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                /**dfs函数有返回值，在主方法中更新res*/
-                res = Math.max(res,dfsLongestIncreasingPath(matrix,memo,i,j));
-            }
-        }
-        return res;
-    }
-
-    private int dfsLongestIncreasingPath(int[][] matrix, int[][] memo, int i, int j) {
-        if (memo[i][j]!=-1) return memo[i][j];
-        memo[i][j] = 1;
-        for (int[] cur:direct){
-            int x = i+cur[0],y = j+cur[1];
-            if (x>0&&x<matrix.length&&j>0&&j<matrix[0].length&&matrix[x][y]>matrix[i][j]){
-                memo[i][j] = Math.max(memo[i][j],dfsLongestIncreasingPath(matrix,memo,x,y));
-            }
-        }
-        return memo[i][j];
-    }
-
-
-    /**
-     * 329能不能修改成“动态规划”的版本呢？？确认一下下面的版本有没有问题!!
-     【思想】
-        1. “递归、回溯遍历”计算答案的解法 改成 “动态规划”的解法，最最最关键、核心的问题（或者说前提条件）————确保每到达
-     一个位置，所有它依赖位置的答案已经计算出来了！！（这一点很重要，要求熟记于心）但是前提是对于任何一个节点它的依赖位置
-     是明确的。
-        2. 换到此题，每一个位置（i，j）可能依赖于四周的四个位置，从这个角度看，是不能进行dp的，没有任何一种遍历方式能满足
-     这个二要求。。。下面的longestIncreasingPath__是基于这样的思想，任何一个位置的dp。一定依赖于比他小的位置的dp，因此
-     在计算所有位置的dp时，先对matrix的所有值排序，保证计算顺序
-           ——————因此，DP的写法中，重要的是”所有位置计算顺序的确定“。这种“计算顺序”，可能是像“编辑距离”、“爬楼梯”等在二
-     维表中明确的位置依赖关系，也可能是像这个题一样在二维表中无法确定明确的依赖位置，需要结合matrix该位置的值来判断
-     */
-    public int longestIncreasingPath__(int[][] matrix) {
-        int m = matrix.length,n = matrix[0].length;
-        List<int[]> cells = new ArrayList<>();
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                cells.add(new int[]{i, j});
-        /*cells中添加所有的位置数组；这一步按照matrix中该位置的值进行排序。
-        因此最终cells中的数组，就是matrix元素升序排序后的位置顺序
-        */
-        cells.sort((a,b) -> matrix[a[0]][a[1]] - matrix[b[0]][b[1]]);
-
-        int[][] dp = new int[m][n];
-        int ans = 1;
-        for (int[] c : cells) {
-            int i = c[0], j = c[1];
-            dp[i][j] = 1;
-            for (int[] dir : dirs) {
-                int x = i + dir[0], y = j + dir[1];
-                if (x >= 0 && x < m && y >= 0 && y < n && matrix[x][y] < matrix[i][j]) {
-                    dp[i][j] = Math.max(dp[i][j], dp[x][y] + 1);
-                }
-            }
-            ans = Math.max(ans, dp[i][j]);
-        }
-        return ans;
-    }
-
-
-
-
         /*450.删除二叉搜索树中的节点
     给定一个二叉搜索树的根节点 root 和一个值 key，删除二叉搜索树中的 key 对应的节点，并保证二叉搜索树的性质不变。返回二叉搜索树（有可能被更新）的根节点的引用。
 
@@ -542,7 +379,7 @@ public class All6_10_template {
 
     如果不存在这样的子字符串，则返回 0。
      */
-    /**下面的代码是错误的！！！（已修改，需要重新提交看看对不对，应该对的）*/
+    /**√，总结一下*/
     public int longestSubstring(String s, int k) {
         return dfsss(s,k,0,s.length());
     }
@@ -553,7 +390,7 @@ public class All6_10_template {
 
         int[] flags = new int[26];
         for (int i = left; i < right; i++) {
-            flags[s.charAt(i) - 'a']++;    /**11.14：这种写法错误的原因是不是因为这里的i错写成了left*/
+            flags[s.charAt(i) - 'a']++;
         }
         /*遍历[left,right)的所有字符————
             如果某位置的字符出现的次数小于k，说明该位置的字符不可能在结果中，需要递归它的左右两半，返回左右两半的最大值

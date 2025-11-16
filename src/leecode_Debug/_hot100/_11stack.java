@@ -175,8 +175,8 @@ public class _11stack {
             if (minStack.peek().equals(pop)){ /**▲err：注意这里比u下使用equals。否则或有个用例“-1024”不对*/
                 minStack.pop();
             }
-            /**或者使用下面的方法来判断相等。。但就是不能使用“==”来判断*/
-//            if (cur.intValue()==minStack.peek().intValue()){
+            /**或者使用下面的方法来判断相等。。但就是不能直接使用“minStack.peek()==pop”来判断*/
+//            if (pop.intValue()==minStack.peek().intValue()){
 //                minStack.pop();
 //            }
         }

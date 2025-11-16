@@ -48,9 +48,9 @@ public class NeedMore01 {
      * 给定一个 m x n 的矩阵，如果一个元素为 0 ，则将其所在行和
      * 列的所有元素都设为 0 。请使用 原地 算法。
      * */
-    public void setZeroes(int[][] matrix) {
-
-    }
+//    public void setZeroes(int[][] matrix) {
+//
+//    }
 
     /*4.
     给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
@@ -62,9 +62,9 @@ public class NeedMore01 {
 
 
     //下一个排列
-    public void nextPermutation(int[] nums) {
-
-    }
+//    public void nextPermutation(int[] nums) {
+//
+//    }
 
     /*148.
      * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
@@ -222,42 +222,6 @@ public class NeedMore01 {
             this.next = null;
             this.random = null;
         }
-    }
-
-    /*394.
-    给定一个经过编码的字符串，返回它解码后的字符串。
-    编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注
-    意 k 保证为正整数。
-    你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
-    此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的
-    输入。
-    * */
-    public String decodeString(String s) {
-        StringBuilder res = new StringBuilder();
-        int multi  = 0;
-        LinkedList<String> stringStack = new LinkedList<>();
-        LinkedList<Integer> multiStack = new LinkedList<>();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c>='0'&&c<='9'){
-                multi = multi*10 + (c-'0');
-            } else if (c=='[') {
-                stringStack.push(res.toString());
-                multiStack.push(multi);
-                multi = 0;
-                res = new StringBuilder();
-            } else if (c==']') {
-                StringBuilder tmp = new StringBuilder();
-                int cur = multiStack.pop();       /**必须使用新的变量记录*/
-                for (int j = 0; j < cur; j++) {
-                    tmp.append(res);
-                }
-                res = new StringBuilder(stringStack.pop()+tmp);
-            } else {
-                res.append(c);
-            }
-        }
-        return res.toString();
     }
 
 

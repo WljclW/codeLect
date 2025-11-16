@@ -1174,39 +1174,6 @@ public class All1_5 {
     }
 
 
-    /*4.寻找两个正序数组的中位数
-    给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
-算法的时间复杂度应该为 O(log (m+n)) 。
-    * */
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        if (nums1.length>nums2.length)return findMedianSortedArrays(nums2,nums1);
-        int m =nums1.length,n = nums2.length;
-        int l = 0,r = m;
-        while (l<=r){
-            int mid = l+(r-l)/2;
-            int midj = (m+n+1)/2-mid;
-
-            int nums1L = mid==0?Integer.MIN_VALUE:nums1[mid-1];
-            int nums1R = mid==m?Integer.MAX_VALUE:nums1[mid];
-            int nums2L = midj==0?Integer.MIN_VALUE:nums2[midj-1];
-            int nums2R = midj==n?Integer.MAX_VALUE:nums2[midj];
-
-            if (nums1L<=nums2R&&nums2L<=nums1R){ /**是不是必须带等于？？应该是的*/
-                if ((m+n)%2==0){
-                    return (Math.max(nums1L,nums2L)+Math.min(nums1R,nums2R))/2.0;
-                }else {
-                    return Math.max(nums1L,nums2L);
-                }
-            }else if (nums1L>nums2R){
-                r = mid-1;
-            }else {
-                l = mid+1;
-            }
-        }
-        return -1;
-    }
-
-
 
     /*199.二叉树的右视图
     给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。

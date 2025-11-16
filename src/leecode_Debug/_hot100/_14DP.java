@@ -177,7 +177,7 @@ public class _14DP {
         int[] dp = new int[n + 1];
         Arrays.fill(dp,n);
         dp[0] = 0; /**dp[0]应该是要初始化为0，否则的话下面的决策过程”Math.min(dp[j],dp[j-i*i]+1);“就永远都是最大值了*/
-        for (int i = 1; i*i <= n; i++) { /**”一个i就相当于之前的一个物品的质量/空间 nums[i]“*/
+        for (int i = 1; i*i <= n; i++) { /**i就相当于0-1背包的物品的索引，i*i就相当于物品占用的 空间/质量*/
             for (int j = i*i; j <= n; j++) {
                 dp[j] = Math.min(dp[j],dp[j-i*i]+1);
             }
@@ -316,7 +316,7 @@ public class _14DP {
                 if (tails[mid] < num) { /**err：注意是和tails数组的数比较，而不是和原始数组*/
                     left = mid + 1;
                 } else {
-                    right = mid - 1;
+                    right = mid - 1; /**要找大于等于的左边界，就要在“大于等于”的时候往左边找，因此右边界right左移*/
                 }
             }
             /*step3：left就是num应该插入的索引位置，将num放在应该插入的位置left*/
@@ -381,7 +381,7 @@ public class _14DP {
         for (int i = 1; i < nums.length; i++) { /**err：i要从1开始，因为res的初始值已经是nums[0]了*/
             int curMin = Math.min(nums[i],Math.min(minPre*nums[i],maxPre*nums[i]));
             int curMax = Math.max(nums[i],Math.max(maxPre*nums[i],maxPre*nums[i]));
-            minPre = curMin; /**err：这里是赋值，而不是取最值*/
+            minPre = curMin; /**err：这里是赋值，而不是取最值！！*/
             maxPre = curMax;
             res = Math.max(res,maxPre); /**【注】在这里更新res，保证了每一轮都会进行更新*/
         }
@@ -532,6 +532,30 @@ public class _14DP {
                 res = Math.max(dp[i][j],res); /**err：最长公共子数组可能在中间位置取到，因此需要在计算过程中更新res。。而不能直接返回右下角位置dp[m][n]！！！*/
             }
 
+        return res;
+    }
+
+    /*238. 除自身以外数组的乘积
+    * 给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素
+    * 的乘积 。
+    题目数据 保证 数组 nums之中任意元素的全部前缀元素和后缀的乘积都在  32 位 整数范围内。
+    请 不要使用除法，且在 O(n) 时间复杂度内完成此题。
+    * */
+    public int[] productExceptSelf(int[] nums) {
+        int[] res = new int[nums.length];
+        res[0] = 1;
+        /*step1：从左往右计算。
+        res[i]表示"0、1、2....i-1"的乘积；res[0]=1*/
+        for (int i = 1; i < nums.length; i++) {
+            res[i] = res[i-1]*nums[i-1];
+        }
+
+        /*step2：倒着计算一遍，把"i+1、i+2、i+3...nums.length-2"位置的乘积 乘到res[i]上*/
+        int post = 1;
+        for (int i = nums.length-2; i >=0; i--) {
+            post *= nums[i+1];
+            res[i] *= post;
+        }
         return res;
     }
 

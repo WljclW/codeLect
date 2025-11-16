@@ -54,6 +54,11 @@ public class _03subString {
     * */
     /**
      *【思路】
+     *【建议的写法】解法minWindow_ano 和 解法minWindow 二选一
+     *【说明】这个题的特殊之处在于：“while循环”内部的if和while可以并列写，也可以把while写在
+     *      if的内部（关于这点见 方法minWindow_ano 和 方法minWindow）。。其中if循环的作用：
+     *      将对应的字符纳入到窗口；while循环的作用：把窗口缩小到 合法/非法 的边界，此时才能
+     *      得到最优解————最小的合法窗口大小
      */
     public String minWindow(String s, String t) {
         if (s.length()<t.length()) return "";
@@ -123,7 +128,7 @@ public class _03subString {
 
     /*另外一种写法如下。其实没有本质的思想区别。唯一的区别就在于left、right更新时机导致的
     * 长度计算的区别
-    *    */
+    */
     public String minWindow_(String s, String t) {
         if (s.length()<t.length()) return "";
 
@@ -213,6 +218,42 @@ public class _03subString {
             }
         }
         return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
+    }
+
+    /* minWindow_ano 写成while循环的版本*/
+    public String minWindow_ano1(String s, String t) {
+        HashMap<Character, Integer> need = new HashMap<>();
+        for (char c:t.toCharArray()){
+            need.put(c,need.getOrDefault(c,0)+1);
+        }
+
+        int valid = 0;
+        int start = -1,minLen = Integer.MAX_VALUE;
+        int left = 0;
+        HashMap<Character, Integer> map = new HashMap<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (need.containsKey(c)){
+                map.put(c,map.getOrDefault(c,0)+1);
+                if (map.get(c).intValue()==need.get(c).intValue()){
+                    valid++;
+                }
+                while (valid==need.size()){
+                    if (i-left+1<minLen){
+                        start = left;
+                        minLen = i-left+1;
+                    }
+                    char c1 = s.charAt(left++);
+                    if (need.containsKey(c1)){
+                        map.put(c1,map.get(c1)-1);
+                        if (map.get(c1)<need.get(c1)){
+                            valid--;
+                        }
+                    }
+                }
+            }
+        }
+        return start==-1?"":s.substring(start,start+minLen);
     }
 
     /**下面的写法是常见的错误写法。。。。

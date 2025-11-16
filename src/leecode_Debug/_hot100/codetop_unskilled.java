@@ -1454,6 +1454,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     //329、矩阵中的最长递增路径
     /**
+     *【说明】动态规划的版本见方法 longestIncreasingPath__，常规的是使用记忆化搜索的版本见方法 longestIncreasingPath
      * dp数组定义：dp[i][j] 表示从单元格 (i,j) 出发的最长递增路径的长度。
      * 转移方程：从 (i,j) 出发，尝试走到上下左右四个方向 (x,y)，前提是 matrix[x][y] > matrix[i][j]；
             dp[i][j] = 1 + max(dp[x][y])。
@@ -1534,6 +1535,104 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return max;
     }
 
+    /*错误写法1*/
+//    int[][] direct = {{1,0},{-1,0},{0,1},{0,-1}};
+//    public int longestIncreasingPath___(int[][] matrix) {
+//        int m = matrix.length,n = matrix[0].length;
+//        int[][] memo = new int[m][n];
+//        int res = 0;
+//        for (int[] cur:memo){
+//            Arrays.fill(cur,-1);
+//        }
+//
+//        for (int i = 0; i < m; i++) {
+//            for (int j = 0; j < n; j++) {
+//                /**dfs函数有返回值，在主方法中更新res*/
+//                res = Math.max(res,dfsLongestIncreasingPath(matrix,memo,i,j));
+//            }
+//        }
+//        return res;
+//    }
+//
+//    private int dfsLongestIncreasingPath(int[][] matrix, int[][] memo, int i, int j) {
+//        if (memo[i][j]!=-1) return memo[i][j];
+//        memo[i][j] = 1;
+//        for (int[] cur:direct){
+//            int x = i+cur[0],y = j+cur[1];
+    /**错误点1：x,y的要求是大于等于0，是带等于的*/
+//            if (x>0&&x<matrix.length&&j>0&&j<matrix[0].length&&matrix[x][y]>matrix[i][j]){
+    /**错误点2：不能直接使用"memo[x][y]"，因为该位置可能还没计算呢，应该使用"dfsLongestIncreasingPath(matrix,memo,x,y)+1"*/
+//                memo[i][j] = Math.max(memo[i][j],memo[x][y]);
+//            }
+//        }
+//        return memo[i][j];
+//    }
+
+    /*错误写法2：这种形式写dp应该是错误的。
+        这个题不像"编辑距离"，"最长回文子串"等dp有明显的位置依赖关系，任何一个位置可能依赖到周围的四个位置，
+    如果这样理解，是没有一种合理的计算顺序的！！！
+    * */
+//    public int longestIncreasingPath(int[][] matrix) {
+//        int[][] directs = {{1,0},{-1,0},{0,1},{0,-1}};
+//        int res = 0;
+//        int m = matrix.length,n = matrix[0].length;
+//        int[][] dp = new int[m][n];
+//        for (int i = 0; i < m; i++) {
+//            for (int j = 0; j < n; j++) {
+//                if (i==0||j==0) dp[i][j] = 1;
+//                else {
+//                    for (int[] cur:directs){
+//                        int x = i+cur[0];
+//                        int y = j+cur[1];
+//                        if (matrix[i][j]>matrix[x][y])
+//                            dp[i][j] = Math.max(dp[x][y]+1,dp[i][j]);
+//                    }
+//                }
+//                res = Math.max(dp[i][j],res);
+//            }
+//        }
+//        return res;
+//    }
+
+    /**
+     * 329能不能修改成“动态规划”的版本呢？？可以，就是下面的形式
+     【思想】
+     1. “递归、回溯遍历”计算答案的解法 改成 “动态规划”的解法，最最最关键、核心的问题（或者说前提条件）————确保每到达
+     一个位置，所有它依赖位置的答案已经计算出来了！！（这一点很重要，要求熟记于心）但是前提是对于任何一个节点它的依赖位置
+     是明确的。
+     2. 换到此题，每一个位置（i，j）可能依赖于四周的四个位置，从这个角度看，是不能进行dp的，没有任何一种遍历方式能满足
+     这个二要求。。。下面的longestIncreasingPath__是基于这样的思想，任何一个位置的dp。一定依赖于比他小的位置的dp，因此
+     在计算所有位置的dp时，先对matrix的所有值排序，保证计算顺序
+     ——————因此，DP的写法中，重要的是”所有位置计算顺序的确定“。这种“计算顺序”，可能是像“编辑距离”、“爬楼梯”等在二
+     维表中明确的位置依赖关系，也可能是像这个题一样在二维表中无法确定明确的依赖位置，需要结合matrix该位置的值来判断
+     */
+    int[][] dirs11 = {{1,0},{-1,0},{0,1},{0,-1}};
+    public int longestIncreasingPath__(int[][] matrix) {
+        int m = matrix.length,n = matrix[0].length;
+        List<int[]> cells = new ArrayList<>();
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                cells.add(new int[]{i, j});
+        /*cells中添加所有的位置数组；这一步按照matrix中该位置的值进行排序。
+        因此最终cells中的数组，就是matrix元素升序排序后的位置顺序
+        */
+        cells.sort((a,b) -> matrix[a[0]][a[1]] - matrix[b[0]][b[1]]);
+
+        int[][] dp = new int[m][n];
+        int ans = 1;
+        for (int[] c : cells) {
+            int i = c[0], j = c[1];
+            dp[i][j] = 1;
+            for (int[] dir : dirs11) {
+                int x = i + dir[0], y = j + dir[1];
+                if (x >= 0 && x < m && y >= 0 && y < n && matrix[x][y] < matrix[i][j]) {
+                    dp[i][j] = Math.max(dp[i][j], dp[x][y] + 1);
+                }
+            }
+            ans = Math.max(ans, dp[i][j]);
+        }
+        return ans;
+    }
 
     //213
     public int rob(int[] nums) {

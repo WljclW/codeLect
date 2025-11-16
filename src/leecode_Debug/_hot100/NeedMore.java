@@ -70,9 +70,9 @@ public class NeedMore {
      * 给定一个 m x n 的矩阵，如果一个元素为 0 ，则将其所在行和
      * 列的所有元素都设为 0 。请使用 原地 算法。
      * */
-    public void setZeroes(int[][] matrix) {
-
-    }
+//    public void setZeroes(int[][] matrix) {
+//
+//    }
 
     /*4.
     给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
@@ -90,9 +90,9 @@ public class NeedMore {
 
 
     //下一个排列
-    public void nextPermutation(int[] nums) {
-
-    }
+//    public void nextPermutation(int[] nums) {
+//
+//    }
 
 
     //k个一组翻转链表

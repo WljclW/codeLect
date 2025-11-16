@@ -649,7 +649,7 @@ public class _10binarySearch {
                     说明nums2Left值选的太大了，因此需要把它变小，就意味着隔板j要变小，因此i
                 要增大，索引挪动左指针，l = i+1。————这样的代码中i相当于之前代码的mid。
             * */
-            if (nums1Left <= nums2Right && nums2Left <= nums1Right) {
+            if (nums1Left <= nums2Right && nums2Left <= nums1Right) { /**err：这里必须带"="*/
                 if ((nums1.length + nums2.length) % 2 == 0) {
                     return (Math.max(nums1Left, nums2Left) +
                             Math.min(nums1Right, nums2Right)) / 2.0;
@@ -661,6 +661,22 @@ public class _10binarySearch {
             } else {
                 l = i + 1;
             }
+
+            //if-else也可以写成下面的形式
+            /*
+            if (nums1Left>nums2Right){  //这里不能带“=”
+                right = nums1Mid-1;
+            } else if (nums1Right < nums2Left) { //这里比较也不能带“=”
+                left = nums1Mid+1;
+            }else {
+                if (((m+n)&1)==1){
+                    return Math.max(nums1Left,nums2Left);
+                }else {
+                    return (Math.max(nums1Left,nums2Left)+
+                            Math.min(nums1Right,nums2Right))/2.0;
+                }
+            }
+             */
         }
         return -1; //其实代码走不到这里
     }
