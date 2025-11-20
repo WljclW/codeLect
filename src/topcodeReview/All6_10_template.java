@@ -84,8 +84,10 @@ public class All6_10_template {
 
     public static void main(String[] args) {
         All6_10_template all610Template = new All6_10_template();
-        System.out.println(all610Template.findMin__(new int[]{4, 5, 6, 7, 0, 1, 2}));
-        System.out.println(all610Template.findMin_(new int[]{4, 5, 6, 7, 0, 1, 2}));
+        int[] res = {34,35,14,3,129,58,19,10,558,144,34,59,82,55,94,25,357,2435,22,709,2342,127,75,338,187,63,150,195,822,663};
+        System.out.println(Arrays.stream(res).sum());
+//        System.out.println(all610Template.findMin__(new int[]{4, 5, 6, 7, 0, 1, 2}));
+//        System.out.println(all610Template.findMin_(new int[]{4, 5, 6, 7, 0, 1, 2}));
     }
 
     /**标记的方法为什么是错误的？？？？？*/
