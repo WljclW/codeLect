@@ -997,7 +997,7 @@ public class codetop_5 {
         }
         dfs(root.left,targetSum-root.val,path);
         dfs(root.right,targetSum-root.val,path);
-        path.removeLast();
+        path.removeLast(); /**err：切记撤销选择*/
     }
 
 
@@ -1336,7 +1336,8 @@ public class codetop_5 {
             if (curNode.left==null&&curNode.right==null&&curVal==targetSum){ //与写法3的区别
                 return true;
             }
-
+            /**因为这里会保证不是null的时候才添加，因此上面的判断可以直接判断，不用预先判断“curNode是空的情况”，因
+             * 为curNode就不可能是null。。。写法3也是同样的道理*/
             if (curNode.left!=null){
                 queueNodes.offer(curNode.left);
                 queueVal.offer(curVal+curNode.left.val);

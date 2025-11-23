@@ -154,6 +154,9 @@ public class _15DP_dims {
         int[] prev = new int[n + 1]; //prev用于存储dp表上一行的信息
         int[] cur = new int[n + 1];  //cur用于存储dp表现在研究的这一行的信息
         for (int i = 1; i <= m; i++) {
+            /**这个题由于不会发生值的覆盖问题，因此虽然cur在新的一轮会赋值为prev，这里不涉及cur的重置就OK，
+             有的题可能在新的一轮必须对cur进行状态重置，比如“最长回文子序列”
+             */
             for (int j = 1; j <= n; j++) {
                 char c1 = text1.charAt(i - 1);
                 char c2 = text2.charAt(j - 1);

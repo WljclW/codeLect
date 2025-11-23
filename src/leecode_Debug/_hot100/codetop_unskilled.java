@@ -734,43 +734,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return pre;
     }
 
-
-    //1143
-    public int longestCommonSubsequence(String text1, String text2) {
-        int len1 = text1.length(),len2 = text2.length();
-        int[][] dp = new int[len1 + 1][len2 + 1];
-        int res = 0;
-        for (int i = 1; i <= len1; i++) {
-            for (int j = 1; j <= len2; j++) {
-                if (text1.charAt(i-1)==text2.charAt(j-1)){
-                    dp[i][j] = dp[i-1][j-1]+1;
-                }else {
-                    dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
-                }
-                res = Math.max(dp[i][j],res);
-            }
-        }
-        return res;
-    }
-
-
-    //78
-    List<List<Integer>> resSubsets;
-    public List<List<Integer>> subsets(int[] nums) {
-        resSubsets = new LinkedList<>();
-        dfs(nums, new LinkedList<Integer>(), 0);
-        return resSubsets;
-    }
-
-    private void dfs(int[] nums, LinkedList<Integer> path, int index) {
-        resSubsets.add(new LinkedList<>(path));
-        for (int i = index; i < nums.length; i++) {
-            path.add(nums[i]);
-            dfs(nums,path,i+1);
-            path.removeLast();
-        }
-    }
-
     //8 字符串转换为整形
 
 

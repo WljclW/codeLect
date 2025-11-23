@@ -519,17 +519,17 @@ public class _14DP {
     public int findLength(int[] nums1, int[] nums2) {
         int[][] dp = new int[nums1.length + 1][nums2.length + 1];
         int res = 0;
-        for (int i=1;i<= nums1.length;i++)
-            for (int j=1;j<= nums2.length;j++){
-                if (nums1[i-1]==nums2[j-1]){
-                    dp[i][j] = dp[i-1][j-1]+1;
+        for (int i = 1; i <= nums1.length; i++)
+            for (int j = 1; j <= nums2.length; j++) {
+                if (nums1[i - 1] == nums2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
                 }
                 /**err：不能出现下面的else。因为子数组必须是连续的，如果nums1[i]≠nums2[j]，则以它两结尾
                  * 的最长相同子数组 长度就是0！！！—————这个题与“最长公共子序列”的区别就仅仅是下面代码的区别*/
 //                else{
 //                    dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
 //                }
-                res = Math.max(dp[i][j],res); /**err：最长公共子数组可能在中间位置取到，因此需要在计算过程中更新res。。而不能直接返回右下角位置dp[m][n]！！！*/
+                res = Math.max(dp[i][j], res); /**err：最长公共子数组可能在中间位置取到，因此需要在计算过程中更新res。。而不能直接返回右下角位置dp[m][n]！！！*/
             }
 
         return res;

@@ -700,51 +700,6 @@ public class review_all {
 //    }
 
 
-    /*78.
-    给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
-    解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
-    * */
-    List<List<Integer>> resSubSets;
-    List<Integer> pathSubsets;
-    public List<List<Integer>> subsets(int[] nums) {
-        resSubSets = new LinkedList<>();
-        pathSubsets = new LinkedList<>();
-        subsetsBack(nums,0);
-        return resSubSets;
-    }
-
-    private void subsetsBack(int[] nums, int index) {
-        resSubSets.add(new LinkedList<>(pathSubsets)); /**这里不new一个新的应该是不行的*/
-        //这里没有return应该也是可以的
-        for (int i = index; i < nums.length; i++) {
-            pathSubsets.add(nums[i]);
-            subsetsBack(nums,i+1);
-            pathSubsets.remove(pathSubsets.size()-1);
-        }
-    }
-
-    /**
-     * 上面的代码和下面的代码唯一的区别是pathSubsets放在了形参的位置，其他的diamond都是一样的。这两种都没问题
-     */
-//    List<List<Integer>> resSubSets;
-//    public List<List<Integer>> subsets(int[] nums) {
-//        resSubSets = new LinkedList<>();
-//        List<Integer> pathSubsets = new LinkedList<>();
-//        subsetsBack(nums,0,pathSubsets);
-//        return resSubSets;
-//    }
-//
-//    private void subsetsBack(int[] nums, int index,List<Integer> pathSubsets) {
-//        resSubSets.add(new LinkedList<>(pathSubsets));
-//        if (index==nums.length) return;
-//        for (int i = index; i < nums.length; i++) {
-//            pathSubsets.add(nums[i]);
-//            subsetsBack(nums,i+1,pathSubsets);
-//            pathSubsets.remove(pathSubsets.size()-1);
-//        }
-//    }
-
-
 
     /*17.
     给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。

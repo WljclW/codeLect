@@ -134,7 +134,7 @@ public class _09huisu {
     }
 
 
-    /*78.
+    /*78. 子集
     给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
     解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
     * */
@@ -176,8 +176,20 @@ public class _09huisu {
     }
 
     private void subsetsBack(int[] nums, int index,List<Integer> pathSubsets) {
-        resSubSets1.add(new LinkedList<>(pathSubsets));
-        if (index==nums.length) return;
+//        if (index==nums.length) return; //写在这里是错误的！
+        /**err：不加注释掉的这一句就可以，并不会发生StackOverflow！！但是如果加了这一句，则——————
+         *      这一句必须在“resSubsets.add(new LinkedList<>(path));”的后面，不然结果会
+         *  少很多，一句话概况少了多少，凡是包含nums最后一个元素的 子集，结果都没有。
+         *      进一步解释为什么？因为如果index==nums.length，根据for循环逻辑可知，一定是
+         *  上一步把最后一个元素添加进path了，然后递归调用subsetsBack，此时index==nums.length。
+         *  如果下面的这句话放在subsetsBack的第一行，就导致方法直接返回了，path没有添加进
+         *  结果！！!
+         *      再解释一下为什么不会发生StackOverflow？？方法的返回值是null，即使没有这一句，当
+         * index来到nums.length的时候，for循环由于循环条件不满足因此不会循环，导致方法结束，因此
+         * 并不会无终止的持续递归下去，因此不会栈溢出。
+         *  */
+        resSubSets1.add(new LinkedList<>(pathSubsets)); /**注：这里必须是new一个*/
+        if (index==nums.length) return; /**注：这里不retrun也是可以的*/
         for (int i = index; i < nums.length; i++) {
             pathSubsets.add(nums[i]);
             subsetsBack(nums,i+1,pathSubsets);

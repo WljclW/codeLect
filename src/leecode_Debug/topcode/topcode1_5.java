@@ -62,38 +62,6 @@ public class topcode1_5 {
     //92
 
 
-    //78
-    List<List<Integer>> resSubsets;
-    public List<List<Integer>> subsets(int[] nums) {
-        resSubsets = new LinkedList<>();
-        LinkedList<Integer> path = new LinkedList<>();
-        subsetsBack(nums,path,0);
-        return resSubsets;
-    }
-
-    private void subsetsBack(int[] nums, LinkedList<Integer> path, int index) {
-//        if (index==nums.length) return; //写在这里是错误的！
-        resSubsets.add(new LinkedList<>(path));
-        /**err：不加这一句就可以，并不会发生StackOverflow！！但是如果加了这一句，则——————
-         *      这一句必须在“resSubsets.add(new LinkedList<>(path));”的后面，不然结果会
-         *  少很多，一句话概况少了多少，凡是包含最后nums最后一个元素的 子集，结果都没有。
-         *      进一步解释为什么？因为如果index==nums.length，根据for循环逻辑可知，一定是
-         *  上一步把最后一个元素添加进path了，然后递归调用subsetsBack，此时index==nums.length。
-         *  如果下面的这句话放在subsetsBack的第一行，就导致方法直接返回了，path没有添加进
-         *  结果！！!
-         *      再解释一下为什么不会发生StackOverflow？？方法的返回值是null，即使没有这一句，当
-         * index来到nums.length的时候，for循环由于循环条件不满足因此不会循环，导致方法结束，因此
-         * 并不会无终止的持续递归下去，因此不会栈溢出。
-         *  */
-        if (index==nums.length) return;
-        for (int i = index; i < nums.length; i++) {
-            path.add(nums[i]);
-            subsetsBack(nums,path,i+1);
-            path.removeLast();
-        }
-    }
-
-
     //110
 
     /**
