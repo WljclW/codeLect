@@ -598,6 +598,29 @@ public class _10binarySearch {
         return nums[right];
     }
 
+    /*写法3：思考能不能用“nums[mid]”和“nums[left]”进行比较？
+        答：强行写也是可以的，但是需要特殊的逻辑。
+    * */
+    public int findMin_02(int[] nums) {
+        int left = 0, right = nums.length - 1;
+
+        while (left < right) {
+            // 如果当前区间已经有序，left就是最小值
+            if (nums[left] < nums[right]) {
+                return nums[left];
+            }
+
+            int mid = left + (right - left) / 2;
+            // 关键！！！方向相反！！
+            if (nums[mid] >= nums[left]) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return nums[left];
+    }
+
 
 
     /*4.寻找两个正序数组的中位数

@@ -334,19 +334,6 @@ public class All1_5_template_1123 {
 //
 //    }
 
-
-    /*
-    143重排链表
-    给定一个单链表 L 的头节点 head ，单链表 L 表示为：
-    L0 → L1 → … → Ln - 1 → Ln
-    请将其重新排列后变为：
-    L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
-    不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
-     */
-//    public void reorderList(ListNode head) {
-//
-//    }
-
     /*23.合并 K 个升序链表
     * 给你一个链表数组，每个链表都已经按升序排列。
     请你将所有链表合并到一个升序链表中，返回合并后的链表。*/
@@ -1169,29 +1156,6 @@ int getMin() 获取堆栈中的最小元素。*/
 //    public ListNode swapPairs(ListNode head) {
 //
 //    }
-
-
-    /*283. 移动零
-给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
-请注意 ，必须在不复制数组的情况下原地对数组进行操作。
-     */
-    public void moveZeroes(int[] nums) {
-        int left = 0,cur = 0;
-        while (cur<nums.length){
-            if (nums[cur]!=0){
-                swap2(nums,left++,cur++);
-            }else {
-                cur++;
-            }
-        }
-    }
-
-    private void swap2(int[] nums, int left, int right) {
-        int tmp = nums[left];
-        nums[left] = nums[right];
-        nums[right] = tmp;
-    }
-
 
 
     /*468. 验证IP地址

@@ -1,11 +1,4 @@
-package leecode_Debug.topcode;
-
-import leecode_Debug.BTree.TreeNode;
-import leecode_Debug.top100.ListNode;
-
-import java.awt.*;
-import java.util.*;
-import java.util.List;
+package leecode_Debug.topcode_template_Locked;
 
 /**
  * 使用时复制一份！！！！！！
@@ -246,7 +239,7 @@ public class All1_5_template {
 
 
     /*
-    143重排链表
+    143. 重排链表
     给定一个单链表 L 的头节点 head ，单链表 L 表示为：
     L0 → L1 → … → Ln - 1 → Ln
     请将其重新排列后变为：

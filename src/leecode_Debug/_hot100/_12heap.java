@@ -1,9 +1,6 @@
 package leecode_Debug._hot100;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**215、掌握最优的解法；347；295*/
 public class _12heap {
@@ -12,10 +9,15 @@ public class _12heap {
     }
 
 
-    /*215.
+    /*215. 数组中的第K个最大元素
     * 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
     请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
     你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。*/
+
+    /**
+        更优的解法参考：leecode_Debug._hot100.codetop_unskilled#findKthLargest(int[], int)
+     */
+    /*写法1：偷懒的写法，借助优先级队列*/
     public int findKthLargest(int[] nums, int k) {
         PriorityQueue<Integer> queue = new PriorityQueue<>();
         int res = 0;
@@ -26,6 +28,42 @@ public class _12heap {
             queue.poll();
         }
         return queue.poll();
+    }
+
+    /*写法2：使用常规的快排版本。但是会有错————"超出时间限制   43 / 44 个通过的测试用例"*/
+    public int findKthLargest_1(int[] nums, int k) {
+        return findKthLargest(nums,0,nums.length-1,nums.length-k);
+    }
+
+    private int findKthLargest(int[] nums, int left, int right, int k) {
+        if (left==right) return nums[left];
+        int pivotIndex = left + new Random().nextInt(right - left + 1);
+        swap1(nums,pivotIndex,right);
+        pivotIndex = partion1(nums,left,right);
+        if (pivotIndex==k){
+            return nums[pivotIndex];
+        } else if (pivotIndex > k) {
+            return findKthLargest(nums,left,pivotIndex-1,k);
+        }else {
+            return findKthLargest(nums,pivotIndex+1,right,k);
+        }
+    }
+
+    private int partion1(int[] nums, int left, int right) {
+        int cur = left;
+        for (int i = left; i < right; i++) {
+            if (nums[i]<=nums[right]){
+                swap1(nums,cur++,i);
+            }
+        }
+        swap1(nums,right,cur); /**与for循环块内的swap参数有区别。这里不能再让cur加加了，快排的代码中也是一样的道理。。因为partion1方法要返回随机选的数放在哪个位置了(位置指的是索引值)*/
+        return cur;
+    }
+
+    private void swap1(int[] nums, int pivotIndex, int right) {
+        int tmp = nums[pivotIndex];
+        nums[pivotIndex] = nums[right];
+        nums[right] = tmp;
     }
 
 

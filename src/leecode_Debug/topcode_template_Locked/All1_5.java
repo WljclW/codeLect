@@ -1,20 +1,18 @@
-package leecode_Debug.topcode;
+package leecode_Debug.topcode_template_Locked;
 
 import leecode_Debug.BTree.TreeNode;
 import leecode_Debug.top100.ListNode;
 
-import javax.sql.rowset.FilteredRowSet;
-import java.io.File;
 import java.util.*;
 
 /**
- * 1~2————215`、53、手撕快排、5、92`、1143、93`、
+ * 1~2————215`、53、手撕快排、5、92`、1143、93`、143
  * 3——————151`、78、322、8
  * 4——————39`、470、122、
  * 5——————112、113`、179、718、手撕堆排序、14
  */
 /**codetop 1~5的全量——————=========1~5使用这个文件
- * err：5、20、215、92、105、234、283、39
+ * err：5、20、215、92、105、234、283、39、146、148、76、227`
  * undo：46的最优解、88、415、72题优化空间、1143空间优化的最优解、93、69、8、151、468`、718
  * 模糊：54
  *
@@ -767,21 +765,32 @@ public class All1_5 {
     不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
      */
     public void reorderList(ListNode head) {
+        //step1：base case的考虑
         if (head==null||head.next==null||head.next.next==null) return;
+        /*step2：找到中间的后面（偶数节点的话）那个节点*/
         ListNode mid = findMid1(head);
         ListNode head2 = mid.next;
-        mid.next = null;
-
+        mid.next = null; /**重点*/
+        /*step3：翻转后半部分链表*/
         head2 = reverse2(head2);
-        mergerTwo1(head,head2);
+        /*step4：合并"以head为头"和"以head2为头"的两半链表*/
+        mergerTwo1(head,head2); /**易错*/
     }
 
     private void mergerTwo1(ListNode head, ListNode head2) {
         while (head2!=null){
+            /**每一轮包含三个操作————
+             ①记录两段链表当前位置的下一个节点；
+             ②两段链表分别拿出一个拼接；
+             ③移动两段链表的指针
+             * */
+            //①
             ListNode headNext = head.next;
             ListNode head2Next = head2.next;
+            //②
             head.next = head2;
             head2.next = headNext;
+            //③
             head = headNext;
             head2 = head2Next;
         }
@@ -798,6 +807,9 @@ public class All1_5 {
         return pre;
     }
 
+    /*1. 此方法的目标：奇数节点的话返回中间节点，偶数节点的话返回中间的第二个节点。
+      2. 与常规找中间节点方法的唯一区别：fast指针初始值不是head，而是"head.next"
+    * */
     private ListNode findMid1(ListNode head) {
         ListNode slow = head,fast = head.next;
         while (fast!=null&&fast.next!=null){
@@ -2146,20 +2158,24 @@ int getMin() 获取堆栈中的最小元素。*/
      */
 
     /*110. 平衡二叉树
-给定一个二叉树，判断它是否是 平衡二叉树 */
-    public boolean isBalanced(TreeNode root) {
+    给定一个二叉树，判断它是否是 平衡二叉树 */
+    /**
+     【注意】其他的解法需要了解一下~~
+     */
+    public boolean isBalanced(leecode_Debug.top100.TreeNode root) {
         if (root==null) return true;
-        int left = getLength1(root.left);
-        int right = getLength1(root.right);
-        if (Math.abs(left-right)>1) return false;
-        return isBalanced(root.left)&&isBalanced(root.right);
+        int left = getDepth(root.left);
+        int right = getDepth(root.right);
+        return isBalanced(root.left)&&
+                isBalanced(root.right)&&
+                Math.abs(left-right)<=1; /**【注意】高度之差的要求：小于等于1（等于1是包含的）*/
     }
 
-    private int getLength1(TreeNode root) {
+    private int getDepth(leecode_Debug.top100.TreeNode root) {
         if (root==null) return 0;
-        int left = getLength1(root.left);
-        int right = getLength1(root.right);
-        return 1+Math.max(left,right);
+        int l = getDepth(root.left);
+        int r = getDepth(root.right);
+        return Math.max(l,r)+1;
     }
 
     /*122. 买卖股票的最佳时机 II
@@ -2814,17 +2830,29 @@ int getMin() 获取堆栈中的最小元素。*/
         于原来i和left相等，因此相当于同一个位置交换，nums[0]的值依然是1，因此满足while条件，进入
         到循环执行“swap5(nums,left++,i);”......
      */
+    /*错误的写法。。。*/
+//    public void moveZeroes(int[] nums) {
+//        if (nums.length<=1) return;
+//        int left = 0;
+//        for (int i = 0; i < nums.length; i++) {
+//            while (nums[i]!=0){ /**err：会导致死循环。。。。。这里需要使用if，不能用while*/
+//                swap5(nums,left++,i);
+//            }
+//        }
+//    }
+
+    /*写法1：使用for循环。*/
     public void moveZeroes(int[] nums) {
         if (nums.length<=1) return;
         int left = 0;
         for (int i = 0; i < nums.length; i++) {
-            while (nums[i]!=0){ /**err：会导致死循环。。。。。这里需要使用if，不能用while*/
+            if (nums[i]!=0){ /**err：这里需要使用if，不能用while*/
                 swap5(nums,left++,i);
             }
         }
     }
 
-    /*主方法可以写成下面的形式*/
+    /*写法2：使用while循环，主方法可以写成下面的形式*/
     public void moveZeroes1(int[] nums) {
         if (nums.length<=1) return;
         int left = 0;

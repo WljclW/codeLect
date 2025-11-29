@@ -1,29 +1,9 @@
-package topcodeReview;
-
-import leecode_Debug.top100.ListNode;
-import leecode_Debug.top100.TreeNode;
-import zuo_course_01base.No_5_binaryTree.ershua.Node;
-
-import java.util.*;
+package leecode_Debug.topcode_template_Locked;
 
 /**
- * 未：498、224、460、123；
- *    LCR 170、LCR 155、LCR 143、572；
- *    450、10、440、LCR 159；
- *    LCR 187、679、44、887、97
- *    673、395、
- *
- *    
- * err：75、287、402、50、329、295、384、400、611、26
- *      279、LCR 146. 螺旋遍历二维数组、63、279、
- *
- * err：279、120. 三角形最小路径和、384.打乱数组、LCR 187. 破冰游戏、
- *      400.第N个数字、50. Pow(x, n)、516. 最长回文子序列、LCR 143 子结构判断（两种实现）、572. 另一个树的子树（两种方法实现）、
- *      7.整数反转、LCR 155. 将二叉搜索树转化为排序的双向链表、679。24 点游戏、498.对角线遍历、
- *      673. 最长递增子序列的个数、440. 字典序的第K小数字、97. 交错字符串、
- *      44.通配符匹配（三种方式都写出来，对比“编辑距离”的三种写法）
+ * 使用时复制一份！！！！！！
  */
-public class All6_10_review {
+public class All6_10_template {
     /*739.每日温度
     给定一个整数数组 temperatures ，表示每天的温度，返回一个数组 answer ，其中 answer[i] 是指对于第
      i 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 0 来代替。
@@ -205,37 +185,6 @@ candidates 中的每个数字在每个组合中只能使用 一次 。
 
 
     /*手撕归并排序*/
-
-    /**
-     实际的题目中可能是有返回值的，下面的额方法会直接修改原始数组nums。因此只需要调用下面的方法后，返回nums
-     即可（把原始的数组返回去）
-     */
-    public void mergeSort(int[] nums,int left,int right){
-        if (left>=right) return;
-        int mid = left+(right-left)/2;
-        mergeSort(nums,left,mid);
-        mergeSort(nums,mid+1,right);
-        mergeSort(nums,left,mid,right);
-    }
-
-    private void mergeSort(int[] nums, int left, int mid, int right) {
-        int[] tmp = new int[right - left + 1];
-        int p1 = left,p2 = mid+1;
-        int index = 0;
-        while (p1<=mid&&p2<=right){
-            if (nums[p1]<nums[p2]){
-                tmp[index++] = nums[p1++];
-            }else {
-                tmp[index++] = nums[p2++];
-            }
-        }
-        while (p1<=mid) tmp[index++] = nums[p1++];
-        while (p2<=right) tmp[index++] = nums[p2++];
-
-        for (int i = 0; i < tmp.length; i++) {
-            nums[left+i] = tmp[i];
-        }
-    }
 
 
     /*136.只出现一次的数字
@@ -857,26 +806,9 @@ boolean empty() 如果栈是空的，返回 true ；否则，返回 false 。
 
 子序列定义为：不改变剩余字符顺序的情况下，删除某些字符或者不删除任何字符形成的一个序列。
      */
-    public int longestPalindromeSubseq(String s) {
-        int n = s.length();
-        int[][] dp = new int[n][n];
-        for (int i = 0; i < n; i++) {
-            dp[i][i] = 1;
-        }
-
-        for (int i = n-2; i >=0; i--) {
-            for (int j = i+1; j < n; j++) {
-                char c1 = s.charAt(i);
-                char c2 = s.charAt(j);
-                if (c1==c2){
-                    dp[i][j] = dp[i+1][j-1]+2;
-                }else {
-                    dp[i][j] = Math.max(dp[i+1][j],dp[i][j-1]);
-                }
-            }
-        }
-        return dp[0][n-1];
-    }
+//    public int longestPalindromeSubseq(String s) {
+//
+//    }
 
 
 
@@ -1049,37 +981,6 @@ boolean empty() 如果栈是空的，返回 true ；否则，返回 false 。
     * */
 //    public boolean isInterleave(String s1, String s2, String s3) {
 //
-//    }
-
-//    public boolean isInterleave(String s1, String s2, String s3) {
-//        int m = s1.length(),n = s2.length();
-//        if (m+n!=s3.length()) return false;
-//        boolean[][] dp = new boolean[m + 1][n + 1];
-//        dp[0][0] = true;
-//        for (int i = 1; i <= n; i++) {
-//            if (s2.substring(0,i).equals(s3.substring(0,i))){
-//                dp[0][i] = true;
-//            }
-//        }
-//
-//        for (int i = 1; i <= m; i++) {
-//            if (s1.substring(0,i).equals(s3.substring(0,i))){
-//                dp[i][0] = true;
-//            }
-//        }
-//
-//        for (int i = 1; i <= m; i++) {
-//            for (int j = 1; j <= n; j++) {
-//                char c1 = s1.charAt(i - 1);
-//                char c2 = s2.charAt(j - 1);
-//                char c3 = s3.charAt(i + j - 1);
-//                if (c1==c3||c2==c3){
-//                    dp[i][j] = dp[i-1][j-1];
-//                }else {
-//
-//                }
-//            }
-//        }
 //    }
 
 

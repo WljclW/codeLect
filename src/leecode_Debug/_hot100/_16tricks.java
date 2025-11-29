@@ -11,7 +11,7 @@ public class _16tricks {
     * 出现两次。找出那个只出现了一次的元素。
     你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。*/
     public int singleNumber(int[] nums) {
-        int res = 0;
+        int res = 0; /**注：这个题res只能初始化为0，因为其他数可能在数组中出现过，res初始化为其他数可能出错*/
         for (int i:nums){
             res ^= i;
         }
