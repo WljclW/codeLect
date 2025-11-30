@@ -6,7 +6,7 @@ import leecode_Debug.top100.ListNode;
 import java.util.*;
 
 /**
- * 1~2————215`、53、手撕快排、5、92`、1143、93`、143
+ * 1~2————215`、53、912` 快排、5、92`、1143、93`、143
  * 3——————151`、78、322、8
  * 4——————39`、470、122、
  * 5——————112、113`、179、718、手撕堆排序、14
@@ -894,7 +894,7 @@ public class All1_5 {
         int j = num2.length() - 1;
         int carry = 0;
 
-        while (i >= 0 || j >= 0 || carry > 0) {
+        while (i >= 0 || j >= 0 || carry > 0) { /**err：三个条件缺一不可*/
             int x = (i >= 0) ? num1.charAt(i--) - '0' : 0; /**把”取某位置的字符“和”更新索引位置“结合，避免忘记。。（前提是后续不会使用这个变量，比如：计算长度等，就需要及逆行矫正了）*/
             int y = (j >= 0) ? num2.charAt(j--) - '0' : 0;
             int sum = x + y + carry;
@@ -1487,6 +1487,8 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
     由于返回类型是整数，结果只保留 整数部分 ，小数部分将被 舍去 。
     注意：不允许使用任何内置指数函数和算符，例如 pow(x, 0.5) 或者 x ** 0.5 。*/
     /**
+     【建议的解法】
+            1. 建议使用的解法 mySqrt。
      【解法】实质就是二分查找“自身平方小于等于x的最大的整数”————因此等价于二分查找右边界问题。
      【关键问题】
             1. 0、1的特殊处理，平方根是它自身。
@@ -1502,7 +1504,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         while (left<=right){
             int mid = left+(right-left)/2;
             /**err：mid*mid可能会发生整型溢出，需不需要考虑这个情况？？？需要验证！！！chatgpt给的优化建议：long square = (long) mid * mid;*/
-            if ((long)mid*mid>x){ /**err：在要转换为long类型！！*/
+            if ((long)mid*mid>x){ /**err：转换为long类型！！*/
                 right = mid-1;
             }else if ((long)mid*mid<x){
                 left = mid+1;
@@ -1537,7 +1539,10 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      *       记录位置(如果等于的时候就直接返回了)；
      *
      */
-    public int mySqrt1(int x) {
+    /*解法2：标记可能的答案ans（二分法的另一种写法，左神常用）。。。
+        最终返回最后一次的标记值就可以了
+    * */
+    public int mySqrt_1(int x) {
         if (x < 2) return x; // 0 和 1 特殊处理，平方根是自己
 
         int left = 1, right = x / 2, ans = 0;

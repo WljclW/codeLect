@@ -19,8 +19,8 @@ public class codetop_5 {
     给定一个已排序的链表的头 head ， 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回 已排序的链表 。
     * */
     /**
-     * 【建议】建议看官方的解法：见方法deleteDuplicates.....
-     *          但是练习中发现deleteDuplicates_82解法用的熟
+     * 【建议】建议看官方的解法：见方法 deleteDuplicates.....
+     *          但是练习中发现 deleteDuplicates_82 解法用的熟
      * 【常错的点】（1）不论哪种解法，“cur = cur.next;”都要放在else块，这是关键！！
      *            （2）不论哪一种解法，cur指针不是指向dummy，就是指向结果链表中的最后一个节点(即保证这个节点一定是在结果中)
      * 【与83的区别】由于要删除所有值相等的节点，因此最后链表中可能一个节点都不剩，因此必须借助dummy节点来解题
@@ -53,8 +53,23 @@ public class codetop_5 {
     }
 
     /*自己的写法。建议看官方的写法，比较清晰*/
-    /**cur指向的是已经拼接到结果链表中的最后一个节点（即cur及之前的位置一定是在结果链表中（除了dummy），即保证不会有重复值的节点）；
-     * cur.next指向的是第一个没有研究的节点————即目前还不确定它是不是应该留下来*/
+    /**【变量说明】cur指向的是已经拼接到结果链表中的最后一个节点（即cur及之前的位置一定是在结果链表中（除了dummy），即保证不会有重复值的节点）；
+     cur.next指向的是第一个没有研究的节点————即目前还不确定它是不是应该留下来
+      【步骤详解】
+            step1：特殊情况的判断。
+            step2：设置虚拟头节点。。因为要删除所有的相同节点，因此最后链表可能是空，即一个节点都没有。
+            step3：只要cur后面还有两个节点，就进入while进行研究————
+                   ----情况1：如果"cur.next.val"等于"cur.next.next.val"，即cur后两个节点的值相等，
+               此时进入到if语句块。。。需要做什么？使用while循环跳过所有值为"cur.next.val"的节点，此
+               时就是把cur.next.next节点删除————语句就是"cur.next.next  = cur.next.next.next;"。while
+               循环结束后，cur.next.next要麽是null，要麽不是null值也不是cur.next.val。但是由于cur.next
+               的值出现过相等的情况，因此还要删除cur.next节点————语句就是"cur.next = cur.next.next;"
+                   ----情况2：如果"cur.next.val"不等于"cur.next.next.val"。说明cur.next的值只出现一次，
+               此时需要保留cur.next节点————对应的语句就是"cur = cur.next;"
+            step4：结束while循环，说明cur后面不足两个节点了，就不用研究了，返回dummy.next。
+            [补充说明]由于while循环内部已经完成了 无用节点的删除，因此出了while循环不用特殊处理就可以，直
+                接返回
+     */
     public ListNode deleteDuplicates_82(ListNode head) {
         if (head==null||head.next==null) return head;
         ListNode dummy = new ListNode(-1, head),cur = dummy;
@@ -70,9 +85,11 @@ public class codetop_5 {
             if (cur.next.next.val==val){ /**如果相等，用while循环跳过所有相等的节点*/
                 while (cur.next.next!=null&&cur.next.next.val==val){
                     /**删除掉cur后面的第二个节点。即”cur===>node1====>node2====>node3“变
-                     为”cur===>node1====>node3”，删除中间的node2*/
+                     为”cur===>node1====>node3”，删除中间的node2。。。因为node2.val与node1.val
+                     的值是相等的。*/
                     cur.next.next  = cur.next.next.next;
                 }
+                //进入到if，说明cur.next节点的值后面出现了，因此删除cur.next。
                 cur.next = cur.next.next;
             }else { /**err：这里的else是精髓，必须使用else来实现*/
                 cur = cur.next;
@@ -760,7 +777,7 @@ public class codetop_5 {
         int l = 0,r = nums.length-1;
         while (l < r) { /**err：要找峰值，由于一定存在，因此最后指针的位置就是峰值位置（不用带等号）*/
             int mid = l + (r - l) / 2;
-            if (nums[mid] >= nums[mid + 1]) { /**err：这里带不带等于都是可以的。但是按照原理来讲，最好不带。（其实相等的时候朝哪一个方向进行都可以）*/
+            if (nums[mid] >= nums[mid + 1]) { /**err：这里带不带等于都是可以的（本质原因：其实相等的时候朝哪一个方向进行都可以）。但是按照原理来讲，最好不带。*/
                 /**err：沿着大数一边走必然能遇到峰值，并且nums[mid]可能就是峰值，因此“r=mid-1”是错误的，可能
                  错过峰值！！！
                     如果使用“r=mid-1”，就错误过峰值，比如提交时case2报错————

@@ -121,114 +121,6 @@ public class All1_5_template_1123 {
 //
 //    }
 
-
-
-    /*46.全排列
-    给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
-    * */
-    List<List<Integer>> resPermute;
-    boolean[] used;
-    public List<List<Integer>> permute(int[] nums) {
-        resPermute = new LinkedList<>();
-        LinkedList<Integer> path = new LinkedList<>();
-        used = new boolean[nums.length];
-        permute(nums,path);
-        return resPermute;
-    }
-
-    private void permute(int[] nums, LinkedList<Integer> path) {
-        if (path.size()==nums.length){
-            resPermute.add(new LinkedList<>(path));
-        }
-        for (int i = 0; i < nums.length; i++) {
-            if (!used[i]){
-                used[i] = true;
-                path.add(nums[i]);
-                permute(nums,path);
-                path.removeLast();
-                used[i] = false;
-            }
-        }
-    }
-
-
-    /*88. 合并两个有序数组
-给你两个按 非递减顺序 排列的整数数组 nums1 和 nums2，另有两个整数 m 和 n ，分别表示 nums1 和 nums2 中的元素数目。
-
-请你 合并 nums2 到 nums1 中，使合并后的数组同样按 非递减顺序 排列。
-
-注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。*/
-    public void merge(int[] nums1, int m, int[] nums2, int n) {
-        int i = m-1,j = n-1;
-        int cur = m+n-1;
-        while (i>=0&&j>=0){
-            if (nums1[i]>nums2[j]){
-                nums1[cur--] = nums1[i--];
-            }else {
-                nums1[cur--] = nums2[j--];
-            }
-        }
-        while (j>=0) nums1[cur--] = nums2[j--];
-    }
-
-
-     /*20.有效的括号
-    * 给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是
-    * 否有效。
-    有效字符串需满足：
-    左括号必须用相同类型的右括号闭合。
-    左括号必须以正确的顺序闭合。
-    每个右括号都有一个对应的相同类型的左括号。*/
-    public boolean isValid(String s) {
-        HashMap<Character, Character> map = new HashMap<>() {
-            {
-                put(')', '(');
-                put(']', '[');
-                put('}', '{');
-            }
-        };
-        Stack<Character> stack = new Stack<>();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (map.containsKey(c)){
-                if (stack.isEmpty()||stack.pop().charValue()!=map.get(c)){
-                    return false;
-                }
-            }
-            stack.push(c);
-        }
-        return stack.isEmpty();
-    }
-    
-    
-    //912 快排
-    private void quickSort(int[] nums,int left,int right){
-        if (left>=right) return;
-        int pivotIndex = left+new Random().nextInt(0,right-left+1);
-        swap322(nums,pivotIndex,right);
-        pivotIndex = partion11(nums,left,right);
-        quickSort(nums,left,pivotIndex-1);
-        quickSort(nums,pivotIndex+1,right);
-    }
-
-    private int partion11(int[] nums, int left, int right) {
-        int cur = left;
-        for (int i = left; i < right; i++) {
-            if (nums[i]<=nums[right]){
-                nums[cur++] = nums[i];
-            }
-        }
-        swap322(nums,cur,right);
-        return cur;
-    }
-
-    private void swap322(int[] nums, int left, int right) {
-        int tmp = nums[left];
-        nums[left] = nums[right];
-        nums[right] = tmp;
-    }
-
-
     /*121.买卖股票的最佳时机
     * 给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
         你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一
@@ -294,37 +186,6 @@ public class All1_5_template_1123 {
 //
 //    }
 
-    /*54.螺旋矩阵
-     * 给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
-     * */
-    public List<Integer> spiralOrder(int[][] matrix) {
-        LinkedList<Integer> res = new LinkedList<>();
-        int left = 0,right = matrix[0].length-1;
-        int top  = 0,bottom = matrix.length-1;
-        while (true){
-            for (int i = left; i <= right; i++) {
-                res.add(matrix[top][i]);
-            }
-            if (++top>bottom) break;
-
-            for (int i = top; i <= bottom; i++) {
-                res.add(matrix[i][right]);
-            }
-            if (--right<left) break;
-
-            for (int i = right; i >= left; i--) {
-                res.add(matrix[bottom][i]);
-            }
-            if (--bottom<top) break;
-
-            for (int i = bottom; i >= top; i--) {
-                res.add(matrix[i][left]);
-            }
-            if (++left>right) break;
-        }
-        return res;
-    }
-
 
     /*300.最长递增子序列
     * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
@@ -340,29 +201,6 @@ public class All1_5_template_1123 {
 //    public ListNode mergeKLists(ListNode[] lists) {
 //
 //    }
-
-
-    /*415. 字符串相加
-    给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和并同样以字符串形式返回。
-
-你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。*/
-    public String addStrings(String num1, String num2) {
-        if ("0".equals(num1)||"0".equals(num2)){
-            return "0".equals(num1)?num2:num1;
-        }
-
-        StringBuilder res = new StringBuilder();
-        int i = num1.length()-1,j = num2.length()-1;
-        int carry = 0;
-        while (i>=0||j>=0){
-            int val1 = i>=0?num1.charAt(i--)-'0':0;
-            int val2 = j>=0?num2.charAt(j--)-'0':0;
-            int sum = val1+val2+carry;
-            res.append(sum%10);
-            carry /= 10;
-        }
-        return res.reverse().toString();
-    }
 
 
     /*56.合并区间
@@ -390,44 +228,6 @@ public class All1_5_template_1123 {
 //
 //    }
 
-
-    /*72.编辑距离
-    * 给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数  。
-    你可以对一个单词进行如下三种操作：
-    插入一个字符
-    删除一个字符
-    替换一个字符*/
-    public int minDistance(String word1, String word2) {
-        int m = word1.length(),n = word2.length();
-        if (m<n){
-            return minDistance(word2,word1);
-        }
-        int[] dp = new int[n + 1];
-        for (int i = 0; i <= n; i++) {
-            dp[i] = i;
-        }
-
-        for (int i = 1; i <= m; i++) {
-            int prev = dp[0];
-            dp[0] = i;
-            for (int j = 1; j <= n; j++) {
-                int tmp = dp[j];
-                char c1 = word1.charAt(i - 1);
-                char c2 = word2.charAt(j - 1);
-                if (c1==c2){
-                    dp[j] = prev;
-                }else {
-                    dp[j] = Math.min(Math.min(dp[j-1],dp[j]),prev)+1;
-                }
-                /**这样看的话，反而比”两行数组 来回切换“，这种方式好点，”两行数组“还需要考虑交换cur和prev后,是不是需要重置*/
-                prev = tmp;
-            }
-        }
-        return dp[n];
-    }
-
-
-
     /*124. 二叉树中的最大路径和
     二叉树中的 路径 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列
     中 至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。路径和 是路径中各节点值的总和。
@@ -449,29 +249,6 @@ public class All1_5_template_1123 {
 //    public List<String> restoreIpAddresses(String s) {
 //
 //    }
-
-
-    /*
-    82. 删除排序链表中的重复元素 II
-    给定一个已排序的链表的头 head ， 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回 已排序的链表 。
-    * */
-    public ListNode deleteDuplicates(ListNode head) {
-        if (head==null||head.next==null) return head;
-        ListNode dummy = new ListNode(-1, head),cur = dummy;
-        while (cur.next!=null&&cur.next.next!=null){
-            int val = cur.next.val;
-            if (cur.next.next!=null&&cur.next.next.val==val){
-                while (cur.next.next!=null&&cur.next.next.val==val){
-                    cur.next.next = cur.next.next.next;
-                }
-                cur.next = cur.next.next;
-            }else {
-                cur = cur.next;
-            }
-        }
-        return dummy.next;
-    }
-
 
     /*142.环形链表 II
      * 给定一个链表的头节点  head ，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。*/
@@ -622,31 +399,6 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 //    }
 
 
-    /*69. x 的平方根
-给你一个非负整数 x ，计算并返回 x 的 算术平方根 。
-
-由于返回类型是整数，结果只保留 整数部分 ，小数部分将被 舍去 。
-
-注意：不允许使用任何内置指数函数和算符，例如 pow(x, 0.5) 或者 x ** 0.5 。*/
-    public int mySqrt(int x) {
-        if (x<=1) return x;
-        int left = 1,right = x/2;
-        while (left<=right){
-            int mid = left+(right-left)/2;
-            long cur = (long) mid*mid;
-            if (cur==x){
-                return mid;
-            } else if (cur > x) {
-                right = mid-1;
-            }else {
-                left = mid+1;
-            }
-        }
-        return right;
-    }
-
-
-
     /*32.最长有效括号
      * 给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的
      * 长度。*/
@@ -702,28 +454,6 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
 //    public int firstMissingPositive(int[] nums) {
 //
 //    }
-
-
-    //    /*105.
-//     * 从前序 和 中序 构造出二叉树*/
-    HashMap<Integer,Integer> inorderMap;
-    int preorderIndex;
-    public TreeNode buildTree(int[] preorder, int[] inorder) {
-        for (int i = 0; i < inorder.length; i++) {
-            inorderMap.put(inorder[i],i);
-        }
-        return buildTree(preorder,inorder,0,inorder.length-1);
-    }
-
-    private TreeNode buildTree(int[] preorder, int[] inorder, int left, int right) {
-        if(left>right) return null;
-        int rootVal = preorder[preorderIndex++];
-        int index = inorderMap.get(rootVal);
-        TreeNode root = new TreeNode(rootVal);
-        root.left = buildTree(preorder,inorder,left,index-1);
-        root.right = buildTree(preorder,inorder,index+1,right);
-        return root;
-    }
 
 
     /*151. 反转字符串中的单词
@@ -913,50 +643,6 @@ int getMin() 获取堆栈中的最小元素。*/
 //    }
 
 
-    /*234。回文链表
-    给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返回 true ；否则，返回 false 。
-     */
-
-    /**
-     * 这样做，如果是偶数节点，前半部分的链表会多一个节点
-     * @param head
-     * @return
-     */
-    public boolean isPalindrome(ListNode head) {
-        if (head==null||head.next==null) return true;
-        ListNode midPost = findMid2(head);
-        ListNode head2 = reverse2(midPost);
-        while (head2!=null){
-            if (head2.val!=head.val){
-                return false;
-            }
-            head2 = head2.next;
-            head = head.next;
-        }
-        return true;
-    }
-
-    private ListNode reverse2(ListNode head) {
-        ListNode pre = null,cur = head;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
-    }
-
-    private ListNode findMid2(ListNode head) {
-        ListNode slow=head,fast= head;
-        while (fast!=null&&fast.next!=null){
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-        return slow;
-    }
-
-
     /*98 验证二叉搜索树
         给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。
 
@@ -1003,32 +689,6 @@ int getMin() 获取堆栈中的最小元素。*/
      *=================================================5=====================================
      *=================================================5=====================================
      */
-
-
-    /*162. 寻找峰值
-峰值元素是指其值严格大于左右相邻值的元素。
-
-给你一个整数数组 nums，找到峰值元素并返回其索引。数组可能包含多个峰值，在这种情况下，返回 任何一个峰值 所在位置即可。
-
-你可以假设 nums[-1] = nums[n] = -∞ 。
-
-你必须实现时间复杂度为 O(log n) 的算法来解决此问题。
-     */
-    public int findPeakElement(int[] nums) {
-        int left = 0,right = nums.length-1;
-        while (left<right){
-            int mid = left+(right-left)/2;
-            /**这样的写法对吗？？*/
-            if (nums[mid]>nums[mid+1]){
-                right = mid;
-            }else {
-                left = mid+1;
-            }
-        }
-        return left;
-    }
-
-
     /*662. 二叉树最大宽度
 给你一棵二叉树的根节点 root ，返回树的 最大宽度 。
 
