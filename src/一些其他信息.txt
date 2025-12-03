@@ -12,3 +12,6 @@ https://mp.weixin.qq.com/s/_IMUhR7I9w7WVe9035_lsQ
 
 clash订阅：
 https://msub.xn--m7r52rosihxm.com/api/v1/client/subscribe?token=dcacbace29de7e8186817034b29edc95
+
+公众号博客
+https://mp.weixin.qq.com/s/UatAJp8vSqziiB1spoPf-g
