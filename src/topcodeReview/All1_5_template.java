@@ -162,4 +162,20 @@ xi 是一个 十六进制字符串 ，可以包含数字、小写英文字母( '
         if ((right-left==2&&Integer.valueOf(s.substring(left,right+1))>255)) return false;
         return true;
     }
+
+
+    /**
+     * =================================================12.2
+     * =================================================12.2
+     * =================================================12.2
+     */
+    public int findKthLargest(int[] nums, int k) {
+        return findKthLargest(nums,0,nums.length-1,nums.length-k);
+    }
+
+    private int findKthLargest(int[] nums, int left, int right, int k) {
+        int pivotIndex = left + new Random().nextInt(0,right-left+1);
+        int pivotNum = nums[pivotIndex];
+        
+    }
 }

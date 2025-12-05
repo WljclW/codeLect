@@ -246,6 +246,7 @@ public class All1_5 {
     /*
     912，手撕快排
      */
+    /**【注意】下面的解法需要验证一下，貌似有的测试用例会超时*/
     public void quickSort(int[] arr,int left,int right) {
         if (left>=right) return; /**err：快排中这里的条件必须是“left>=right”或者“left>right”.如果仅仅有等号是不对的*/
         /**如果上面的if写成“if (left==right) return;”，912题提交时下面这行会报错————
@@ -301,6 +302,7 @@ public class All1_5 {
     给你一个字符串 s，找到 s 中最长的 回文 子串。
      */
     /**
+     * 【说明】详细的解释参考：leecode_Debug._hot100.codetop_unskilled#longestPalindrome_review(java.lang.String)
      * 马拉车算法 可以实现将时间复杂度降为O(N)，但是空间复杂度高于“中心扩散法”，空间复杂度为O(N)。
      */
     public String longestPalindrome(String s) {
@@ -344,13 +346,6 @@ public class All1_5 {
      * 中心扩散法的复杂度分析：
      *      时间复杂度：O(N^2)；
      *      空间复杂度：O(1)
-     *中心扩散法中最关键的有两点：
-     *      第一点：双指针 + while循环计算回文长度返回，此时返回值是“(r-1)-(l+1)+1”即r-l-1。并且这个值就
-     *  是真实的回文子串的长度，因为计算方式是边界索引值相减的，与“回文中心是（i，i）还是（i，i+1）”是没有关
-     *  系的。
-     *      第二点：更新回文子串的最大长度时，同时更新回文子串的起始位置，这个起始位置是关键————i-(len-1)/2。
-     * @param s
-     * @return
      */
     public String longestPalindrome_1(String s) {
         int start = 0, maxLen = 0;
@@ -371,15 +366,6 @@ public class All1_5 {
             l--;
             r++;
         }
-        /**
-         * 如何理解下面返回值的计算？？？
-         *      根据while循环可知，只要“满足不越界 并且 字符相等”，就会执行while循环。。。。如果某次不再进
-         *   入了，说明此时此刻此时l和r“要么越界了 要么对应的字符不相等”————即回文子串不包含r位置也不包含l位
-         *   置。
-         *      如果是之前滑动窗口、二分法等包括左右边界，此时计算长度的表达式就是“r-l+1”。
-         *      但是这里是既不包含左边界，也不包含右边界，因此最后有效回文是闭区间 [l+1, r-1]，此时的长度
-         *   是“(r-1)-(l+1)+1”即r-l-1
-         */
         return r-l-1; /***这里是如何理解的？？*/
     }
 
@@ -455,13 +441,13 @@ public class All1_5 {
     岛屿总是被水包围，并且每座岛屿只能由水平方向和/或竖直方向上相邻的陆地连接形成。
     此外，你可以假设该网格的四条边均被水包围。
     * */
-    public int numIsland(char[][] grid){
+    public int numIsland(char[][] grid) {
         int res = 0;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[0].length; j++) {
-                if (grid[i][j]=='1'){
+                if (grid[i][j] == '1') {
                     res++;
-                    dfs1(grid,i,j);
+                    dfs1(grid, i, j);
                 }
             }
         }
@@ -469,12 +455,12 @@ public class All1_5 {
     }
 
     private void dfs1(char[][] grid, int i, int j) {
-        if (i<0||i>=grid.length||j<0||j>=grid[0].length||grid[i][j]!='1') return;
+        if (i < 0 || i >= grid.length || j < 0 || j >= grid[0].length || grid[i][j] != '1') return;
         grid[i][j] = '\n';
-        dfs1(grid,i-1,j);
-        dfs1(grid,i+1,j);
-        dfs1(grid,i,j-1);
-        dfs1(grid,i,j+1);
+        dfs1(grid, i - 1, j);
+        dfs1(grid, i + 1, j);
+        dfs1(grid, i, j - 1);
+        dfs1(grid, i, j + 1);
     }
 
     /*46.

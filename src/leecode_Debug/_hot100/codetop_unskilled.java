@@ -299,13 +299,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         return s.substring(start, start + maxLen);
     }
 
-
-
-    //92
-//    public ListNode reverseBetween(ListNode head, int left, int right) {
-//
-//    }
-
     /**
      * ==============================1~5 page====================================================================================
      * ==============================1~5 page====================================================================================
@@ -344,7 +337,8 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
     /*解法2：快排的思路。下面的写法会超时，思考为什么？？？
     *   快排是每一轮会把一个数放在正确的位置，如果某一轮结束某个数被放在n-k的位置，说明这个数就是答案。
-    * 为什么最优？这个题求解的是第K个最大数，其他的数并不要求有序！
+    * 为什么最优？这个题求解的是第K个最大数，其他的数并不要求有序！排序的话会强制全数组变得有序，这种肯定
+    * 多干了许多事。
     *   此时的复杂度分析：
     *       时间复杂度：O(N)
     *       空间复杂度：O(1)（原地操作，递归栈深度 O(log n)）。
@@ -374,7 +368,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     private int partion(int[] nums, int l, int r) {
         int cur = l;
         for (int i = l; i < r; i++) {
-            if (nums[i] < nums[r]) {
+            if (nums[i] < nums[r]) { //快排的版本这里带不带等于都可以
                 swap(nums, cur++, i);
             }
         }
@@ -489,7 +483,11 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             int pivotIndex = left + random.nextInt(right - left + 1);
             int pivot = nums[pivotIndex];
 
-            // 2. 三向划分
+            /* 2. 三向划分。划分的最终结果：
+                ①左闭右开区间 [left,lt）这些元素都是小于pivot的元素
+                ②闭区间 [lt,gt]这些元素都是等于pivot的元素。
+                ③左开右闭区间（gt，right]都是大于pivot的元素
+             */
             int[] range = partition3Way(nums, left, right, pivot);
             int lt = range[0], gt = range[1];
 
@@ -507,10 +505,26 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
     /**
-      三向划分（Dutch National Flag）,使得区间被分为：
+      1. 方法的功能：三向划分（Dutch National Flag）,使得区间被分为：
                 [left, lt-1] < pivot
                 [lt, gt] == pivot
                 [gt+1, right] > pivot
+      2. 理解此方法，有以下几个关键点
+          关键点1：这种方法中，任意时刻，数组会被划分为4部分（有些部分可能为空）————
+                 nums[left .. lt-1]：所有元素 < pivot
+                 nums[lt .. i-1]：所有元素 == pivot
+                 nums[i .. gt]：未检查/未知区
+                 nums[gt+1 .. right]：所有元素 > pivot
+             这条不变式是算法正确性的关键。每一步的 swap/指针移动都维护这个不变式，并逐步缩小未知区 [i..gt]。
+          关键点2：结束时 lt 和 gt 指向什么位置？有什么特征？
+                 当循环结束（i > gt）时，未知区已经被处理完毕（为空）。因此：
+             lt：等于段（== pivot）区间的起始索引。也就是说，lt 指向第一个等于 pivot 的元素（如果存在）。
+             gt：等于段（== pivot）区间的结束索引。也就是说，gt 指向最后一个等于 pivot 的元素（如果存在）。
+             换言之，等于 pivot 的元素全部位于 nums[lt .. gt]（闭区间）。
+          关键点3：等于区可能为空（【说明】但是这个题等于的区域不可能是空，因为pivot就是从数组中选出来的）
+                 如果没有任何元素等于 pivot，则等于区为空，表现为 lt > gt。例如：若所有元素 < pivot，循环结束
+             时 lt == right+1，gt == right → lt > gt。若所有元素 > pivot，循环结束时 lt == left，gt == left-1 → lt > gt。
+             因此必须在调用方处理 lt>gt 表示“无等于元素”的情况。
      */
     private int[] partition3Way(int[] nums, int left, int right, int pivot) {
         int lt = left;    // 小于 pivot 的区域边界
@@ -587,7 +601,9 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
 
-    //5
+    /*5 最长回文子串
+    给你一个字符串 s，找到 s 中最长的 回文 子串。
+     */
     public String longestPalindrome_review(String s) {
         if (s == null || s.length() == 0) return "";
         StringBuilder sb = new StringBuilder("#");
@@ -604,9 +620,11 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         for (int i = 0; i < n; i++) {
             /*3.1 这一步就是“马拉车算法”的核心精髓。。具体的做法如下————
                       （1）计算出i位置关于“目前回文中心”center的对称位置。
-                      （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信息*/
+                      （2）如果现在研究的位置i不超过“最远回文右边界”right，则可以快速计算出p[i]————这一步会充分用到之前已经计算的信
+                  息。。达成的效果就是”每次到达i位置时，（i,j]子串如果回文它的回文长度是多少？ 且 j∈(i,right]————这些位置的答案就不
+                  用计算了，可以直接得到结果“*/
             int mirror = 2*center-i;
-            if (i<right){
+            if (i<right){ /**有一个疑问，这里带等于的时候对不对*/
                 p[i] = Math.min(right-i,p[mirror]);
             }
 
@@ -649,8 +667,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      *  是真实的回文子串的长度，因为计算方式是边界索引值相减的，与“回文中心是（i，i）还是（i，i+1）”是没有关
      *  系的。
      *      第二点：更新回文子串的最大长度时，同时更新回文子串的起始位置，这个起始位置是关键————i-(len-1)/2。
-     * @param s
-     * @return
      */
     public String longestPalindrome_1(String s) {
         int start = 0, maxLen = 0;
@@ -681,57 +697,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
          *   是“(r-1)-(l+1)+1”即r-l-1
          */
         return r-l-1; /***err：这里是如何理解的？？*/
-    }
-
-
-    //92
-
-    /**
-     *【思路】
-     *      1、使用虚拟头节点dummy；
-     *      2、for循环移动指针。目标：让pre指向left的前一个节点，让end指向right节点。
-     *      3、记录pre.next(此节点是需要翻转部分的第一个节点)，记录end.next(此节点即是反转部分
-     *          过后的第一个节点)；然后将end.next=null。
-     *          [补充说明]K个一组反转链表、这个题都会涉及到将某节点的next指针置为null，原因：翻
-     *          转链表的代码中，"while (cur!=null)"因此停止翻转的标志是cur来到null，如果不设置，
-     *          就会导致每一次都反转到链表的末尾才结束，这明显是错的。因为我们只需要翻转中间的某
-     *          一部分链表。
-     *      4、翻转从pre.next开始的链表，并进行节点的拼接。
-     *      5、返回dummy.next
-     */
-    public ListNode reverseBetween_(ListNode head, int left, int right) {
-        ListNode dummy = new ListNode(-1, head),pre = dummy,end = dummy;
-        for (int i = 0; i < left - 1; i++) { /**注意i的范围：让pre来到left的前一个节点，因此i只能走left-1步*/
-            pre = pre.next;
-        }
-        for (int i = 0; i < right; i++) { /**注意i的范围：让end来到right节点，因此i需要走right步*/
-            end = end.next;
-        }
-        /**这里的操作类似于“K个一组翻转链表”的操作。
-         *      1. 首先两个指针，分别来到“要反转部分的前一个节点pre（相当于 k个一组中前一组的最后一个节点）” 以及 “要反转部分的最后一个
-         *  节点end（相当于 k个一组中当前组的最后一个节点）”
-         *      2. 记录一下要反转部分的第一个节点start即pre.next；要反转部分之后的第一个节点next即end.next；
-         *      3. 将end.next置为null，之所以这麽设置是因为：翻转链表的时候“cur!=null”是循环结束的标志。
-         *      4. 翻转需要翻转的部分，并进行结果的拼接*/
-        ListNode start = pre.next;
-        ListNode next = end.next;
-        end.next = null;
-
-        pre.next = rever(start);
-        start.next = next;
-        return dummy.next;
-    }
-
-    //翻转链表的完整代码
-    private ListNode rever(ListNode head) {
-        ListNode pre = null,cur = head;
-        while (cur!=null){
-            ListNode next = cur.next;
-            cur.next = pre;
-            pre = cur;
-            cur = next;
-        }
-        return pre;
     }
 
     //8 字符串转换为整形

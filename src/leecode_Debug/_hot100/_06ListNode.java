@@ -970,7 +970,8 @@ public class _06ListNode {
 
 
 
-    /*92？？？
+    /*92. 反转链表 II
+给你单链表的头指针 head 和两个整数 left 和 right ，其中 left <= right 。请你反转从位置 left 到位置 right 的链表节点，返回 反转后的链表 。*/
     /*官方解：穿针引线法*/
     public ListNode reverseBetween(ListNode head, int left, int right) {
         ListNode dummy = new ListNode(-1, head);
@@ -1020,7 +1021,7 @@ public class _06ListNode {
 
     /*解法2：常规的数节点，然后反转*/
     /**
-     *【关键问题————捋清楚找哪一个节点；以及对应的i应该取的范围】
+     *一、 【关键问题————捋清楚找哪一个节点；以及对应的i应该取的范围】
      *      捋清楚链表数节点的问题————
      *    1.在i从0开始情况下，i<m。指针会从开始的地方走m步！！
      *    2. 题目中left是第left个节点，因此要从head之前的节点开始走，走left步，指针会指向left节点！但
@@ -1028,6 +1029,17 @@ public class _06ListNode {
      * 节点开始翻转链表），因此这里“i<left-1”。
      *    3. 题目中right指的也是第right个节点，因此从head前面的节点开始，走right步后指针会指向第right
      * 个节点！由于我们需要特殊处理第right个节点 以及 记录第right+1个节点，所以这里“i<right”。
+     *二、【解题思路 或者说 详细的步骤】
+     *      1、使用虚拟头节点dummy；
+     *      2、for循环移动指针。目标：让pre指向left的前一个节点，让end指向right节点。
+     *      3、记录pre.next(此节点是需要翻转部分的第一个节点)，记录end.next(此节点即是反转部分
+     *          过后的第一个节点)；然后将end.next=null。
+     *          [补充说明]K个一组反转链表、这个题都会涉及到将某节点的next指针置为null，原因：翻
+     *          转链表的代码中，"while (cur!=null)"因此停止翻转的标志是cur来到null，如果不设置，
+     *          就会导致每一次都反转到链表的末尾才结束，这明显是错的。因为我们只需要翻转中间的某
+     *          一部分链表。
+     *      4、翻转从pre.next开始的链表，并进行节点的拼接。
+     *      5、返回dummy.next
      */
     public ListNode reverseBetween_(ListNode head, int left, int right) {
         /**
@@ -1043,12 +1055,18 @@ public class _06ListNode {
          节点“，因此第一个for循环”i<letf-1“；②我们想让fast指向“right节点”，也就是想来到”第right个节点“，
          因此第二个for循环条件是”i<right“.*/
         ListNode dummy = new ListNode(-1, head),slow = dummy,fast = dummy;
-        for (int i = 0; i < left - 1; i++) { /**err：slow要来到left的前一个节点，因此满足“i<left-1”*/
+        for (int i = 0; i < left - 1; i++) { /**err：我们的目标是slow要来到left的前一个节点，因此满足“i<left-1”————i只用走"left-1"步*/
             slow = slow.next;
         }
-        for (int i = 0; i < right; i++) { /**err：fast要来到right节点，因此“i<right”*/
+        for (int i = 0; i < right; i++) { /**err：fast要来到right节点，因此“i<right”————i需要走”right“步*/
             fast = fast.next;
         }
+        /**下面的操作类似于“K个一组翻转链表”的操作。
+         *      1. 首先两个指针，分别来到“要反转部分的前一个节点pre（相当于 k个一组中前一组的最后一个节点）” 以及 “要反转部分的最后一个
+         *  节点end（相当于 k个一组中当前组的最后一个节点）”
+         *      2. 记录一下要反转部分的第一个节点start即pre.next；要反转部分之后的第一个节点next即end.next；
+         *      3. 将end.next置为null，之所以这麽设置是因为：翻转链表的时候“cur!=null”是循环结束的标志。
+         *      4. 翻转需要翻转的部分，并进行结果的拼接*/
         /*其实就是“翻转从slow.next到fast的这段链表”，整体局面分为三部分“slow节点———>slow.next到fast翻转的结
           果————>restStart开始的剩余部分链表”，因此翻转完成后拼接上即可*/
         ListNode start = slow.next;
