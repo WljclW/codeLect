@@ -258,13 +258,14 @@ public class All6_10_template {
             if (root.left == null) return root.right;
             if (root.right == null) return root.left;
 
-            TreeNode minNode = findMin(root.right);
+            TreeNode minNode = findMinRight(root.right);
             root.val = minNode.val;
             return deleteNode(root.right, minNode.val);
         }
     }
 
-    private TreeNode findMin(TreeNode root) {
+    //寻找右子树的最小值
+    private TreeNode findMinRight(TreeNode root) {
         while (root.left!=null) root = root.left;
         return root;
     }

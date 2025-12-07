@@ -233,11 +233,12 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      */
     public String longestPalindrome(String s) {
         /*step1：特殊情况的考虑*/
-        if (s == null || s.length() == 0) return "";
+        if (s == null || s.length() <= 1) return s;
         /*step2：StringBuilder预处理字符串并构造出新字符串。做法————给原字符串所有的间隔（包括开始位置和结束位置）都加“#”*/
-        StringBuilder sb = new StringBuilder("#");
+        StringBuilder sb = new StringBuilder("#"); /**在构建的时候只能使用 字符串"#"*/
         for (char c : s.toCharArray()) {
             sb.append(c).append("#");
+//            sb.append(c).append('#');   /*等价于在最后添加 字符'#'*/
         }
         String str = sb.toString();
         int n = str.length();

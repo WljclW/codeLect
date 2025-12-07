@@ -382,12 +382,12 @@ public class _07binarytree {
     }
 
 
-    /*108.升序数组转换为平衡二叉搜索树*/
+    /*108. 将有序数组转换为二叉搜索树*/
     /**
      *【总结】所有根据“某些数据”构造二叉树的题都是一样的套路————
      *      step1：每一步进行时选出一个数创建节点作为当前的根节点；
      *      step2：判断左右子树的节点值都是哪些————即确定索引范围；
-     *      step3：确定出左右子树节点在数组中的范围后，递归调用构造出左右子树；
+     *      step3：确定出左右子树节点在数组中的范围后，递归调用此方法构造出左右子树；
      *      step4：将递归的返回值拼接到step2中的根节点；
      *      step5：返回step2中的根节点
      *   综上，这样的递归方法通常含有三个参数：①是数组；②、③是指明使用哪些数构造当前这
@@ -398,10 +398,21 @@ public class _07binarytree {
         return build(nums,0,nums.length-1);
     }
 
+    /*调用的方法的含义：使用nums数组[l,r]这区间内的所有数，构建出二叉搜索树，并返回根节点*/
     private TreeNode build(int[] nums, int l, int r) {
         if (l>r) return null; /**err："l>r"不要写错了，如果写错了发现最后的返回值永远是空，啥也没有*/
+//        if (l==r) return new TreeNode(nums[l]);  /*没有这一句也是对的*/
         int mid = l+(r-l)/2; /**err：错误的写法“mid = l+(r-l)>>1”，原因：>>运算符优先级低于+*/
-        TreeNode root = new TreeNode(mid);
+        /**err：注意是用"中间位置的值"来构建根节点，不要写成"new TreeNode(mid)"，如果写错了会发现测试用例
+         全是错的，其中第一个测试用例报错如下————
+                     输入
+                        nums = [-10,-3,0,5,9]
+                     输出
+                        [2,0,3,null,1,null,4]
+                     预期结果
+                        [0,-3,9,-10,null,5]
+         */
+        TreeNode root = new TreeNode(nums[mid]);
         root.left = build(nums,l,mid-1);
         root.right = build(nums,mid+1,r);
         return root;

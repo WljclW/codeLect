@@ -1237,7 +1237,7 @@ public class codetop_unskilled_6_10 {
             /*情况2：代码走到这里说明左右子树都不是null，因此————
                 首先，去找右子树的最小值来代替这个节点；
                 然后，去右子树递归删除最小值的那个节点*/
-            TreeNode minNode = findMin(root.right);
+            TreeNode minNode = findMinRight(root.right);
             root.val = minNode.val;
 //            return deleteNode(root.right, minNode.val);
             root.right = deleteNode(root.right,minNode.val);
@@ -1246,7 +1246,7 @@ public class codetop_unskilled_6_10 {
     }
 
     /*去right为根的子树找这个子树的最小值。————一颗树中最左的孩子即是最小值*/
-    private TreeNode findMin(TreeNode right) {
+    private TreeNode findMinRight(TreeNode right) {
         while (right.left!=null){
             right = right.left;
         }
@@ -2367,7 +2367,7 @@ public class codetop_unskilled_6_10 {
     }
 
 
-    /*994 腐烂的橘子 (Rotting Oranges)
+    /*994. 腐烂的橘子 (Rotting Oranges)
     在一个 m x n 的网格中，每个单元格有三种值：
         0 表示空格
         1 表示新鲜橘子
@@ -2378,29 +2378,35 @@ public class codetop_unskilled_6_10 {
         如果不可能让所有橘子都腐烂，返回 -1。
      */
     /**【多源BFS】
+     【易错点】
+            1. 每一轮并不能无脑的更新 minute，这是典型的错误，见方法 orangesRotting_error
      【思想】整体的思想类似于力扣”课程表“。。。。。这种题目往往需要使用队列，并且整体的思路类似如下：
             step1：把满足某种要求的位置（一维索引 或者 二维位置）入队列。条件：这些位置往往是不需要额外操作就能到达的位
         置，举个例子，比如”课程表“中没有前置课程的课程即入度为0的课程、再比如这个题目中腐烂的橘子（不需要额外的操作即可进
         行扩散）
             step2：①只要满足某个要求，就不断的从队列弹出东西。举例子：比如”课程表“题目中只要队列中还有东西即当前可以直接
         学习的课程（这些课程满足要么它没有前置课程，要么它所有的前置课程已经学习完成）；再比如本题中只要队列不为空，就不停的
-        弹出元素进行扩散腐烂过程。
+        弹出元素进行扩散腐烂过程，因为队列中的是已经腐烂的位置可以继续感染下去。
                   ②操作①以后会发现某些位置变得也符合要求了，因此加入到队列。比如：”课程表“题目中某一个课程的所有前置课
-        程都学习完成了，该课程加入到队列。再比如这个题中某个位置的橘子由不腐烂变成腐烂了，该位置加入到队列（下一轮就可以从
-        这个位置向四周继续感染了）。
+        程都学习完成了（表现为某课程的入度变为0），该课程加入到队列。再比如这个题中某个位置的橘子由不腐烂变成腐烂了，该
+        位置加入到队列（代表下一轮就可以从这个位置向四周继续感染了）。
+     【为什么叫做"多源"？？】
+            1. 含义：因为任何一个时刻，任何一个腐烂的橘子都可以同时向四周扩散！因此时间增加1单位时，每一个腐烂的橘子都同时向
+        四周扩散，很明显起点是多个。
+            2. 代码中是如何体现的？
+                代码中的体现就是，每一轮（每一轮 while）都会先记录 queue.size()，然后从 queue 中依次（fori 的体现）弹出这
+        些元素，对于每一个元素尝试向四方感染（for dirs的体现）。。。因此每一轮会将所有腐烂的橘子出队列，并且任何腐烂的橘子最
+        多只会进一次 queue，弹出后再也不会进入queue了
      */
     public int orangesRotting(int[][] grid) {
         int m = grid.length, n = grid[0].length;
-        LinkedList<int[]> queue = new LinkedList<>();
-        int fresh = 0;
+        LinkedList<int[]> queue = new LinkedList<>(); //记录腐烂橘子的位置。每过一秒就可以从这些位置向四周扩散
+        int fresh = 0; //记录新鲜的橘子有多少个
         /*step1：包括2个内容，一是把所有腐烂橘子的位置添加到queue（这种思想类似于”课程表“题目）、二是计算新鲜的橘子有多少个*/
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                if (grid[i][j] == 2) {
-                    queue.offer(new int[]{i, j});
-                } else if (grid[i][j] == 1) {
-                    fresh++;
-                }
+                if (grid[i][j] == 2) queue.offer(new int[]{i, j});
+                if (grid[i][j] == 1) fresh++;
             }
         }
         /*step2：如果开始的时候新鲜的橘子数量就是0，说明不需要耗费时间————直接返回0*/
@@ -2408,22 +2414,21 @@ public class codetop_unskilled_6_10 {
 
         int minute = 0;
         int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-
         /*step3：根据腐烂橘子的位置，进行扩散，每"扩散一轮"可能需要更新花费的时间minute（注：不是无脑
         更新，只有这一轮碰到新鲜的橘子才会更新minute）..."扩散一轮"的含义————把当前队列中所有腐烂的位
         置出队列，并感染它的四个相邻位置。。因此“minute”以及“hasRot”变量的更新应该是在“while内的for
         循环结束之后进行的”*/
         while (!queue.isEmpty()) {
             int size = queue.size();
-            /**err：这里直接更新minute，应该是有问题的，判断是否还需要进行的标准应该是“queue不是空 并且 新鲜橘子的数量fresh大于0”*/
+            /**err：这里直接更新minute，是有问题的~~判断是否还需要进行的标准应该是“queue不是空 并且 新鲜橘子的数量fresh大于0”*/
 //            minute++;
             boolean hasRot = false;  // 本轮是否有新腐烂的橘子
             for (int i = 0; i < size; i++) {
                 /**有一个疑问：为什么对于腐烂的橘子，研究一遍就能直接出队列？？
-                 解释：因为一个腐烂的橘子，经过一分钟已经把周围的橘子都变腐烂了，因此只需要从4周已经腐烂的橘子继续
+                    解释：因为一个腐烂的橘子，经过一分钟已经把周围的橘子都变腐烂了，因此只需要从4周已经腐烂的橘子继续
                  感染下去。。。所以每一个腐烂的橘子只需要研究一次，它的任务就完成了，因为被它传染的橘子会继续传染下去，
                  因此研究一次后腐烂的橘子就需要弹出队列。
-                 反之，如果它不出队，则下一次从它再次向周围感染橘子，花费的时间 肯定比 它四周橘子出发感染下去的花费时
+                    反之，如果它不出队，则下一次从它再次向周围感染橘子，花费的时间 肯定比 它四周橘子出发感染下去的花费时
                  间更长
                  */
                 int[] cur = queue.poll();
@@ -2435,16 +2440,50 @@ public class codetop_unskilled_6_10 {
                     if (x >= 0 && x < m && y >= 0 && y < n && grid[x][y] == 1) {
                         grid[x][y] = 2;
                         fresh--;
-                        hasRot = true;
+                        hasRot = true; /**err：更新变量，表示本轮腐烂其他橘子了*/
                         queue.offer(new int[]{x, y});
                     }
                 }
             }
             // 只有当本轮确实有新橘子腐烂时（出了for循环以后），时间才 +1
-            if (hasRot) minute++;
+            if (hasRot) minute++; /**err：只有本轮腐烂橘子的时候，才增加分钟数*/
         }
         return fresh == 0 ? minute : -1; //队列为空后，如果fresh不是0，说明有些橘子到不了，是不能被腐烂的（即四周是空格子即grid该位置是0）
     }
+
+
+    //    public int orangesRotting_error(int[][] grid) {
+//        int fresh = 0;
+//        LinkedList<int[]> queue = new LinkedList<>();
+//        int m = grid.length,n = grid[0].length;
+//        for (int i = 0; i < m; i++) {
+//            for (int j = 0; j < n; j++) {
+//                if (grid[i][j]==1) fresh++;
+//                if (grid[i][j]==2) queue.offer(new int[]{i,j});
+//            }
+//        }
+//
+//        int minute = 0;
+//        if (fresh==0) return minute;
+//        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+//        while (!queue.isEmpty()){
+//            int size = queue.size();
+    /**error：每一轮并不是无脑的更新 minute！！！！！！！！*/
+//            minute++;
+//            for (int i = 0; i < size; i++) {
+//                int[] cur = queue.poll();
+//                for(int[] dir:dirs){
+//                    int x = dir[0]+cur[0],y = dir[1]+cur[1];
+//                    if (x>=0&&x<m&&y>=0&&y<n&&grid[x][y]==1){
+//                        fresh--;
+//                        grid[x][y] = 2;
+//                        queue.offer(new int[]{x,y});
+//                    }
+//                }
+//            }
+//        }
+//        return fresh==0?minute:-1;
+//    }
 
 
     /*97. 交错字符串
