@@ -184,33 +184,7 @@ public class NeedMore01 {
     }
 
     /*138复制链表*/
-    public Node copyRandomList(Node head) {
-        Node cur = head;
-        while (cur!=null){
-            Node node = new Node(cur.val);
-            node.next = cur.next;
-            cur.next = node;
-            cur = cur.next;
-        }
-
-        cur =  head;
-        while (cur!=null){
-            if (cur.random!=null){
-                cur.next.random = cur.random.next;
-            }
-            cur = cur.next.next;
-        }
-
-        Node res = head.next;
-        cur = res;
-        while (cur.next!=null){
-            head.next = head.next.next;
-            cur.next = cur.next.next;
-            head = head.next;
-            cur = cur.next;
-        }
-        return res.next;
-    }
+//    public Node copyRandomList(Node head) {}
 
     class Node {
         int val;

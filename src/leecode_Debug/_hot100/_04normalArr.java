@@ -23,7 +23,7 @@ public class _04normalArr {
      *      那到底最大子数组和是多少呢？使用一个外面的变量来标记,每计算出一个位置的值时更新。*/
     public int maxSubArray(int[] nums) {
         int maxSum = Integer.MIN_VALUE; //记录最大子数组和
-        int curSum = 0; //记录以当前位置结尾的最大子数组的和
+        int curSum = 0; //记录以“当前位置结尾”的最大子数组的和。【注意】必须是以i位置结尾的子数组
         for(int i=0;i<nums.length;i++){
             curSum = Math.max(nums[i],curSum+nums[i]); /*nums[i]独自成一队；cur+nums[i]和前面的部分子数组组成新的子数组*/
             maxSum = Math.max(curSum,maxSum); /*更新找到的最大子数组和————即返回值*/
@@ -176,7 +176,7 @@ public class _04normalArr {
             /**while会不断的将i位置的元素放到正确的位置....
              * 【注意】
              *      1.虽然交换但是i位置不能变，因为换过来的数还需要继续判断，这就是
-             * 为什么这里是while循环。。(跟"颜色交换(荷兰国旗类似)"，交换后不能移动cur指针)，
+             * 为什么这里是while循环。。(跟"颜色交换(荷兰国旗)"类似，交换后不能移动cur指针)，
              * 因为交换来的元素需要研究一下
              *      2.与"小于 等于 大于"将数组的数分开有异曲同工，如果当前遍历的位置
              * 的数发现大于flag需要换到大于区域，因此需要继续判断这个"从大于区域换来
@@ -196,7 +196,7 @@ public class _04normalArr {
             if (nums[i] != i + 1) return i + 1; //下标i的地方应该存储i+1这个数
         }
 
-        return nums.length + 1; /**err：到了这里说明数组中不缺，因此应该返回下一个数*/
+        return nums.length + 1; /**err：到了这里说明数组中不缺，因此应该返回下一个数。注意不是 nums.length*/
     }
 
     public void swap(int[] nums,int i,int j){

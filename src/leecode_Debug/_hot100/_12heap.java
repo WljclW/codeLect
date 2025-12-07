@@ -68,7 +68,7 @@ public class _12heap {
 
 
 
-    /*347.
+    /*347. 前 K 个高频元素
     *给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率
     * 前 k 高的元素。你可以按 任意顺序 返回答案。
     * */
@@ -86,8 +86,6 @@ public class _12heap {
      * 为堆顶是出现次数最少的)
      *     step3：从优先级队列依次弹出每个元素（数组形式），将数字（即数组的第0维）添加进
      * 结果数组
-     * @author: Zhou
-     * @date: 2025/6/1 15:35
      */
     public int[] topKFrequent(int[] nums, int k) {
         /*step1：统计数组每一个元素出现的次数*/
@@ -102,8 +100,8 @@ public class _12heap {
         /**上面的排序规则可以使用下面的来代替，原理是什么？？*/
 //        PriorityQueue<int[]> queue = new PriorityQueue<>(Comparator.comparingInt(o -> o[1]));
         /*step3：（1）遍历map，根据键值对创建一维int数组，放进优先级队列；
-        *       （2）整个过程保证优先级队列的size不大于k
-        * */
+                 （2）整个过程保证优先级队列的size不大于k
+        */
         for (Map.Entry<Integer,Integer> entry:map.entrySet()){
             int[] cur = new int[2];
             cur[0] = entry.getKey();
@@ -124,7 +122,7 @@ public class _12heap {
 
 
 
-    /*295
+    /*295. 数据流的中位数
     中位数是有序整数列表中的中间值。如果列表的大小是偶数，则没有中间值，中位数是两个中间值的
     平均值。
     例如 arr = [2,3,4] 的中位数是 3 。
@@ -155,21 +153,26 @@ public class _12heap {
      *      的例子？？？
      */
     class MedianFinder_1 {
-        PriorityQueue<Integer> min;
-        PriorityQueue<Integer> max;
+        PriorityQueue<Integer> min; //存放较小的那一半 数据
+        PriorityQueue<Integer> max; //存放较大的那一半 数据
         public MedianFinder_1() {
+            /**min：存放较小的那一半。要求：能快速拿出小数中的最大值；
+               max：存放较大的那一半。要求：能快速拿出大数中的最小值
+                 由于优先级队列默认是"小根堆（升序的）————“小根堆”堆顶是最小值"，min要快速拿出最大值，因此需
+             要指定排序规则。
+             * */
             min = new PriorityQueue<>((A,B)->B.compareTo(A));
             max = new PriorityQueue<>();
         }
 
         public void addNum(int num) {
             /**
-                 只要两边的数是相等的，最终的目的就是将数放在较小的那一半即min，但是要想把数放到min中，必须先
-             放进max，然后弹出max的顶，把弹出来的数放入min。
-                 只要两边的数不相等，则只有可能是min的元素比max多1，因为每一次相等时都是向min中放元素。此时需
-             要把数放进max（这个是最终目的），也是同样的道理，数据最终要放进max，需要先放进min，然后从min中弹
-             出数放入max
-                上面的这种“南辕北辙”的方式，目的是保证数据的全局有序和有效，仅仅弹出顶的做法不可靠
+                 只要两边的数是相等的，最终的目的就是将数放在较小的那一半即 min，但是要想把数放到 min 中，必须先
+             放进 max，然后弹出 max 的顶，把弹出来的数放入 min。
+                 只要两边的数不相等，在这种设计下只有可能是 min 的元素比 max 多1，因为每一次相等时都是向 min 中
+             放元素。此时需要把数放进 max（这个是最终目的）————也是同样的道理，数据最终要放进 max，需要先放进 min，
+             然后从 min 中弹出数放入 max
+                上面的这种“南辕北辙”的方式，目的是保证数据的全局有序和有效，仅仅弹出顶的做法不可靠！！
              */
             if (min.size()-max.size()==0){
                 max.offer(num);
@@ -193,8 +196,8 @@ public class _12heap {
         }
     }
 
+    /*跟 MedianFinder_1 是一样的思路，看 MedianFinder_1 即可，不用看下面的写法*/
     class MedianFinder {
-
         PriorityQueue<Integer> small;
         PriorityQueue<Integer> big;
         public MedianFinder() {
@@ -224,8 +227,6 @@ public class _12heap {
                 small.offer(big.poll());
             }
         }
-
-
 
         public double findMedian() {
             int size = small.size() + big.size();

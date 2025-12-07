@@ -809,35 +809,9 @@ public class All1_5 {
     /*23.合并 K 个升序链表
     * 给你一个链表数组，每个链表都已经按升序排列。
     请你将所有链表合并到一个升序链表中，返回合并后的链表。*/
-    public ListNode mergeKLists(ListNode[] lists) {
-        if (lists==null||lists.length==0) return null;
-        return mergeKLists(lists,0,lists.length-1);
-    }
-
-    private ListNode mergeKLists(ListNode[] lists, int left, int right) {
-        if (left==right) return lists[left];
-        int mid = left+(right-left)/2;
-        ListNode l = mergeKLists(lists, left, mid);
-        ListNode r = mergeKLists(lists, mid + 1, right);
-
-        return mergerTwo2(l,r);
-    }
-
-    private ListNode mergerTwo2(ListNode l, ListNode r) {
-        ListNode dummy = new ListNode(-1),cur = dummy;
-        while (l!=null&&r!=null){
-            if (l.val<r.val){
-                cur.next = l;
-                l  =l.next;
-            }else {
-                cur.next = r;
-                r = r.next;
-            }
-            cur = cur.next;
-        }
-        cur.next = l==null?r:l;
-        return dummy.next;
-    }
+//    public ListNode mergeKLists(ListNode[] lists) {
+//
+//    }
 
 
     /*415. 字符串相加

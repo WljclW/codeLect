@@ -1358,94 +1358,25 @@ public class codetop_unskilled_6_10 {
     boolean search(String word) 如果字符串 word 在前缀树中，返回 true（即，在检索之前已经插入）；否则，返回 false 。
     boolean startsWith(String prefix) 如果之前已经插入的字符串 word 的前缀之一为 prefix ，返回 true ；否则，返回 false 。
     **/
+//    class Trie {
+//
+//        public Trie() {
+//
+//        }
+//
+//        public void insert(String word) {
+//
+//        }
+//
+//        public boolean search(String word) {
+//
+//        }
+//
+//        public boolean startsWith(String prefix) {
+//
+//        }
+//    }
 
-    /**
-     【解题关键】关键是大脑中有一个26叉树，树中的每一个节点存储的是一个TrieNode结构————这个结
-            构中包含了26个孩子的指针（即TrieNode[26]），以及是不是某一个单词结尾的标志（即变
-            量isEnd）
-     【代码的重点】①声明TrieNode，标志着节点的样子；②类内声明一个root作为根节点，每一次查找
-        和 想插入的时候 都必须从root开始。
-     【疑问】
-            1. 前缀树的方法中第一行往往都是"TrieNode node = root;"，原因是什么？？
-        答：每一次操作都是从根节点出发一步一步进行的，因此要保证整个树根是确定的，所以每一次
-        方法执行之前要拷贝一份根节点，来使用拷贝后的指针node来执行操作。。。否则上一步操作完
-        root节点就变了，因此就不对了
-     【其他说明】
-             ①每个节点存的是一个“分支数组 + 是否是单词结尾”；
-             ②单词的路径就是从 root 一路走下去；
-             ③search 就是看路径能不能走完，并且 isEnd=true；
-             ④startsWith 就是看路径能不能走完，不管 isEnd。
-            【注意】每一个位置并不用存储字符，而是对应的索引位置不是null的时候，就说明有对应的字符，
-         因此是用下标index来暗示是不是有对应字符的。比如：index=0的位置如果不是null，就说明当前的
-         位置是可以匹配到字符a的；index=2的位置如果不是null，就说明当前位置是可以匹配到字符b的....
-         这才是这个题最抽象的地方~~
-     */
-    class Trie {
-
-        class TrieNode{
-            TrieNode[] children = new TrieNode[26]; /**err：注意在声明的时候进行初始化，或者 在空参的构造器中进行初始化也可以*/
-            boolean isEnd;
-        }
-
-        private final TrieNode root; /**标识整个“前缀树”的根节点*/
-
-        public Trie() {
-            root = new TrieNode();
-        }
-
-        /**
-         1. 插入的具体思路————
-             for循环拿到word的每一个字符，如果字符对应位置的TrieNode是null，则创建；node来
-         到它孩子数组的对应位置。
-         2. 插入 和 查找前缀/查找单词 的区别————
-            插入的时候如果到某一步发现children对应位置的TrieNode是null，则会创建TrieNode。
-         但是”查找前缀/查找单词“的时候如果到某一步发现children对应位置的TrieNode是null，就直
-         接返回false了。
-         */
-        public void insert(String word) {
-            /**疑问？每一个方法之前都会这样记录一下这个变量，不记录的话行不行？？记录的意义又
-             是什么？？
-                答：不记录是不行的。意义就是保证全局记录的根节点root是正确的。如果这里不记录
-             的话，会导致下面的问题————
-                以insert为例，最终root指针将会来到插入节点的最后的位置，后面的操作就不知道根
-             节点是啥了，所有的查找、插入都无从下手了*/
-            TrieNode node = root;
-            for (char c:word.toCharArray()){
-                int index = c-'a';
-                if (node.children[index]==null){
-                    node.children[index] = new TrieNode();
-                }
-                node = node.children[index];
-            }
-            node.isEnd = true;
-        }
-
-        /**
-         【思路】
-         【search和startsWith的唯一区别在于：方法的最后返回值】
-             startsWith要求有这样的前缀就可以，并不一定匹配一个确定的单词；但是search方法的要求是
-         必须完整的匹配到一个单词…………因此最后的一个字符的isEnd必须是true才表示找到了
-         */
-        public boolean search(String word) {
-            TrieNode node = root;
-            for (char c:word.toCharArray()){
-                int index = c-'a';
-                if (node.children[index]==null) return false;
-                node = node.children[index];
-            }
-            return node.isEnd; /**和startsWith方法的唯一区别*/
-        }
-
-        public boolean startsWith(String prefix) {
-            TrieNode node = root;
-            for (char c:prefix.toCharArray()){
-                int index = c-'a';
-                if (node.children[index]==null) return false;
-                node =node.children[index];
-            }
-            return true;
-        }
-    }
 
 
 
@@ -1962,37 +1893,9 @@ public class codetop_unskilled_6_10 {
     例如，先修课程对 [0, 1] 表示：想要学习课程 0 ，你需要先完成课程 1 。
     请你判断是否可能完成所有课程的学习？如果可以，返回 true ；否则，返回 false 。
     * */
-    public boolean canFinish(int numCourses, int[][] prerequisites) {
-        List<List<Integer>> graph = new LinkedList<>();
-        for (int i = 0; i < numCourses; i++) {
-            graph.add(new LinkedList<>());
-        }
-
-        int[] indgree = new int[numCourses];
-        for (int[] cur : prerequisites) {
-            int index = cur[0], ele = cur[1];
-            graph.get(ele).add(index);
-            indgree[index]++;
-        }
-
-        LinkedList<Integer> zeroIndgree = new LinkedList<>();
-        for (int i = 0; i < indgree.length; i++) {
-            if (indgree[i] == 0) zeroIndgree.offer(i);
-        }
-
-        int count = 0;
-        while (!zeroIndgree.isEmpty()) {
-            Integer curIndex = zeroIndgree.poll();
-            count++;
-            for (int index : graph.get(curIndex)) {
-                indgree[index]--;
-                if (indgree[index] == 0) {
-                    zeroIndgree.offer(index);
-                }
-            }
-        }
-        return count == numCourses;
-    }
+//    public boolean canFinish(int numCourses, int[][] prerequisites) {
+//
+//    }
 
 
     /*210 课程表Ⅱ

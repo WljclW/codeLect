@@ -14,7 +14,6 @@ public class _11stack {
     左括号必须以正确的顺序闭合。
     每个右括号都有一个对应的相同类型的左括号。*/
     /**推荐使用写法：isValid_01（栈的做法）
-     *              isValid_count（count计数的做法）
      */
     public boolean isValid(String s) {
         LinkedList<Character> stack = new LinkedList<>();
@@ -58,18 +57,17 @@ public class _11stack {
         }};
         for (int i=0;i<s.length();i++){
             char c = s.charAt(i);
-            if (!map.containsKey(c)){ //说明是左括号直接入栈
+            if (map.containsKey(c)){  //说明是右括号
+                /**验证栈顶是否匹配 直接弹出栈顶字符，使用pop()弹出并验证*/
+                if (stack.isEmpty()||stack.pop()!=map.get(c)) return false;
+            }else{ //说明是左括号直接入栈
                 stack.push(c);
-            }else{ //说明是右括号
-                if (stack.isEmpty()||stack.pop()!=map.get(c)){ /**验证栈顶是否匹配 直接弹出栈顶字符，使用pop()弹出并验证*/
-                    return false;
-                }
             }
         }
         return stack.isEmpty(); /**err：注意返回值。否则“((”这样的字符串结果是错误的*/
     }
 
-    /**使用一个变量，一遍遍历——————这样的做法是错误的。。
+    /**
         【说明】如果字符串只包含一种括号，是可行的。比如字符串只包含“(”以及“)”就可以用下
      面的方法。。但是这个题目中字符串中包含三种括号，因此使用一个变量就不够了，一个变量不
      能区分三种括号。
@@ -90,7 +88,7 @@ public class _11stack {
 
 
 
-    /*155.
+    /*155. 最小栈
     设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。
 
     实现 MinStack 类:
@@ -191,7 +189,7 @@ public class _11stack {
     }
 
 
-    /*394.
+    /*394. 字符串解码
     给定一个经过编码的字符串，返回它解码后的字符串。
     编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注
     意 k 保证为正整数。
@@ -229,9 +227,9 @@ public class _11stack {
         for (Character c : s.toCharArray()) {
             /**err：“c >= '0'”等于号不能少，因为有一个例子是“"100[leetcode]"”，所以要包括字符0*/
             if (c >= '0' && c <= '9') //①碰到数字，计算multi。【注意】闭区间['0','9']。
-                digit = 10 * digit + Integer.parseInt(c + "");
+                digit = 10 * digit + c-'0';
             else if (c == '[') { //碰到左括号
-                /*只要碰到左括号，说明接下来要重新计算了。因此将目前的数字和res分别入栈；
+                /*只要碰到左括号，说明接下来要重新计算了。因此将目前的 数字 和 res 分别入栈；
                 然后将multi重置为0，res重置为新建状态
                 * */
                 stack_digit.push(digit);
@@ -239,9 +237,13 @@ public class _11stack {
                 digit = 0;  /**err：需要重置数字 和 字符串*/
                 res = new StringBuilder(); /**err：需要重置数字 和 字符串*/
             } else if (c == ']') { //碰到右括号
+                /**碰到右括号的时候：先把当前括号内的字符串res重复左括号前的次数。左括号前的次数是多少呢？
+                 * 需要从 stack_digit 弹出一个。。。因为每一次碰到左括号的时候需要把前面计算出来的系数入
+                 * 栈；然后需要前面拼接上之前的字符串，之前的字符串是啥呢？也需要从栈中弹出来！！！*/
                 /*【说明】这个题目的这个解法来说，只要碰到]，此时multi的值必然就是0；并且res就是
-                当前这组括号中的字符串————潜藏规则。因此从数字栈stack_digit中弹出数字，将res添加
-                对应的次数，然后在前面拼接上从res_stack弹出的字符串
+                当前这组括号中的字符串————潜藏规则。因此从数字栈stack_digit中弹出数字cur_digit，
+                将res添加对应的次数 并且 存储在 tmp，然后在前面拼接上从res_stack弹出的字符串————这
+                个弹出的字符串就是这对“[]”前面解析出的字符串，因此要拼接到 tmp的前面
                 【tip】其中从stack_digit中弹出的数字就是“现在这对括号”之前的那个数字————暗示着括号
                 内的字符串重复的次数，而括号内的字符串其实就是此时此刻res的值
                 * */
@@ -250,6 +252,7 @@ public class _11stack {
                 for (int i = 0; i < cur_digit; i++) {
                     tmp.append(res);
                 }
+//                res = new StringBuilder(tmp).append(stack_str.pop()); /**这么写是错误的，弹出的字符串必须拼接到 当前[]字符串tmp 的前面！！！*/
                 res = new StringBuilder(stack_str.pop() + tmp);
             } else {
                 res.append(c);
@@ -259,7 +262,7 @@ public class _11stack {
     }
 
 
-    /*739.
+    /*739. 每日温度
     给定一个整数数组 temperatures ，表示每天的温度，返回一个数组 answer ，其中 answer[i] 是指对于第
      i 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 0 来代替。
     * */
@@ -368,7 +371,7 @@ public class _11stack {
     求在该柱状图中，能够勾勒出来的矩形的最大面积。
     * */
     /**
-     * 【建议的解法】使用下面的largestRectangleArea2
+     * 【建议的解法】强烈建议使用下面的 largestRectangleArea2
      * 【题目的本质】————针对每一个位置i，找到左右两边最近的小于heights[i]的位置。就得到了该位置所能绘制出的最大矩形，等
      * 每一个位置的值都求出来了，全局的最大矩形也就得到了。
      *    这个题也可以用一维数组来表示，完整的可能情况：枚举每一个位置，比如该位置的高度是m，从该位置向左右两边查找第一个
@@ -469,9 +472,18 @@ public class _11stack {
 
             // 只要满足 当前高度小于栈顶元素，弹出栈顶并计算面积
             while (!stack.isEmpty() && currHeight < heights[stack.peek()]) {
-                int height = heights[stack.pop()]; //矩形的高：弹出来栈顶index对应的高度
-                int width = stack.isEmpty() ? i : i - stack.peek() - 1; //矩形的宽，注意此时栈顶的stack.peek()位置的高度是不满足的
-                maxArea = Math.max(maxArea, height * width);
+                /*矩形的高：弹出来栈顶index对应的高度*/
+                int heightCur = heights[stack.pop()];
+                /*（1）矩形的宽：注意此时栈顶的stack.peek()位置的高度是不满足的，而i的高度也不满足。比
+                如：stack.peek() = 2，i = 5。实际上只有3，4满足，2和5的高度并不满足大于等于height,
+                因此宽度是“i-stack.peek()-1”
+                  （2）计算思路：i是右边小于 heightCur 的位置；
+                           stack.peek()是左边小于 heightCur 的位置，那如果栈空了呢？就当作左边的位
+                        置是-1；
+                           因此“右边界-左边界-1”即可
+                 */
+                int width = stack.isEmpty() ? i-(-1)+1 : i - stack.peek() - 1;
+                maxArea = Math.max(maxArea, heightCur * width);
             }
             stack.push(i); /**err：当前索引入栈。。漏掉时得出的结果总是0！！！（反馈的测试用例就是这样）*/
         }

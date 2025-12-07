@@ -258,6 +258,23 @@ public class _01completeBag {
         return dp[amount]==amount+1?-1:dp[amount];
     }
 
+    /*下面的写法又不一样了，最后返回之前比较的时候必须使用 大于等于*/
+    public int coinChange_ano(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp,amount+1);
+        dp[0] = 0;
+        for (int i = coins[0]; i <= amount; i++) {
+            dp[i] = dp[i-coins[0]] + 1;
+        }
+
+        for (int i = 1; i < coins.length; i++) {
+            for (int j = coins[i]; j <= amount; j++) {
+                dp[j] = Math.min(dp[j],dp[j-coins[i]]+1);
+            }
+        }
+        return dp[amount]>=amount+1?-1:dp[amount];
+    }
+
 
 
 

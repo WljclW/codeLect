@@ -14,8 +14,8 @@ public class _02DoublePoint {
     *    研究到的位置
     * */
     /**
-     * 【建议】使用解法moveZeroes1、moveZeroes2（moveZeroes2更符合自己的想法）。直接采用交换的方式，这样就不用
-     * 对cur后面的位置再赋值了
+     * 【建议】使用解法moveZeroes1、moveZeroes2（moveZeroes2更符合自己的想法），尽量不要使用moveZeroes。
+     *      直接采用交换的方式，这样就不用对cur后面的位置再赋值了
      * */
     public void moveZeroes(int[] nums) {
         int left = 0;
@@ -80,14 +80,15 @@ public class _02DoublePoint {
     }
 
 
-    /*
-    * 11.给你 n 个非负整数 a1，a2，…，an，每个数代表坐标中的一个点 (i, ai) 。在坐标内画 n 条垂直线，垂直
+    /* 11. 盛最多水的容器
+    * 给你 n 个非负整数 a1，a2，…，an，每个数代表坐标中的一个点 (i, ai) 。在坐标内画 n 条垂直线，垂直
     * 线 i 的两个端点分别为 (i, ai) 和 (i, 0)。找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最
     * 多的水。
     * 【】：注意这个题和接雨水是不一样的，这个题目中挡板的宽度忽略不计。但是接雨水问题42其实是一个个柱子组
     *    成的，柱子之间是没有间隙的。
     * */
     /**
+     * 【建议的解法】建议使用 maxArea_ ，这样的写法更清晰
      * 【步骤】双指针相向而行，计算以它们为边界能盛多少水。。只要中间有间距（即left<right）
      *      1. 每到一个位置计算能盛的水（高度取决于左右指针位置height的最小值，宽度取决于两个指针的距离）
      *      2. 看两个指针对应的height哪一个高，更新height小的那一个指针。
@@ -109,12 +110,30 @@ public class _02DoublePoint {
         return result;
     }
 
-    /*
-    * 15.给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有满足条件且不重复的三元组。
+    public int maxArea_(int[] height) {
+        int left = 0,right = height.length-1;
+        int res =0;
+        while (left<right){
+            if (height[left]>height[right]){
+                int cur = height[right]*(right-left);
+                right--;
+                res = Math.max(res,cur);
+            }else {
+                int cur = height[left]*(right-left);
+                left++;
+                res =Math.max(res,cur);
+            }
+        }
+        return res;
+    }
+
+    /* 15. 三数之和
+    * 给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有满足条件且不重复的三元组。
     * 【】：关键的步骤在于双指针 过程中，如何跳过所有相同的元素。
     * */
     /**
      * TODO：拿到“while (left<right && nums[left]==nums[++left]);”的字节码看一下
+     * 【建议的解法】建议使用解法 threeSum
      * 【关键】先排序；然后从左向右遍历位置cur，每到一处位置cur，设置left、right指针，根据当前三个位置数的和
      *      与0的关系，来移动left或者right指针。
      * 【步骤】
@@ -186,7 +205,7 @@ public class _02DoublePoint {
             while (left<right){
                 int curRes = nums[i]+nums[left]+nums[right];
                 if(curRes<0){
-                    /*>0，<0的时候不去重也可以，但是=0必须去重。
+                    /**>0，<0的时候不去重也可以，但是=0必须去重。
                     * 比如：这里是<0，则下面的两句使用哪一句都可以，后面的一句去重只是把去重操作提前了*/
 //                    left++; //这麽写表示不去重，也是可以的
                     while (left<right && nums[left]==nums[++left]); /*跳过所有相等的值*/
@@ -236,15 +255,16 @@ public class _02DoublePoint {
 
 
     /*
-    * 42.给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+    * 42. 接雨水
+    给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
     * */
     /**
      *【双指针的思路】left从index=0开始向右，right从index=height.length-1开始向左。过程中左右两边分别记录碰到的最大值。
      *      每一时刻————
      *      ①根据left、right的位置更新leftmax、rightMax。二者分别标识left指针、right指针遍历时遇到的height最大值
      *      ②根据leftMax、rightMax的最小值 更新left位置能存的雨水高度 或者 更新right位置能存的雨水高度。————这里
-     *      有一个trike，left和right位置height元素小的那个，xxxxMax的值也小。比如：height[right]<height[left]，
-     *      则rightMax<=leftMax，为什么？？？反证法
+     *      有一个小技巧，left 和 right位置 height值素小的那个，xxxxMax 的值也小。比如：height[right]<height[left]，
+     *      则 rightMax<=leftMax，为什么？？？反证法
      *      ③将②中计算的值累加到结果res；并移动height小的那一侧对应的指针。（比如height[left]<height[right]则移
      *      动left）
      *      ④重复①~③过程，直到left==right
@@ -256,7 +276,9 @@ public class _02DoublePoint {
         while (left<right){ /*这里带等于也是可以的，为什么呢？答案见下面的扩展解析即方法trap_kuozhan注释*/
             leftMax = Math.max(height[left],leftMax);
             rightMax = Math.max(height[right],rightMax);
-            if (height[left]<height[right]){
+            if (height[left]<height[right]){ //带等于也是可以的
+                /**这里理论上应该用两边最大高度 的 最小值来作为高度的边界。有一个优
+                 化：如果"height[left]<height[right]",则必有“leftMax≤rightMax”*/
                 res += (leftMax-height[left]);
                 left++; /**这里的left++写在上一行也是可以的，这样的话if块就只有一句话，即“res += (leftMax-height[left++]);”，亲测可行。下面的right--也是一个道理*/
             }else{

@@ -8,16 +8,16 @@ package leecode_Debug._hot100;
  *   这样的技巧其实还用在了“求解旋转排序数组的最小值”
  */
 public class _10binarySearch {
-    /*35.
+    /*35. 搜索插入位置
     给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
     请必须使用时间复杂度为 O(log n) 的算法。
     * */
     /**
-     * 【题目的实质】查找某一个数应该插在排序数组的什么位置。
+     * 【题目的实质】查找某一个数应该插在排序数组的什么位置，本质：类似于查找某个数在数组中的左边界。
      * 用"5，7，7，8，8，10"来捋过程
      * 下面是关于闭区间的理解————
      *      首先明确一点：闭区间的写法中，出循环时l一定等于r+1，因此返回值写l和r+1是等效的！！
-     * 【建议的解法】看searchInsert_01
+     * 【建议的解法】看 searchInsert_01
      * 【关键!!】题目的本质是(左边界问题)：查找给定元素第一次出现的位置(如果数组中有的话)
      *                或者  查找大于目标元素的第一个数的位置(如果数组没有给定的元素)
      * 【进一步理解】这个题是寻找目标值左边界的方法（注意：理论上这个题求的是目标值target应该插入到什么地方。并且如果数组中有多个目标值
@@ -27,7 +27,7 @@ public class _10binarySearch {
      *          情况2：如果目标值严格大于数组的最大值，则最后l会来到nums.length的位置，这个位置很明显越界了。此时说明数组中肯定没有目标
      *      值。。。此时如果想插入target，则放在数组的最后面就行
      *          情况3：如果目标值严格小于数组的最小值，则最后l会来到0的位置，这个位置不越界。【注】但是因为target小于数组的最小值，因此
-     *      0位置的数很明显不等于目标值。。。。此时如果想插入target，则放在数组的第一个位置就行
+     *      这种情况下0位置的数很明显不等于目标值。。。。这种情况如果想插入target，则放在数组的第一个位置就行
      *          问题：情况2和情况3都是严格的大于小于，那如果目标值等于数组的最大值 或者 等于数组的最小值呢？
      *            答：其实这种情况跟情况1是一样的。具体来说分为四种情况————
      *               ①如果等于数组最小值，且最小值唯一。则l指针会指向0；
@@ -65,7 +65,7 @@ public class _10binarySearch {
             int mid = (left + right) / 2;
             if (nums[mid] < target) {
                 left = mid + 1;
-            } else { /**因为本质上想求解的是左边界，因此即使nums[mid]与target相等了，right也左移*/
+            } else { /**因为本质上想求解的是左边界，因此即使nums[mid]与target相等了，我们也要继续去左边看看有没，因此移动right指针*/
                 right = mid - 1;
             }
         }
@@ -76,18 +76,19 @@ public class _10binarySearch {
 =====================================================================================
 * */
 
-    /*74.
+    /*74. 搜索二维矩阵
     给你一个满足下述两条属性的 m x n 整数矩阵：
     每行中的整数从左到右按非严格递增顺序排列。
     每行的第一个整数大于前一行的最后一个整数。
     给你一个整数 target ，如果 target 在矩阵中，返回 true ；否则，返回 false 。
     * */
     /**
-     * 【建议的解法】见方法searchMatrix
+     * 【建议的解法】见方法 searchMatrix
      * 【迷茫的点】
      *      1. 建议使用左闭右闭的写法。即开始时left=0,right=nums.length-1;
      *      2. 无论是左闭右开，还是左闭右闭区间的写法。根据mid计算该位置的坐
-     *  标方法是一样的，都是[mid/n][mid%n]。————这一点很重要！！
+     *  标方法是一样的，都是[mid/n][mid%n]。————这一点很重要！！并且整个计算
+     *  位置的过程与“matrix的行数”没有关系。
      * */
     //左闭右闭的写法
     public boolean searchMatrix(int[][] matrix, int target) {
@@ -132,21 +133,23 @@ public class _10binarySearch {
  ======================================================================
  * */
 
-    /*34.”第一次和最后一次出现的位置“
+    /*34. 在排序数组中查找元素的第一个和最后一个位置
     给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
     如果数组中不存在目标值 target，返回 [-1, -1]。
     你必须设计并实现时间复杂度为 O(log n) 的算法解决此问题。
     * */
     /**
+     *【建议的解法】 如果采用分别查找左右边界的话，见解法 searchRange_02；
+     *              如果想分别查找两次左边界的话，见解法 searchRange_01
      *【重要说明】方法“searchRange_02”中的注释指出了寻找两种边界的代码区别！！————
      *      区别1：如果nums[mid]==target，指针如何移动？
      *          如果寻找左边界，则应该移动right指针，因为我们想尽量的往左再找找；
      *          反之
      *          如果寻找右边界，则应该移动left指针，因为我们想最大限度的往右边找找。
      *      区别2：最后应该返回哪一个指针？
-     *          如果寻找左边界，则相等的时候right=mid-1,因此最终right位置必然小于target，所以需要返回left;
+     *          如果寻找左边界，则相等的时候right=mid-1,因此最终right位置必然小于target（不符合要求），所以需要返回left;
      *          反之
-     *          如果寻找右边界，则相等的时候left=mid+1,因此最终left位置必然大于target，所以需要返回right;
+     *          如果寻找右边界，则相等的时候left=mid+1,因此最终left位置必然大于target（不符合要求），所以需要返回right;
      * 解法1（见方法searchRange）：分别求出左右边界————
      *      区别1：相等时指针的移动。对于nums[mid]>target 以及 nums[mid]<target 的情况，指针的变化
      *  都是一样的，唯一的区别在于nums[mid]==target的时候：
@@ -156,7 +159,7 @@ public class _10binarySearch {
      *          如果是求解左边界，则返回值应该是left；如果是求解右边界则返回值应该是right.
      *     【补充说明】任何写法在“nums[mid]==target”的时候都必须移动边界为mid+1或者mid-1，不能将边界移动为mid，
      *          移动为mid会出现死循环，代码直观的展示就是报错“运行时间超过限制”。举个例子————
-     *          如果求解右边界的diamagnetic写成下面的样子，就会出现“死循环”，比如数组为“”
+     *          如果求解右边界的代码写成下面的样子，就会出现“死循环”
 *                                     if (nums[mid]>target){
                                           right = mid-1;
                                       }else {
@@ -165,10 +168,10 @@ public class _10binarySearch {
      *
      * 解法2（见方法searchRange_01）：求出target的左边界 以及 target+1的左边界.
      *     如果target的左边界对应的数是target，说明一定也有右边界；否则说明数组中没
-     * 有target，因此也必然没有右边界。
+     * 有target，因此也必然没有右边界————
      *          如果左边界对应的值不是target，说明数组中压根就没有target这个数，因此直接返回[-1,-1]；
-     *          如果求得左边界不越界，且数组这个位置的值是target，则再去求target+1的左边界。target+1的
-     *     左边界-1就是target的右边界；
+     *          如果求得左边界不越界，且数组这个位置的值是 target，则再去求 target+1 的左边界。“target+1 的
+     *     左边界-1”就是 “target 的右边界”；
      * */
     public int[] searchRange(int[] nums, int target) {
         int left = searchLeftBound(nums,target);
@@ -267,7 +270,7 @@ public class _10binarySearch {
     public int[] searchRange_01(int[] nums, int target) {
         int left = searchLeft(nums,target); //step1：找target的左边界
         if (left==nums.length || nums[left]!=target){ //step2：验证左边界是不是越界？左边界的数是不是target？？
-            return new int[]{-1,-1}; //说明数组中压根就没有target这个数
+            return new int[]{-1,-1}; //如果进入这个if，说明数组中压根就没有target这个数
         }
         int right = searchLeft(nums,target+1); //step3：求target+1的左边界，该左边界-1即为target的右边界
         return new int[]{left,right-1}; /**【注意】right-1表示求出的target+1的左边界-1，因为right其实返回的是target+1的左边界left，因此target的右边界需要往左*/
@@ -309,7 +312,7 @@ public class _10binarySearch {
             int mid = l+(r-l)/2;
             if (nums[mid]<target){
                 l = mid+1;
-            }else{ /**求左右边界的区别1：nums[mid]==target时那个指针移动？怎么移动？*/
+            }else{ /**求左右边界的区别1：nums[mid]==target时哪个指针移动（换句话说，接下来想去哪一边继续找）？怎么移动？*/
                 r = mid-1;
             }
         }
@@ -623,12 +626,14 @@ public class _10binarySearch {
 
 
 
-    /*4.寻找两个正序数组的中位数
+    /*4. 寻找两个正序数组的中位数
     给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
 算法的时间复杂度应该为 O(log (m+n)) 。
     * */
     /**
-     *【建议的解法】使用下面的findMedianSortedArrays就可以，逻辑清晰。。。。官方解的写法有区别但不大
+     *【建议的解法】使用下面的 findMedianSortedArrays 就可以，逻辑清晰。。。。官方解的写法有区别但不大
+     *【易错点】
+     *      1. "二分枚举一个数组的隔板"时，要求必须枚举短的那个数组。。。如果枚举长的哪个数组，可能导致计算出“短数组”的隔板索引为负数
      *【思路】1. 想象在nums1中的每一个间隙都能插入隔板，这个隔板的索引从[0,nums1.length].因此隔板的索引值就指出了这个隔板之前一共有
      *      多少个数。。。。
      *       2. 已知两个数组，一半有多少个数呢？(len1+len2+1)/2........这样的计算方法包含了奇数和偶数的情况————
@@ -648,7 +653,9 @@ public class _10binarySearch {
         while (l <= r) {
             /*3.1：注意i和j的对应关系。他们的和是“(nums1.length + nums2.length + 1) / 2”
             *   如何理解i/j？
-            *       其中i就是插在nums1中的隔板，i的值就表明它之前有*/
+            *       其中i就是插在nums1中的隔板，i的值就表明它之前有多少个元素
+            *       其中j就是插在nums2中的隔板，j的值就代表它之前有多少个元素
+            * */
             int i = l + (r - l) / 2;
             int j = (nums1.length + nums2.length + 1) / 2 - i;
             /*3.2：利用i、j隔板可以得到4个数。形如————

@@ -41,11 +41,11 @@ public class _01bag {
      * 【关键】问题等价于求解：target的背包能放下物品的最大价值是不是target（其中target就是数组元素和的一半）
      * 【实质】实质是一道0-1背包问题。。。转化为0-1背包问题：
      *      每一个物品的重量是nums[i]，价值是nums[i]，背包容量是target，能否放下target
-     *  价值的物品（其中target=sum/2）.
+     *  价值的物品（其中target=数组元素和/2）.
      * */
     /*一维数组的形式*/
     public boolean canPartition(int[] nums) {
-        /*step1：求出数组的和，看看是不是能平分为两部分*/
+        /*step1：求出数组的和，看看是不是能平分为两部分————即必须是偶数才能*/
         int target = 0;
         for (int num : nums) {
             target += num;
@@ -56,7 +56,9 @@ public class _01bag {
         int[] dp = new int[target + 1];
         /*0-1背包一维数组形式的核心逻辑————
          *   ①一维的写法中遍历的顺序不能颠倒（外层for循环是遍历物品；内层循环遍历背包容量）；
-         *   ②一维的写法中背包容量必须从大到小遍历；*/
+         *   ②一维的写法中背包容量必须从大到小遍历（原因是：计算dp[i][j]时，依赖于上一行前面某位
+         * 置（比如：dp[i-1][j-m]）的值）,如果每一行从前往后计算会导致一维中计算dp[j]时，dp[j-m]
+         * 已经更新了，也就是说dp[j-m]此时不再等价于二维中的dp[i-1][j-m]，而是等价于二维中的dp[i][j-m]；*/
         for (int i = 0; i < nums.length; i++)
             for (int j = target; j >= nums[i]; j--) {  /**err：还是双重循环，但是内循环需要“倒着遍历背包容量”————这一步是所有0-1背包的问题的关键*/
                 dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i]);

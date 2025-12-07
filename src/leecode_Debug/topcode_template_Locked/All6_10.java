@@ -71,36 +71,9 @@ public class All6_10 {
 
 
     /*138复制链表*/
-    public Node copyRandomList(Node head) {
-        if (head==null) return head;
-        Node cur = head;
-        while (cur!=null){
-            Node newNode = new Node(cur.val);
-            newNode.next = cur.next;
-            cur.next = newNode;
-            cur = cur.next.next;
-        }
-
-        cur = head;
-        while (cur!=null){
-            if (cur.random!=null){
-                cur.next.random = cur.random.next;
-            }
-            cur = cur.next.next;
-        }
-
-        cur = head;
-        Node res = head.next,resCur = res;
-        while (resCur.next!=null){
-            cur.next = cur.next.next;
-            cur = cur.next;
-
-            resCur = resCur.next.next;
-            resCur = resCur.next;
-        }
-
-        return res;
-    }
+//    public Node copyRandomList(Node head) {
+//
+//    }
 
     class Node {
         int val;

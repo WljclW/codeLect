@@ -101,9 +101,9 @@ public class review_all {
 
 
     /*138复制链表*/
-    public Node copyRandomList(Node head) {
-        return null;
-    }
+//    public Node copyRandomList(Node head) {
+//
+//    }
 
     class Node {
         int val;
@@ -271,9 +271,8 @@ public class review_all {
         请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
     * */
     /*解法1：简洁*/
-    public int firstMissingPositive(int[] nums) {
-        return 0;
-    }
+//    public int firstMissingPositive(int[] nums) {
+//    }
 
 
     /*240.

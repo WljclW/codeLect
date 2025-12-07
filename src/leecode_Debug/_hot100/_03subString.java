@@ -35,14 +35,14 @@ public class _03subString {
             元素进入到队列时，就需要生成1位置的最大值信息，因为1~k这样的窗口大小是k，因此对应i-k+1位置的信息）。
             【注意】由于窗口的大小固定k，因此要注意判断队列头的元素是不是已经出窗口了！！*/
         for (int i = k; i < nums.length; i++) {
-            while (!queue.isEmpty() && nums[i] >= nums[queue.peekLast()]) { //①先将当前位置的元素入栈
+            while (!queue.isEmpty() && nums[i] >= nums[queue.peekLast()]) { //①先将当前位置的元素入栈。前提：进行合规检查，把不合规的踢出去
                 queue.pollLast();
             }
             queue.offerLast(i);
             if (queue.peekFirst() == i - k) { //②判断队头元素是不是变得不合法（即当前队列头的索引是不是已经出窗口了），不合法时弹出
                 queue.pollFirst();
             }
-            res[i - k + 1] = nums[queue.peekFirst()]; //③这一轮会生成res的（注意别写错了）”i-k+1位置“的信息
+            res[i - k + 1] = nums[queue.peekFirst()]; //③这一轮会生成res的（注意别写错了）"i-k+1位置"的信息
         }
         return res;
     }
@@ -176,8 +176,45 @@ public class _03subString {
         return len==Integer.MAX_VALUE?"":s.substring(start,start+len);
     }
 
+    /*用 for 的写法*/
+    public String minWindow_wh(String s, String t) {
+        HashMap<Character, Integer> need = new HashMap<>();
+        for (char c:t.toCharArray()){
+            need.put(c,need.getOrDefault(c,0)+1);
+        }
 
-    /*除了上面的两种写法以外，还有下面的方法*/
+        HashMap<Character, Integer> window = new HashMap<>();
+        int start = -1,len = Integer.MAX_VALUE;
+        int valid = 0,left = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (need.containsKey(c)){
+                window.put(c,window.getOrDefault(c,0)+1);
+                if (window.get(c).intValue()==need.get(c)){
+                    valid++;
+                }
+            }
+            while (valid==need.size()){
+                if (i-left+1<len){
+                    len = i-left+1;
+                    start = left;
+                }
+                char c1 = s.charAt(left++);
+                if (need.containsKey(c1)){
+                    window.put(c1,window.get(c1)-1);
+                    if (window.get(c1)<need.get(c1)){
+                        valid--;
+                    }
+                }
+            }
+        }
+        return start==-1?"":s.substring(start,start+len);
+    }
+
+    /*除了上面的写法以外，还有下面的方法....
+        总的来说，方案的思路就是：for循环/while循环 的选择、里面while和if是并列还是包含关系 的选择，一
+     共2*2=4种写法
+    * */
     public String minWindow_ano(String s, String t) {
         if (s.length()<t.length()) return "";
         HashMap<Character, Integer> need = new HashMap<>();
@@ -338,8 +375,8 @@ public class _03subString {
             //先更新前缀和，然后看前缀和pre-k的数量，有的话累加到res.（pre-k到当前位置的子数组和就是k）
             pre += num;
             /**err：下面两行交换就错了！！
-             *      必须是先更新res，然后再将pre放进map。
-             *      否则，k=0的时候会出错，此时会出现pre-k=pre，如果先把pre放进去，就导致map.get(pre-k)的
+             *      必须是先更新res，然后再将pre放进map，如果先把pre放进map会影响结果！！！
+             *      比如：k=0的时候会出错，此时会出现pre-k=pre，如果先把pre放进去，就导致map.get(pre-k)的
              *  数值比正确的多了。——————比如：放进去之前get的结果是m，放进去之后再获取结果就是m+1了！！*/
             res += map.getOrDefault(pre-k,0);
             map.put(pre,map.getOrDefault(pre,0)+1); /**err：更新了前缀和，不要忘记放进map*/

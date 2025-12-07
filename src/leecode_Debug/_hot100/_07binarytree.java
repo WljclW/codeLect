@@ -102,6 +102,7 @@ import java.util.Stack;
  */
 public class _07binarytree {
     /*94中序遍历*/
+    /*非递归形式的写法*/
     public List<Integer> inorderTraversal(TreeNode root) {
         LinkedList<Integer> res = new LinkedList<>();
         Stack<TreeNode> stack = new Stack<>();
@@ -116,6 +117,21 @@ public class _07binarytree {
             }
         }
         return res;
+    }
+
+    /*递归形式的写法*/
+    List<Integer> resInorder;
+    public List<Integer> inorderTraversal_(leecode_Debug.top100.TreeNode root) {
+        resInorder = new LinkedList<>();
+        if (root==null) return resInorder;
+        dfs1(root);
+        return resInorder;
+    }
+
+    private void dfs1(leecode_Debug.top100.TreeNode root) {
+        dfs1(root.left);
+        resInorder.add(root.val);
+        dfs1(root.right);
     }
 
 
@@ -161,15 +177,18 @@ public class _07binarytree {
     }
 
 
-    /*
-    * 226.给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
+    /* 226. 翻转二叉树
+    * 给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
      * */
+    /**
+     *【建议】层序遍历的思路采用写法 invertTree_no_size；递归的思路写法 invertTree
+     */
     /*解法1：递归的写法*/
     public TreeNode invertTree(TreeNode root) {
-        /*step1：basecase*/
+        /*step1：base case*/
         if (root==null) return root;
         if (root.left==null&&root.right==null) return root; /*没有这一句也OK*/
-        /*step2：完成左右孩子的操作*/
+        /*step2：左右子树分别研究。完成左右孩子的翻转*/
         /**
          * err：这里必须使用临时变量记录一下，不能这么写：
          *      root.left = invertTree(root.right);
@@ -213,8 +232,23 @@ public class _07binarytree {
         cur.right = tmp;
     }
 
+    /*写法3:同时这个题并不需要严格的区分不同层的节点，只需要挨个研究不是null的节点，因此不需要每一层之前先记录queue的size*/
+    public TreeNode invertTree_no_size(TreeNode root) {
+        LinkedList<TreeNode> deque = new LinkedList<>();
+        if (root==null) return root;
+        deque.offer(root);
+        while (!deque.isEmpty()){
+            TreeNode cur = deque.poll();
+            swap(cur);
+            if (cur.left!=null) deque.offer(cur.left);
+            if (cur.right!=null) deque.offer(cur.right);
+        }
+        return root;
+    }
 
-    /*101.给你一个二叉树的根节点 root ， 检查它是否轴对称。*/
+
+    /*101. 对称二叉树
+    给你一个二叉树的根节点 root ， 检查它是否轴对称。*/
     /*解法1：递归法。*/
     public boolean isSymmetric(TreeNode root) {
         if (root == null) return true; //因为递归的方法需要使用到“root.”，因此必须先判空
@@ -225,6 +259,8 @@ public class _07binarytree {
         /*
         base case：（1）如果两个都是空，返回true；
                    （2）如果有且仅有一个是空，返回false
+        说明两个都不是空，则①判断节点的值是否相等；②左边的右孩子 和 右边的左孩子 是不是对称；③左边的左孩子 和 右边的
+                    右孩子是否对称。三者同时满足才返回true。
          */
         if (l == null && r == null) return true;
         if (l == null || r == null) return false;
@@ -268,7 +304,7 @@ public class _07binarytree {
         return true;
     }
 
-    /*543.
+    /*543. 二叉树的直径
     * 给你一棵二叉树的根节点，返回该树的 直径 。
     二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
     两节点之间路径的 长度 由它们之间边数表示。*/
@@ -277,8 +313,8 @@ public class _07binarytree {
      */
     /**
      *124与543有类似的道理
-     *    543中每个节点返回给父节点的信息是以它为根的子树高度，但是每个节点的决策信息是左右子树高度的最大
-     *值+1。因此需要使用额外的函数来改变返回值信息，同时在这个过程中更新结果。
+     *    124中每个节点返回给父节点的信息是以它为根的子树高度，但是每个节点的决策信息是左右子树高度的最大
+     *值+1（1代表自身）。因此需要使用额外的函数来改变返回值信息，同时在这个过程中更新结果。
      *    ①我们期望节点的返回信息：每个节点的返回信息是它最大的贡献值，左右子树只能选一；
      *    ②每一个节点的决策信息：每个结点的决策值，是左边的贡献，右边的贡献，再加节点
      *    这两者之间的差异，再加上原方法要求返回整个树的最大路径，也不是节点的最大贡献。因此必须使用两个方
@@ -290,21 +326,31 @@ public class _07binarytree {
         return maxDiameter;
     }
 
-    /**  其实这个题的辅助函数就是计算以root为根的树的高度
+    /**
+    1.     其实这个题的辅助函数就是计算以root为根的树的高度
      同时
-        在这个过程中更新答案
+           在这个过程中更新答案
+    2. 从下面的方法注释中，可以明显的看出来：到每一个节点时，该节点需要计算的决策信息 和 该节点需要给上层节点的返回值信息，这两
+     者之间是有差异的
      */
     private int dfs(TreeNode root) {
         if (root==null) return 0;
         int left = dfs(root.left);
         int right = dfs(root.right);
-        maxDiameter = Math.max(left+right,maxDiameter); /*决策信息：到每一个节点后，对于题目所求信息的决策*/
-        return 1 + Math.max(left,right); /*返回值信息：每一个节点返回给父节点的信息*/
+        /**
+         【注】路径的长度就是"左右高度之和"，不能再加1了！！
+                比如，左右子树的高度都是1，则路径长度就是2，如下图，6节点有两个孩子，路径长度就
+            是2————即左右子树的高度和：
+                                6
+                               / \
+                              4  3
+         */
+        maxDiameter = Math.max(left+right,maxDiameter); /*来到每一个节点时决策信息：到每一个节点后，对于题目所求信息的决策*/
+        return 1 + Math.max(left,right); /*每一个节点返回值信息：每一个节点返回给父节点的信息*/
     }
 
 
     /*102.层序遍历*/
-
     /**
             【注意】层序遍历必须区分每一行，因此在while循环内，必须先使用“deque.size()”获得出当
      前这一层的节点数；但是对于二叉树的题目中，有的就不需要要个区分每一层节点，因此就可以省略“while
@@ -362,12 +408,16 @@ public class _07binarytree {
     }
 
 
-    /*98.
+    /*98. 验证二叉搜索树
     * 给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。
     有效 二叉搜索树定义如下：
     节点的左子树只包含 小于 当前节点的数。
     节点的右子树只包含 大于 当前节点的数。
     所有左子树和右子树自身必须也是二叉搜索树。*/
+    /**
+     【建议的写法】递归的写法采用官方给出的 isValidBST_offical；
+            迭代的写法 就是中序遍历的迭代写法，在访问节点的时候修改标记变量 并 判断是不是严格升序。
+     */
     /*方法1：递归的方式来完成*/
     public boolean isValidBST(TreeNode root) {
         return isValidBST(root,null,null);
@@ -377,11 +427,42 @@ public class _07binarytree {
         if (root == null) return true;
         if (min != null && root.val <= min) return false;
         if (max != null && root.val >= max) return false;
-        return isValidBST(root.left, min, root.val) && isValidBST(root.right, root.val, max);
+        return isValidBST(root.left, min, root.val /*root.left 代表去左子树，左子树的节点值必须小于等于根 root.val*/) &&
+                isValidBST(root.right, root.val, max); /*同理：root.right 代表去右子树，右子树的节点值不能小于等于根 root.val*/
     }
 
-    /*方法2：中序迭代来看是不是升序*/
-    public boolean isValidBST_inorder(TreeNode root) {
+    /*递归方法，官方给出的写法*/
+    public boolean isValidBST_offical(TreeNode root) {
+        return isValidBST_offical(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    public boolean isValidBST_offical(TreeNode node, long lower, long upper) {
+        if (node == null) {
+            return true;
+        }
+        if (node.val <= lower || node.val >= upper) {
+            return false;
+        }
+        return isValidBST_offical(node.left, lower, node.val) && isValidBST_offical(node.right, node.val, upper);
+    }
+
+    /*方法2：中序迭代来看是不是升序。
+        写法1：声明为引用类型，初始化为 null；见方法 isValidBST_Integer
+        写法2：声明为long，初始化为 Long.MIN_VALUE；见方法 isValidBST_long
+    * */
+    /**
+     【注】
+        1. 这个题使用 preVal 记录前面一个节点的值，用于判断是不是严格升序。但是这个值不能初始化为"Integer.MIN_VALUE",
+     会有测试用例报错，如下：
+                             输入
+                                root = [-2147483648,-2147483648]
+                             输出
+                                 true
+                             预期结果
+                                 false
+        正确：要麽 preVal声明为Integer 初始化为 null；要麽 preVal声明为long，初始化为 Long.MIN_VALUE
+     */
+    public boolean isValidBST_Integer(TreeNode root) {
         Stack<TreeNode> stack = new Stack<>();
         Integer preVal = null;
         while (root!=null||!stack.isEmpty()){
@@ -401,9 +482,30 @@ public class _07binarytree {
         return true;
     }
 
+    public boolean isValidBST_long(leecode_Debug.top100.TreeNode root) {
+        Stack<leecode_Debug.top100.TreeNode> stack = new Stack<>();
+        if (root==null) return true;
+        long prev = Long.MIN_VALUE;
+        while (!stack.isEmpty()||root!=null){
+            if (root!=null){
+                stack.push(root);
+                root = root.left;
+            }else {
+                leecode_Debug.top100.TreeNode cur = stack.pop();
+                if (prev==Long.MIN_VALUE) prev = cur.val;
+                else {
+                    if (prev>=cur.val) return false;
+                    prev  =cur.val;
+                }
+                root = cur.right;
+            }
+        }
+        return true;
+    }
 
 
-    /*230.
+
+    /*230. 二叉搜索树中第 K 小的元素
     * 给定一个二叉搜索树的根节点 root ，和一个整数 k ，请你设计一个算法查找其中第 k 小的元素（从 1 开始计数）。*/
     public int kthSmallest(TreeNode root, int k) {
         Stack<TreeNode> stack = new Stack<>();
@@ -420,9 +522,27 @@ public class _07binarytree {
         return -1;
     }
 
+    /*写法2：递归的写法*/
+    int res, k;
+    void dfs3(TreeNode root) {
+        if (root == null) return;
+        /**1. 访问左子树*/
+        dfs3(root.left);
+        /**2. 访问当前节点。。。本质是使用中序遍历二叉树，过程中记录结果*/
+        if (k == 0) return;
+        if (--k == 0) res = root.val;
+        /**3. 访问右子树*/
+        dfs3(root.right);
+    }
+    public int kthSmallest_digui(TreeNode root, int k) {
+        this.k = k;
+        dfs3(root);
+        return res;
+    }
 
 
-    /*199.
+
+    /*199. 二叉树的右视图
     给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
     * */
     public List<Integer> rightSideView(TreeNode root) {
@@ -443,7 +563,7 @@ public class _07binarytree {
     }
 
 
-    /*114.
+    /*114. 二叉树展开为链表
     * 给你二叉树的根结点 root ，请你将它展开为一个单链表：
     展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
     展开后的单链表应该与二叉树 先序遍历 顺序相同。*/
@@ -452,7 +572,7 @@ public class _07binarytree {
         if (root==null) return;
         LinkedList<TreeNode> stack = new LinkedList<>();
         stack.push(root);
-        TreeNode cur = null;
+        TreeNode cur = null; /**cur代表当前已经拼接得到的那部分链表 的最后一个节点，下一个节点就拼接到 cur.right*/
         while (!stack.isEmpty()){
             TreeNode nowNode = stack.pop();
             if (cur==null){ //cur是null，说明nowNode是先序遍历的第一个节点
@@ -460,7 +580,7 @@ public class _07binarytree {
             }else{ //否则的话将nowNode拼接到cur节点右边
                 cur.right = nowNode;
                 cur.left = null; /**由于是先序遍历，因此到任何一个孩子的时候，左孩子节点一定已经研究过了，因此这一步不会导致错过节点*/
-                cur = cur.right; /*这里的cur.right其实就是nowNode，因此这一句等同于“cur=nowNode。”*/
+                cur = cur.right; /*这里的cur.right其实就是nowNode，因此这一句等同于写成“cur=nowNode。”*/
             }
             /**上面的if-else逻辑可以简化为下面的形式。原因在于if-else有公用的一句“cur = nowNode;”，并且
              if语句块只有这一句话。因此可以省略if块，原来的else块写为if语句块，把这个赋值的逻辑写在if块之
@@ -470,17 +590,13 @@ public class _07binarytree {
 //                curNode.left = null;
 //            }
 //            curNode = cur;
-            if (nowNode.right!=null){
-                stack.push(nowNode.right);
-            }
-            if (nowNode.left!=null){
-                stack.push(nowNode.left);
-            }
+            if (nowNode.right!=null) stack.push(nowNode.right);
+            if (nowNode.left!=null) stack.push(nowNode.left);
         }
     }
 
 
-    /*105.
+    /*105. 从前序与中序遍历序列构造二叉树
     * 从前序 和 中序 构造出二叉树*/
     /**
      * 对于任何一颗树，前序的第一个节点一定是树的根；中序遍历中这个根节点的左边就是左子树，右边就是右子树
@@ -492,8 +608,12 @@ public class _07binarytree {
      *      3. 返回root
      *【补充说明】
      *      1. 为了从中序遍历快速得到某个数据所在的位置，通常使用map来优化
-     *      2. “先序-后序”来构建的时候有区别。因为后序遍历的顺序是“左-右-根”，因此倒着拿的时候
-     *  会先拿到右子树，因此需要先构造右子树、再构造出左子树
+     *      2. “先序-后序”来构建的时候有区别。
+     *          2.1 因为后序遍历的顺序是“左-右-根”，此时要倒序拿，因为根在最后；然后接着拿到节点其实是根节点的右
+     *      子树；中序遍历的顺序是“左-根-右”，因此先使用右半部分数据构建右子树，再使用左半部分构建左子树。顺序不
+     *      能错！！
+     *          2.2 而先序遍历的顺序是“根-左-右”，此时要顺序拿，因为根在前面；然后接着拿的时候其实是拿到了根节
+     *      点的左子树；中序遍历的顺序就是“左=根-右”，因此先使用左半部分构建左子树，再使用右半部分构建右子树。
      *【复杂度分析——比如数组中有n个数据】
      *      时间复杂度：因为每一个节点都会进行创建，因此递归的调用深度（递归次数）是n；每一次递归是都是先创建二叉树节点，然后在中序
      *  遍历中查找它的位置，由于使用HashMap因此每一次递归时间复杂度是O(1)，因此总的时间复杂度O(n).
@@ -513,8 +633,8 @@ public class _07binarytree {
         int curVal = preorder[preOrderIndex++];
         TreeNode root = new TreeNode(curVal);
         Integer inorderIndex = inorderMap.get(curVal);
-        root.left = buildTree(preorder,inorder,l,inorderIndex-1); /*左边范围到inorderIndex-1位置*/
-        root.right = buildTree(preorder,inorder,inorderIndex+1,r); /*右边是从inorderIndex+1开始*/
+        root.left = buildTree(preorder,inorder,l,inorderIndex-1); /*使用inorder中左边的数据构建左子树，左边范围到inorderIndex-1位置*/
+        root.right = buildTree(preorder,inorder,inorderIndex+1,r); /*使用inorder中右边的数据构建右子树，右边是从inorderIndex+1开始*/
         return root;
     }
 
@@ -529,6 +649,7 @@ public class _07binarytree {
     /*236.二叉树最近公共祖先
     * */
     /**
+     *【建议】递归法使用解法 lowestCommonAncestor。
      * 解析建议看K神：https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/solutions/240096/236-er-cha-shu-de-zui-jin-gong-gong-zu-xian-hou-xu/
      * */
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
@@ -555,7 +676,7 @@ public class _07binarytree {
     }
 
 
-    /*124
+    /*124. 二叉树中的最大路径和
     * 二叉树中的 路径 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列中 至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。
     路径和 是路径中各节点值的总和。
     给你一个二叉树的根节点 root ，返回其 最大路径和 。
@@ -601,6 +722,7 @@ public class _07binarytree {
      */
     int resMaxPathSum = Integer.MIN_VALUE; /**err：注意初始化为0是不行的，因为可能所有的节点值都小于0，因此最大路径必小于0*/
     public int maxPathSum(TreeNode root) {
+        /*备注：没有下面的两个 特殊情况 的考虑也是ok的，代码没问题！*/
         if (root==null) return 0;
         if (root.left==null&&root.right==null) return root.val;
         dfsMaxPathSum(root);

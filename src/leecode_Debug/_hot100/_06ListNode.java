@@ -137,6 +137,8 @@ public class _06ListNode {
     * 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返
     * 回 true ；否则，返回 false 。*/
     /**
+     * 【结论，重要！！！！！！】这个题就找中间节点（常规方法），然后从这个节点翻转，挨个比较可以。。
+     *       2个不用：不用考虑奇偶的时候找哪一个节点、不用考虑前一部分链表的最后必须置为null！！
      * 【关键】
      *      1. "找中间节点"时找到中间节点(奇数的情况) 或者 中间节点的下一个节点(偶数的情况)————即寻找
      *  中间节点时slow、fast指针的初始值都是head。
@@ -284,7 +286,7 @@ public class _06ListNode {
         return res.next;
     }
 
-    /*2.
+    /*2. 两数相加
     * 给你两个 非空 的链表，表示两个非负的整数。它们每位数字都是按照 逆序 的方式存储的，并且每个节点只能存储 一位 数字。
     请你将两个数相加，并以相同形式返回一个表示和的链表。
     你可以假设除了数字 0 之外，这两个数都不会以 0 开头。*/
@@ -308,7 +310,7 @@ public class _06ListNode {
 
     /*19.
     * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。*/
-    /**    🔺强烈建议使用官方解,即方法removeNthFromEnd1~~~~~~~
+    /**    🔺强烈建议使用官方解,即方法 removeNthFromEnd1~~~~~~~
      * 【解题关键&&官方解精髓】开始时slow指向虚拟头dummy节点；
      *                       开始时fast指向head 并且 fast先走n步（注意slow和fast的开始位置不一样）
      *                      （最后fast指向null的时候，slow正好指向倒数第n+1个节点）
@@ -362,7 +364,7 @@ public class _06ListNode {
     }
 
 
-    /*24.
+    /*24. 两两交换链表中的节点
     * 给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下
     * 完成本题（即，只能进行节点交换）。*/
     /**
@@ -417,7 +419,7 @@ public class _06ListNode {
     public ListNode reverseKGroup(ListNode head, int k) {
         ListNode dummy = new ListNode(-1, head);
         ListNode pre = dummy,end = dummy;
-        while (end.next != null) { /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。“end.next!=null”是保证下一组A组还有节点*/
+        while (end.next != null) { /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。“end.next!=null”是保证后面还有节点,有节点才继续新一轮的研究*/
             /*step1：先数k个节点，如果不够k个(end==null)，说明剩下的不够k个，因此结束循环，返回*/
             for (int i = 0; i < k && end != null; i++) { //经过这一轮循环，end会来到新的一组即A组的最后一个节点
                 end = end.next;
@@ -500,17 +502,16 @@ public class _06ListNode {
         }
         return headNew;
 
-        /*step3，也可以改写成下面的形式*/
-//        if (head==null) return null;
+        /*step3 写法2：也可以改写成下面的形式*/
 //        Node res = head.next,ress = res;
 //        while(ress.next!=null){
-//            head.next = ress.next;
-//            ress.next = head.next.next;
+//            head.next = head.next.next;
+//            ress.next = ress.next.next;
 //            head = head.next;
 //            ress = ress.next;
 //        }
 //        head.next = null;
-//        ress.next=null;
+//        ress.next = null;
 //        return res;
 
         /*step3，chatgpt的写法*/
@@ -589,6 +590,7 @@ public class _06ListNode {
     * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。*/
     /**
      * 【思路】归并排序
+     * 【建议的解法】使用 sortList。主方法思路清晰，整理节点的逻辑放在找中间节点的方法
      * 【解此题的关键】
      *      1. “找中点”的时候，必须找到中间的节点midPrev（如果是偶数个节点，找到中间两个中的第一个）；然后记录下
      *   一个节点（midPrev.next）；第三步将“midPrev.next”置为null；最后返回找到的那个节点即返回midPrev
@@ -604,7 +606,8 @@ public class _06ListNode {
         /*1.特殊情况的考虑————没有节点或者只有一个节点，此时不用排序*/
         if (head==null||head.next==null) return head;
         /*2.找到中间节点的后一个节点（奇数得到中间，偶数得到中间的后一个）。
-        但是其中有一个细节————在findMid中必须要先找到中间的第一个节点*/
+        但是其中有一个细节————在findMid中必须要先找到中间的第一个节点！
+            原因：要把前一半链表的最后节点置为null，因为合并链表的时候，链表的结束标志是null*/
         ListNode mid = findMid(head);
         /*3.分别排序左、右两半链表*/
         ListNode left = sortList(head);
@@ -730,6 +733,7 @@ public class _06ListNode {
      *         ②更新cur指针
      *      2. 需要熟悉一下"分治合并"————跟归并排序的思路是一样的，区别就是在merge的时候时两个链表的合并。
      *      关于"分治"的代码可以参考：https://leetcode.cn/problems/merge-k-sorted-lists/solutions/3787/leetcode-23-he-bing-kge-pai-xu-lian-biao-by-powcai/?envType=study-plan-v2&envId=top-100-liked
+     * 【建议的解法】使用 mergeKLists_01
      * */
     /*解法1：借助优先级队列。假设lists中有k个队列，每一个队列有n个节点
     * 时间复杂度：元素数量k*n,每一个元素进队列出队列一次，复杂度logK，因此总体时间复杂度O(kn*logk)
@@ -958,6 +962,12 @@ public class _06ListNode {
             next.pre = pre;
         }
 
+        /**removeNode 方法也可以这么写*/
+//        private void removeNode(DouListNode node) {
+//            node.pre.next = node.next;
+//            node.next.pre = node.pre;
+//        }
+
         /*把一个节点添加为头节点*/
         private void addNodeToHead(DouListNode newNode) {
             DouListNode next = head.next;
@@ -966,6 +976,14 @@ public class _06ListNode {
             next.pre = newNode;
             newNode.pre = head;
         }
+
+        /**addNodeToHead 方法也能这么写*/
+//        private void addToHead(DouListNode newNode) {
+//            newNode.next = head.next;
+//            head.next = newNode;
+//            newNode.pre = head;
+//            newNode.next.pre = newNode;
+//        }
     }
 
 

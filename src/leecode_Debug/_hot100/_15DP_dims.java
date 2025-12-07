@@ -41,13 +41,29 @@ public class _15DP_dims {
     public int uniquePaths1(int m, int n) {
         int[] dp = new int[n];
         Arrays.fill(dp,1);
-        for (int i = 1; i < m; i++) {
-            for (int j = 1; j < n; j++) {
+        /**dp[0]代表的是第一列的某个位置，第一行、第一列任何一个位置的路径数都是1，并且这个位置的初始值就填充的
+         是1，因此后续的操作可以不管，每一行直接从“j=1”开始研究
+         */
+        for (int i = 1; i < m; i++) { //i 代表 计划研究第i行
+            for (int j = 1; j < n; j++) { //j 代表 计划研究第i行的index=j的列，同时结果对应着dp[j]。
                 dp[j] += dp[j-1];
             }
         }
         return dp[n-1];
     }
+
+    /*复杂一点的话，可以写成下面的形式*/
+//    public int uniquePaths__(int m, int n) {
+//        int[] dp = new int[n];
+//        Arrays.fill(dp,1);
+//        for (int i = 1; i < m; i++) {
+//            for (int j = 0; j < n; j++) {
+//                if (j==0) dp[j] = 1;
+//                else dp[j] += dp[j-1];
+//            }
+//        }
+//        return dp[n];
+//    }
 
     /*64.
     * 给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路
@@ -102,7 +118,7 @@ public class _15DP_dims {
 //    }
 
 
-    /*1143.
+    /*1143. 最长公共子序列
     给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果
     不存在 公共子序列 ，返回 0 。
     一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺
@@ -110,13 +126,19 @@ public class _15DP_dims {
     例如，"ace" 是 "abcde" 的子序列，但 "aec" 不是 "abcde" 的子序列。
     两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。
     * */
+    /**
+     【推荐的解法】
+            1. 二维数组的动规，看写法 longestCommonSubsequence
+            2. 两行数组滚动更新的写法 longestCommonSubsequence_2row
+            3. 最优版本：使用一行数组来动规，见写法 longestCommonSubsequence_1dim
+     */
     public int longestCommonSubsequence(String text1, String text2) {
         int m = text1.length(),n = text2.length();
         int[][] dp = new int[m+1][n+1];
-        /*step1：对于初始值第一行的dp[0][i]和第一列的dp[i][0]，公共子序列都是0，数组元素
-        的默认值就是零值，因此这个题可以省略base case的初始化*/
+        /*step1：对于初始值第一行的dp[0][i]和第一列的dp[i][0]，公共子序列都是0（因为有一个串是空串。比如：第一行表示text1的长
+        度是0即空串；同理第一列表示text2是空串），数组元素的默认值就是零值，因此这个题可以省略base case的初始化*/
         /*step2：针对每一个位置分别研究。。。根据i-1和j-1位置的字符是否相等来决定dp[i][j]*/
-        for (int i=1;i<=m;i++){ /**err：二维dp很多都需要多一个长度，因此i和j是能娶到m和n的。如果忘了等于，结果永远是0，因为那个位置的值一直是默认值*/
+        for (int i=1;i<=m;i++){ /**err：二维dp很多都需要多一个长度，因此i和j是能取到m和n的。如果忘了等于，结果永远是0，因为那个位置的值一直是默认值*/
             char c = text1.charAt(i-1);
             for (int j=1;j<=n;j++){
                 if (text2.charAt(j-1)==c){
@@ -127,7 +149,7 @@ public class _15DP_dims {
                     dp[i][j] = dp[i-1][j-1]+1; /**【说明】简化的写法，其实是所有做法中公共长度的最大值*/
                 }else {
                     /*情况2：
-                    如果当前字符不一样，dp[i][j]的值取决于dp[i-1][j]和dp[i][j-1]的最大值。
+                        如果当前字符不一样，dp[i][j]的值取决于dp[i-1][j]和dp[i][j-1]的最大值。
                     dp[i][j]：第一个字符串的前i个字符和第二个字符串的前j个字符的最长公共序列
                     * */
                     dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
@@ -140,13 +162,13 @@ public class _15DP_dims {
     /**空间优化：两行数组的写法
      【说明】
      1. 两行DP的写法中，prev就看作是二维DP中的dp[i-1][..]，而cur看作是二维DP中的dp[i][..]。（简单点说，计算时代码中的
-     prev直接改成dp[i-1]、代码中的cur直接改写成dp[i]）比如，下面的代码中————
+     prev直接改成dp[i-1]、代码中的cur直接改写成dp[i]，就等价于二维下的动规了）比如，下面的代码中————
          ①“cur[j] = prev[j-1] + 1;”就相当于“dp[i][j] = prev[i-1][j-1] + 1”；
          ②“cur[j] = Math.max(cur[j-1],prev[j]);”就相当于“dp[i][j] = Math.max(dp[i][j-1],dp[i-1][j])”
-     可以看出，改写后的表达式跟二维DP的表达式一模一样！！
-     2. 两行的DP中，由于习惯研究某一行的每一列，因此“脑补出短的元素在一行”。比如：如果text1短就让text1写在行的位置，这样
+        可以看出，改写后的表达式跟二维DP的表达式一模一样！！
+     2. 两行的DP中，由于习惯研究某一行的每一列，因此“脑补出短的元素在一行”。比如：如果text1短就让text1写在一行的位置，这样
      创建的dp长度就是text1.length+1；反之如果text2比较短，就让text2写在行的位置，此时创建的动规数组长度就是text2.lenth+1。
-     这样的话空间复杂度能降低到O(M,N)（其中M时text1的长度，N是text2的长度~~~）
+     这样的话空间复杂度能降低到 O(min(M,N))（其中M时text1的长度，N是text2的长度~~~）
      */
     public int longestCommonSubsequence_2row(String text1, String text2) {
         int m = text1.length(),n = text2.length();
@@ -191,15 +213,15 @@ public class _15DP_dims {
      *    区别于72题。在72的1行数组动规中，这里会更新“dp[0]=i”，由于这个题是计算公共子序列，且dp[0]
      *表示第二个串是空串，因此dp[0]必然是0，数组的默认值以及初始值就是0，因此省略此步骤
      *   ②if-else块会更新dp某位置，因此计算之前先记录dp[i]
-     *   ③dp[i]流程结束前将tmp更新到prev
+     *   ③更新dp[i]的流程结束前将tmp更新到prev
      */
     public int longestCommonSubsequence_1dim(String text1, String text2) {
         int m = text1.length(),n = text2.length();
         if (m<n) return longestCommonSubsequence_1dim(text2,text1);
         int[] dp = new int[n + 1];
         for (int i = 1; i <= m; i++) {
-            int prev = 0; //①、对应 dp[i-1][j-1]
-            dp[0] = 0; /**对比于72题，这一步可以省略*/
+            int prev = 0; //①、对应 dp[i-1][j-1]，需要记录一下
+            dp[0] = 0; /**对比于72题，这一步可以省略。*/
             for (int j = 1; j <= n; j++) {
                 int tmp = dp[j]; //②、暂存 dp[i-1][j]，因为它马上要被覆盖
                 char c1 = text1.charAt(i - 1);
@@ -209,7 +231,7 @@ public class _15DP_dims {
                 }else {
                     dp[j] = Math.max(dp[j-1],dp[j]);
                 }
-                prev = tmp; //③、更新 prev 为 dp[i-1][j]。。因为下一轮要计算dp[i][j+1]，这样prev还是它的左上角位置
+                prev = tmp; //③、更新 prev 为 dp[i-1][j]。。因为下一轮要计算dp[i][j+1]，这样对于dp[i][j+1]来说，prev 记录的还是它的左上角位置
             }
         }
         return dp[n];
@@ -224,7 +246,7 @@ public class _15DP_dims {
     替换一个字符*/
     /**
      * 【关键】定义dp[i][j]为第一个字符串前i个字符 和 第二个字符串前j个字符 的编辑距离。
-     *      则任意的dp[i][j]可以通过dp[i-1][j]、dp[i][j-1]、dp[i-1][j-1]表示。
+     *      则任意的dp[i][j]可以通过dp[i-1][j]、dp[i][j-1]、dp[i-1][j-1]推导出来，具体的推导逻辑如下————
      *      dp[i-1][j]此时就表示第一个子串的前i-1个字符匹配第二个串的前j个字符。因此暗示这个分支我们需要在第二个字符串
      *  添加第一个串的第i个字符；同理也可以理解为删除第一个串的第i个字符。
      *      dp[i][j-1]此时就表示第一个子串的前i个字符匹配第二个串的前j-1个字符。因此暗示这个分支我们需要在第一个字符串
@@ -233,7 +255,10 @@ public class _15DP_dims {
      *  换第一个串的i字符与第二个串的j字符相同；同时也可以理解为替换第二个串的j字符与第一个串的i字符相同。
      * */
     /**
-     * 这个题看官方解析就行
+     * 【解法】
+     *      1. 二维dp的写法见 minDistance1
+     *      2. 两行数组交替更新的写法见 minDistance_2row
+     *      3. 一行数组滚动更新的写法见
      * 【解题关键】每一个普遍位置dp[i][j]可以由前面的位置推导过来
      *      dp[i][j-1]+1：相当于删除第二个串的第j个字符 或者 给第一个串第i个字符位置后添加第二个串的第j个字符
      *      dp[i-1][j]+1：相当于删除第一个串的第i个字符 或者 给第二个串第j个字符位置后添加第一个串的第i个字符
@@ -339,7 +364,7 @@ public class _15DP_dims {
      *     问题：dp[i][j]依赖于dp[i-1][j]、dp[i][j-1]、dp[i-1][j-1]。此时从前往后计
      *  算就不对，必须借助额外的变量存储dp[i-1][j-1]的信息————代表着上一行前一个位置的值。
      *     如何解决：在一行数组的动规中，要求在更新任何一个位置的值之前，必须先记录，比如：计
-     *  算dp[3]的之前先使用tmp记录dp[3]的值dp[3](old)，dp[3]更新后将dp[3](old)赋值给局
+     *  算dp[3]的之前先使用tmp记录dp[3]的值dp[3](old)，dp[3]更新后将dp[3](old)即tmp赋值给局
      *  部变量prev;接下来会计算dp[4]，依然先记录dp[4]（old）到变量tmp中，更新dp[4]时二维中
      *  会使用到左上角的位置值即dp[i-1][j-1]，就等价于一维中的dp[3](old)，而此时的dp[3]（old）
      *  是在变量prev中存储的。。。。。综上，整个过程形成了闭环，同时可以看到prev,tmp变量是缺一不
@@ -350,7 +375,8 @@ public class _15DP_dims {
         /*setep1：保证空间复杂度为O(min(m,n))————即把短的字符串放在二维表中列的位置*/
         if (m<n) return minDistance_1dim(word2,word1);
         /*step2：创建数组 并且 初始化。
-            【说明】此时初始化相当于”二维dp“时初始化第一行的操作，即把word1当作是空串。
+            【说明】此时初始化相当于”二维dp“时初始化第一行的操作，即把word1当作是空串。因此每一个位置的距离
+         就等于 word2该位置的长度
         * */
         int[] dp = new int[n + 1];
         for (int i = 0; i <= n; i++) {
@@ -362,14 +388,14 @@ public class _15DP_dims {
             int prev = dp[0]; /**要更新dp[0]了，因此先记录一下*/
             dp[0] = i; /**相当于二维中第一列（word2此时是空串）的值，word2是空串，此时的编辑距离就是word1的长度*/
             for (int j = 1; j <= n; j++) {
-                int tmp = dp[j]; /**下面要更新dp[j]了，因此也是先记录一下*/
+                int tmp = dp[j]; /**下面要更新dp[j]了，因此也是先记录一下，此时记录的 tmp 相当于 dp[i-1][j]，下一轮研究dp[j+1]，tmp对dp[j+1]来说就是左上角的位置了*/
                 char c1 = word1.charAt(i - 1);
                 char c2 = word2.charAt(j - 1);
                 if (c1==c2){
                     dp[j] = prev;
                 }else {
-                    /**左边的dp[j]相当于二维中的dp[i][j]，右边的dp[j-1]相当于二维中的dp[i][j-1]，右边的dp[j]相当于二维中
-                     * 的dp[i-1][j]，右边的prev相当于二维中的dp[i-1][j-1]*/
+                    /**左边的dp[j]相当于二维中的dp[i][j]；右边的dp[j-1]相当于二维中的dp[i][j-1]；右边的dp[j]相当于二维中
+                     * 的dp[i-1][j]；右边的prev相当于二维中的dp[i-1][j-1]*/
                     dp[j] = Math.min(Math.min(dp[j-1],dp[j]),prev)+1;
                 }
                 prev = tmp;

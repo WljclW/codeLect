@@ -11,7 +11,7 @@ public class _16tricks {
     * 出现两次。找出那个只出现了一次的元素。
     你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。*/
     public int singleNumber(int[] nums) {
-        int res = 0; /**注：这个题res只能初始化为0，因为其他数可能在数组中出现过，res初始化为其他数可能出错*/
+        int res = 0; /**err：这个题res只能初始化为0，因为其他数可能在数组中出现过，res初始化为其他数可能出错*/
         for (int i:nums){
             res ^= i;
         }
@@ -27,7 +27,8 @@ public class _16tricks {
      * 整体的思想：
      *      假设数组中的数进行投票，每一个数都投给自己一票，不是自己的话就-1，则最终多数元素的票数绝对是正值。
      * 解题关键：
-     *      每一次碰到票数是0，就更新标记值（候选值），然后针对这个数投票
+     *      每一次碰到票数是0，就更新标记值（候选值，更新为现在研究的数），然后针对这个数投票。。思考：这里为
+     *  什么需要更新？每一次 total 变为0的时候，说明前面的数相互抵消了，多数元素在剩下的数据中找
      */
     public int majorityElement(int[] nums) {
         int total = 0; //标记当前的票数
@@ -41,25 +42,27 @@ public class _16tricks {
         return flag;
     }
 
-    /*75.
+    /*75. 颜色分类
     * 给定一个包含红色、白色和蓝色、共 n 个元素的数组 nums ，原地 对它们进行排序，使
     * 得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
     我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
     必须在不使用库内置的 sort 函数的情况下解决这个问题。*/
-    /*
-    * 【注意】cur位置小于1的时候，left和cur指针都需要++。。。否则会报错，如下：
-    *       输入
+    /**
+     1. 【注意】cur位置小于1的时候，left和cur指针都需要++。。。否则会报错，如下：
+           输入
             nums =
             [2,0,2,1,1,0]
             输出
             [1,1,2,2,0,0]
             预期结果
             [0,0,1,1,2,2]
+     2. 下面的写法是三指针的写法？？这种写法要使用 while循环，使用 for循环 目前没有找到合适的写法。
+     3. 官方解法有给出其他的写法，可理解理解
     * */
     public void sortColors(int[] nums) {
         int left = 0, right = nums.length - 1;
         int cur = 0;
-        while (cur <= right) { /**err：这里必须是小于等于（保证所有位置都研究过），并且注意边界是right。*/
+        while (cur <= right) { /**err：这里必须是小于等于（保证所有位置都研究过），并且注意边界是right，而不是nums.length-1（因为right右边的部分一定是2，不用再研究了）。*/
             if (nums[cur] < 1) { /*如果是0，交换到left指向位置，*/
                 swap(nums, left++, cur++); /**err：注意，这种情况cur也得++，因为此时cur位置的值要麽是0要麽是1，left的位置要么是0要么是1，这两个位置的值不可能是2*/
             } else if (nums[cur] == 1) {
@@ -83,11 +86,19 @@ public class _16tricks {
     你设计的解决方案必须 不修改 数组 nums 且只用常量级 O(1) 的额外空间。
     * */
     /**
-     *【易错点】第一步找相等位置使用“do-while循环”（第一步务必使用“do-while循环”）；然后使用“while循
-     *      环”找入环节点
+     *【建议的解法】 建议使用写法 findDuplicate————即 slow 和 fast 的初始值为0.....原因如下：
+     *      如果 slow 和 fast 的初始值为0，则后面第二次循环时使用"while循环" 或者 "do-while循环"都是
+     *  可以的；
+     *      但是如果 slow 和 fast 的初始值为 nums[0]，则后面第二次循环时只能使用"while循环"，使用"do-while循环"
+     *  结果就错了。
+     *【易错点】
+     *     1. 基于上面所说的两种写法区别：第一步找相等位置使用“do-while循环”（第一步务必使用“do-while循环”）；然
+     *      后使用“while循环”找入环节点（不论那种写法，第二步使用"while循环"都不错）
+     *     2. 第一步的时候，fast 和 slow 初始值设置的是什么；第二步重置slow 或者 fast 指针就得是什么。。。这两次
+     *      的值必须相等，因为这个操作本质上等于将某一个指针重置为头结点————即第一步时初始的位置。
      *【注意】
      *      1. 这个题要求不能修改数组！！！因此使用“快慢指针”或者“二分查找”
-     *      2. 【注】这个题数组是n+1个数，但是数值是[1,n]，因此数值作为下标是不会越界的
+     *      2. 【注】这个题数组是 n+1 个数，但是数值是[1,n]，因此数值作为下标是不会越界的
      *【总结】关于数组中重复数的题目————
      *      ①136：只出现一次的数字：使用异或运算，出现两次的数异或为0.
      *      ②442：标记num应该出现的位置，因为都是正数，此时将对应的位置"|num|-1"标记为负数，说
@@ -101,7 +112,8 @@ public class _16tricks {
     public int findDuplicate(int[] nums) {
         int slow = 0,fast = 0;
         /*step1：类似于环形链表找环。区别————
-        *   区别1：链表通过fast.next.next实现fast一次走两步；数组这里需要通过nums[nums[fast]]实现一次走两步。
+        *   区别1：链表通过fast.next.next实现fast一次走两步；数组这里需要通过nums[nums[fast]]实现 fast 指针
+        * 一次走两步。
         *   区别2：由于链表可以使用“while(fast!=null&&fast.next!=null)”作为while条件，因此在链表中可以使用
         * “while(){}”即while循环结构；但是数组这里没有明确的终止条件，因此只能使用“do{}while();”这种循环方式。
         *   共同点：链表中的while是slow、fast先走才判断是不是相等；数组这里do{}while()会保证循环体至少执行一次
@@ -111,9 +123,11 @@ public class _16tricks {
             slow = nums[slow];
             fast = nums[nums[fast]];
         }while (slow!=fast);
-        /*step2：跟链表一样，重置其中的一个指针为初始位置。然后每个指针每一步都只走一步，slow、fast相等时即为所求*/
+        /*step2：跟链表一样，重置其中的一个指针为初始位置。然后每个指针每一步都只走一步，slow、fast相等时即为所求。。
+            【备注】这里直接使用 while循环 没问题，并且这里必须使用while循环，使用do-while循环就错了！！！
+        */
         slow = 0;
-        while (slow!=fast){
+        while (slow!=fast){ /**注：这里也成do-while循环也是可以的*/
             slow = nums[slow];
             fast = nums[fast];
         }
@@ -137,11 +151,11 @@ public class _16tricks {
 
         // 阶段 2：找到入口点（重复数）
         slow = nums[0];
-        while (slow != fast) { /**err：为什么这里需要使用while？为什么使用"do-while"就错了*/
+        while (slow != fast) { /**err：为什么这种写法这里必须使用while？使用"do-while"就错了。*/
             slow = nums[slow];
             fast = nums[fast];
         }
-        return slow; /**这里是不是要使用nums获取slow对应的数？？还是说直接返回slow，需要直接返回slow*/
+        return slow; /**这里是不是要使用nums获取slow对应的数？？答：需要直接返回slow*/
     }
 
 
@@ -190,7 +204,19 @@ public class _16tricks {
 
 
 
-    /*31.下一个排列*/
+    /*31.下一个排列
+    整数数组的一个 排列  就是将其所有成员以序列或线性顺序排列。
+
+例如，arr = [1,2,3] ，以下这些都可以视作 arr 的排列：[1,2,3]、[1,3,2]、[3,1,2]、[2,3,1] 。
+整数数组的 下一个排列 是指其整数的下一个字典序更大的排列。更正式地，如果数组的所有排列根据其字典顺序从小到大排列在一个容器中，那么数组的 下一个排列 就是在这个有序容器中排在它后面的那个排列。如果不存在下一个更大的排列，那么这个数组必须重排为字典序最小的排列（即，其元素按升序排列）。
+
+例如，arr = [1,2,3] 的下一个排列是 [1,3,2] 。
+类似地，arr = [2,3,1] 的下一个排列是 [3,1,2] 。
+而 arr = [3,2,1] 的下一个排列是 [1,2,3] ，因为 [3,2,1] 不存在一个字典序更大的排列。
+给你一个整数数组 nums ，找出 nums 的下一个排列。
+
+必须 原地 修改，只允许使用额外常数空间。
+     */
     /**
      * 【强烈建议】使用官方解，见方法nextPermutation_offical 或者 nextPermutation_2(更符合自己的想法)
      * 【如果有下一个更大的排列，则做法分为三步】
@@ -313,7 +339,7 @@ public class _16tricks {
      */
     public void nextPermutation_myMethod(int[] nums) {
         int flag = nums.length; /**【注意】这里尽量不要取Integer.MAX_VALUE!!!*/
-        /*step1：从后面开始找到第一个降序的位置，即nums[i]<nums[i+1]*/
+        /*step1：从后面开始找到第一个升序（nums[i]<nums[i+1]）的位置i，用 flag 标记 i*/
         for (int i=nums.length-2;i>=0;i--){
             if (nums[i]<nums[i+1]){
                 flag = i;
@@ -354,6 +380,7 @@ public class _16tricks {
     /*下一个排列的写法，flag初始化为-1，兼顾了整个数组翻转的情况*/
     public void nextPermutation_2(int[] nums) {
         int flag = -1;
+        /*step1：从后面开始找到第一个升序（nums[i]<nums[i+1]）的位置i，用 flag 标记 i*/
         for (int i = nums.length-2; i >=0 ; i--) {
             if (nums[i]<nums[i+1]){
                 flag = i;
@@ -361,6 +388,9 @@ public class _16tricks {
             }
         }
 
+        /*step2：倒着找第一个大于升序位置数nums[flag]的数nums[i]，并交换；交换后把flag（不包含
+            flag）之后的所有数逆序。。。。
+                如果升序的位置根本就不存在，此时flag不会更新，还是-1，不会进入到这个if.*/
         if (flag>=0){      /**【说明】这里添加一个if判断flag的值，优化代码的逻辑，即使需要直接执行最后一行也不用写一段特殊逻辑*/
             for (int i = nums.length-1;i>flag; i--) {
                 if (nums[i]>nums[flag]){ /**err：这里必须“严格大于”，不能带“=”*/
@@ -440,6 +470,6 @@ public class _16tricks {
 
 
         int[] a = new int[]{3,2,1};
-        new _16tricks().nextPermutation(a);
+//        new _16tricks().nextPermutation(a);
     }
 }
