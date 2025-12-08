@@ -1,7 +1,5 @@
 package leecode_Debug.topcode_template_Locked;
 
-import com.sun.source.tree.Tree;
-import leecode_Debug.top100.ListNode;
 import leecode_Debug.top100.TreeNode;
 
 import java.util.*;
@@ -48,6 +46,27 @@ public class hot100_temp_1 {
 //        }
 //    }
 
+    /**非递归的写法采用层次遍历的写法。。。。把握关键点：每次入队列、出队列是 左右两边的对称节点同时进行的*/
+    public boolean isSymmetric(TreeNode root) {
+        if (root==null) return true;
+        LinkedList<TreeNode> left = new LinkedList<>();
+        LinkedList<TreeNode> right = new LinkedList<>();
+        left.push(root.left);
+        right.push(root.right);
+        while (!left.isEmpty()){
+            TreeNode leftCur = left.pop();
+            TreeNode rightCur = right.pop();
+            if (leftCur==null&&rightCur==null) continue;
+            if (leftCur==null||rightCur==null) return false;
+
+            left.push(leftCur.left);
+            right.push(rightCur.right);
+            left.push(leftCur.right);
+            right.push(rightCur.left);
+        }
+        return true;
+    }
+
     /*
     437. 路径总和 III
 给定一个二叉树的根节点 root ，和一个整数 targetSum ，求该二叉树里节点值之和等于 targetSum 的 路径 的数目。
@@ -78,9 +97,54 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 
 每一种解法包含一个不同的 n 皇后问题 的棋子放置方案，该方案中 'Q' 和 '.' 分别代表了皇后和空位。
      */
-//    public List<List<String>> solveNQueens(int n) {
-//
-//    }
+    List<List<String>> resSolveNQueens;
+
+    public List<List<String>> solveNQueens(int n) {
+        resSolveNQueens = new LinkedList<>();
+        char[][] flags = new char[n][n];
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(flags[i], '.');
+        }
+        solveNQueens(n, 0, flags);
+        return resSolveNQueens;
+    }
+
+    private void solveNQueens(int n, int row, char[][] flags) {
+        if (row == n) {
+            resSolveNQueens.add(getString11(n, flags));
+            return;
+        }
+        for (int i = 0; i < n; i++) {
+            if (isValid11(row, i, flags)) {
+                flags[row][i] = 'Q';
+                solveNQueens(n, row + 1, flags);
+                flags[row][i] = '.';
+            }
+        }
+    }
+
+    private boolean isValid11(int row, int col, char[][] flags) {
+        for (int i = 0; i < row; i++) {
+            if (flags[i][col] == 'Q') return false;
+        }
+        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+            if (flags[i][j] == 'Q') return false;
+        }
+        for (int i = row - 1, j = col + 1; i >= 0 && j < flags.length; i--, j++) {
+            if (flags[i][j] == 'Q') return false;
+        }
+        return true;
+    }
+
+    private List<String> getString11(int n, char[][] flags) {
+        LinkedList<String> res = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            res.add(new String(flags[i]));
+        }
+        return res;
+    }
+
+
 
     /*
     215. 数组中的第K个最大元素
@@ -124,4 +188,46 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 //        int cur = left;
 //
 //    }
+
+
+    public int findKthLargest(int[] nums, int k) {
+        k %= nums.length;
+        return findKthLargest(nums,0,nums.length,nums.length-k);
+    }
+
+    private int findKthLargest(int[] nums, int left, int right, int index) {
+        if (left==right) return nums[left];
+        int pivotIndex = left+new Random().nextInt(right-left+1);
+        int pivot = nums[pivotIndex];
+        
+        int[] cur = partion11(nums,left,right,pivot);
+        if (cur[0]>index){
+            return findKthLargest(nums,left,cur[0]-1,index);
+        } else if (cur[1]<index) {
+            return findKthLargest(nums,cur[1]-1,right,index);
+        }else {
+            return pivot;
+        }
+    }
+
+    private int[] partion11(int[] nums, int left, int right, int pivot) {
+        int l = left,r = right;
+        int cur = left;
+        while (cur<=right){
+            if (nums[cur]<pivot){
+                swap11(nums,l++,cur++);
+            }else if (nums[cur]>pivot){
+                swap11(nums,cur,r--);
+            }else {
+                cur++;
+            }
+        }
+        return new int[]{left,right};
+    }
+
+    private void swap11(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
+    }
 }
