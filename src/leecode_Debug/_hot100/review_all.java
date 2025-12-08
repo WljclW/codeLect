@@ -540,9 +540,8 @@ public class review_all {
 
 
     /*101.给你一个二叉树的根节点 root ， 检查它是否轴对称。*/
-    public boolean isSymmetric(TreeNode root) {
-        return false;
-    }
+//    public boolean isSymmetric(TreeNode root) {
+//    }
 
     /*98.
     * 给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。

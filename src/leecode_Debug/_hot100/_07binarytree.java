@@ -304,6 +304,30 @@ public class _07binarytree {
         return true;
     }
 
+    /*迭代法 的不同的写法*/
+    /**非递归的写法采用层次遍历的写法。。。。把握关键点：每次入队列、出队列是 左右两边的对称节点同时进行的*/
+    public boolean isSymmetric(leecode_Debug.top100.TreeNode root) {
+        if (root==null) return true;
+        LinkedList<leecode_Debug.top100.TreeNode> left = new LinkedList<>();
+        LinkedList<leecode_Debug.top100.TreeNode> right = new LinkedList<>();
+        left.push(root.left);
+        right.push(root.right);
+        while (!left.isEmpty()){
+            leecode_Debug.top100.TreeNode leftCur = left.pop();
+            leecode_Debug.top100.TreeNode rightCur = right.pop();
+            if (leftCur==null&&rightCur==null) continue;
+            if (leftCur==null||rightCur==null) return false;
+            if (leftCur.val!=rightCur.val) return false;
+
+            left.push(leftCur.left);
+            right.push(rightCur.right);
+            left.push(leftCur.right);
+            right.push(rightCur.left);
+        }
+        return true;
+    }
+
+
     /*543. 二叉树的直径
     * 给你一棵二叉树的根节点，返回该树的 直径 。
     二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。

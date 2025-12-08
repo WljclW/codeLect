@@ -313,6 +313,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
      */
     /**
+     【建议的写法】 强烈建议使用 写法 findKthLargest_best。
      TODO:理解chatgpt给出的三种解法
     方法1：调用Arrays.sort()进行完整的排序。时间复杂度——O(n log n)，空间复杂度O(1).
     方法2：借助优先级队列。只要优先级队列的数字超过k，就弹出。
@@ -321,6 +322,63 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     方法3：快排思想的排序。
      TODO:借助这个题继续思考，“Hoare分区的快排版本”怎么写？
      */
+    public int findKthLargest_best(int[] nums, int k) {
+        /**err：不能取余。取了就错了。原因解释————
+         比如数组中只有两个元素"[2,1]"，现在要找第二大的值，2 % 2=0，k就变成了0，然后
+         "nums.length-k"变成了2————等价于告诉findKthLargest找出排序后索引为"2"的位置元
+         素是多少，而数组的长度才是2，所以压根没这种元素！！！
+         */
+//        k %= nums.length;  //错误的，不能有
+        return findKthLargest_best(nums,0,nums.length,nums.length-k);
+    }
+
+    private int findKthLargest_best(int[] nums, int left, int right, int index) {
+        /*step1：base case 情况*/
+        if (left==right) return nums[left];
+        /*step2：选出基准的元素*/
+        int pivotIndex = left+new Random().nextInt(right-left+1);
+        int pivot = nums[pivotIndex];
+        /*step3：返回数组————cur[0]是第一个出现 pivot 值的位置，cur[1]是最后一个出现 pivot
+            值的位置。经过"partion_best"方法的执行，数组中"[left,right]"这部分划分为三部分，
+            分别为
+                “第一部分：[left,cur[0]-1]”，这部分的数据都小于 pivot；
+                “第二部分：[cur[0],cur[1]]”，这部分的数据都等于 pivot；
+                “第三部分：[cur[1],right]”，这部分的数据都大于 pivot；
+        * */
+        int[] cur = partion_best(nums,left,right,pivot);
+        /*step4：判断索引“index”出现在哪一部分，然后继续递归寻找*/
+        if (cur[0]>index){
+            return findKthLargest_best(nums,left,cur[0]-1,index);
+        } else if (cur[1]<index) {
+            return findKthLargest_best(nums,cur[1]-1,right,index);
+        }else {
+            return pivot;
+        }
+    }
+
+    private int[] partion_best(int[] nums, int left, int right, int pivot) {
+        int l = left,r = right;
+        int cur = left;
+        while (cur<=right){
+            if (nums[cur]<pivot){
+                swap11(nums,l++,cur++);
+            }else if (nums[cur]>pivot){
+                swap11(nums,cur,r--);
+            }else {
+                cur++;
+            }
+        }
+        return new int[]{left,right};
+    }
+
+    private void swap11(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
+    }
+
+
+
     /*解法1：借助优先级队列。保证优先级队列中只有k个元素，最后弹出即可*/
     public int findKthLargest(int[] nums, int k) {
         /**
@@ -528,20 +586,20 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
              因此必须在调用方处理 lt>gt 表示“无等于元素”的情况。
      */
     private int[] partition3Way(int[] nums, int left, int right, int pivot) {
-        int lt = left;    // 小于 pivot 的区域边界
+        int leftBound = left;    // 小于 pivot 的区域边界
         int i = left;     // 当前扫描指针
-        int gt = right;   // 大于 pivot 的区域边界
+        int rightBound = right;   // 大于 pivot 的区域边界
 
-        while (i <= gt) {
+        while (i <= rightBound) {
             if (nums[i] < pivot) {
-                swap_chatgpt3(nums, lt++, i++);
+                swap_chatgpt3(nums, leftBound++, i++);
             } else if (nums[i] > pivot) {
-                swap_chatgpt3(nums, i, gt--);
+                swap_chatgpt3(nums, i, rightBound--);
             } else {
                 i++;
             }
         }
-        return new int[]{lt, gt};
+        return new int[]{leftBound, rightBound};
     }
 
     private void swap_chatgpt3(int[] nums, int l, int r) {

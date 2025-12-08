@@ -679,7 +679,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
 
-    /*51.
+    /*51. N 皇后
     按照国际象棋的规则，皇后可以攻击与之处在同一行或同一列或同一斜线上的棋子。
 
 n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，并且使皇后彼此之间不能相互攻击。
@@ -738,18 +738,15 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     private boolean isVaid(int row, int col, int n, char[][] chessBoard) {
         //①判断col这一列是不是有皇后
         for (int rowIndex=0;rowIndex<row;rowIndex++){
-            if (chessBoard[rowIndex][col]=='Q')
-                return false;
+            if (chessBoard[rowIndex][col]=='Q') return false;
         }
         //②判断45方向，是不是有皇后。。此时每一次"行坐标-1，纵坐标也是-1"
         for (int i=row-1,j=col-1;i>=0&&j>=0;i--,j--){
-            if (chessBoard[i][j]=='Q')
-                return false;
+            if (chessBoard[i][j]=='Q') return false;
         }
         //③判断135度方向，是不是有皇后。。此时每一次"行坐标-1，但是纵坐标+1"
         for (int i=row-1,j=col+1;i>=0&&j<=n-1;i--,j++){
-            if (chessBoard[i][j]=='Q')
-                return false;
+            if (chessBoard[i][j]=='Q') return false;
         }
         return true;
     }
