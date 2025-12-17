@@ -558,17 +558,22 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
 
-    /*131.
+    /*131. 分割回文串
     给你一个字符串 s，请你将 s 分割成一些 子串，使每个子串都是 回文串 。返回 s 所有可能的分割方案。
     * */
     /**
+     *【建议的解法】见方法 partition_dp。
      *【思路】假设当前这一轮需要从i位置开始，我们就从i位置开始划分子串（i~i+1的子串、i~1+2的子串、i~i+3的子串），如果划
      * 分出的子串是回文的，则继续往后尝试剩下的部分，具体来说————
      *      如果尝试划分的子串是回文的，则将划分的子串添加进路径pathPartition，接着从子串后的下一个位置继续研究；
-     *      否则如果划分出的子串不是回文的，我们就继续下一个位置划分子串。具体的代码是在for循环内if的条件语句
+     *      否则如果划分出的子串不是回文的，我们就继续尝试从下一个位置划分子串。具体的代码是在for循环内if的条件语句
      *【解法】解法1和解法2的区别在于，如何判断某一个子串是不是回文的。其中————
      *      解法1对于每一个子串使用双指针相向而行，每到一个位置判断字符是不是相等；
-     *      解法2使用动态规划提前计算，二维布尔数组标识每一个子串是不是回文的
+     *      解法2使用动态规划提前计算，二维布尔数组dp[i][j]标识“子串[i,i+1。。。j]”（注意这个子串是闭区间的，即包括位置i 和
+     *  位置j的字符）是不是回文的
+     *【补充说明】
+     *      1. 这个题目中动态规划用于求解：回文子串相关问题。子串必须是连续的，在具体的”状态转移方程“中，类似于”718. 最长重
+     *  复子数组“————子数组也必须是连续的；但是跟”最长回文子序列“
      */
     /*
     * 解法1：朴素的解法。
@@ -629,7 +634,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         char[] str = s.toCharArray();
         path_partition_dp = new LinkedList<>();
         dp_partition_dp = new boolean[str.length][str.length];
-        isPalindrome(str);
+        computePalindrome(str);
         backtracking(s, 0);
         return result_partition_dp;
     }
@@ -647,7 +652,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                     backtracking(str, i + 1);
                     path_partition_dp.pollLast();
                 } else {
-                    //不是回文子串，跳过
+                    //不是回文子串，跳过。。没有这个 else 分支也是可以的。
                     continue;
                 }
             }
@@ -655,7 +660,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     }
 
     //通过动态规划判断是否是回文串,参考动态规划篇 52 回文子串
-    public void isPalindrome(char[] str) {
+    public void computePalindrome(char[] str) {
         for (int i = str.length-1; i >=0 ; --i) {
             for (int j = i; j < str.length; ++j) {
                 if (str[j] == str[i]) {
@@ -666,7 +671,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                     }
                 }
 
-                /*for循环的逻辑也可以使用下面的逻辑实现，这两行代码就集结了情况1和情况2。
+                /*for循环内 所有的逻辑 也可以使用下面的逻辑实现，这两行代码就集结了情况1和情况2。
                 *       【补充说明】虽然i是从最后一行开始，并且dp[i][j]依赖dp[i+1][j-1]，看着依赖了下一行，其
                 * 实并不会越界，因为第二层for循环规定了j从i开始到str.length-1，因此最后一行只有一个元素需要计算，
                 * 并且这个元素的位置i和j是相等的，因此"j-i<=1"就得到true了，后面不会继续计算的
@@ -775,7 +780,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     }
 
     /*
-     * @param row：现在（这一次递归）研究哪一行
+     * @param row：现在（这一轮递归）研究哪一行
      * @param cols：存放哪些列放置了皇后，二进制是1的话就代表别的行已经在这一列放过皇后了
      * @param diag1：存放主队角中，哪些列放置了皇后
      * @param diag2：存放副对角线中，哪些列放置了皇后
@@ -790,21 +795,39 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
             return;
         }
         /*step2：是关键。available的含义 available中二进制是1的位置就是所有能放置皇后的位置
-            cols | diag1 | diag2————所有 不能放皇后的位置；
-            (~(cols | diag1 | diag2)————取反后得到所有能放置皇后的位置（但这个结果不能直接用）；
-            & ((1 >> numOfQueen) - 1)————与之后的整数中，为1的位置是能放置皇后的列
+                cols | diag1 | diag2————所有 不能放皇后的位置；
+                (~(cols | diag1 | diag2)————取反后得到所有能放置皇后的位置（但这个结果不能直接用）；
+                & ((1 >> numOfQueen) - 1)————与之后的整数中，为1的位置是能放置皇后的列。为什么要与这个？因为
+             具体的题目中棋盘可能很小，但是整数有32位，与之后高位多余的都是0，就不会干扰了
+           【表达式计算的结果】available 二进制表示法中，1所在的位置就是可以放置皇后的位置
          */
         int available = (~(cols | diag1 | diag2)) & ((1 >> numOfQueen) - 1);
-        /*step3：使用while循环，依次拿出 二进制available中最右边的1，拿出后就在row行的这个位置放置一个皇后。继续研究后面的行*/
+        /*step3：使用while循环，依次拿出 二进制available中最右边的1，拿出后就在row行的这个位置放置一个皇后，继续研究后面的行。
+            【解释】因为 available 的二进制中，所有的1都是可以放置皇后的位置，因此使用”while循环“依次在available的某个1的位
+          置放置皇后，并继续向后面的行研究
+        */
         while (available != 0) {
-            /*①：一个数和它的相反数相与，得到二进制最低位的1*/
+            /*①计算 position：一个数和它的相反数相与，得到二进制最低位的1*/
             int position = available & -available;
-            /*②：在二进制 available 中，把最低位的1抹为0*/
+            /*②更新 available：在二进制 available 中，把最低位的1抹为0。。。。表示后续不能再尝试在这个位置放皇后了*/
             available &= (available - 1);
-            /*③：position-1 就得出了哪一列放置皇后是合理的。curCol就是对应的列号*/
+            /*③：position-1 就得出了哪一列放置皇后是合理的。curCol就是对应的列号。
+                    使用 Integer.bitCount(position - 1) 是为了从 position 中提取出 具体列的索引。这个操作的目的是 将一个二
+               进制数表示的单一位置，转化为它对应的列号。详细理解：
+                        首先 position 的二进制表示中只含有一个‘1’，其余的位都是0，它表示的是”第几列可以放置皇后“。举两个具体的例
+                     子：
+                        例子1————position = 0010，实际上表示index=1的列可以放置皇后（看二进制中'1'所在的索引，倒着数）;其中
+                     position-1 就是 0001，Integer.bitCount(position - 1) 的结果就是1......最终表示尝试”将index=row这
+                     一行的皇后尝试放在index=1“这一列。
+                        例子2————position = 1000，表示index=3的列可以放置皇后（看二进制中'1'所在的索引，倒着数。'1'在第4位，
+                     因此index=3）;其中 position-1 就是 0111，Integer.bitCount(position - 1) 的结果就是3.....最终表示
+                     尝试”将index=row这一行的皇后尝试放在index=3的这一列“
+                【目的】”Integer.bitCount(position - 1)“计算的就是position中的1倒着数出现在第几位。如果是倒着数第n位置，求出
+             来的就是 n-1，即索引
+            * */
             int curCol = Integer.bitCount(position - 1);
             path[row] = curCol;
-
+            /*④：递归调用方法，处理下一行。。。。【注】在递归调用的时候更新实参变量*/
             backtrack(
                     row + 1,
                     cols |= position,
@@ -812,6 +835,9 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
                     (diag2 |= position) >> 1,
                     path
             );
+            /**为什么这里不需要回溯操作？
+                    因为每一轮递归中的 available是局部变量，下一轮开始的时候 available会重新计算
+            */
         }
     }
 

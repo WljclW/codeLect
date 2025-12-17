@@ -1374,8 +1374,10 @@ public class codetop_5 {
     路径 不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
     * */
     /**
-     * 【思路】用一个map存放前缀和，此时前缀和的含义：从根节点到这个节点的路径和。。。每一次存放之前先看map中有没有
+     *【思路】用一个map存放前缀和，此时前缀和的含义：从根节点到这个节点的路径和。。。每一次存放之前先看map中有没有
      *      符合条件的前缀和，即map.get(curSum-targetSum)的值
+     *【注意点】
+     *      1. 每一次更新了当前路径和信息后，都需要”先更新答案（即从map中取东西）；然后再更新map（把东西放进map）“————这个顺序很关键
      *【关于思路的解析 以及 多个疑问，参看（灵茶山艾府）：
      *      https://leetcode.cn/problems/path-sum-iii/solutions/2784856/zuo-fa-he-560-ti-shi-yi-yang-de-pythonja-fmzo/
      *】
@@ -1412,13 +1414,19 @@ public class codetop_5 {
         return ans;
     }
 
+    /*
+     * @param root：代表从哪一节点出发沿着树往下走
+     * @param i：从根节点到当前节点的路径和。（注意：我们仅仅记录从真正的根节点一直到现在的节点路径和）
+     * @param targetSum：题目已知的 targetSum————即题目要求的路径和
+     * @param cnt：一个存放”路径和——>这种路径和的数量“这样关系的map，用于快速的计算出”路径和等于 i-targetSum 的路径数量“
+     */
     private void dfs(TreeNode root, long i, int targetSum, Map<Long, Integer> cnt) {
-        if (root==null) return;
-        i += root.val;
-        ans += cnt.getOrDefault(i-targetSum,0);
-        cnt.put(i,cnt.getOrDefault(i,0)+1);
+        if (root==null) return; //①来到叶子节点，什么也不做
+        i += root.val; //②更新路径和信息
+        ans += cnt.getOrDefault(i-targetSum,0); //③从map中计算”路径和为 i-targetSum 的路径数量“
+        cnt.put(i,cnt.getOrDefault(i,0)+1); //④将当前的路径和存放进map
 //        cnt.merge(i,1,Integer::sum); /*这种写法跟上一行是同样的效果*/
-        dfs(root.left,i,targetSum,cnt);
+        dfs(root.left,i,targetSum,cnt); //⑤递归左右子树
         dfs(root.right,i,targetSum,cnt);
 //        cnt.merge(i,-1,Integer::sum);
         cnt.put(i,cnt.getOrDefault(i,0)-1); /*这种写法跟下一行是同样的效果*/
