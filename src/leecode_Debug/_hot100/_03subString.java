@@ -20,6 +20,8 @@ public class _03subString {
      *          窗口内(即队首的索引不能是i-k)，并生成对应位置的信息(生成i-k+1位置的信息)
      */
     public int[] maxSlidingWindow(int[] nums, int k) {
+        /**err：滑动窗口的大小是k，因此能得到的数据量是“nums.length-k+1”。比如：有3个数，窗口的大小是3，
+         则最终的数组中只有一个数，因为只有一种窗口的可能*/
         int[] res = new int[nums.length - k + 1]; //比如nums长度为3，窗口大小为3，则res中应该包含一个数
         LinkedList<Integer> queue = new LinkedList<>();
         /*step1：先将窗口的大小扩大为k，结束后生成res[0]的信息*/
@@ -54,11 +56,14 @@ public class _03subString {
     * */
     /**
      *【思路】
-     *【建议的写法】解法minWindow_ano 和 解法minWindow 二选一
+     *【建议的写法】解法 minWindow_ano 和 解法 minWindow 二选一
      *【说明】这个题的特殊之处在于：“while循环”内部的if和while可以并列写，也可以把while写在
      *      if的内部（关于这点见 方法minWindow_ano 和 方法minWindow）。。其中if循环的作用：
      *      将对应的字符纳入到窗口；while循环的作用：把窗口缩小到 合法/非法 的边界，此时才能
      *      得到最优解————最小的合法窗口大小
+     *【一个关键点】
+     *      1. 遍历到s的字符c时，只有这个字符出现在了need种，才会进行研究，否则没有研究的必要。
+     *  因此从整体看，大部分的逻辑被包在“if (need.containsKey(c))”里面。
      */
     public String minWindow(String s, String t) {
         if (s.length()<t.length()) return "";

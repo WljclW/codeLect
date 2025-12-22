@@ -428,6 +428,12 @@ public class _10binarySearch {
     /*解法2：比较的时候采用“nums[left]”，而不要使用nums[0]；
     *         同理，右边有序时比较使用“nums[right]”，而不要使用nums[nums.length-1]。
     *       ——————这样处理能更好的理解81题官方解法*/
+    /**
+        这个题最关键的问题：要判断出来应该去哪一边找；要想知道去哪一边找就得确定出哪一边有序，使用有序的一边来确
+     定接下来要去哪一边找。——————因此最关键的问题确定出哪一边是有序的。
+         情况1：如果nums[mid]>=nums[left]。则说明mid的左边必然是有序的，数组不一定是两部分有序
+         情况2：否则的话即nums[mid]<nums[left]。则说明mid的右边有序，数组一定是两部分有序的
+     */
     public int search_2(int[] nums, int target) {
         int left = 0, right = nums.length - 1;
         while (left <= right) {
@@ -436,7 +442,7 @@ public class _10binarySearch {
             /**err：这里必须使用“>=”，因为有一个测试用例是“[3,1]，target=1”。
              如果不带等于会返回-1，结果是错误的，应该返回1
              */
-            if (nums[mid] >= nums[left]) { /**nums[mid] >= nums[left]————>说明左边肯定是有序的*/
+            if (nums[mid] >= nums[left]) { /**nums[mid] >= nums[left]————>说明左边肯定是有序的；等价于 nums[mid] > nums[right],见解法 search_another*/
                 if (target >= nums[left] && target < nums[mid]) {
                     right = mid - 1;
                 } else {

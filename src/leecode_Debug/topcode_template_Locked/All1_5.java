@@ -7,7 +7,7 @@ import java.util.*;
 
 /**
  * 1~2————215`、53、912` 快排、5、92`、1143、93`、143
- * 3——————151`、78、322、8
+ * 3——————151`、78、322、8、165. 比较版本号
  * 4——————39`、470、122、
  * 5——————112、113`、179、718、手撕堆排序、14
  */
@@ -1543,6 +1543,13 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         int left = 1, right = x / 2;
         while (left <= right) {
             int mid = left + (right - left) / 2;
+            /**
+             整体上分为三种情况：
+                 等于的时候，直接返回；
+                 大于的时候，需要移动right指针，去左边；
+                 小于的时候，需要移动left指针，去右边。
+             从上面的三种情况可以看出来：最后left指针一定是大于的，right指针一定是小于的。。。。right就是满足 平方小于x 的最大整数
+             * */
             if (mid > x / mid) { /**这种写法避免了使用long，避免了mid*mid发生int溢出的风险*/
                 right = mid - 1;
             } else {
@@ -1570,10 +1577,10 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      声明：最大正数：2147483647；最小负数：-2147483648
      ①例子1===》输入："-2147483649"。最后一位累加前，res = 214748364、当前 digit = 9、
      判断 (Integer.MAX_VALUE - 9)/10 = (2147483647-9)/10 = 214748363，
-     res = 214748364 > 214748363 → 越界 → 返回 Integer.MIN_VALUE ✅
+        res = 214748364 > 214748363 → 越界 → 返回 Integer.MIN_VALUE ✅
      ②例子2===》输入：“-2147483648”。最后一位累加前，res = 214748364、当前 digit = 8、
      判断 (Integer.MAX_VALUE - 8)/10 = (2147483647-8)/10 = 214748363，
-     res = 214748364 > 214748363→ 越界 → 返回 Integer.MIN_VALUE ✅
+        res = 214748364 > 214748363→ 越界 → 返回 Integer.MIN_VALUE ✅
      【补充】类似的道理可以参考69题的”mySqrt_best“方法实现，69题中的mid*mid可能超出int范围，因此直接计算不
      方便，但是比较”mid“和”x/mid“的大小可以避免这种溢出情况
      */
@@ -1592,7 +1599,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
         }
 
         // 3. 遍历数字
-        int res = 0;
+        int res = 0; /**err：这里的res需要直接初始化为0！！！因为题目说了如果没有解析到数字就返回0，初始化为0，就包含了这种情况！*/
         while (index < n) {
             char ch = s.charAt(index);
             if (!Character.isDigit(ch)) break; /*如果index位置不是数字就停止解析，跳出while循环*/
@@ -2240,7 +2247,7 @@ int getMin() 获取堆栈中的最小元素。*/
      */
     /**
      【第一行 或者 第一列】 第一行或者第一列时1的位置就是1，否则时0；
-     【矩阵中间的位置】 如果matrix的该位置时‘1’，则取决于左上角三个位置dp值的最小值；否则matrix该位置的值
+     【矩阵中间的位置】 如果matrix的该位置是‘1’，则取决于左上角三个位置dp值的最小值；否则matrix该位置的值
      是0，则该位置的dp值也是0
      */
     public int maximalSquare(char[][] matrix) {
@@ -2256,6 +2263,27 @@ int getMin() 获取堆栈中的最小元素。*/
                     }
                 }
                 res = Math.max(dp[i][j],res);
+            }
+        }
+        return res*res;
+    }
+
+    /*写法2：可以使用下面的写法*/
+    public int maximalSquare_(char[][] matrix){
+        int m = matrix.length,n = matrix[0].length;
+        int[][] dp = new int[m][n];
+        int res = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                /**优化点：只研究 '1'字符所在的位置*/
+                if (matrix[i][j]=='1'){
+                    if (i==0||j==0)
+                        dp[i][j] = 1;
+                    else
+                        dp[i][j] = Math.min(dp[i-1][j],Math.min(dp[i][j-1],dp[i-1][j-1]))+1;
+
+                    res = Math.max(res,dp[i][j]);
+                }
             }
         }
         return res*res;

@@ -123,7 +123,7 @@ public class _09huisu {
             return;
         }
         for (int i=0;i<nums.length;i++){
-            if (!used[i]){
+            if (!used[i]){ /**只研究没有被选择的数*/
                 path.add(nums[i]);
                 used[i] = true;
                 permuteTrace(nums,path,used);
@@ -289,7 +289,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     private void combinationSumback(int[] candidates, int target, int index) {
         if (sum==target){
             resCombinationSum.add(new LinkedList<>(pathCombinationSum));
-            return;  /**err：因为这里的数都是大于0的，因此这里可以直接return*/
+            return;  /**err：因为这里的数都是大于0的，因此这里可以直接return。不过 不return也没问题*/
         }
         if (sum>target || index>=candidates.length){
             return;

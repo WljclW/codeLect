@@ -165,6 +165,8 @@ public class _07binarytree {
             int size = deque.size();
             for (int i = 0; i < size; i++) {
                 TreeNode cur = deque.poll();
+                /**这里就不用判断”cur是不是null“！！因为第一次加入的时候确
+                 保了cur不是null，并且后续加入的时候都确保不是null，因此弹出来的节点必然不是null*/
                 if (cur.left!=null){
                     deque.offer(cur.left);
                 }
@@ -450,7 +452,8 @@ public class _07binarytree {
     节点的右子树只包含 大于 当前节点的数。
     所有左子树和右子树自身必须也是二叉搜索树。*/
     /**
-     【建议的写法】递归的写法采用官方给出的 isValidBST_offical；
+     【建议的写法】递归的写法采用官方给出的 isValidBST；迭代的写法参考 isValidBST_Integer（注意：迭代
+        的写法中建议将 prev的初始值设置为null。否则就要初始化为 Long.MIN_VALUE）。
             迭代的写法 就是中序遍历的迭代写法，在访问节点的时候修改标记变量 并 判断是不是严格升序。
      */
     /*方法1：递归的方式来完成*/
@@ -517,10 +520,11 @@ public class _07binarytree {
         return true;
     }
 
+    /*不建议的写法*/
     public boolean isValidBST_long(leecode_Debug.top100.TreeNode root) {
         Stack<leecode_Debug.top100.TreeNode> stack = new Stack<>();
         if (root==null) return true;
-        long prev = Long.MIN_VALUE;
+        long prev = Long.MIN_VALUE; /**如果不初始化未null，这里就不能初始化为“Integer.MIN_VALUE”。。。。因此建议使用写法 isValidBST_Integer*/
         while (!stack.isEmpty()||root!=null){
             if (root!=null){
                 stack.push(root);

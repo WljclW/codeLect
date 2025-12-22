@@ -349,7 +349,7 @@ public class _06ListNode {
         ListNode dummy = new ListNode(0, head);
         /**     官方解中，slow指针开始时指向了head节点的前一个；fast指针指向head节点！！
          * 解释：这样相当于fast指针和slow指针之间有n个节点，最后fast来到null的时候，slow指针指向倒数n+1个节点，只用
-         * 将slow.next = slow.next.next即可*/
+         * 将slow.next = slow.next.next即可完成 删除倒数第n个节点 的操作*/
         ListNode slow = dummy;
         ListNode fast = head;
         for (int i = 0; i < n; ++i) { /*step1：fast从head先走n步。。。此时fast相比slow其实多走了k+1步*/
@@ -652,6 +652,7 @@ public class _06ListNode {
     *   前一半链表最后节点的next置null。
     * */
     private ListNode findMid(ListNode head) {
+        /**注；fast指针的初始值是精髓*/
         ListNode slow = head,fast = head.next; /**与“找中间节点”的区别，fast的初始位置是在head.next而不是head*/
         while (fast!=null && fast.next!=null){
             slow = slow.next;

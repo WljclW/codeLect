@@ -269,6 +269,8 @@ public class codetop_5 {
         while (cur1 < len1 || cur2 < len2) { /**err：注意这里必须是“||”连接，多次错。。。跟“链表两数相加”类似，只要有一个还没到头就继续*/
             /*step1：分别初始化两个val1和val2，计算两个'.'之间的数；并且保证如果没有数也是初始值0*/
             int val1 = 0;
+            /**err：这里需要使用cur1（因此for循环第一个表达式省略），不能使用新的循环变量，否则会导致cur1更新错误。。。。
+             同理下面的for循环使用cur2作为循环控制变量*/
             for (; cur1 < len1 && version1.charAt(cur1) != '.'; cur1++) {
                 val1 = val1 * 10 + version1.charAt(cur1) - '0';
             }
