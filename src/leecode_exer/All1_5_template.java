@@ -358,21 +358,49 @@ public class All1_5_template {
     }
 
 
+
+
+    /**
+     * =====================================其他写法的一些补充==========================================
+     * =====================================其他写法的一些补充==========================================
+     * =====================================其他写法的一些补充==========================================
+     * =====================================其他写法的一些补充==========================================
+     * =====================================其他写法的一些补充==========================================
+     */
     /*101对称二叉树
     给你一个二叉树的根节点 root ， 检查它是否轴对称。
      */
-    /**迭代的写法怎么写？？*/
+    /**迭代的写法 补充？？*/
     public boolean isSymmetric(TreeNode root) {
         if (root==null) return true;
-        return isSymmetric(root.left,root.right);
-    }
+        if (root.left==null&&root.right==null) return true;
+        if (root.left==null||root.right==null) return false;
 
-    private boolean isSymmetric(TreeNode left, TreeNode right) {
-        if (left==null&&right==null) return true;
-        if (left==null||right==null) return false;
-        return left.val==right.val&&
-                isSymmetric(left.left,right.right)&&
-                isSymmetric(left.right,right.left);
+        LinkedList<TreeNode> queueLeft = new LinkedList<>();
+        LinkedList<TreeNode> queueRight = new LinkedList<>();
+        queueLeft.offer(root.left);
+        queueRight.offer(root.right);
+        while (!queueLeft.isEmpty()){
+            TreeNode curLeft = queueLeft.poll();
+            TreeNode curRight = queueRight.poll();
+            if (curLeft.val!=curRight.val) return false;
+            if (curLeft.left!=null){
+                queueLeft.offer(curLeft.left);
+                if (curRight.right==null) return false;
+                queueRight.offer(curRight.right);
+            }else if (curRight.right!=null){
+                return false;
+            }
+
+            if (curLeft.right!=null){
+                queueLeft.offer(curLeft.right);
+                if (curRight.left==null) return false;
+                queueRight.offer(curRight.left);
+            } else if (curRight.left != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

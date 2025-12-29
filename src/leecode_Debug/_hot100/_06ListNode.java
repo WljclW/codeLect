@@ -310,7 +310,7 @@ public class _06ListNode {
 
     /*19.
     * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。*/
-    /**    🔺强烈建议使用官方解,即方法 removeNthFromEnd1~~~~~~~
+    /**【🔺强烈建议使用官方解】即方法 removeNthFromEnd1 ~~~~~~~
      * 【解题关键&&官方解精髓】开始时slow指向虚拟头dummy节点；
      *                       开始时fast指向head 并且 fast先走n步（注意slow和fast的开始位置不一样）
      *                      （最后fast指向null的时候，slow正好指向倒数第n+1个节点）
@@ -418,7 +418,7 @@ public class _06ListNode {
     你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。*/
     public ListNode reverseKGroup(ListNode head, int k) {
         ListNode dummy = new ListNode(-1, head);
-        ListNode pre = dummy,end = dummy;
+        ListNode pre = dummy, end = dummy;
         while (end.next != null) { /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。“end.next!=null”是保证后面还有节点,有节点才继续新一轮的研究*/
             /*step1：先数k个节点，如果不够k个(end==null)，说明剩下的不够k个，因此结束循环，返回*/
             for (int i = 0; i < k && end != null; i++) { //经过这一轮循环，end会来到新的一组即A组的最后一个节点
@@ -793,24 +793,24 @@ public class _06ListNode {
 
     private ListNode merge(ListNode[] lists, int l, int r) {
         /**err：终止条件必须写对。
-            如果写成“if (left>right) return null;”报错：java.lang.StackOverflowError
-            1. 注意这里的终止条件要区别于快排。快排中是对区间内的元素进行排序，因此”left>=right“直接返回，且快排是没有返回值
+         如果写成“if (left>right) return null;”报错：java.lang.StackOverflowError
+         1. 注意这里的终止条件要区别于快排。快排中是对区间内的元素进行排序，因此”left>=right“直接返回，且快排是没有返回值
          的，想要返回值直接返回原始数组就行。。。。这个题是合并区间内的链表，是有返回值的，因此终止条件是”left==right“———区间
          内只有一个链表，直接返回
-            2. 快排的写法中终止条件是“if(left>=right) return;”。这个题中的终止条件可以写成“if (left>right) return null;
+         2. 快排的写法中终止条件是“if(left>=right) return;”。这个题中的终止条件可以写成“if (left>right) return null;
          if (l==r) return lists[l];”（虽然这个题不考虑left>right的情况也可以）。。。因此从这个逻辑可以看出来，对于区间这种问
          题，以后终止条件“普遍考虑left>=right时怎么处理”就可以了！！————关于这一点，需要再理解理解，chatgpt说这种说法有问题~
          */
 //        if (left>right) return null; /*大于的情况是可以省略的。如果只有这一句没有下面的等于情况就是错误的*/
-        if (l==r) return lists[l]; /**err：等于的时候怎么返回是必须要有的。*/
+        if (l == r) return lists[l]; /**err：等于的时候怎么返回是必须要有的。*/
         /*如果上面的if条件中没有“lists.length == 0”，就必须有下面的话。否则会报错：
-        * java.lang.ArrayIndexOutOfBoundsException: Index 0 out of bounds for length 0
-        * 意思是存在length=0的lists*/
+         * java.lang.ArrayIndexOutOfBoundsException: Index 0 out of bounds for length 0
+         * 意思是存在length=0的lists*/
 //        if (l<r) return null;
-        int mid = l+(r-l)/2;
+        int mid = l + (r - l) / 2;
         ListNode mergeLeft = merge(lists, l, mid); /**右边界必须是mid，不能是mid-1..为什么？？*/
         ListNode mergeRight = merge(lists, mid + 1, r); /**err：右边界是r不是nums.length-1*/
-        return mergeTwoList(mergeLeft,mergeRight);
+        return mergeTwoList(mergeLeft, mergeRight);
     }
 
     /*合并两个升序链表的原始代码————一模一样*/
@@ -828,12 +828,12 @@ public class _06ListNode {
         ListNode dummy = new ListNode(-1);
         ListNode cur = dummy;
         /*step1：只要两个都还有元素，就将val小的那一个拼接到结果链。。
-        * 【注】拼接后需要移动那个链表的指针 以及 结果链表的指针*/
-        while (mergeLeft!=null&&mergeRight!=null){
-            if (mergeLeft.val< mergeRight.val){
+         * 【注】拼接后需要移动那个链表的指针 以及 结果链表的指针*/
+        while (mergeLeft != null && mergeRight != null) {
+            if (mergeLeft.val < mergeRight.val) {
                 cur.next = mergeLeft;
                 mergeLeft = mergeLeft.next;
-            }else{
+            } else {
                 cur.next = mergeRight;
                 mergeRight = mergeRight.next;
             }
@@ -848,7 +848,7 @@ public class _06ListNode {
                 预期结果
                 [1,1,2,3,4,4,5,6]
         * */
-        cur.next = mergeLeft==null?mergeRight:mergeLeft; /**err：注意拼接还有节点的那个链表*/
+        cur.next = mergeLeft == null ? mergeRight : mergeLeft; /**err：注意拼接还有节点的那个链表*/
         return dummy.next;
     }
 

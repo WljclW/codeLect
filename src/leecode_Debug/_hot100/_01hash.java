@@ -88,7 +88,9 @@ public class _01hash {
             //②：把 flags 数组中的每一个数添加到sb。（注：需要使用”#“分隔，否则会出错）
             StringBuilder sb = new StringBuilder();
             for(int i:flags){
-                /**疑问：和”sb.append(i).append("#")“ 的区别是什么？？*/
+                /**疑问：和”sb.append(i).append("#")“ 的区别是什么？？
+                 【注意】这里就仅仅是把每隔字符出现的次数记录到 StringBuilder 中了。
+                 */
                 sb.append(i).append('#');
             }
             //③：把 str 存进 key 对应value即列表中

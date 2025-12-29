@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 public class _03subString {
     /*
-    239.
+    239. 滑动窗口最大值
     * 给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右
     * 侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
     * 返回 滑动窗口中的最大值 。
@@ -243,7 +243,8 @@ public class _03subString {
                 }
                 /**下面代码的位置跟原来方案是不一样的，也是可行的！！即————
                  *      下面的while循环写在if (need.containsKey(c))里面；
-                 *   或者 写在if (need.containsKey(c))外面都是可以的*/
+                 *   或者
+                 *      写在if (need.containsKey(c))外面都是可以的*/
                 while (valid==need.size()){
                     if (right-left<len){
                         len = right-left;

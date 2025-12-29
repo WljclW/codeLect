@@ -22,24 +22,26 @@ public class _05matrix {
      *【思路】 ①使用两个标记变量标记第一行和第一列是不是有0；
      *        ②使用第一行和第一列标记所有的元素对应的行列是不是有0.
      *    疑惑：为什么需要使用两个标记变量？？？
-     *          答：②中会修改第一行或者第一列，避免对原来的数据造成污染
+     *          答：②中会修改第一行或者第一列，避免对原来的数据造成污染。比如开始的时候只有位置(1,2)的位
+     *    置是0，但是遍历后会把 位置(1,0) 和 位置(0,2) 都设置成0，这明显错了。后面会发现第一行有零，第一
+     *    列也有0，这是错的。因为初始的时候第一行和第一列都没有0
      *【易错点、写代码的关键】step1必须在step2之前。step3必须在step4之前并且step3中i和j必须都从1开始。
      *      如果step2在step1之前，就会导致原始数据的首行首列先被污染；再去统计首行首列的0的信息就
      *  错了。
      *      如果step4在step3之前，就会导致首行首列被修改，因此前面统计的信息也错了。
      */
     public void setZeroes(int[][] matrix) {
-        boolean firRow = false,firCol = false;
-        int m = matrix.length,n = matrix[0].length;
+        boolean firRow = false, firCol = false;
+        int m = matrix.length, n = matrix[0].length;
         /*step1：遍历第一行以及第一列，如果碰到0修改（第一行、第一列）对应的标志变量*/
         for (int i = 0; i < m; i++) {
-            if (matrix[i][0]==0){
-                firCol=true;
+            if (matrix[i][0] == 0) {
+                firCol = true;
                 break;
             }
         }
         for (int i = 0; i < n; i++) {
-            if (matrix[0][i]==0){
+            if (matrix[0][i] == 0) {
                 firRow = true;
                 break;
             }
@@ -48,7 +50,7 @@ public class _05matrix {
         /**思考：下面的i,j都从0或者都从1开始，为什么都是对的？？*/
         for (int i = 1; i < m; i++) {
             for (int j = 1; j < n; j++) {
-                if (matrix[i][j]==0){
+                if (matrix[i][j] == 0) {
                     matrix[i][0] = 0;
                     matrix[0][j] = 0;
                 }
@@ -57,27 +59,27 @@ public class _05matrix {
         /*step3：根据“第一行和第一列元素值”，修改除首行首列的所有元素值*/
         /**思考：下面的i,j为什么必须都从1开始，从0开始就错了？？？
          * 错误的用力如下————
-                  输入
-                  matrix =
-                  [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
-                  输出
-                  [[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-                  预期结果
-                  [[0,0,0,0],[0,4,5,0],[0,3,1,0]]
+         输入
+         matrix =
+         [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
+         输出
+         [[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+         预期结果
+         [[0,0,0,0],[0,4,5,0],[0,3,1,0]]
          */
         for (int i = 1; i < m; i++) {
             for (int j = 1; j < n; j++) {
-                if (matrix[i][0]==0||matrix[0][j]==0)
+                if (matrix[i][0] == 0 || matrix[0][j] == 0)
                     matrix[i][j] = 0;
             }
         }
         /*step4：根据标志变量的值，修改第一行和第一列的值*/
-        if (firRow){
+        if (firRow) {
             for (int i = 0; i < n; i++) {
                 matrix[0][i] = 0;
             }
         }
-        if (firCol){
+        if (firCol) {
             for (int i = 0; i < m; i++) {
                 matrix[i][0] = 0;
             }

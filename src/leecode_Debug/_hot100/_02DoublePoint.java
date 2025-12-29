@@ -14,8 +14,9 @@ public class _02DoublePoint {
     *    研究到的位置
     * */
     /**
-     * 【建议】使用解法moveZeroes1、moveZeroes2（moveZeroes2更符合自己的想法），尽量不要使用moveZeroes。
+     * 【建议】使用解法 moveZeroes1、moveZeroes2（moveZeroes2更符合自己的想法），尽量不要使用moveZeroes。
      *      直接采用交换的方式，这样就不用对cur后面的位置再赋值了
+     *       其中 moveZeroes1 是最优的解法
      * */
     public void moveZeroes(int[] nums) {
         int left = 0;
@@ -92,6 +93,18 @@ public class _02DoublePoint {
      * 【步骤】双指针相向而行，计算以它们为边界能盛多少水。。只要中间有间距（即left<right）
      *      1. 每到一个位置计算能盛的水（高度取决于左右指针位置height的最小值，宽度取决于两个指针的距离）
      *      2. 看两个指针对应的height哪一个高，更新height小的那一个指针。
+     * 【与接雨水问题的区别】
+     *      接雨水问题中：两个边界（即left,right）相向而行，任何一个位置i接到的雨水高度，等于两个指针这一路走来遇到的最
+     *  大值（即leftMax,rightMax）的最小值 与 height[i]的高度差；然后移动边界值小的那一边，但是注意这里有一个优化————
+     *  height的元素值小的那一边，对应的那个边界也一定是小的（举个例子：如果height[left]<height[right]，则必有leftMax
+     *  不大于 rightMax）
+     *      盛最多水的容器 问题中：每一时刻求解以left、right明确作为桶的边界的容器能盛的水；并且移动height值较小的那一边的
+     *  指针。
+     *      因此可以看出这两个题中有一个相同点 以及 一个不同点：
+     *          ①相同点：任何时刻，移动height值较小的那一个指针————比如height[left]<height[right],则下一步移动left，
+     *  left++；否则的话就移动right，即right--。
+     *          ②不同点：计算答案的机制不同——————盛最多水的容器中，计算当前位置答案的方法”int cur = (right-left)*Math.min(height[left],height[right]);“。
+     *  但是在接雨水问题中，更新答案的方法”res += (leftMax-height[left]);（其中的left可能是right）“
      */
     public int maxArea(int[] height) {
         int left = 0,right = height.length-1;

@@ -31,7 +31,7 @@ public class _04normalArr {
         return maxSum;
     }
 
-    /*56.
+    /*56. 合并区间
     *以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。请你合并所有重
     * 叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。
     * */
@@ -56,7 +56,7 @@ public class _04normalArr {
         });
         res.add(intervals[0]); /*step1的关键步骤：先将区间加到结果集里面，然后再利用后续元素更新这个元素的结尾界限*/
         /*step2：遍历剩下的数组。更新res中最后一个元素的右边界？还是往res中新添加一个区间？*/
-        for (int i=1;i<intervals.length;i++) {
+        for (int i = 1; i < intervals.length; i++) {
             int[] cur = intervals[i];
             /**根据不同的情况看 更新res中最后一个区间？？还是把当前区间添加进res？？*/
             if (res.getLast()[1] >= cur[0]) { //情况1:更新res中最后一个区间的右边界（说明cur的起点在最后一个数组区间内）
@@ -69,7 +69,7 @@ public class _04normalArr {
     }
 
 
-    /*189.
+    /*189. 轮转数组
     * 给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。
     * */
     /**
@@ -98,7 +98,7 @@ public class _04normalArr {
     }
 
 
-    /*238.
+    /*238. 除自身以外数组的乘积
     * 给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素
     * 的乘积 。
     题目数据 保证 数组 nums之中任意元素的全部前缀元素和后缀的乘积都在  32 位 整数范围内。
@@ -142,7 +142,7 @@ public class _04normalArr {
             res[i] = res[i-1]*nums[i-1]; /**err：注意两个index都是i-1..*/
         }
 
-        int post = 1; //用于记录当前位置以后的数的连乘积是多少
+        int post = 1; //用于记录当前位置以后的数的连乘积是多少。比如但其概念研究i位置，post就是[i+1，nums.length-1]这些数的乘积值
         for (int i = nums.length-1; i >= 0; i--){ /**err：等于0的时候也需要计算。否则结果数组的第一个数是1*/
             res[i] *= post;
             post *= nums[i];
