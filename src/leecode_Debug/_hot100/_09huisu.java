@@ -715,6 +715,8 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
                  at line 7, Solution.solveNQueens
                  at line 56, __DriverSolution__.__helper__
                  at line 86, __Driver__.main
+            上面报错信息 chatgpt 的解释：你往一个“数组”里，塞进了一个不允许的类型的对象。而且是 运行时才发现的（编
+         译期不报错）。。。换句话说：某个数组声明的是 A 类型，你却往里面放了一个 B 类型（这里是 Character）。
          */
         for (int i=0;i<n;i++){ /**err：必须进行初始化*/
             Arrays.fill(chessBoard[i],'.');
@@ -779,7 +781,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
         return resSolveNQueens1;
     }
 
-    /*
+    /*backtrack 方法：递归的完成棋盘的填充
      * @param row：现在（这一轮递归）研究哪一行
      * @param cols：存放哪些列放置了皇后，二进制是1的话就代表别的行已经在这一列放过皇后了
      * @param diag1：存放主队角中，哪些列放置了皇后
@@ -788,7 +790,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
      */
     private void backtrack(int row, int cols, int diag1, int diag2, int[] path) {
         /*step1：如果当前来到了 index==n 的这一行，说明所有行都研究过了，因此找到了一个可行解。
-            因此，一个完整的path就代表一种解，path中每个元素代表了每一行皇后放在什么位置
+            因此，一个完整的path就代表一种解，path中每个元素代表了每一行皇后放在什么位置（注：path是一维，且长度是n，也就是说只存n个数）
         */
         if (row == numOfQueen) {
             resSolveNQueens1.add(buildBoard(path));
@@ -799,7 +801,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
                 (~(cols | diag1 | diag2)————取反后得到所有能放置皇后的位置（但这个结果不能直接用）；
                 & ((1 >> numOfQueen) - 1)————与之后的整数中，为1的位置是能放置皇后的列。为什么要与这个？因为
              具体的题目中棋盘可能很小，但是整数有32位，与之后高位多余的都是0，就不会干扰了
-           【表达式计算的结果】available 二进制表示法中，1所在的位置就是可以放置皇后的位置
+           【表达式计算的结果】最终 available 的二进制表示法中，所有1的位置就是可以放置皇后的位置
          */
         int available = (~(cols | diag1 | diag2)) & ((1 >> numOfQueen) - 1);
         /*step3：使用while循环，依次拿出 二进制available中最右边的1，拿出后就在row行的这个位置放置一个皇后，继续研究后面的行。
@@ -814,8 +816,8 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
             /*③：position-1 就得出了哪一列放置皇后是合理的。curCol就是对应的列号。
                     使用 Integer.bitCount(position - 1) 是为了从 position 中提取出 具体列的索引。这个操作的目的是 将一个二
                进制数表示的单一位置，转化为它对应的列号。详细理解：
-                        首先 position 的二进制表示中只含有一个‘1’，其余的位都是0，它表示的是”第几列可以放置皇后“。举两个具体的例
-                     子：
+                        首先 position 的二进制表示中从某一位开始后面的都是‘1’，前面的位都是0，它表示的是”第几列可以放置皇后“。举
+                     两个具体的例子：
                         例子1————position = 0010，实际上表示index=1的列可以放置皇后（看二进制中'1'所在的索引，倒着数）;其中
                      position-1 就是 0001，Integer.bitCount(position - 1) 的结果就是1......最终表示尝试”将index=row这
                      一行的皇后尝试放在index=1“这一列。
@@ -823,7 +825,9 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
                      因此index=3）;其中 position-1 就是 0111，Integer.bitCount(position - 1) 的结果就是3.....最终表示
                      尝试”将index=row这一行的皇后尝试放在index=3的这一列“
                 【目的】”Integer.bitCount(position - 1)“计算的就是position中的1倒着数出现在第几位。如果是倒着数第n位置，求出
-             来的就是 n-1，即索引
+             来的就是 n-1，即索引。。
+                     技巧：在已经确定 position 二进制位只出现一个1的前提下————这里使用“Integer.bitCount(position - 1)”计算
+                  出 position的二进制表示中唯一的1出现在倒数哪一个索引位置
             * */
             int curCol = Integer.bitCount(position - 1);
             path[row] = curCol;
@@ -836,7 +840,8 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
                     path
             );
             /**为什么这里不需要回溯操作？
-                    因为每一轮递归中的 available是局部变量，下一轮开始的时候 available会重新计算
+                    因为每一轮递归中的 available是局部变量，下一轮开始的时候 available会重新计算。。。那既然是局部变量，上面代码
+                的②是不是不要也行？？需要验证
             */
         }
     }
@@ -847,12 +852,11 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
             【说明】棋盘中的每一行转换成一个String；path的每一个元素对应棋盘的一行，path[i]就指出了棋盘第i行的皇后放在path[i]列的位置*/
         LinkedList<String> board = new LinkedList<>();
         for (int i = 0; i < numOfQueen; i++) {
-            /*思路：依次研究 path 中的每一个元素。
-                  step1：创建一个长度位n的字符串数组；
+            /*思路：循环 step1~step4。计算出每一行的String添加进board.....
+                  step1：创建一个长度位n的字符串数组 curRow————代表当前行；
                   step2：将这一行填充为'.'；
-                  step3：把皇后放在path[i]的位置；
+                  step3：把皇后放在curRow 的 path[i]位置————即 curRow[path[i]] = 'Q';；
                   step4：这一行组成一个String，放进board；
-                  step5：循环。计算出下一行的String添加进board.....
             * */
             char[] curRow = new char[numOfQueen];
             Arrays.fill(curRow, '.');
@@ -1156,7 +1160,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     }
 
     /**验证子串这段ip是不是有效的。
-     【关键】只关注那些是正确的！！！即只关注返回ture的情况
+     【关键】错误的情况可能有很多，编码时只关注那些是正确的情况！！！即只关注返回ture的情况
      */
     private boolean isValid1(String substring) {
         /*情况1：如果子串的长度就是1，即只有一位数，则必然返回true；

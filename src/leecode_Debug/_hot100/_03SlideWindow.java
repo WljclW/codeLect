@@ -101,6 +101,10 @@ public class _03SlideWindow {
     /*438. 找到字符串中所有字母异位词
     * 给定一个字符串 s 和一个非空字符串 p，找到 s 中所有是 p 的字母异位词的子串，返回这些子串的起始索引。
     * */
+
+    /**
+     【建议的解法】建议使用解法 findAnagrams_best。时间复杂度 O(n)
+     */
     public List<Integer> findAnagrams(String s, String p) {
         LinkedList<Integer> res = new LinkedList<>();
         if (s.length()<p.length()) return res;
@@ -174,6 +178,58 @@ public class _03SlideWindow {
                 res.add(i - pLen + 1);
             }
         }
+        return res;
+    }
+
+    /**
+     【总结】定长窗口 + 频次数组 + diff 计数法
+     【关键】（下面的代码是进窗口时相关的逻辑代码，对于if块内的出窗口时也是类似的道理）
+          1. 只有p字符串中有某个字符时，才更新diff。————代码“if (flags[cRight - 'a'] > 0) diff--;”
+          2. 任何一个字符只要出窗口 或者 进窗口，都需要更新flags————代码“flags[cRight - 'a']--;”
+          综上，找没找到匹配的异位词，最关键的是变量diff的含义。。。。。
+            为什么flags的元素值没有意义？因为只要元素出窗口 或者 进窗口，都会无脑更新flags数组对应位
+         置的值，但是只有在flags的值大于0的时候，才会执行diff--.
+     【详细的步骤】
+             1. 统计字符串 p 中每个字符的出现次数（记为 cnt）
+             2. 初始化滑动窗口 [left, right)
+             3. right 右移：
+                    当前字符加入窗口 → cnt[ch]--
+                    如果减之前 cnt[ch] > 0，说明匹配了一个字符，diff--
+             4. 当窗口长度大于 p.length()：
+                    左侧字符移出 → cnt[ch]++
+                    如果加之前 cnt[ch] >= 0，说明破坏了匹配，diff++
+             5. 若 diff == 0，当前窗口是异位词，记录 left
+     */
+    public List<Integer> findAnagrams_best(String s, String p) {
+        LinkedList<Integer> res = new LinkedList<>();
+        if (s.length() < p.length()) return res;
+        /*step1：统计p字符串的词频*/
+        int[] flags = new int[26];
+        for (char c : p.toCharArray()) {
+            flags[c - 'a']++;
+        }
+        /*step2：一些变量的初始化。*/
+        int left = 0, right = 0; //left 左边界、right 当前研究的位置
+        int diff = p.length();
+        /*step3：滑动窗口研究整个字符串*/
+        while (right < s.length()) {
+            /*①对于当前位置right的字符，无脑进入窗口。*/
+            char cRight = s.charAt(right);
+            if (flags[cRight - 'a'] > 0) diff--;
+            flags[cRight - 'a']--; /**有可能p字符串中就没有这个字符，这样的话这个位置就变成负数了，没有关系吗？？？？*/
+            right++;
+            /*②如果当前窗口的大小，超过了p字符串的长度，则让left位置的字符出窗口*/
+            if (right - left > p.length()) {
+                /**【说明】if块内的代码 和 上面的4行代码 几乎是一模一样的*/
+                char cLeft = s.charAt(left);
+                if (flags[cLeft - 'a'] > 0) diff++;
+                flags[cLeft - 'a']++;
+                left++;
+            }
+            /*③如果diff等于0，说明：找到了一个p的“异位词”，更新res*/
+            if (diff == 0) res.add(left);
+        }
+
         return res;
     }
 

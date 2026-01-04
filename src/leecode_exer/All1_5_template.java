@@ -68,7 +68,7 @@ public class All1_5_template {
                 if (size>capacity){
                     DouNode relTail = tail.prev;
                     removeNode(relTail);
-                    map.remove(relTail.value);
+                    map.remove(relTail.value); /**这里是错的！！！！！！！！！*/
                     size--;
                 }
             }
@@ -270,9 +270,47 @@ public class All1_5_template {
 给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过
     在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
     * */
-//    public List<String> restoreIpAddresses(String s) {
-//
-//    }
+    /**
+     * 验证这个题的时候，顺便验证一下 leecode_Debug._hot100._09huisu#restoreIpAddresses2(java.lang.String) 写法是不是对的、、、、
+     */
+    List<String> resRestoreIpAddresses;
+    public List<String> restoreIpAddresses(String s) {
+        resRestoreIpAddresses = new LinkedList<>();
+        StringBuilder path = new StringBuilder(s);
+        restoreIpAddresses(s,0,0,path);
+        return resRestoreIpAddresses;
+    }
+
+    private void restoreIpAddresses(String s, int num, int index, StringBuilder path) {
+        if (num==3){
+            if (isValid11(s,index,s.length()))
+                resRestoreIpAddresses.add(new String(path));
+            return;
+        }
+        if (index==s.length()) return;
+        for (int i = index; i < s.length()-1; i++) {
+            if (isValid11(s,index,i+1)){
+                path.insert(i+num+1,'.');
+                restoreIpAddresses(s,num+1,i+1,path);
+                path.deleteCharAt(i+num+1);
+            }
+        }
+    }
+
+    private boolean isValid11(String s, int left, int right) {
+        if (right<=left) return false;
+        if (right-left>3) return false;
+        if (right-left>1&&s.charAt(left)=='0') return false;
+        if (right-left==3){
+            int sum = 0;
+            for (int i = 0; i < 3; i++) {
+                int digit = s.charAt(left+i)-'0';
+                sum = sum*10+digit;
+            }
+            if (sum>255) return false;
+        }
+        return true;
+    }
 
 
     /*
@@ -311,9 +349,18 @@ public class All1_5_template {
 返回 单词 顺序颠倒且 单词 之间用单个空格连接的结果字符串。
 
 注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。*/
-//    public String reverseWords(String s) {
-//
-//    }
+    public String reverseWords(String s) {
+        s = s.trim();
+        int i = s.length()-1,j = i;
+        StringBuilder res = new StringBuilder();
+        while (i>=0){
+            while (i>=0&&s.charAt(i)!=' ') i--;
+            res.append(s.substring(i+1,j+1)).append(' ');
+            while (i>=0&&s.charAt(i)==' ') i--;
+            j = i;
+        }
+        return res.toString().trim();
+    }
 
     /**
      * ==================================4==============================

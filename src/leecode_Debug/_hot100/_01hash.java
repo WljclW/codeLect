@@ -39,16 +39,20 @@ public class _01hash {
     */
     public List<List<String>> groupAnagrams(String[] strs) {
         HashMap<String, List<String>> map = new HashMap<>();
-        for (String str:strs){
+        for (String str : strs) {
+            //①把字符串转换为字符数组
             char[] chars = str.toCharArray();
+            //②排序字符数组
             Arrays.sort(chars);
+            //③转换为字符串
             String s = new String(chars);
-            if (map.containsKey(s)){
+            //④在map中添加到字符串对应的list
+            if (map.containsKey(s)) {
                 map.get(s).add(str);
-            }else{
+            } else {
                 LinkedList<String> ele = new LinkedList<>();
                 ele.add(str);
-                map.put(s,ele);
+                map.put(s, ele);
             }
         }
         return new LinkedList<>(map.values()); /**🔺err：返回之前强转类型。。。注意的是强转类型不能像平时的那样，要使用new的方式*/
@@ -64,6 +68,7 @@ public class _01hash {
             List<String> ele = map.getOrDefault(new String(chars), new LinkedList<String>());
             ele.add(strs[i]);
             /*可以使用下面的三行代替上面的两行*/
+            /**可以推断出：map的key如果是字符串，其实是使用”equals“方法来判断key是不是相等的，而不是引用*/
 //            String s = new String(chars);
 //            List<String> ele = map.getOrDefault(s, new LinkedList<String>());
 //            ele.add(strs[i]);
@@ -76,6 +81,8 @@ public class _01hash {
     /*解法3：统计字符的数量。
         时间复杂度分析：O(nk)，其中 n 是字符串的个数，k 是字符串的最大长度。
                     解释：每一个字符串需要遍历一遍，统计每个字符的数量，因此是 nk
+        【说明】这种方法省去了字符数组的排序，只需要过一遍字符串的字符，因此复杂度是n；如果是排序，最优的时
+     间复杂度也是O(n*logn)，比仅仅遍历一遍字符的复杂度高
     */
     public List<List<String>> groupAnagrams_best(String[] strs) {
         HashMap<String, List<String>> map = new HashMap<>();
