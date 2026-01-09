@@ -107,6 +107,7 @@ public class _08tulun {
             graph————存放一个个列表，索引i位置的列表存储课程i所有的后置课程————即如果课程i
         完成，接下来可学习的课程列表。可以描述为“前置课程i====>课程i所有后置课程的列表”
             indegree————入度表，索引i位置的值表示课程i的入度，即课程i的前置课程还有多少
+            时间复杂度————O(V)，因为循环执行 numCourses 次；空间复杂度————O(V)
          */
         List<List<Integer>> graph = new LinkedList<>();
         for (int i = 0; i < numCourses; i++) {
@@ -123,6 +124,7 @@ public class _08tulun {
             【注意】graph中位置index存储的是“课程index====>课程index所有的后继课程”，但是根据
          题目中描述的信息可知prerequisites数组存储的是“cur = [课程m，课程m的前置课程]”，因此这
          里添加的时候应该是倒序的关系，反过来添加即“拿到cur[1]对应的list然后把cur[0]加进去”
+            时间复杂度————O(E)，因为每一条边就对应一次循环；
         */
         for (int[] p : prerequisites) { /**err：最绕的是这个for循环的内容*/
             int index = p[0], preCourse = p[1];
@@ -130,15 +132,22 @@ public class _08tulun {
             indegree[index]++;
         }
 
-        /*step3：将入度为0的节点入队列*/
+        /*step3：将入度为0的节点入队列。
+            时间复杂度————O(V)，需要遍历 numCourses；
+        * */
         LinkedList<Integer> queue = new LinkedList<>();
         for (int i = 0; i < numCourses; i++) {
             if (indegree[i] == 0) queue.offer(i);
         }
         /*step4：依次拿出入度为0的节点进行处理，具体的步骤如下————
-         *       ①从队列中弹出一个元素。（该课程对应的入度为0，即可直接学习）
-         *       ②更新count。（已学习的课程数+1）
-         *       ③从graph拿出“curVal是前置课程的课程列表”，将它对应的入度-1。如果-1后入度为0，则加进队列*/
+                ①从队列中弹出一个元素。（该课程对应的入度为0，即可直接学习）
+                ②更新count。（已学习的课程数+1）
+                ③从graph拿出“curVal是前置课程的课程列表”，将它对应的入度-1。如果-1后入度为0，则加进队列。
+            这里的时间复杂度是难点。时间复杂度————
+                ①外层的while循环每一个节点最多会入队列一次，出队列一次，因此外层的while循环最多执行V次；
+                ②内层的for循环呢？这一步非常容易误判成 V * V，但这是错误的。每条边 pre → course；只会在
+            pre被弹出的时候，访问一次；所有的for循环加起来，最多也就是边的数量即E。
+                综上，上面的循环整体的时间复杂度 O(V+E)*/
         int count = 0;
         while (!queue.isEmpty()) {
             Integer curVal = queue.poll();

@@ -2,10 +2,7 @@ package leecode_Debug._hot100;
 
 import leecode_Debug.BTree.TreeNode;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**DFS三种遍历的核心对比
  🌲 一、DFS 三种形式的核心区别（直观对比）
@@ -637,10 +634,10 @@ public class _07binarytree {
 
     /*105. 从前序与中序遍历序列构造二叉树
     * 从前序 和 中序 构造出二叉树*/
-    /**
+    /**解法1：递归
      * 对于任何一颗树，前序的第一个节点一定是树的根；中序遍历中这个根节点的左边就是左子树，右边就是右子树
      *【注意】“中序-先序构造二叉树”和“中序-后序构造二叉树”的题目中，递归的时候必须有终止条件————"if (left>right) return null;"
-     *【思路】
+     *【递归解法的思路】
      *      1. 从先序遍历中拿到第一个节点，是当前树的根节点————构造出TreeNode root；
      *      2. 在中序遍历中找到该节点所在的位置————利用左边的节点构造root.left、利用右边的节点构造出
      *          root.right
@@ -676,6 +673,61 @@ public class _07binarytree {
         root.right = buildTree(preorder,inorder,inorderIndex+1,r); /*使用inorder中右边的数据构建右子树，右边是从inorderIndex+1开始*/
         return root;
     }
+
+
+    /**解法2：迭代
+       1.
+             前序遍历：根 → 左 → 右
+             中序遍历：左 → 根 → 右
+             递归解法本质是：
+                 用前序确定“当前根”，用中序确定“左右子树的边界”
+             迭代解法的核心思想是：
+                 用一个栈，模拟递归过程中“还没构建完右子树的节点路径”
+       2. 要理解迭代法，需要明白一个核心点：栈中保存的节点，都是：已经创建，但“右子树还没构建”的节点。并且：
+     栈从底到顶，是一条从根走到当前节点的路径
+       3. 详细的理解————中序顺序是：左子树 → 根 → 右子树
+             当我们在中序中 遇到某个节点的值，说明：这个节点的左子树已经全部构造完了。因此：如果栈顶节点的
+        值 == inorder[inIndex]，说明这个节点的左子树结束了，要“回退”，准备构造它的右子树
+     */
+    /**
+     【思想的关键】①前序负责“造节点”；②中序负责“告诉你什么时候该回头”；③栈负责“记住还没处理右子树的祖先”。
+        ①体现在：在代码的实现中，创建TreeNode的时候使用的一定是preorder的元素值；
+        ②体现在：中序遍历的值“inorder[inIndex]”仅仅使用if以及else的判断条件中；
+        ③体现在：
+     */
+    private TreeNode buildTree_diedai(int[] preorder, int[] inorder, int l, int r) {
+        if (preorder==null||preorder.length==0) return null;
+
+        TreeNode root = new TreeNode(preorder[0]);
+        ArrayDeque<TreeNode> stack = new ArrayDeque<>();
+        stack.push(root);
+
+        int inIndex = 0;
+        for (int i = 1; i < preorder.length; i++) {
+            int val = preorder[i];
+            TreeNode node = stack.peek();
+
+            /*step1（if语句块）：中序元素值 不等于 栈顶节点的值，说明中序这个元素是栈顶节点的左孩子，此时需要
+            做两件事——————
+                    ①拼接栈顶结点的左孩子；
+                    ②将左孩子压入到栈
+              step2（else语句块）：
+            * */
+            if (node.val!=inorder[inIndex]){
+                node.left = new TreeNode(val);
+                stack.push(node.left);
+            }else {
+                while (!stack.isEmpty()&&stack.peek().val==inorder[inIndex]){
+                    node = stack.pop();
+                    inIndex++;
+                }
+                node.right = new TreeNode(val);
+                stack.push(node.right);
+            }
+        }
+        return root;
+    }
+
 
     /*437.
     * 给定一个二叉树的根节点 root ，和一个整数 targetSum ，求该二叉树里节点值之和等于 targetSum 的 路径 的数目。
