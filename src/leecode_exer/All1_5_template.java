@@ -615,24 +615,6 @@ public class All1_5_template {
     }
 
 
-    /*560. 和为 K 的子数组
-给你一个整数数组 nums 和一个整数 k ，请你统计并返回 该数组中和为 k 的子数组的个数 。
-
-子数组是数组中元素的连续非空序列。
-     */
-    public int subarraySum(int[] nums, int k) {
-        HashMap<Integer, Integer> map = new HashMap<>();
-        map.put(0,1);
-        int preSum = 0,res =0;
-        for (int num:nums){
-            preSum += num;
-            res += map.getOrDefault(preSum-k,0);
-            map.put(preSum,map.getOrDefault(preSum,0)+1);
-        }
-        return res;
-    }
-
-
     /*198. 打家劫舍
 你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。
 

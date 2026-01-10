@@ -474,6 +474,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
     * */
     /**
+     * 【建议】 几种解法差不多，但是自己常用的是 exist_3。易错点：撤销对（i,j）位置值的修改
      * 【思路】从每一个位置展开研究(即从这个位置开始，一一对比word的每一个字符，看能不能找到可行解)。
      *      "展开研究"的具体逻辑(即for循环的逻辑)：
      *          ①什么时候找到了可行解？来到了word的最后字符的后面，即word字符的所有数据都匹配成功了。
@@ -487,11 +488,12 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
      *      1. 为什么这个题需要标记走过的路，但是”矩阵中最长的递增路径“中并不需要标记走过的路；
      *      2. dfs的一般使用方法，尤其是主函数的调用参数是什么？？怎么确定？？dfs的流程又是什么，返回值的确定怎么做？？
      * ⚠TODO：注意一点很重要的区别
-     *      一般来说，像这种二维表的回溯，往往会联想到DP。如果某一个格子的结果（Boolean类型）能根据“有限的数个变量”确定
+     *      一般来说，像这种二维表的回溯，往往会联想到DP。如果某一个格子的结果（Boolean类型）能根据“有限的几个变量”确定
      *   出它的值，那就能改成dp 或者 记忆化搜索！！！—————这一点总结很重要。
      *      但是遗憾的是这个题不能。比如根据（i,j,index）能唯一确定位置（i,j）的结果吗？不能，因为这个题有条件————走过的路
      *   不能再走，因此从位置（i,j）开始后续还能走哪些位置，是受“之前是怎么来到位置（i，j）的”这个路径影响。换言之，我们从
-     *   不同的路径走到位置（i,j），可能继续走下去结果是不同的。。。。这一区别，就导致79题无法改写成 记忆化搜索 或者 dp的版本
+     *   不同的路径走到位置（i,j），可能继续走下去结果是不同的。。。。这一区别，就导致79题无法改写成 记忆化搜索 或者 dp的版
+     *   本，关于这一点的详细解释 左神 有讲
      * */
     /*
     * 解法1：在每一轮中，研究过的元素使用字符'\0'来标记
@@ -555,6 +557,37 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             return curFlag;
         }
         return false;
+    }
+
+
+    /*写法3
+
+     */
+    public boolean exist_3(char[][] board, String word) {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (dfs1(board,i,j,0,word)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    int[][] dirs1 = {{1,0},{-1,0},{0,1},{0,-1}};
+    private boolean dfs1(char[][] board, int i, int j, int index, String word) {
+        /**表示的是 base case的时候，返回信息*/
+        if (index==word.length()) return true;
+        if (i<0||i>=board.length||j<0||j>=board[0].length||board[i][j]!=word.charAt(index)) return false;
+        board[i][j] = '\n';
+        boolean tmp = false;
+        for (int[] dir:dirs1){
+            int x = i+dir[0],y = j+dir[1];
+            tmp = tmp || dfs1(board,x,y,index+1,word);
+        }
+        board[i][j] = word.charAt(index); /**err：注意这里必须要还原，因为后面从别的位置遍历还会使用这个位置的值*/
+        /**表示的是任何一个位置，经过不同方向的追溯，最终计算出当前位置的信息*/
+        return tmp;
     }
 
 
@@ -643,20 +676,17 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         if (startIndex >= str.length()) {
             //如果起始位置大于s的大小，说明找到了一组分割方案
             result_partition_dp.add(new ArrayList<>(path_partition_dp));
-        } else {
-            for (int i = startIndex; i < str.length(); ++i) { /**i从startIndex开始，取不到str.length()。因此这里截取子串是左闭右闭的思想*/
-                if (dp_partition_dp[startIndex][i]) {
-                    //是回文子串，先将当前子串保存入path，然后进入下一步递归
-                    path_partition_dp.offerLast(str.substring(startIndex, i + 1));
-                    //要从下一个位置开始研究，保证不重复
-                    backtracking(str, i + 1);
-                    path_partition_dp.pollLast();
-                } else {
-                    //不是回文子串，跳过。。没有这个 else 分支也是可以的。
-                    continue;
-                }
+        }
+        for (int i = startIndex; i < str.length(); ++i) { /**i从startIndex开始，取不到str.length()。因此这里截取子串是左闭右闭的思想*/
+            if (dp_partition_dp[startIndex][i]) {
+                //是回文子串，先将当前子串保存入path，然后进入下一步递归
+                path_partition_dp.offerLast(str.substring(startIndex, i + 1));
+                //要从下一个位置开始研究，保证不重复
+                backtracking(str, i + 1);
+                path_partition_dp.pollLast();
             }
         }
+
     }
 
     //通过动态规划判断是否是回文串,参考动态规划篇 52 回文子串
@@ -687,6 +717,21 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
             }
         }
     }
+
+
+    /**计算二维矩阵中每一个位置的信息，自己写的写法见 compute1
+     *      使用动态规划计算出每一个位置dp[i][j]的值，表示子串“[i,j]”闭区间是不是回文的。。。并且这个二维
+     * 矩阵只有右上角有数据*/
+//    private void compute1(boolean[][] dp, String s) {
+//        int n = s.length();
+//        for (int i = n-1; i >= 0; i--) {
+//            dp[i][i] = true;
+//            for (int j = i+1; j < n; j++) {
+//                if (j-i<=2&&s.charAt(i)==s.charAt(j)) dp[i][j] = true;
+//                else dp[i][j] = s.charAt(i)==s.charAt(j)&&dp[i+1][j-1];
+//            }
+//        }
+//    }
 
 
     /*51. N 皇后

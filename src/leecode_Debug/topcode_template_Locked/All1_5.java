@@ -2820,27 +2820,6 @@ int getMin() 获取堆栈中的最小元素。*/
     给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
     请注意 ，必须在不复制数组的情况下原地对数组进行操作。
      */
-    /*最简化，且效率最高的写法*/
-    /**
-     易错点：为什么for循环内不能使用while循环？？比如nums = {1,0,2,0,0,0}.
-            开始时left=0，i=0，执行while循环时发现“nums[i]!=0”，因此会进入while循环执行代
-        码“swap5(nums,left++,i)”，由于i等于left，因此交换后其实相当于不交换因为是一个位置。。
-        交换完成后left++所以left变为1，但是i的值依然是0。。。。。
-            然后再回到while判断条件“ while (nums[i]!=0)”，由于交换后i的值没变依然h是0，并且由
-        于原来i和left相等，因此相当于同一个位置交换，nums[0]的值依然是1，因此满足while条件，进入
-        到循环执行“swap5(nums,left++,i);”......
-     */
-    /*错误的写法。。。*/
-//    public void moveZeroes(int[] nums) {
-//        if (nums.length<=1) return;
-//        int left = 0;
-//        for (int i = 0; i < nums.length; i++) {
-//            while (nums[i]!=0){ /**err：会导致死循环。。。。。这里需要使用if，不能用while*/
-//                swap5(nums,left++,i);
-//            }
-//        }
-//    }
-
     /*写法1：使用for循环。*/
     public void moveZeroes(int[] nums) {
         if (nums.length<=1) return;

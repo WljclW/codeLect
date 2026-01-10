@@ -1167,7 +1167,7 @@ public class codetop_5 {
     }
 
 
-    /*543
+    /*543. 二叉树的直径
     给你一棵二叉树的根节点，返回该树的 直径 。
     二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
 
@@ -1208,6 +1208,14 @@ public class codetop_5 {
         int left = depth(root.left);
         int right = depth(root.right);
         /*step2：求出这个节点作为根的子树的直径————该节点左子树、右子树的高度和*/
+        /**
+         【注】路径的长度就是"左右高度之和"，不能再加1了！！
+            比如，左右子树的高度都是1，则路径长度就是2，如下图，6节点有两个孩子，路径长度就
+         是2————即左右子树的高度和：
+                                      6
+                                     / \
+                                    4  3
+         */
         maxDiameterOfBinaryTree = Math.max(maxDiameterOfBinaryTree, left + right);
         /*step3：返回以这个节点为根的子树的高度————该节点的左子树、右子树的最大高度 + 1*/
         return Math.max(left, right) + 1;

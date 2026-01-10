@@ -15,10 +15,11 @@ public class _12heap {
     你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。*/
 
     /**
-        更优的解法参考：leecode_Debug._hot100.codetop_unskilled#findKthLargest(int[], int)
+     这里给出的写法都不好，
+        强烈建议使用的解法：leecode_Debug._hot100.codetop_unskilled#findKthLargest_best
      */
     /*写法1：偷懒的写法，借助优先级队列*/
-    public int findKthLargest(int[] nums, int k) {
+    public int findKthLargest_queue(int[] nums, int k) {
         PriorityQueue<Integer> queue = new PriorityQueue<>();
         int res = 0;
         for (int i:nums){

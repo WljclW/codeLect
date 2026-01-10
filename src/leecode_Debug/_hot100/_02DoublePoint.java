@@ -14,10 +14,40 @@ public class _02DoublePoint {
     *    研究到的位置
     * */
     /**
-     * 【建议】使用解法 moveZeroes1、moveZeroes2（moveZeroes2更符合自己的想法），尽量不要使用moveZeroes。
-     *      直接采用交换的方式，这样就不用对cur后面的位置再赋值了
+     易错点：为什么for循环内不能使用while循环？？比如nums = {1,0,2,0,0,0}.
+     开始时left=0，i=0，执行while循环时发现“nums[i]!=0”，因此会进入while循环执行代
+     码“swap5(nums,left++,i)”，由于i等于left，因此交换后其实相当于不交换因为是一个位置。。
+     交换完成后left++所以left变为1，但是i的值依然是0。。。。。
+     然后再回到while判断条件“ while (nums[i]!=0)”，由于交换后i的值没变依然h是0，并且由
+     于原来i和left相等，因此相当于同一个位置交换，nums[0]的值依然是1，因此满足while条件，进入
+     到循环执行“swap5(nums,left++,i);”......
+     */
+    /*错误的写法。。。*/
+//    public void moveZeroes(int[] nums) {
+//        if (nums.length<=1) return;
+//        int left = 0;
+//        for (int i = 0; i < nums.length; i++) {
+//            while (nums[i]!=0){ /**err：会导致死循环。。。。。这里需要使用if，不能用while*/
+//                swap5(nums,left++,i);
+//            }
+//        }
+//    }
+
+    /**
+     * 【建议】使用解法 moveZeroes_best，但是 moveZeroes2更符合自己的想法），尽量不要使用moveZeroes。
+     *      最好直接使用采用交换的方式，这样就不用对cur后面的位置再赋值了
      *       其中 moveZeroes1 是最优的解法
      * */
+    public void moveZeroes_best(int[] nums) {
+        if (nums.length<=1) return;
+        int left = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i]!=0){ /**err：这里需要使用if，不能用while*/
+                swap(nums,left++,i);
+            }
+        }
+    }
+
     public void moveZeroes(int[] nums) {
         int left = 0;
         int cur = 0;
@@ -227,6 +257,7 @@ public class _02DoublePoint {
                     while(left<right && nums[right]==nums[--right]);
                 }else {
                     res.add(new ArrayList<>(Arrays.asList(nums[i],nums[left],nums[right]))); /**err：使用这个添加list方便*/
+//                    res.add(Arrays.asList(nums[i],nums[left],nums[right])); // 上一行可以直接简化成这种写法！！！
                     while (left<right && nums[left]==nums[++left]); /**【注意】其实保证left<right就能保证l和r都不越界*/
                     while (left<right && nums[right]==nums[--right]); /**并且这两的“++left”和“--right”必须放在后面。补充：如果放在前面就是先移动指针，再判断的时候就会发现永远是相等的*/
                 }

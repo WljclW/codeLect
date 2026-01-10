@@ -349,7 +349,7 @@ public class _10binarySearch {
      */
     /**
      * 【强烈建议！】题解中不要出现nums[0]，nums[nums.length-1]这样的数据，而是用nums[l]、nums[r]代替，见方
-     *      法search_3。。使用"nums[l]、nums[r]"更具有普适性！
+     *      法 search_3。。使用"nums[l]、nums[r]"更具有普适性！
      * 【说明】解法1和解法2的区别在于比较是使用的值不一样，但是强烈建议使用解法2，即 search_2。这个解法才更好的
      *      体现出了某一个区间有序，然后确定target的范围，81的解法就是在search_2的基础上改进的（具体的说：仅仅
      *      是多一个情况————如果nums[mid]=nums[left]=nums[right]就l++;r--。）
@@ -434,7 +434,7 @@ public class _10binarySearch {
          情况1：如果nums[mid]>=nums[left]。则说明mid的左边必然是有序的，数组不一定是两部分有序
          情况2：否则的话即nums[mid]<nums[left]。则说明mid的右边有序，数组一定是两部分有序的
      */
-    public int search_2(int[] nums, int target) {
+    public int search_3(int[] nums, int target) {
         int left = 0, right = nums.length - 1;
         while (left <= right) {
             int mid = left + (right - left) / 2;

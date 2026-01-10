@@ -87,12 +87,12 @@ public class _01hash {
     public List<List<String>> groupAnagrams_best(String[] strs) {
         HashMap<String, List<String>> map = new HashMap<>();
         for (String str:strs){
-            //①：统计 str 中每一个字符的数量
+            //①：for循环，统计 str 中每一个字符的数量
             int[] flags = new int[26];
             for (char c:str.toCharArray()){
                 flags[c-'a']++;
             }
-            //②：把 flags 数组中的每一个数添加到sb。（注：需要使用”#“分隔，否则会出错）
+            //②：for循环，把 flags 数组中的每一个数添加到sb。（注：需要使用”#“分隔，否则会出错）
             StringBuilder sb = new StringBuilder();
             for(int i:flags){
                 /**疑问：和”sb.append(i).append("#")“ 的区别是什么？？

@@ -48,6 +48,7 @@ public class _16tricks {
     我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
     必须在不使用库内置的 sort 函数的情况下解决这个问题。*/
     /**
+     【建议的解法】建议使用 sortColors_while，while的写法比较熟
      1. 【注意】cur位置小于1的时候，left和cur指针都需要++。。。否则会报错，如下：
            输入
             nums =
@@ -59,7 +60,8 @@ public class _16tricks {
      2. 下面的写法是三指针的写法？？这种写法要使用 while循环，使用 for循环 目前没有找到合适的写法。
      3. 官方解法有给出其他的写法，可理解理解
     * */
-    public void sortColors(int[] nums) {
+    /*写法1：while循环的写法*/
+    public void sortColors_while(int[] nums) {
         int left = 0, right = nums.length - 1;
         int cur = 0;
         while (cur <= right) { /**err：这里必须是小于等于（保证所有位置都研究过），并且注意边界是right，而不是nums.length-1（因为right右边的部分一定是2，不用再研究了）。*/
@@ -77,6 +79,28 @@ public class _16tricks {
         nums[i] = nums[j];
         nums[j] = tmp;
     }
+
+
+    /*写法2：for循环的写法*/
+    public void sortColors_for(int[] nums) {
+        int p0 = 0, p2 = nums.length - 1;
+
+        for (int i = 0; i <= p2; i++) {
+            while (i <= p2 && nums[i] == 2) {
+                swap2(nums, i, p2--);
+            }
+            if (nums[i] == 0) {
+                swap2(nums, i, p0++);
+            }
+        }
+    }
+
+    private void swap2(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+
 
 
     /*287. 寻找重复数
@@ -126,7 +150,7 @@ public class _16tricks {
         /*step2：跟链表一样，重置其中的一个指针为初始位置。然后每个指针每一步都只走一步，slow、fast相等时即为所求。。
             【备注】这里直接使用 while循环 没问题，并且这里必须使用while循环，使用do-while循环就错了！！！
         */
-        slow = 0;
+        slow = 0; /**注：slow、fast指针初始化是多少，这里重置的时候也需要重置为多少，是对应的*/
         while (slow!=fast){ /**注：这里也成do-while循环也是可以的*/
             slow = nums[slow];
             fast = nums[fast];
