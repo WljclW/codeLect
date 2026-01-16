@@ -1133,6 +1133,79 @@ void put(int key, int value) 如果关键字 key 已经存在，则变更其数�
         return Math.max(left,right)+1;
     }
 
+    /**
+     1. 根据上面的递归方法可以看出来，使用的其实是后序遍历，也就是说在“后序遍历访问节点的位置添加对节点的处理逻辑”
+         后序遍历（左右 → 根），每个节点：
+            已经知道 左子树高度 和 右子树高度；用 left + right 更新直径；返回高度给父节点
+            👉 所以：543 的迭代写法 = 后序遍历 + 记录高度
+     2. 为什么要使用后序遍历？
+        因为到某个节点的时候，需要知道这个节点左右子树的高度。
+     */
+    /*这个题 递归法 改写成 迭代法 的思考：
+    【关键~~】visited变量用于模拟“递归法中回溯的过程”；map变量用于模拟递归写法的返回值。。。。因此这种写法等价于递归法时
+        jvm底层帮助我们干的事
+    思考1：二叉树的直径 = 某个节点的：左子树高度 + 右子树高度。所以对每个节点，我们必须在左右子树都已经算完高度之后，才能：
+        用 leftHeight + rightHeight 更新直径。计算并返回当前节点的高度
+           👉 这句话已经强制要求：后序遍历
+    思考2： 递归版本里，你什么都没写，但 JVM 帮你偷偷做了三件事：
+            depth(node):
+                depth(left)
+                depth(right)
+                ← 拿到左右返回值
+                计算当前节点
+                return 高度
+            等价翻译成大白话：先处理左右孩子；等左右都算完，再处理自己
+            👉 迭代的唯一难点：
+            怎么“等左右算完”？
+    思考3： 为什么需要引入 visited 标志？
+            普通栈只能做到：先压 → 后弹。但后序遍历需要的是：左 → 右 → 根
+        所以我们必须区分：第一次看到这个节点（还没处理子树），第二次看到这个节点（左右子树已经处理完）
+        visited：为false的时候表示第一次访问这个节点；为true的时候表示第二次访问这个节点。。因此该变量
+     的本质是在模拟“递归返回阶段”。
+     */
+    public int diameterOfBinaryTree_diedai(TreeNode root) {
+        if (root==null) return 0;
+
+        Stack<TreeNode> stack = new Stack<>(); // 用于存储节点，前中后序遍历的迭代法都需要使用到Stack 来代替 递归
+        Stack<Boolean> visited = new Stack<>(); // 用于标记对应的TreeNode是第几次遇到的
+
+        HashMap<TreeNode, Integer> heightMap = new HashMap<>(); // 用于存储 节点——>以该节点为根的子树的高度
+        int diameter = 0;
+
+        stack.push(root);
+        visited.push(false);
+
+        while (!stack.isEmpty()){
+            TreeNode node = stack.pop();
+            Boolean isVisited = visited.pop();
+
+            if (node==null) continue;
+            if (!isVisited){ /**isVisited是false，说明是第一次来到这个节点*/
+                /*只有当第二次来到某个节点（即对应的visited变量是true）的时候，才处理；如果第一次来到某个节
+                点，需要将它的左右孩子入栈*/
+                stack.push(node);
+                visited.push(true);
+
+                stack.push(node.right);
+                visited.push(false);
+
+                stack.push(node.left);
+                visited.push(false);
+            }else { /**isVisited是 true，说明是第二次来到这个节点————即后序遍历需要访问的时机了*/
+                /*进入到else，说明后序遍历到node节点了，因此需要决策node节点的信息；决策出来后就要更新全局结果*/
+                //①先从 heightMap 中获取左右子节点的高度
+                int leftHeight = heightMap.getOrDefault(node.left,0);
+                int rightHeight = heightMap.getOrDefault(node.right,0);
+                //②决策出当前节点的 直径信息
+                diameter = Math.max(leftHeight+rightHeight,diameter); /**等价于递归写法中的 resDiameterOfBinaryTree = Math.max(left+right,resDiameterOfBinaryTree);*/
+                //③将当前节点的高度信息存储到 heightMap
+                heightMap.put(node,Math.max(leftHeight,rightHeight)+1); /**等价于递归写法中的 return Math.max(left,right)+1;*/
+            }
+        }
+
+        return diameter;
+    }
+
 
     /*
     102. 二叉树的层序遍历
