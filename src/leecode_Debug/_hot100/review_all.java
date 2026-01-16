@@ -634,9 +634,8 @@ public class review_all {
     /*416.
      * 给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两
      * 个子集，使得两个子集的元素和相等。*/
-    public boolean canPartition(int[] nums) {
-        return false;
-    }
+//    public boolean canPartition(int[] nums) {
+//    }
 
     /*32.
      * 给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的
@@ -772,10 +771,8 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
     中 至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。路径和 是路径中各节点值的总和。
     给你一个二叉树的根节点 root ，返回其 最大路径和 。
     * */
-    int maxSum = Integer.MIN_VALUE;
-    public int maxPathSum(TreeNode root) {
-        return 0;
-    }
+//    public int maxPathSum(TreeNode root) {
+//    }
 
 
     /*165

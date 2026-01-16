@@ -371,7 +371,7 @@ public class _11stack {
     求在该柱状图中，能够勾勒出来的矩形的最大面积。
     * */
     /**
-     * 【建议的解法】强烈建议使用下面的 largestRectangleArea2
+     * 【建议的解法】强烈建议使用下面的 largestRectangleArea2；警惕出错的写法 largestRectangleArea_err
      * 【题目的本质】————针对每一个位置i，找到左右两边最近的小于heights[i]的位置。就得到了该位置所能绘制出的最大矩形，等
      * 每一个位置的值都求出来了，全局的最大矩形也就得到了。
      *    这个题也可以用一维数组来表示，完整的可能情况：枚举每一个位置，比如该位置的高度是m，从该位置向左右两边查找第一个
@@ -458,6 +458,7 @@ public class _11stack {
     * 右边的边界
     * */
     public int largestRectangleArea2(int[] heights) {
+        /*说明：使用普通的 Stack 也是可以的*/
         Deque<Integer> stack = new LinkedList<>(); // 存储索引
         int maxArea = 0;
         int n = heights.length;
@@ -489,6 +490,56 @@ public class _11stack {
         }
 
         return maxArea;
+    }
+
+
+    /**
+     *下面的解法就是错误的！！！！
+     */
+//    public int largestRectangleArea_err(int[] heights) {
+//        int res = 0;
+//        LinkedList<Integer> stack = new LinkedList<>();
+//        for (int i = 0; i <=heights.length; i++) {
+//            int curHeight = i==heights.length?0:heights[i];
+//            while (!stack.isEmpty()&&curHeight<heights[stack.peekLast()]){
+//                Integer cur = stack.pollLast();
+//                int left = stack.isEmpty()?-1:stack.peekLast();
+//                int curVal = (i-left-1)*heights[cur];
+//                res = Math.max(res,curVal);
+//            }
+            /**【说明】LinkedList既可以是队列也可以是栈，但是使用方法的时候需要搭配！！！详细解释————
+                这种写法中，使用的是 LinkedList，变量声明的也是LinkedList。由于之前判断栈顶，弹出栈顶
+             的方法使用的是“peekLast()”，“stack.pollLast()”，因此默认是把末尾当作了栈顶！！
+                所以如果想入栈的时候使用“stack.offerLast(i);”，而不要在入栈的时候又使用“push()”，这种
+             不搭配的使用方法容易出错！！因为顺序就迷惑了。
+                【建议】
+                    1. 如果变量声明为 LinkedList 类型，则调用方法的时候使用 pollLast()、offerLast(i)、pollFirst()、
+             offerFirst(i)等，即 明确的指定插入、删除是在哪一个头；
+                    2. 如果变量声明为 Stack 类型，则使用常规的 push(i)，pop()，peek()
+                    3. 如果变量声明为 Deque 类型，则使用的方法 和 LinkedList类型时的方法一致。即调用方法的时候使用
+             pollLast()、offerLast(i)、pollFirst()、offerFirst(i)等，即 明确的指定插入、删除是在哪一个头；
+             */
+//            stack.push(i); /**err：出错的地方*/
+//        }
+//        return res;
+//    }
+//
+
+    /*下面是对 largestRectangleArea_err 的修改。*/
+    public int largestRectangleArea_err_xiugai(int[] heights) {
+        int res = 0;
+        LinkedList<Integer> stack = new LinkedList<>();
+        for (int i = 0; i <=heights.length; i++) {
+            int curHeight = i==heights.length?0:heights[i];
+            while (!stack.isEmpty()&&curHeight<heights[stack.peekLast()]){
+                Integer cur = stack.pollLast();
+                int left = stack.isEmpty()?-1:stack.peekLast();
+                int curVal = (i-left-1)*heights[cur];
+                res = Math.max(res,curVal);
+            }
+            stack.offerLast(i); /**这里也要使用 offerXxxx 这样的方法，不能使用 push方法*/
+        }
+        return res;
     }
 
 

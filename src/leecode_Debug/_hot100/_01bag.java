@@ -60,7 +60,7 @@ public class _01bag {
          * 置（比如：dp[i-1][j-m]）的值）,如果每一行从前往后计算会导致一维中计算dp[j]时，dp[j-m]
          * 已经更新了，也就是说dp[j-m]此时不再等价于二维中的dp[i-1][j-m]，而是等价于二维中的dp[i][j-m]；*/
         for (int i = 0; i < nums.length; i++)
-            for (int j = target; j >= nums[i]; j--) {  /**err：还是双重循环，但是内循环需要“倒着遍历背包容量”————这一步是所有0-1背包的问题的关键*/
+            for (int j = target; j >= nums[i]; j--) {  /**err：还是双重循环，但是内循环需要“倒着（amount从大到小）遍历背包容量”————这一步是所有0-1背包的问题的关键，根本原因是每一个物品只能选择一次*/
                 dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i]);
             }
         return dp[target] == target;

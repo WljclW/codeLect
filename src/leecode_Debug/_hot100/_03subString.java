@@ -91,7 +91,7 @@ public class _03subString {
                  * 道理。。
                  *      这里如果不使用“.intValue()”会导致倒数第二个测试用例过不了！！，因为数太大了，超过
                  * 了Integer缓存的整数范围。
-                 *    2. 只有在相等的时候才会更新valid！！
+                 *    2. 只有在相等的时候才会更新valid！！因此valid的值最大也就是 need中key的数量
                  * */
                 if (window.get(c).intValue()==need.get(c).intValue()){
                     valid++;
@@ -124,6 +124,7 @@ public class _03subString {
                         valid--;
                     }
                 }
+                /**err：忘记更新 left 指针。。。会发现第一个测试用例报错*/
                 left++; //注释④
             }
             right++;
@@ -381,7 +382,7 @@ public class _03subString {
             //先更新前缀和，然后看前缀和pre-k的数量，有的话累加到res.（pre-k到当前位置的子数组和就是k）
             pre += num;
             /**err：下面两行交换就错了！！
-             *      必须是先更新res，然后再将pre放进map，如果先把pre放进map会影响结果！！！
+             *      必须是 1.先更新res，然后 2.再将pre放进map，如果先把pre放进map会影响结果！！！
              *      比如：k=0的时候会出错，此时会出现pre-k=pre，如果先把pre放进去，就导致map.get(pre-k)的
              *  数值比正确的多了。——————比如：放进去之前get的结果是m，放进去之后再获取结果就是m+1了！！*/
             res += map.getOrDefault(pre-k,0);

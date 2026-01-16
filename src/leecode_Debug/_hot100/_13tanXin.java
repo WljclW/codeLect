@@ -115,7 +115,7 @@ public class _13tanXin {
 
         /*遍历所有位置，每到一个位置先更新一下最远能到的位置；如果i来到了边界，就更新边界为maxPosition，就是
         * 下一跳的边界，此时就需要增加一步*/
-        for (int i=0;i<nums.length-1;i++){ /**err：注意这里只能遍历到nums.length-2，否则得出的结果会多1。因为跳到最后一个位置就不用再跳了*/
+        for (int i=0;i<nums.length-1;i++){ /**err：注意这里只能遍历到nums.length-2，否则得出的结果会多1。。。。因为一定能跳到最后一个位置，跳到了就结束了否则step就会比结果多1！！！跳到最后一个位置就不用再跳了*/
             maxPosition = Math.max(maxPosition,i+nums[i]); //每到一个位置，根据"从这个位置跳，最远能到哪里"更新最远的可达边界来更新全局的最远可达边界
             if (i==bound){ //一旦来到边界，step++ 并且 更新下一次能到的最远距离
                 step++;
@@ -129,13 +129,13 @@ public class _13tanXin {
     public int jump_(int[] nums) {
         int right = 0,bound =0;
         int cur = 0,step = 0;
-        while (cur<nums.length-1){
+        while (cur<nums.length-1){ /***/
             right = Math.max(right,cur+nums[cur]);
             if (cur==bound){
                 step++;
                 bound = right;
             }
-            cur++;
+            cur++; /**err：如果忘记更新cur，用例报错：超出运行时间*/
         }
         return step;
     }

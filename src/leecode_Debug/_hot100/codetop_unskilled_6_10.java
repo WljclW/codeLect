@@ -2461,7 +2461,10 @@ public class codetop_unskilled_6_10 {
     }
 
 
-    //    public int orangesRotting_error(int[][] grid) {
+    /**
+     * "腐烂橘子"的出错点！见下面的两处注释
+     */
+//    public int orangesRotting_error(int[][] grid) {
 //        int fresh = 0;
 //        LinkedList<int[]> queue = new LinkedList<>();
 //        int m = grid.length,n = grid[0].length;
@@ -2477,10 +2480,22 @@ public class codetop_unskilled_6_10 {
 //        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
 //        while (!queue.isEmpty()){
 //            int size = queue.size();
-    /**error：每一轮并不是无脑的更新 minute！！！！！！！！*/
+    /**err1：每一轮并不是无脑的更新 minute！！！！！！！！只有这一轮碰到"新鲜橘子"的时候才需要更
+     新minute，因此在正确的解法中需要使用一个 布尔变量 来记录"本轮是不是遇到了新鲜橘子"*/
 //            minute++;
-//            for (int i = 0; i < size; i++) {
-//                int[] cur = queue.poll();
+    /**err2：不能使用for循环来出队列中的位置信息。。。因为在poll()的时候，碰到变腐烂的橘子还需要把对
+     应的位置添加到 queue，在删除的同时不允许修改，否则就是下面的报错。
+        因此，这个时候要使用“ for (int i = 0; i < size; i++)”来一次弹出queue原来的数据，二叉树的层
+     序遍历也是同样的道理！！
+             java.util.ConcurrentModificationException
+             at line 978, java.base/java.util.LinkedList$ListItr.checkForComodification
+             at line 900, java.base/java.util.LinkedList$ListItr.next
+             at line 17, Solution.orangesRotting
+             at line 56, __DriverSolution__.__helper__
+             at line 86, __Driver__.main
+     *
+     * */
+//            for (int[] cur:queue){
 //                for(int[] dir:dirs){
 //                    int x = dir[0]+cur[0],y = dir[1]+cur[1];
 //                    if (x>=0&&x<m&&y>=0&&y<n&&grid[x][y]==1){

@@ -255,37 +255,6 @@ void put(int key, int value) - 如果键 key 已存在，则变更其值；如�
     }
 
 
-    /*114
-    给你二叉树的根结点 root ，请你将它展开为一个单链表：
-
-展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
-展开后的单链表应该与二叉树 先序遍历 顺序相同。
-     */
-    /**
-     * 【思路】使用前序比哪里依次将节点串起来。
-     * 【难点】方法是没有返回值的————因此不能虚拟头节点。导致拼接指针的初始值只能初始化为null 或者 root(建议初始化为null)
-     * @param root
-     */
-    public void flatten(TreeNode root) {
-        if (root==null) return;
-        TreeNode cur = null; /*声明cur节点，将所有的节点串起来*/
-        LinkedList<TreeNode> stack = new LinkedList<>();
-        stack.push(root);
-        while (!stack.isEmpty()){
-            TreeNode nowNode = stack.pop();
-            if (cur==null)  /*cur如果是null说明是第一个节点，将cur指向根节点*/
-                cur = nowNode;
-            else{   /*否则的话将节点拼接到right指针，然后cur指针右移*/
-                cur.left = null;
-                cur.right = nowNode;
-                cur = cur.right;        /**err：更新cur指针。。。。如果忘记变更，会导致最终的结果最多只有两个节点*/
-            }
-            if (nowNode.right!=null) stack.push(nowNode.right);
-            if (nowNode.left!=null) stack.push(nowNode.left);
-        }
-    }
-
-
     /*958
     给你一棵二叉树的根节点 root ，请你判断这棵树是否是一棵 完全二叉树 。
 
@@ -1861,33 +1830,6 @@ void put(int key, int value) - 如果键 key 已存在，则变更其值；如�
 
         // 返回结果，dp[m][n] 表示整个 s1 和 s2 是否能组成 s3
         return dp[m][n];
-    }
-
-
-    /*230. 二叉搜索树中第 K 小的元素
-     */
-    /**
-     *【说明】第k小就是从小到大排序的第k个；第k大就是从大到小排序的第k个。。。。
-     *      体现再二叉搜索树的区别无非就是：先往哪个孩子节点走的问题
-     *【思路】二叉树第k小的元素比较简单，就是中序遍历的第k个元素
-     *【注意】官方的解法中，有一些更骚的解法
-     */
-    public int kthSmallest(TreeNode root, int k) {
-        Stack<TreeNode> stack = new Stack<>();
-        while (root!=null||!stack.isEmpty()){
-            if (root!=null){
-                stack.push(root);
-                root = root.left;
-            }else{
-                TreeNode cur = stack.pop();
-                k--;
-                if (k==0){
-                    return cur.val;
-                }
-                root  = cur.right;
-            }
-        }
-        return -1;
     }
 
     /*LCR 174. 寻找二叉搜索树中的目标节点

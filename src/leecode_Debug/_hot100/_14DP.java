@@ -82,9 +82,9 @@ public class _14DP {
         LinkedList<List<Integer>> res = new LinkedList<>();
         /*step 1. 特殊情况的考虑*/
         if (numRows==0) return res;
-        res.add(new LinkedList<>(Arrays.asList(1)));
+        res.add(Arrays.asList(1));
         if (numRows==1) return res;
-        res.add(new LinkedList<>(Arrays.asList(1,1)));
+        res.add(Arrays.asList(1,1));
         if (numRows==2) return res;
         /*step 2. 以此计算出第i行的List，其中i的范围————[3,numRows-1]*/
         for (int i = 3; i <= numRows; i++) {
@@ -201,6 +201,7 @@ public class _14DP {
         dp[0] = 0; /*dp0的初始值是0*/
         dp[1] = 1;
         for (int i = 2; i <= n; i++) { /*i：表示需要dp[i]的值————即i至少有多少个完全平方数组成*/
+            /**err：内层循环的条件是“j * j <= i”，不要错写成“j * j <= n”，写错了会越界*/
             for (int j = 1; j * j <= i; j++) { /*j：从j开始挨个枚举，枚举到j的平方已经大于i为止*/
                 dp[i] = Math.min(dp[i], dp[i - j * j] + 1);
             }
@@ -269,8 +270,8 @@ public class _14DP {
                 /*
                 if条件语句的解释————
                     dp[j]：0~j-1这段子串能由列表的字符串拼出来；【注意：dp[j]对应的是0~j-1的子串是否可匹配到】
-                    set.contains(s.substring(j,i))：j~i-1这段子串是不是在题目字符串的列表中
-                1. 解释一下if条件：dp[j]表示0~j-1的子串能不能由字典的词组成；然后我们再看[j,i-1)的子串是不是在字典中，如果
+                    set.contains(s.substring(j,i))：j~i-1（包含左右边界）这段子串是不是在题目字符串的列表中
+                1. 解释一下if条件：dp[j]表示0~j-1的子串能不能由字典的词组成；然后我们再看[j,i)的子串是不是在字典中，如果
                     在字典中就说明[0,i-1) 的子串能由字典的一个或者多个词组成
                 2. “set.contains(s.substring(j,i))”中i是能取到s.length()的，但是substring函数是左闭右开的区间，因此实
                     际上获取子串时不会去拿s.length()位置的字符，不会导致越界异常。
@@ -425,6 +426,7 @@ public class _14DP {
         int minPre = nums[0],maxPre = nums[0];
         int res = nums[0];
         for (int i = 1; i < nums.length; i++) { /**err：i要从1开始，因为res的初始值已经是nums[0]了*/
+            /*curMin、curMax分别代表“以nums[i]结尾的子数组乘积的最小值、最大值”*/
             int curMin = Math.min(nums[i],Math.min(minPre*nums[i],maxPre*nums[i]));
             int curMax = Math.max(nums[i],Math.max(maxPre*nums[i],maxPre*nums[i]));
             /**err：下面的操作是直接赋值，而不是取最值！！

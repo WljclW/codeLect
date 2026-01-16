@@ -293,6 +293,8 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
                  回文串的左边界，包含这个字符。
                     这个字符对应原字符串的哪个位置呢？？除以2即可。因此需要除以2得到映射到原字符串的下标，每两个位置对应原字符串的一
                  个位置！
+                  【总结】i,maxlen都是在str中的度量单位，str中回文串的起始位置是“i-maxlen”即“i-dp[i]”，映射到原始串s中实际的起始位置是除
+                 以2的关系
                  */
                 start = (i - maxLen) / 2; /**？？？*/
             }
@@ -313,7 +315,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
     你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
      */
     /**
-     【建议的写法】 强烈建议使用 写法 findKthLargest_best。
+     【建议的写法】 强烈建议使用写法 findKthLargest_best。
      TODO:理解chatgpt给出的三种解法
     方法1：调用Arrays.sort()进行完整的排序。时间复杂度——O(n log n)，空间复杂度O(1).
     方法2：借助优先级队列。只要优先级队列的数字超过k，就弹出。
@@ -356,18 +358,26 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         }
     }
 
+    /**
+        这里的 partion_best方法 其实就是"颜色分类"的原版代码。————
+            left指针：第一个等于pivot的值在哪个位置。（这个值一定存在，因为pivot就是从数组
+        中选出来的）
+            right指针：下一次碰到大于pivot的时候，哪个元素应该放置的位置。因为while循环的循
+        环条件是“while (cur<=right)”，因此出了while循环时，right指针其实就是pivot最后一次出
+        现的位置
+     */
     private int[] partion_best(int[] nums, int left, int right, int pivot) {
-        int l = left,r = right;
         int cur = left;
         while (cur<=right){
             if (nums[cur]<pivot){
-                swap11(nums,l++,cur++);
-            }else if (nums[cur]>pivot){
-                swap11(nums,cur,r--);
+                swap11(nums,left++,cur++);
+            } else if (nums[cur] > pivot) {
+                swap11(nums,cur,right--);
             }else {
                 cur++;
             }
         }
+        /**这里的返回值，正确的吗？？？？？待验证，这是关键，保证“闭区间[left,right] 内的元素都是等于flag的”*/
         return new int[]{left,right};
     }
 
@@ -375,23 +385,6 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
         int tmp = nums[l];
         nums[l] = nums[r];
         nums[r] = tmp;
-    }
-
-
-
-    /*解法1：借助优先级队列。保证优先级队列中只有k个元素，最后弹出即可*/
-    public int findKthLargest(int[] nums, int k) {
-        /**
-         *优先级队列，默认就是升序排序的
-         */
-        PriorityQueue<Integer> queue = new PriorityQueue<>();
-        for (int num : nums) {
-            queue.offer(num);
-            if (queue.size() > k) {
-                queue.poll();
-            }
-        }
-        return queue.poll();
     }
 
     /*解法2：快排的思路。下面的写法会超时，思考为什么？？？

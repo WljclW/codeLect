@@ -154,7 +154,7 @@ public class _06ListNode {
      *     间的第二个节点只不过需要先拿到中间的第一个节点做处理；如果原始是奇数个节点，则它是中间节点后面的那个节点）
      * 【思路】
      *      1. 这种思路即下面 isPalindrome 写法的思路：正常找出链表的 中点（1，4，7会来到4） 或者 中间的后一个节点
-     *  （1，4，6，7会来到6）。此时翻转后半部分后，会得到两个链表，分别拿奇偶情况看————
+     *  （1，4，6，7会来到6）。此时翻转后半部分后，会得到两个链表，分别拿奇偶情况看（比较绕！！！！）————
      *      ①如果是奇数节点（1，4，7）：1——>4——>7——>null；7——>4——>null.此时的循环终止条件head2!=null
      *      ②如果是偶数节点（1，4，6，7）：1——>4———>6———>null；7——>6——>null.此时循环的终止条件head2！=null
      *    综上，奇数偶数节点的判断终止条件都是head2!=null即可。并且奇数时从中间节点 或者 偶数
@@ -177,7 +177,7 @@ public class _06ListNode {
      * 分节点被重复添加。
      * */
     public boolean isPalindrome(ListNode head) {
-        /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点。。
+        /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点————即普通的“找中间节点”。。
         *     根据这个位置可以知道，以slow为头的后半部分的节点数量必然不大于第一部分的节点数量。。但是前一半链表的
         * 最后节点next并不是null————即不像"排序链表"那样断开连接，因此使用head2!=null就是可以的，并且也必须这样判
         * 断，不能用"head!=null"作为结束条件，因为如果是偶数个节点此时前半部分会多一个节点
@@ -222,7 +222,7 @@ public class _06ListNode {
     }
 
 
-    /*141
+    /*141. 环形链表
     * 给你一个链表的头节点 head ，判断链表中是否有环。*/
     public boolean hasCycle(ListNode head) {
         ListNode slow = head,fast = head;
@@ -341,6 +341,7 @@ public class _06ListNode {
 
     /*官方解*/
     /**【建议采样这种】官方解，官方解的通用性更好。。
+     *      【思想的关键：让 slow 以及 fast 指针之间隔n个节点~~~】
      *      这种写法下fast指针指向slow指针前面的第n+1个节点，因此当fast指针指向null
      *  的时候，slow指针指向要删除节点的前一个节点。举个例子：
      *      比如想删除倒数第二个节点，则fast指针指向null的时候，slow指针指向的是倒数
@@ -380,7 +381,7 @@ public class _06ListNode {
         ListNode dummy = new ListNode(-1,head);
         ListNode cur = dummy;
 
-        //while条件的含义：保证下一次还能搞到2个节点，如果不够两个了，说明不必要进行下一轮操作了
+        //while条件的含义：保证下一次还能搞到2个节点，如果不够两个了（即后面的不用研究了因为不够一组），说明不必要进行下一轮操作了
         while (cur.next != null && cur.next.next != null) {
             /**step1：每一轮开始前，用node1、node2分别记录原始链表的第一个节点node1、第二个节点node2。*/
             ListNode node1 = cur.next; //原始的第一个节点
@@ -416,28 +417,31 @@ public class _06ListNode {
     * 给你链表的头节点 head ，每 k 个节点一组进行翻转，请你返回修改后的链表。
     k 是一个正整数，它的值小于或等于链表的长度。如果节点总数不是 k 的整数倍，那么请将最后剩余的节点保持原有顺序。
     你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。*/
+    /**
+     * 【强烈建议使用的解法】见写法 copyRandomList1
+     */
     public ListNode reverseKGroup(ListNode head, int k) {
         ListNode dummy = new ListNode(-1, head);
         ListNode pre = dummy, end = dummy;
-        while (end.next != null) { /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。“end.next!=null”是保证后面还有节点,有节点才继续新一轮的研究*/
+        while (end.next != null) { /**end是已经完成反转部分的最后一个节点即A组前面一组的最后一个节点。。。。“end.next!=null”是保证后面还有节点,有节点才继续新一组的研究*/
             /*step1：先数k个节点，如果不够k个(end==null)，说明剩下的不够k个，因此结束循环，返回*/
             for (int i = 0; i < k && end != null; i++) { //经过这一轮循环，end会来到新的一组即A组的最后一个节点
                 end = end.next;
             }
-            if (end == null) break; //说明这一组不够k个节点了，因此不用动，结束循环即可
+            if (end == null) break; //说明这一组不够k个节点了，因此不用翻转，结束循环即可
             /*step2：记录几个节点。此时——————
              *      pre指向这一组前面的那个节点（即前一组的最后一个节点，对于第一组来说，前一个结点即为dummy节
              * 点————此思想类似于“两两交换链表节点”）；curStart（即pre.next）指向这一组的第一个节点；end指向这
              * 一组的最后一个节点；nextStart（即end.next）指向下一组的第一个节点*/
-            ListNode curStart = pre.next; //当前这一组的第一个节点
-            ListNode nextStart = end.next; //下一组的第一个节点
+            ListNode curStart = pre.next; // 当前这一组的第一个节点
+            ListNode nextStart = end.next; // 下一组的第一个节点（因为上面的for循环之后，end会来到当前这组的最后一个节点）
             /*step3：几个节点之间调整连接关系*/
             /**err：用nextStart记录下end.next以后，务必将end.next置为null。。。因为翻转链表的结束标志是"cur==null"*/
             end.next = null; //当前这一组节点的最后一个节点的next置为null，便于翻转链表
             pre.next = reverse(curStart); //reverse返回的是 这一组翻转 之后的开始节点，要拼在前一组后面————即赋给pre.next。
             curStart.next = nextStart; //这一组翻转完成后，curStart（即翻转之前，这一组的第一个节点）变成了这一组的最后一个节点。。因此将start.next赋值为nextStart(其中nextStart为下一组的第一个节点)————这一步就将当前组和下一组连起来了
             /*step4：pre和end更新，更新为这一组的最后一个节点。。和最开始的“pre = dummy,end = dummy”呼应，每一轮循环之后状
-            态回归到循环开始时的样子*/
+            态回归到循环开始时的样子，初始状态：pre、end指向前一组的最后一个节点*/
             pre = curStart;
             end = curStart;
         }
@@ -471,7 +475,9 @@ public class _06ListNode {
      * 【出错步骤】第三步的代码难写，建议看下面的方法copyRandomList1
      * */
     public Node copyRandomList(Node head) {
-        if(head==null) return null; /**err：特例的判断*/
+        /**err：特例的判断。。注意写成“if (head==null||head.next==null) return head;”就是错误的，因为如
+         果head不是null，则必须返回拷贝后的节点*/
+        if(head==null) return null;
         Node cur = head;
         /*step1：给每一个节点后面放一个新创建的节点*/
         while(cur!=null){
@@ -537,12 +543,13 @@ public class _06ListNode {
      唯一的区别在于第三步拆分链表的时候逻辑更清晰。
     */
     /**
+     *【强烈推荐使用下面的解法！！】
      *【常见错误】
      *      1. 第三步结束链表的拆分以后需要将原始链表的next置为null，否则会报如下的错误：
      *   Next pointer of node with label 1 from the original list was modified.
      */
     public Node copyRandomList1(Node head) {
-        if (head == null) return head;
+        if (head == null) return head; /**err：只有head是null，这一个base case。。。如果head不是null就不能直接返回head了*/
 
         Node cur = head;
         while (cur != null) {
@@ -658,7 +665,7 @@ public class _06ListNode {
             slow = slow.next;
             fast = fast.next.next;
         }
-        //如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个；奇数节点时值得就是中间节点
+        // 如果是偶数个节点，代码执行到这里slow会指向中间两个节点的第一个；奇数节点时指的就是中间节点
         ListNode res = slow.next;
         slow.next = null; /**【说明】把前一半链表的最后节点指向null，其实最根本的原因在于结束排序的代码是“head==null||head.next==null”，我们是用null作为链表结束的标志*/
         return res;
@@ -808,7 +815,7 @@ public class _06ListNode {
          * 意思是存在length=0的lists*/
 //        if (l<r) return null;
         int mid = l + (r - l) / 2;
-        ListNode mergeLeft = merge(lists, l, mid); /**右边界必须是mid，不能是mid-1..为什么？？*/
+        ListNode mergeLeft = merge(lists, l, mid); /**右边界必须是mid，不能是mid-1..为什么？？因为两个相邻数的一半是小的那个数，比如“(4+5)/2=4”，如果这里写成mid-1,就会出现左半部分是(4,3)，但是最终的条件条件是"l == r"，没有考虑l>r的情况，因此这里必须写成mid*/
         ListNode mergeRight = merge(lists, mid + 1, r); /**err：右边界是r不是nums.length-1*/
         return mergeTwoList(mergeLeft, mergeRight);
     }
