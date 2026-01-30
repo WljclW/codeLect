@@ -193,11 +193,11 @@ public class _03SlideWindow {
              1. 统计字符串 p 中每个字符的出现次数（记为 cnt）
              2. 初始化滑动窗口 [left, right)
              3. right 右移：
-                    当前字符加入窗口 → cnt[ch]--
-                    如果减之前 cnt[ch] > 0，说明匹配了一个字符，diff--
+                    当前字符加入窗口 ————> 无脑的进行 flags[ch]--
+                    如果减之前 flags[ch] > 0，说明匹配了一个字符，diff--
              4. 当窗口长度大于 p.length()：
-                    左侧字符移出 → cnt[ch]++
-                    如果加之前 cnt[ch] >= 0，说明破坏了匹配，diff++
+                    左侧字符移出 ————> 无脑的进行 flags[ch]++
+                    如果加之前 flags[ch] >= 0，说明破坏了匹配，diff++
              5. 若 diff == 0，当前窗口是异位词，记录 left
      */
     public List<Integer> findAnagrams_best(String s, String p) {

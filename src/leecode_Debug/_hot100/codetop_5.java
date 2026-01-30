@@ -1408,7 +1408,7 @@ public class codetop_5 {
         perfixMap.put(curSum, perfixMap.getOrDefault(curSum, 0) + 1);
         res += dfs(root.left, curSum, perfixMap, targetSum);
         res += dfs(root.right, curSum, perfixMap, targetSum);
-        perfixMap.put(curSum, perfixMap.get(curSum) - 1);
+        perfixMap.put(curSum, perfixMap.get(curSum) - 1); /**err（需要验证一下！）：这里必须要进行回溯！！！因为代码到这里，代表要回到当前节点的父节点！！！*/
         return res;
     }
 

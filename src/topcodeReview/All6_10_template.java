@@ -421,7 +421,8 @@ public class All6_10_template {
         求需要多少分钟，才能让所有新鲜橘子都腐烂。
         如果不可能让所有橘子都腐烂，返回 -1。
      */
-    /**验证一下下面的解法对不对，，是错误的*/
+    /**验证一下下面的解法对不对，，是错误的？？？？
+     * 怎么修改？在下面的基础上改成正确的形式*/
     int ressss = 0;
     public int orangesRotting(int[][] grid) {
         LinkedList<int[]> queue = new LinkedList<>();
@@ -505,16 +506,16 @@ public class All6_10_template {
             }
         }
 
-        while (rotNum>0&&!queue.isEmpty()){
+        while (rotNum > 0 && !queue.isEmpty()) {
             int size = queue.size();
             minute++;
             for (int i = 0; i < size; i++) {
                 int[] cur = queue.poll();
-                for (int[] direct:directs){
-                    int x = cur[0]+direct[0],y = cur[1]+direct[1];
-                    if (x>=0&&x<m&&y>=0&&y<n&&grid[x][y]==1){
+                for (int[] direct : directs) {
+                    int x = cur[0] + direct[0], y = cur[1] + direct[1];
+                    if (x >= 0 && x < m && y >= 0 && y < n && grid[x][y] == 1) {
                         grid[x][y] = 2;
-                        queue.offer(new int[]{x,y});
+                        queue.offer(new int[]{x, y});
                         rotNum--;
                     }
                 }
