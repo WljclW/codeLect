@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class codetop_5 {
     /*
-    82
+    82. 删除排序链表中的重复元素 II
     给定一个已排序的链表的头 head ， 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回 已排序的链表 。
     * */
     /**
@@ -74,7 +74,7 @@ public class codetop_5 {
         if (head==null||head.next==null) return head;
         ListNode dummy = new ListNode(-1, head),cur = dummy;
         /**解释这里while的循环条件
-         * 1. 明白一点：任何一个时刻cur指针要么指向dummy(初始情况)、要么指向结果链表中的最后一个节点(即确保该节点在结果中并且是
+         * 1. 明白一点：任何一个时刻cur指针要么指向dummy(初始情况)、要么指向结果链表中的最后一个有效节点(即确保该节点在结果中并且是
          *      目前已知的最后一个，后面的结果还没有研究)
          * 2. while的循环条件"cur.next!=null&&cur.next.next!=null"就是保证后面至少还有两个节点。为什么这样做？？因为至少
          *      有两个节点的时候，才能讨论是不是有相同数值的节点。。。。。cur及之前(包括cur)的节点研究过了，肯定没有重复，因此
@@ -84,12 +84,11 @@ public class codetop_5 {
             int val = cur.next.val; /**记录相等的值是多少*/
             if (cur.next.next.val==val){ /**如果相等，用while循环跳过所有相等的节点*/
                 while (cur.next.next!=null&&cur.next.next.val==val){
-                    /**删除掉cur后面的第二个节点。即”cur===>node1====>node2====>node3“变
-                     为”cur===>node1====>node3”，删除中间的node2。。。因为node2.val与node1.val
-                     的值是相等的。*/
+                    /**删除掉cur后面的第二个节点（所有相同的节点）。即”cur===>node1====>node2====>node3“变
+                     为”cur===>node1====>node3”，删除中间的node2。。。因为node2.val与node1.val的值是相等的。*/
                     cur.next.next  = cur.next.next.next;
                 }
-                //进入到if，说明cur.next节点的值后面出现了，因此删除cur.next。
+                // 进入到if，说明cur.next节点的值后面出现了，因此删除cur.next，即下面这行的操作。
                 cur.next = cur.next.next;
             }else { /**err：这里的else是精髓，必须使用else来实现*/
                 cur = cur.next;
@@ -132,8 +131,7 @@ public class codetop_5 {
 
 
 
-    /*83
-    删除排序链表中的重复元素
+    /*83. 删除排序链表中的重复元素
 给定一个已排序的链表的头 head ， 删除所有重复的元素，使每个元素只出现一次 。返回 已排序的链表 。
     * */
     /**
@@ -154,6 +152,21 @@ public class codetop_5 {
             if (cur.val == cur.next.val) { //如果现在节点cur的值等于下一个节点值，则将cur节点的next指向下下一个节点————即删除下一个节点
                 cur.next = cur.next.next;
             } else { //否则的话，说明不相等。cur后移继续研究后面的节点
+                cur = cur.next;
+            }
+        }
+        return head;
+    }
+
+    //单指针的写法
+    public ListNode deleteDuplicates1_single(ListNode head) {
+        if (head==null||head.next==null) return head;
+        ListNode cur = head;
+        while (cur!=null){
+            //TODO:这里不能写成 while循环！！！！
+            if (cur.next!=null&&cur.next.val==cur.val){
+                cur.next = cur.next.next;
+            }else {
                 cur = cur.next;
             }
         }
@@ -259,6 +272,7 @@ public class codetop_5 {
     除此之外返回 0。
     * */
     /**
+     *  强烈建议使用解法：compareVersion，这是最优解法
      *【思路】双指针，从左往右依次判断。
      *【关键】while循环条件的“||”暗含着两个版本号长度不一致的情况。出现版本号长度不一样的时候，版本号短的那一个
      *      后面的值就是0.
@@ -266,7 +280,7 @@ public class codetop_5 {
     public int compareVersion(String version1, String version2) {
         int len1 = version1.length(),len2 = version2.length();
         int cur1 = 0,cur2 = 0;
-        while (cur1 < len1 || cur2 < len2) { /**err：注意这里必须是“||”连接，多次错。。。跟“链表两数相加”类似，只要有一个还没到头就继续*/
+        while (cur1 < len1 || cur2 < len2) { /**err：注意这里必须是“||”连接，多次错。。。跟“链表两数相加”类似，只要有一个还没到头就继续判断*/
             /*step1：分别初始化两个val1和val2，计算两个'.'之间的数；并且保证如果没有数也是初始值0*/
             int val1 = 0;
             /**err：这里需要使用cur1（因此for循环第一个表达式省略），不能使用新的循环变量，否则会导致cur1更新错误。。。。
@@ -376,6 +390,7 @@ public class codetop_5 {
             maxSumNumbers += curSum; /**遍历的过程中，碰到叶子节点更新全局变量maxSumNumbers*/
         dfsSumNumbers(root.left, curSum);
         dfsSumNumbers(root.right, curSum);
+        //TODO:这里为什么不需要还原curSum???
     }
 
     /*写法2的变形*/
@@ -531,7 +546,7 @@ public class codetop_5 {
         LinkedList<TreeNode> deque = new LinkedList<>();
         TreeNode cur = root;
 //        int preValent= Integer.MIN_VALUE; /*这里用int类型是错误的！！！用int范围过小了————原因：系欸但的最小值是int的最小值*/
-        long preValent = Long.MIN_VALUE; /**err~~~：注意这里不能使用Integer.MIN_VALUE；并且不能声明为Long类型（声明为对象类型使没有int->long的隐式转换的，就会报错）。*/
+        long preValent = Long.MIN_VALUE; /**err~~~：注意这里不能使用Integer.MIN_VALUE；并且不能声明为Long类型（声明为对象类型使没有int->long的隐式转换（自动拆箱）的，就会报错）。*/
         while (cur!=null || !deque.isEmpty()) {
             if (cur != null) {
                 deque.push(cur);
@@ -779,7 +794,7 @@ public class codetop_5 {
         int l = 0,r = nums.length-1;
         while (l < r) { /**err：要找峰值，由于一定存在，因此最后指针的位置就是峰值位置（不用带等号）*/
             int mid = l + (r - l) / 2;
-            if (nums[mid] >= nums[mid + 1]) { /**err：这里带不带等于都是可以的（本质原因：其实相等的时候朝哪一个方向进行都可以）。但是按照原理来讲，最好不带。*/
+            if (nums[mid] >= nums[mid + 1]) { /**err：这里带不带等于都是可以的（本质原因：其实相等的时候朝哪一个方向继续进行都可以）。但是按照原理来讲，最好不带。*/
                 /**err：沿着大数一边走必然能遇到峰值，并且nums[mid]可能就是峰值，因此“r=mid-1”是错误的，可能
                  错过峰值！！！
                     如果使用“r=mid-1”，就错误过峰值，比如提交时case2报错————
@@ -919,11 +934,12 @@ public class codetop_5 {
     }
 
 
-    /*113/路径总和 II
+    /*113. 路径总和 II
     给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
     叶子节点 是指没有子节点的节点。
     * */
     /**
+     【强烈建议】 使用解法 pathSum_2
      这个题往往会错误的写成下面的样子。此时第一个用例就会报错————
              输入
              root =
@@ -1229,7 +1245,7 @@ public class codetop_5 {
      * 113题要求求出所有符合的路径
      * 437题不要求从根节点出发，求出这样的路径的数量
      * */
-    /*112
+    /*112. 路径总和
     给你二叉树的根节点 root 和一个表示目标和的整数 targetSum 。判断该树中是否存在 根节点到叶子节点 的路径，这条
     路径上所有节点值相加等于目标和 targetSum 。如果存在，返回 true ；否则，返回 false 。叶子节点 是指没有子节
     点的节点。
@@ -1258,10 +1274,8 @@ public class codetop_5 {
      */
     /*写法1：DFS递归方法*/
     public boolean hasPathSum(TreeNode root, int targetSum) {
-        if (root==null)
-            return false;
-        if (root.left==null&&root.right==null)
-            return targetSum==root.val;
+        if (root==null) return false;
+        if (root.left==null&&root.right==null) return targetSum==root.val;
         return hasPathSum(root.left,targetSum-root.val)||
                 hasPathSum(root.right,targetSum-root.val);
     }
@@ -1355,7 +1369,7 @@ public class codetop_5 {
         LinkedList<leecode_Debug.BTree.TreeNode> queueNodes = new LinkedList<>();
         LinkedList<Integer> queueVal = new LinkedList<>();
         queueNodes.offer(root);
-        queueVal.offer(root.val); //与写法3的区别....一个是存储差值，一个存储和
+        queueVal.offer(root.val); //与写法3的区别....一个是存储还差多少；一个存储当前路径的和是多少
         while (!queueNodes.isEmpty()){
             leecode_Debug.BTree.TreeNode curNode = queueNodes.poll();
             Integer curVal = queueVal.poll();

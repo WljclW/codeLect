@@ -490,6 +490,7 @@ public class All1_5 {
         int p1 = m-1,p2 = n-1;
         int cur = m+n-1;
         while (p1>=0&&p2>=0){
+            //TODO:注意，由于是到这合并，因此谁大先放谁
             nums1[cur--] = nums1[p1]>nums2[p2]?nums1[p1--]:nums2[p2--]; /**err：谁大先放谁，因为是倒序合并*/
         }
 
@@ -749,6 +750,67 @@ public class All1_5 {
     请将其重新排列后变为：
     L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
     不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+     */
+
+    /**
+      【强烈建议】建议使用 reorderList_best
+     */
+    public void reorderList_best(ListNode head) {
+        ListNode mid = findMid_best(head);
+        ListNode head2 = rever_best(mid);
+        mergeTwo_best(head,head2);
+    }
+
+    /**
+     【作用】合并以 head 和 head2 为头的两个链表。
+     【小技巧】无论原始链表是奇数个节点 还是 偶数个节点，合并完成后，后一半链表的指针必然指向null。
+     * */
+    private void mergeTwo_best(ListNode head, ListNode head2) {
+        ListNode p1 = head,p2 =head2;
+        while (p2!=null){
+            ListNode next1 = p1.next;
+            ListNode next2 = p2.next;
+            p1.next = p2;
+            p2.next = next1;
+
+            p1 = next1;
+            p2 = next2;
+        }
+    }
+
+    /*常规的翻转链表的写法*/
+    private ListNode rever_best(ListNode head) {
+        ListNode pre = null,cur = head;
+        while (cur!=null){
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre =  cur;
+            cur = next;
+        }
+        return pre;
+    }
+
+    /**关键：需要将前后两半链表断开连接。
+     * 目的：1. slow和fast的初始值保证了，slow最终会来到中间节点（如果原来链表有奇数个节点） 或者
+     *   中间的第二个节点（如果原来链表有偶数个节点）；
+     *      2. 出了while循环先记录slow.next；在将slow.next置为null；再返回原始值
+     * */
+    private ListNode findMid_best(ListNode head) {
+        ListNode slow = head,fast = head.next;
+        while (fast!=null&&fast.next!=null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        ListNode res = slow.next;
+        slow.next = null;
+        return res;
+    }
+
+
+    /**写法2————
+     * 下面的写法“实质上”与 reorderList_best，没有本质的区别。。。写法的唯一区别在于：
+     *      找到“中间的第一个节点”后，将后面置为null的操作是在主方法中？还是在 找中间
+     *  节点的方法中。
      */
     public void reorderList(ListNode head) {
         //step1：base case的考虑
@@ -1450,6 +1512,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      【建议的解法】
             1. 建议使用的解法 mySqrt。
      【解法】实质就是二分查找“自身平方小于等于x的最大的整数”————因此等价于二分查找右边界问题。
+     【易错点】这个题需要返回右边界！！
      【关键问题】
             1. 0、1的特殊处理，平方根是它自身。
             2. 二分查找过程中————
@@ -1472,7 +1535,7 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
                 return mid;
             }
         }
-        return right; /*由于现在的写法是求解”平方小于等于x的右边界“那个数，因此应该返回right*/
+        return right; /**err：由于现在的写法是求解”平方小于等于x的最右边的“那个数，因此应该返回right*/
     }
 
     /**
@@ -1586,11 +1649,11 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
      */
     public int myAtoi(String s) {
         int index = 0 /*index表示当前来到的位置*/, n = s.length();
-        // 1. 跳过空格
+        // 1. 跳过所有的前导空格
         while (index < n && s.charAt(index) == ' ') index++;
         if (index == n) return 0;
 
-        // 2. 判断符号
+        // 2. 判断符号————前提是如果第一位置确实是符号
         int sign = 1;
         char c = s.charAt(index);
         if (c == '+' || c == '-') {
@@ -1613,6 +1676,8 @@ boolean empty() 如果队列为空，返回 true ；否则，返回 false
                      if (res>(Integer.MAX_VALUE-c+'0')/10) return sign==1?Integer.MAX_VALUE:Integer.MIN_VALUE;
                 注意表达式“Integer.MAX_VALUE-c+'0'”去掉括号要变号，因此不再是“c-‘0’”了
              */
+            //TODO:这里比较越界的时候，其实是使用了逆运算。。。"res*10+num"是这一步之后的结果，如果越界就说
+            // 明比“Integer.MAX_VALUE”大————>即“res”>"(Integer.MAX_VALUE-num)/10"
             if (res > (Integer.MAX_VALUE - digit) / 10) { /**err：溢出判断是精髓*/
                 return (sign == 1) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
             }
@@ -2141,16 +2206,17 @@ int getMin() 获取堆栈中的最小元素。*/
     /**
      【注意】其他的解法需要了解一下~~
      */
-    public boolean isBalanced(leecode_Debug.top100.TreeNode root) {
+    public boolean isBalanced(TreeNode root) {
         if (root==null) return true;
         int left = getDepth(root.left);
         int right = getDepth(root.right);
+        /**①左、右子树都是平衡二叉树，并且②当前节点为根的子树也是平衡二叉树*/
         return isBalanced(root.left)&&
                 isBalanced(root.right)&&
                 Math.abs(left-right)<=1; /**【注意】高度之差的要求：小于等于1（等于1是包含的）*/
     }
 
-    private int getDepth(leecode_Debug.top100.TreeNode root) {
+    private int getDepth(TreeNode root) {
         if (root==null) return 0;
         int l = getDepth(root.left);
         int r = getDepth(root.right);
@@ -2429,7 +2495,7 @@ int getMin() 获取堆栈中的最小元素。*/
                 +dfs5(grid,i,j+1)
                 +dfs5(grid,i-1,j)
                 +dfs5(grid,i+1,j);
-        /**这个题不还原grid[i][j]的值是没问题的*/
+        /**这个题不还原grid[i][j]的值是没问题的！！！并且如果还原了反而就错了！*/
     }
 
     /**
@@ -2483,7 +2549,7 @@ int getMin() 获取堆栈中的最小元素。*/
         String flag = strs[0];
         for (int i = 0; i < flag.length(); i++) {  /*这个for循环表示从0开始研究str[0]的每一个位置*/
             for (int j = 1; j < strs.length; j++) { /*这个for循环表示：对于str[0]的每一个位置，研究剩下的所有字符串，看i位置的字符是不是相等*/
-                String cur = strs[j];
+                String cur = strs[j]; /**注意：这里是拿出str[j]个字符串，j表示字符串的索引！！*/
                 if (cur.length()==i || cur.charAt(i)!=flag.charAt(i)) /*但凡某一个位置的字符不相等 或者 i已经越界 ===》直接返回。此时i就是取子串的右边界*/
                     return flag.substring(0,i);
             }

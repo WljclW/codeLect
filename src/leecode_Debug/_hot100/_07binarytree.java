@@ -175,6 +175,26 @@ public class _07binarytree {
         return depth;
     }
 
+    /**使用先序遍历的思路，解法*/
+    public TreeNode invertTree_xianxu(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        if (root==null) return root;
+        stack.push(root);
+        while (!stack.isEmpty()){
+            TreeNode cur = stack.pop();
+            swap2(cur);
+            if (cur.right!=null) stack.push(cur.right);
+            if (cur.left!=null) stack.push(cur.left);
+        }
+        return root;
+    }
+
+    private void swap2(TreeNode cur) {
+        TreeNode tmp = cur.left;
+        cur.left = cur.right;
+        cur.right = tmp;
+    }
+
 
     /* 226. 翻转二叉树
     * 给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。

@@ -265,7 +265,7 @@ public class _14DP {
         boolean[] dp = new boolean[s.length() + 1];
         HashSet<String> set = new HashSet<>(wordDict);
         dp[0] = true;
-        for (int i = 1; i < s.length() + 1; i++) {
+        for (int i = 1; i < s.length() + 1; i++) { /**dp[0]已经确定了，从dp[1]开始往后面的位置计算*/
             for (int j = 0; j < i; j++) { //j<i，因此j其实并不能取到s.length()，但是i可以取到。所以这种时候能枚举完整个s
                 /*
                 if条件语句的解释————
@@ -353,8 +353,9 @@ public class _14DP {
         /**for循环的完整逻辑：遍历nums数组的每一个数，判断它应该插入到tails数组的什么位置..
          本质上是找到一个数在dp数组中应该插入的位置，见力扣 35题*/
         for (int num : nums) {
-            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置..跟力扣35题的原理、代码是一样的
-             【目的】计算出num应该插入到tails数组的什么位置*/
+            /*step2：下面的逻辑就是在数组中二分查找num应该插入的位置(即第一个大于等于num的位置)..跟力扣35题的原理、
+            代码是一样的。。
+            【目的】计算出num应该插入到tails数组的什么位置*/
             int left = 0, right = size - 1; /**err：注意是在已经存放的数中查找应该放的位置，因此右边界是size-1*/
             while (left <= right) {
                 int mid = (left + right) / 2;

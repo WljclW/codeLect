@@ -13,7 +13,7 @@ public class _11stack {
     左括号必须用相同类型的右括号闭合。
     左括号必须以正确的顺序闭合。
     每个右括号都有一个对应的相同类型的左括号。*/
-    /**推荐使用写法：isValid_01（栈的做法）
+    /**强烈推荐使用写法：isValid_01（栈的做法）
      */
     public boolean isValid(String s) {
         LinkedList<Character> stack = new LinkedList<>();

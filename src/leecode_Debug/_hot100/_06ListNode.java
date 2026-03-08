@@ -196,7 +196,7 @@ public class _06ListNode {
         return true;
     }
 
-    /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点。。
+    /*step1：slow来到中间（奇数个节点）或者 中间的第二个（偶数个节点）节点。。—————其实就是“找中间节点”的常规做法
      *     根据这个位置可以知道，以slow为头的后半部分的节点数量必然不大于第一部分的节点数量。。但是slow之
      * 前的节点next指针并不会变化。因此下面的while循环判断的时候使用“head2!=null”来判断后半部分的链表是不
      * 是判断结束了*/
@@ -206,6 +206,8 @@ public class _06ListNode {
             slow = slow.next;
             fast = fast.next.next;
         }
+        //TODO:这个题中，“找中间节点”不用将两半链表断开连接（排序链表需要断开）。虽然没有明确设
+        // 置next是null，但是反转后mid.next其实就已经是null了
         return slow;
     }
 
@@ -615,7 +617,7 @@ public class _06ListNode {
         /*2.找到中间节点的后一个节点（奇数得到中间，偶数得到中间的后一个）。
         但是其中有一个细节————在findMid中必须要先找到中间的第一个节点！
             原因：要把前一半链表的最后节点置为null，因为合并链表的时候，链表的结束标志是null*/
-        ListNode mid = findMid(head);
+        ListNode mid = findMid(head); /**排序链表中，找中间节点是重点，必须把前后两半链表断开连接*/
         /*3.分别排序左、右两半链表*/
         ListNode left = sortList(head);
         ListNode right = sortList(mid);

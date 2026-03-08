@@ -42,7 +42,7 @@ public class _02DoublePoint {
         if (nums.length<=1) return;
         int left = 0;
         for (int i = 0; i < nums.length; i++) {
-            if (nums[i]!=0){ /**err：这里需要使用if，不能用while*/
+            if (nums[i]!=0){ /**err：这里需要使用if，不能用while！！因为能保证i一定在left的右边*/
                 swap(nums,left++,i);
             }
         }
